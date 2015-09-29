@@ -17,5 +17,8 @@ class NewVisitorTest(unittest.TestCase):
         # the page title and header mention UniFam
         self.assertIn('UniFam', self.browser.title)
 
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('UniFam', header_text)
+
 if __name__ == '__main__':  #7
     unittest.main(warnings='ignore')  #8

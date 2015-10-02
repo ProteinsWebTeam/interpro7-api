@@ -7,12 +7,12 @@ from selenium.common.exceptions import StaleElementReferenceException
 
 class FunctionalTest(StaticLiveServerTestCase):  #1
     @classmethod
-    def setUpClass(cls):  #1
-        for arg in sys.argv:  #2
-            if 'liveserver' in arg:  #3
-                cls.server_url = 'http://' + arg.split('=')[1]  #4
-                return  #5
-        super().setUpClass()  #6
+    def setUpClass(cls):
+        for arg in sys.argv:
+            if 'liveserver' in arg:
+                cls.server_url = 'http://' + arg.split('=')[1]
+                return
+        super().setUpClass()
         cls.server_url = cls.live_server_url
 
     @classmethod

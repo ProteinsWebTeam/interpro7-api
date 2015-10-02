@@ -83,13 +83,17 @@ WSGI_APPLICATION = 'unifam.wsgi.application'
 # }
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    'pfam_ro': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
             'read_default_file': os.path.join(BASE_DIR, 'unifam/mysql.conf')
         },
     }
 }
-
+TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -109,3 +113,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+

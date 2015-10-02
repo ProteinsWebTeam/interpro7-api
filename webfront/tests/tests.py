@@ -19,10 +19,12 @@ class ImportedModelTest(TransactionTestCase):
         self.assertEqual(all_clans.count(), 1)
         self.assertEqual(all_clans[0], cl)
 
-
     def test_home_page_returns_correct_html(self):
-        request = HttpRequest()  #1
-        Clan.objects.using('pfam_ro').create(clan_acc="CL0587",clan_id="CL0587",updated=timezone.now())
-        response = home_page(request)  #2
-        expected_html = render_to_string('home.html', {"clan": {"clan_acc": "CL0587"}})
-        self.assertEqual(response.content.decode(), expected_html)
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html')
+
+    def test_clans_returns_correct_html(self):
+        c1 = Clan.objects.using('pfam_ro').create(clan_acc="CL0587",clan_id="CL0587",updated=timezone.now())
+        c2 = Clan.objects.using('pfam_ro').create(clan_acc="CL0588",clan_id="CL0588",updated=timezone.now())
+        response = self.client.get('/clans/')
+        self.assertTemplateUsed(response, 'clans.html')

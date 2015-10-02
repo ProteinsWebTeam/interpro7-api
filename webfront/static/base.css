@@ -1,0 +1,9 @@
+h1 {
+    text-transform: uppercase;
+    font-weight: normal;
+    margin: 0;
+    font-family: 'GothicCustom', 'Arial Narrow', sans-serif;
+    font-size: 40px;
+    line-height: 40px;
+    text-shadow: 1px 1px #CCC;
+}

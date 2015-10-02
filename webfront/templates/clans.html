@@ -1,0 +1,14 @@
+<!DOCTYPE>
+<html>
+    <title>UniFam - Clans</title>
+    <body>
+    <h1>UniFam - Clans</h1>
+    <div>Clans:
+        <ul class="clans">
+        {% for clan in clans %}
+            <li class="clan">{{ forloop.counter }}: <header><a href="/clans/{{ clan.clan_id }}/">{{ clan.clan_id }}</a></header></li>
+        {% endfor %}
+        </ul>
+    </div>
+    </body>
+</html>

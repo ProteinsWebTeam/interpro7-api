@@ -1,0 +1,20 @@
+[
+  {
+    "model": "webfront.Clan",
+    "pk": 1,
+    "fields": {
+      "clan_acc": "TEST_ACC",
+      "clan_id": "TEST_ID",
+      "updated": "1980-08-06"
+    }
+  },
+  {
+    "model": "webfront.Clan",
+    "pk": 2,
+    "fields": {
+      "clan_acc": "TEST_ACC_2",
+      "clan_id": "TEST_ID_2",
+      "updated": "1980-08-06"
+    }
+  }
+]

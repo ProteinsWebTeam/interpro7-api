@@ -13,7 +13,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('UniFam', self.browser.title)
 
         header_text = self.browser.find_element_by_tag_name('h1').text
-        self.assertIn('UniFam', header_text)
+        self.assertIn('UNIFAM', header_text)
 
         # The page has a link for clans and the user clicks on it
         self.browser.find_element_by_css_selector('a.clans_link').click()
@@ -23,7 +23,7 @@ class NewVisitorTest(FunctionalTest):
 
         # The user will have a way to choose a clan from the  DB
         clan_li =self.browser.find_element_by_css_selector('li.clan')
-        clan_header =clan_li.find_element_by_tag_name('header').text
+        clan_header =clan_li.find_element_by_tag_name('a').text
         # The user chooses a clan
         clan_li.find_element_by_tag_name("a").click()
 

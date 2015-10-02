@@ -309,7 +309,7 @@ class NcbiTaxonomy(models.Model):
 
 class NestedDomains(models.Model):
     pfama_acc = models.ForeignKey('Pfama', db_column='pfamA_acc')  # Field name made lowercase.
-    nests_pfama_acc = models.ForeignKey('Pfama', db_column='nests_pfamA_acc')  # Field name made lowercase.
+    nests_pfama_acc = models.ForeignKey('Pfama', db_column='nests_pfamA_acc', related_name='nested_domain')  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -318,7 +318,7 @@ class NestedDomains(models.Model):
 
 class NestedLocations(models.Model):
     pfama_acc = models.ForeignKey('Pfama', db_column='pfamA_acc')  # Field name made lowercase.
-    nested_pfama_acc = models.ForeignKey('Pfama', db_column='nested_pfamA_acc')  # Field name made lowercase.
+    nested_pfama_acc = models.ForeignKey('Pfama', db_column='nested_pfamA_acc', related_name='nested_location')  # Field name made lowercase.
     pfamseq_acc = models.ForeignKey('Pfamseq', db_column='pfamseq_acc')
     seq_version = models.IntegerField(blank=True, null=True)
     seq_start = models.IntegerField(blank=True, null=True)
@@ -460,8 +460,8 @@ class Pfama(models.Model):
 
 
 class Pfama2PfamaHhsearch(models.Model):
-    pfama_acc_1 = models.ForeignKey(Pfama, db_column='pfamA_acc_1')  # Field name made lowercase.
-    pfama_acc_2 = models.ForeignKey(Pfama, db_column='pfamA_acc_2')  # Field name made lowercase.
+    pfama_acc_1 = models.ForeignKey(Pfama, db_column='pfamA_acc_1', related_name='relationship_source')  # Field name made lowercase.
+    pfama_acc_2 = models.ForeignKey(Pfama, db_column='pfamA_acc_2', related_name='relationship_target')  # Field name made lowercase.
     evalue = models.CharField(max_length=25)
 
     class Meta:
@@ -470,8 +470,8 @@ class Pfama2PfamaHhsearch(models.Model):
 
 
 class Pfama2PfamaScoop(models.Model):
-    pfama_acc_1 = models.ForeignKey(Pfama, db_column='pfamA_acc_1')  # Field name made lowercase.
-    pfama_acc_2 = models.ForeignKey(Pfama, db_column='pfamA_acc_2')  # Field name made lowercase.
+    pfama_acc_1 = models.ForeignKey(Pfama, db_column='pfamA_acc_1', related_name='scoop_source')  # Field name made lowercase.
+    pfama_acc_2 = models.ForeignKey(Pfama, db_column='pfamA_acc_2', related_name='scoop_target')  # Field name made lowercase.
     score = models.FloatField()
 
     class Meta:
@@ -521,8 +521,8 @@ class PfamaFasta(models.Model):
 
 
 class PfamaInteractions(models.Model):
-    pfama_acc_a = models.ForeignKey(Pfama, db_column='pfamA_acc_A')  # Field name made lowercase.
-    pfama_acc_b = models.ForeignKey(Pfama, db_column='pfamA_acc_B')  # Field name made lowercase.
+    pfama_acc_a = models.ForeignKey(Pfama, db_column='pfamA_acc_A', related_name='interactor_source')  # Field name made lowercase.
+    pfama_acc_b = models.ForeignKey(Pfama, db_column='pfamA_acc_B', related_name='interactor_target')  # Field name made lowercase.
 
     class Meta:
         managed = False

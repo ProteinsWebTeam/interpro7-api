@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from webfront.models import Clan
+
 
 def home_page(request):
-    return render(request, 'home.html')
+    clan = Clan.objects.using('pfam_ro').last()
+    return render(request, 'home.html', {"clan":clan})

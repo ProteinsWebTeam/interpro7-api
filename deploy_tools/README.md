@@ -40,7 +40,7 @@ Assume we have a user account at /home/username
 2.  Pull down source code into folder named source
 
     ```
-    git clone https://github.com/ProteinsWebTeam/project-skeleton.git source 
+    git clone https://github.com/ProteinsWebTeam/project-skeleton.git PROJECT/source 
     cd PROJECT/source
     ```
 
@@ -51,26 +51,30 @@ Assume we have a user account at /home/username
     ```
     virtualenv --python=python3 ../virtualenv
     ```
-
+    
 4.  Install requirements in the virtual environment
 
     ```
     ../virtualenv/bin/pip install -r requirements.txt
     ```
     
+    *Warning* The mysqlclient might be required to be installed globally and under sudo rights. ```pip3 install mysqlclient``` 
+
 5.  Migrate the database models
 
     ```
      ../virtualenv/bin/python manage.py migrate
     ```
     
-6.  Collect the static files
+6.  Collect the static files. Only necessary for server deployment.
 
     ```
     ../virtualenv/bin/python manage.py collectstatic --noinput
     ```
     
-7.  Start the server
+7.  Create and configure the ```PROJECT/unifam/mysql.conf``` file
+
+8.  Start the server
     ```
     ../virtualenv/bin/python manage.py runserver
     ```
@@ -82,7 +86,8 @@ Assume we have a user account at /home/username
     
     To run unit tests use ```../virtualenv/bin/python manage.py test webfront```
 
-*   The functional test are in ```[project]/functional_tests/tests.py```
+*   The functional test are in ```[project]/functional_tests/tests.py``` and they are configured to firefox, so you need 
+    to have it installed in your machine
     
     To run functional tests use ```../virtualenv/bin/python manage.py test functional_tests```
 

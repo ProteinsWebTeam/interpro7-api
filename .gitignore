@@ -3,3 +3,4 @@ __pycache__
 .idea
 unifam/mysql.conf
 *.pyc
+.DS_Store

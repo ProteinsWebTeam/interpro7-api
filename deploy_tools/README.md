@@ -25,3 +25,67 @@ Assume we have a user account at /home/username
          ├── static
          └── virtualenv
 ```
+
+## Local Deployment
+
+1.  Create directory structure in ~/sites
+    
+    ```
+    mkdir -p PROJECT/database
+    mkdir -p PROJECT/source
+    mkdir -p PROJECT/static
+    mkdir -p PROJECT/virtualenv
+    ```
+         
+2.  Pull down source code into folder named source
+
+    ```
+    git clone https://github.com/ProteinsWebTeam/project-skeleton.git source 
+    cd PROJECT/source
+    ```
+
+    From now on all the command assume you ar in the ```PROJECT/source``` directory.
+
+3.  Start the virtual env in the assigned folder:
+    
+    ```
+    virtualenv --python=python3 ../virtualenv
+    ```
+
+4.  Install requirements in the virtual environment
+
+    ```
+    ../virtualenv/bin/pip install -r requirements.txt
+    ```
+    
+5.  Migrate the database models
+
+    ```
+     ../virtualenv/bin/python manage.py migrate
+    ```
+    
+6.  Collect the static files
+
+    ```
+    ../virtualenv/bin/python manage.py collectstatic --noinput
+    ```
+    
+7.  Start the server
+    ```
+    ../virtualenv/bin/python manage.py runserver
+    ```
+
+
+## Testing
+
+*   The unit tests are located in ```[project]/source/webfront/tests/tests.py```
+    
+    To run unit tests use ```../virtualenv/bin/python manage.py test webfront```
+
+*   The functional test are in ```[project]/functional_tests/tests.py```
+    
+    To run functional tests use ```../virtualenv/bin/python manage.py test functional_tests```
+
+All the test can be run at the same time:
+
+```../virtualenv/bin/python manage.py test```

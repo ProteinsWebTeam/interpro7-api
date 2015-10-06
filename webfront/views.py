@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from webfront.models import Clan
+from webfront.models import Clan, Pfama
 from rest_framework import viewsets
-from webfront.serializers import ClanSerializer
+from webfront.serializers import ClanSerializer, PfamaSerializer
 
 
 def home_page(request):
@@ -19,8 +19,9 @@ def clan_page(request, clan_id):
 
 
 class ClanViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
     queryset = Clan.objects.using('pfam_ro').all()
     serializer_class = ClanSerializer
+
+class PFamAViewSet(viewsets.ModelViewSet):
+    queryset = Pfama.objects.using('pfam_ro').all()
+    serializer_class = PfamaSerializer

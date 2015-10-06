@@ -11,6 +11,59 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+class Pfama(models.Model):
+    pfama_acc = models.CharField(db_column='pfamA_acc', primary_key=True, max_length=7)  # Field name made lowercase.
+    pfama_id = models.CharField(db_column='pfamA_id', unique=True, max_length=16)  # Field name made lowercase.
+    previous_id = models.TextField(blank=True, null=True)
+    description = models.CharField(max_length=100)
+    author = models.TextField()
+    deposited_by = models.CharField(max_length=100)
+    seed_source = models.TextField()
+    type = models.CharField(max_length=11)
+    comment = models.TextField(blank=True, null=True)
+    sequence_ga = models.FloatField(db_column='sequence_GA')  # Field name made lowercase.
+    domain_ga = models.FloatField(db_column='domain_GA')  # Field name made lowercase.
+    sequence_tc = models.FloatField(db_column='sequence_TC')  # Field name made lowercase.
+    domain_tc = models.FloatField(db_column='domain_TC')  # Field name made lowercase.
+    sequence_nc = models.FloatField(db_column='sequence_NC')  # Field name made lowercase.
+    domain_nc = models.FloatField(db_column='domain_NC')  # Field name made lowercase.
+    buildmethod = models.TextField(db_column='buildMethod')  # Field name made lowercase.
+    model_length = models.IntegerField()
+    searchmethod = models.TextField(db_column='searchMethod')  # Field name made lowercase.
+    msv_lambda = models.FloatField()
+    msv_mu = models.FloatField()
+    viterbi_lambda = models.FloatField()
+    viterbi_mu = models.FloatField()
+    forward_lambda = models.FloatField()
+    forward_tau = models.FloatField()
+    num_seed = models.IntegerField(blank=True, null=True)
+    num_full = models.IntegerField(blank=True, null=True)
+    updated = models.DateTimeField()
+    created = models.DateTimeField(blank=True, null=True)
+    version = models.SmallIntegerField(blank=True, null=True)
+    number_archs = models.IntegerField(blank=True, null=True)
+    number_species = models.IntegerField(blank=True, null=True)
+    number_structures = models.IntegerField(blank=True, null=True)
+    number_ncbi = models.IntegerField(blank=True, null=True)
+    number_meta = models.IntegerField(blank=True, null=True)
+    average_length = models.FloatField(blank=True, null=True)
+    percentage_id = models.IntegerField(blank=True, null=True)
+    average_coverage = models.FloatField(blank=True, null=True)
+    change_status = models.TextField(blank=True, null=True)
+    seed_consensus = models.TextField(blank=True, null=True)
+    full_consensus = models.TextField(blank=True, null=True)
+    number_shuffled_hits = models.IntegerField(blank=True, null=True)
+    number_rp15 = models.IntegerField(blank=True, null=True)
+    number_rp35 = models.IntegerField(blank=True, null=True)
+    number_rp55 = models.IntegerField(blank=True, null=True)
+    number_rp75 = models.IntegerField(blank=True, null=True)
+    number_ref_proteome = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'pfamA'
+
+
 
 class ActiveSiteAlignments(models.Model):
     pfama_acc = models.ForeignKey('Pfama', db_column='pfamA_acc')  # Field name made lowercase.
@@ -90,6 +143,7 @@ class Clan(models.Model):
     number_species = models.IntegerField(blank=True, null=True)
     number_sequences = models.IntegerField(blank=True, null=True)
     competed = models.IntegerField(blank=True, null=True)
+    members = models.ManyToManyField(Pfama, through="ClanMembership")
 
     class Meta:
         managed = False
@@ -405,58 +459,6 @@ class PdbResidueData(models.Model):
         managed = False
         db_table = 'pdb_residue_data'
 
-
-class Pfama(models.Model):
-    pfama_acc = models.CharField(db_column='pfamA_acc', primary_key=True, max_length=7)  # Field name made lowercase.
-    pfama_id = models.CharField(db_column='pfamA_id', unique=True, max_length=16)  # Field name made lowercase.
-    previous_id = models.TextField(blank=True, null=True)
-    description = models.CharField(max_length=100)
-    author = models.TextField()
-    deposited_by = models.CharField(max_length=100)
-    seed_source = models.TextField()
-    type = models.CharField(max_length=11)
-    comment = models.TextField(blank=True, null=True)
-    sequence_ga = models.FloatField(db_column='sequence_GA')  # Field name made lowercase.
-    domain_ga = models.FloatField(db_column='domain_GA')  # Field name made lowercase.
-    sequence_tc = models.FloatField(db_column='sequence_TC')  # Field name made lowercase.
-    domain_tc = models.FloatField(db_column='domain_TC')  # Field name made lowercase.
-    sequence_nc = models.FloatField(db_column='sequence_NC')  # Field name made lowercase.
-    domain_nc = models.FloatField(db_column='domain_NC')  # Field name made lowercase.
-    buildmethod = models.TextField(db_column='buildMethod')  # Field name made lowercase.
-    model_length = models.IntegerField()
-    searchmethod = models.TextField(db_column='searchMethod')  # Field name made lowercase.
-    msv_lambda = models.FloatField()
-    msv_mu = models.FloatField()
-    viterbi_lambda = models.FloatField()
-    viterbi_mu = models.FloatField()
-    forward_lambda = models.FloatField()
-    forward_tau = models.FloatField()
-    num_seed = models.IntegerField(blank=True, null=True)
-    num_full = models.IntegerField(blank=True, null=True)
-    updated = models.DateTimeField()
-    created = models.DateTimeField(blank=True, null=True)
-    version = models.SmallIntegerField(blank=True, null=True)
-    number_archs = models.IntegerField(blank=True, null=True)
-    number_species = models.IntegerField(blank=True, null=True)
-    number_structures = models.IntegerField(blank=True, null=True)
-    number_ncbi = models.IntegerField(blank=True, null=True)
-    number_meta = models.IntegerField(blank=True, null=True)
-    average_length = models.FloatField(blank=True, null=True)
-    percentage_id = models.IntegerField(blank=True, null=True)
-    average_coverage = models.FloatField(blank=True, null=True)
-    change_status = models.TextField(blank=True, null=True)
-    seed_consensus = models.TextField(blank=True, null=True)
-    full_consensus = models.TextField(blank=True, null=True)
-    number_shuffled_hits = models.IntegerField(blank=True, null=True)
-    number_rp15 = models.IntegerField(blank=True, null=True)
-    number_rp35 = models.IntegerField(blank=True, null=True)
-    number_rp55 = models.IntegerField(blank=True, null=True)
-    number_rp75 = models.IntegerField(blank=True, null=True)
-    number_ref_proteome = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'pfamA'
 
 
 class Pfama2PfamaHhsearch(models.Model):

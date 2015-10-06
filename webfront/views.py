@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from webfront.models import Clan, Pfama
+from webfront.models import Clan, Pfama, Pfama2PfamaHhsearch
 from rest_framework import viewsets
-from webfront.serializers import ClanSerializer, PfamaSerializer
+from webfront.serializers import ClanSerializer, PfamaSerializer, Pfama2PfamaHhsearchSerializer
 
 
 def home_page(request):
@@ -25,3 +25,7 @@ class ClanViewSet(viewsets.ModelViewSet):
 class PFamAViewSet(viewsets.ModelViewSet):
     queryset = Pfama.objects.using('pfam_ro').all()
     serializer_class = PfamaSerializer
+
+class PFamA2PFamAViewSet(viewsets.ModelViewSet):
+    queryset = Pfama2PfamaHhsearch.objects.using('pfam_ro').all()
+    serializer_class = Pfama2PfamaHhsearchSerializer

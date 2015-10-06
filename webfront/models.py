@@ -143,7 +143,7 @@ class Clan(models.Model):
     number_species = models.IntegerField(blank=True, null=True)
     number_sequences = models.IntegerField(blank=True, null=True)
     competed = models.IntegerField(blank=True, null=True)
-    members = models.ManyToManyField(Pfama, through="ClanMembership")
+    members = models.ManyToManyField(Pfama, through="ClanMembership",related_name="clan")
 
     class Meta:
         managed = False
@@ -195,12 +195,13 @@ class ClanLitRef(models.Model):
 
 
 class ClanMembership(models.Model):
-    clan_acc = models.ForeignKey(Clan, db_column='clan_acc')
+    clan_acc = models.ForeignKey(Clan, db_column='clan_acc',primary_key=True)
     pfama_acc = models.ForeignKey('Pfama', db_column='pfamA_acc')  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'clan_membership'
+        unique_together = ('clan_acc','pfama_acc')
 
 
 class ClanWiki(models.Model):
@@ -462,13 +463,14 @@ class PdbResidueData(models.Model):
 
 
 class Pfama2PfamaHhsearch(models.Model):
-    pfama_acc_1 = models.ForeignKey(Pfama, db_column='pfamA_acc_1', related_name='relationship_source')  # Field name made lowercase.
+    pfama_acc_1 = models.ForeignKey(Pfama, db_column='pfamA_acc_1', related_name='relationship_source', primary_key=True)  # Field name made lowercase.
     pfama_acc_2 = models.ForeignKey(Pfama, db_column='pfamA_acc_2', related_name='relationship_target')  # Field name made lowercase.
     evalue = models.CharField(max_length=25)
 
     class Meta:
         managed = False
         db_table = 'pfamA2pfamA_hhsearch'
+        unique_together = ('pfama_acc_1','pfama_acc_2')
 
 
 class Pfama2PfamaScoop(models.Model):

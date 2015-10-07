@@ -1,20 +1,59 @@
 [
   {
     "model": "webfront.Clan",
-    "pk": 1,
     "fields": {
       "clan_acc": "TEST_ACC",
       "clan_id": "TEST_ID",
-      "updated": "1980-08-06"
+      "updated": "2011-09-01T13:20:30+03:00"
     }
   },
   {
     "model": "webfront.Clan",
-    "pk": 2,
     "fields": {
       "clan_acc": "TEST_ACC_2",
       "clan_id": "TEST_ID_2",
-      "updated": "1980-08-06"
+      "updated": "2011-09-01T13:20:30+03:00"
     }
-  }
-]
+  },
+  {
+    "model": "webfront.Pfama",
+    "fields": {
+      "pfama_acc": "TEST_PFAM_ACC",
+      "pfama_id": "TEST_PFAM_ID",
+      "updated": "2011-09-01T13:20:30+03:00",
+      "num_full": 95
+    }
+  },
+  {
+    "model": "webfront.Pfama",
+    "fields": {
+      "pfama_acc": "TEST_PFAM_ACC_2",
+      "pfama_id": "TEST_PFAM_ID_2",
+      "updated": "2011-09-01T13:20:30+03:00",
+      "num_full": 5
+    }
+  },
+  {
+    "model": "webfront.ClanMembership",
+    "pk":1,
+    "fields": {
+      "pfama_acc": "TEST_PFAM_ACC",
+      "clan_acc": "TEST_ACC"
+    }
+  },
+  {
+    "model": "webfront.ClanMembership",
+    "pk":2,
+    "fields": {
+      "pfama_acc": "TEST_PFAM_ACC_2",
+      "clan_acc": "TEST_ACC"
+    }
+  },
+  {
+    "model": "webfront.Pfama2PfamaHhsearch",
+    "fields": {
+      "pfama_acc_1": "TEST_PFAM_ACC",
+      "pfama_acc_2": "TEST_PFAM_ACC_2",
+      "evalue": "0.04"
+    }
+  }]

@@ -7,10 +7,12 @@ class PfamaSerializer(serializers.HyperlinkedModelSerializer):
         model = Pfama
         fields = ('pfama_acc', 'pfama_id', 'num_full')
 
+
 class Pfama2PfamaHhsearchSerializer(serializers.HyperlinkedModelSerializer):
     pfama_acc_1 = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
     pfama_acc_2 = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
     evalue = serializers.FloatField()
+
     class Meta:
         model = Pfama2PfamaHhsearch
         fields = ('pfama_acc_1','pfama_acc_2','evalue')
@@ -27,8 +29,7 @@ class ClanSerializer(serializers.HyperlinkedModelSerializer):
             total += member.num_full
         return total
 
-
-    def get_relationships(self,obj):
+    def get_relationships(self, obj):
         queryset = Pfama2PfamaHhsearch.objects.using('pfam_ro').all().filter(pfama_acc_1__clan=obj).filter(pfama_acc_2__clan=obj)
         serializer = Pfama2PfamaHhsearchSerializer(queryset, many=True)
         return serializer.data
@@ -37,3 +38,7 @@ class ClanSerializer(serializers.HyperlinkedModelSerializer):
         model = Clan
         fields = ('clan_acc', 'clan_id', 'total_occurrences', 'members', 'relationships')
 
+class MembershipSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ClanMembership
+        fields = ('clan_acc', 'pfama_acc')

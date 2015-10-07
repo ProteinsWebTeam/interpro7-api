@@ -16,29 +16,29 @@ class Pfama(models.Model):
     pfama_id = models.CharField(db_column='pfamA_id', unique=True, max_length=16)  # Field name made lowercase.
     previous_id = models.TextField(blank=True, null=True)
     description = models.CharField(max_length=100)
-    author = models.TextField()
+    author = models.TextField(blank=True, null=True)
     deposited_by = models.CharField(max_length=100)
-    seed_source = models.TextField()
+    seed_source = models.TextField(blank=True, null=True)
     type = models.CharField(max_length=11)
     comment = models.TextField(blank=True, null=True)
-    sequence_ga = models.FloatField(db_column='sequence_GA')  # Field name made lowercase.
-    domain_ga = models.FloatField(db_column='domain_GA')  # Field name made lowercase.
-    sequence_tc = models.FloatField(db_column='sequence_TC')  # Field name made lowercase.
-    domain_tc = models.FloatField(db_column='domain_TC')  # Field name made lowercase.
-    sequence_nc = models.FloatField(db_column='sequence_NC')  # Field name made lowercase.
-    domain_nc = models.FloatField(db_column='domain_NC')  # Field name made lowercase.
-    buildmethod = models.TextField(db_column='buildMethod')  # Field name made lowercase.
-    model_length = models.IntegerField()
-    searchmethod = models.TextField(db_column='searchMethod')  # Field name made lowercase.
-    msv_lambda = models.FloatField()
-    msv_mu = models.FloatField()
-    viterbi_lambda = models.FloatField()
-    viterbi_mu = models.FloatField()
-    forward_lambda = models.FloatField()
-    forward_tau = models.FloatField()
+    sequence_ga = models.FloatField(db_column='sequence_GA', null=True)  # Field name made lowercase.
+    domain_ga = models.FloatField(db_column='domain_GA', null=True)  # Field name made lowercase.
+    sequence_tc = models.FloatField(db_column='sequence_TC', null=True)  # Field name made lowercase.
+    domain_tc = models.FloatField(db_column='domain_TC', null=True)  # Field name made lowercase.
+    sequence_nc = models.FloatField(db_column='sequence_NC', null=True)  # Field name made lowercase.
+    domain_nc = models.FloatField(db_column='domain_NC', null=True)  # Field name made lowercase.
+    buildmethod = models.TextField(db_column='buildMethod', null=True)  # Field name made lowercase.
+    model_length = models.IntegerField(null=True)
+    searchmethod = models.TextField(db_column='searchMethod', null=True)  # Field name made lowercase.
+    msv_lambda = models.FloatField(null=True)
+    msv_mu = models.FloatField(null=True)
+    viterbi_lambda = models.FloatField(null=True)
+    viterbi_mu = models.FloatField(null=True)
+    forward_lambda = models.FloatField(null=True)
+    forward_tau = models.FloatField(null=True)
     num_seed = models.IntegerField(blank=True, null=True)
     num_full = models.IntegerField(blank=True, null=True)
-    updated = models.DateTimeField()
+    updated = models.DateTimeField(null=True)
     created = models.DateTimeField(blank=True, null=True)
     version = models.SmallIntegerField(blank=True, null=True)
     number_archs = models.IntegerField(blank=True, null=True)
@@ -195,7 +195,7 @@ class ClanLitRef(models.Model):
 
 
 class ClanMembership(models.Model):
-    clan_acc = models.ForeignKey(Clan, db_column='clan_acc',primary_key=True)
+    clan_acc = models.ForeignKey(Clan, db_column='clan_acc')
     pfama_acc = models.ForeignKey('Pfama', db_column='pfamA_acc')  # Field name made lowercase.
 
     class Meta:

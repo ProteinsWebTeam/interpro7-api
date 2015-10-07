@@ -5,6 +5,7 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 router.register(r'clans', views.ClanViewSet)
 router.register(r'pfama', views.PFamAViewSet)
+router.register(r'clan_membership', views.MembershipViewSet)
 router.register(r'clan_relationships', views.PFamA2PFamAViewSet)
 
 urlpatterns = [

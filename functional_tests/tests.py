@@ -1,3 +1,4 @@
+import time
 from functional_tests.base import FunctionalTest
 import json
 

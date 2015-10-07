@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block title %} - Clan: {{ clan.clan_id }}{% endblock %}
-
+{% block head %}
+<link href="/static/clanviewer/bundle.css" rel="stylesheet">
+<script src="/static/clanviewer/clanviewer.js"></script>
+{% endblock %}
 {% block content %}
 <h1>UniFam - Clan: {{ clan.clan_id }}</h1>
 <div>Clans:
@@ -9,5 +12,16 @@
         <li class="clan"><b>ID:</b> {{ clan.clan_id }}</li>
         <li class="clan"><b>Acc:</b> {{ clan.clan_acc }}</li>
     </ul>
+    <div id="network">
+
+    </div>
+    <script>
+        // if you don't specify a html file, the sniper will generate a div with id "rootDiv"
+        var app = require("clanviewer");
+        var instance = new app({el: "#network"});
+        d3.json("/api/clans/{{ clan.clan_acc }}/?format=json", function(error, data) {
+            instance.paint(data);
+        });
+    </script>
 </div>
 {% endblock %}

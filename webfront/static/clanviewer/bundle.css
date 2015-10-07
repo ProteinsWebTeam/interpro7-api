@@ -1,0 +1,41 @@
+.link path{
+    fill: none;
+    stroke: #666;
+    stroke-width: 1.5px;
+    opacity: 0.9;
+}
+.link:hover path{
+    stroke: #686;
+}
+.link text{
+    fill: #373;
+}
+.link:hover text{
+    font-size: 12px
+}
+.node circle {
+    fill: #ccc;
+    stroke: #333;
+    stroke-width: 1.5px;
+    opacity: 0.9;
+}
+.node:hover circle {
+    stroke: #A33;
+    fill: #dcc;
+}
+text {
+    font: 10px sans-serif;
+    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+    cursor: default;
+}
+a.href text{
+    cursor: pointer;
+}
+.node:hover text {
+    fill: #A33;
+}
+
+#arrowhead {
+    fill: black;
+    stroke: black;
+}

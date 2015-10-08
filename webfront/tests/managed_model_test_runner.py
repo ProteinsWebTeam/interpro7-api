@@ -15,6 +15,7 @@ class UnManagedModelTestRunner(DiscoverRunner):
         self.unmanaged_models = [m for m in myapp.models.values() if not m._meta.managed]
         for m in self.unmanaged_models:
             m._meta.managed = True
+        print("using the custom")
         super(UnManagedModelTestRunner, self).setup_test_environment(*args, **kwargs)
 
     def teardown_test_environment(self, *args, **kwargs):
@@ -24,9 +25,6 @@ class UnManagedModelTestRunner(DiscoverRunner):
             m._meta.managed = False
 
 if 'test' in sys.argv or 'test_coverage' in sys.argv:  # Covers regular testing and django-coverage
-    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
-    DATABASES['default']['NAME'] = os.path.join(BASE_DIR, '../database/db.sqlite3')
-
     DATABASES['pfam_ro']['ENGINE'] = 'django.db.backends.sqlite3'
     DATABASES['pfam_ro']['NAME'] = os.path.join(BASE_DIR, '../database/db2.sqlite3')
     DATABASES['pfam_ro']['TEST'] = {'MIRROR': 'default'}

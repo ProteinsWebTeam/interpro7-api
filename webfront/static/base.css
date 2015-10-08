@@ -7,3 +7,9 @@ h1 {
     line-height: 40px;
     text-shadow: 1px 1px #CCC;
 }
+
+.box {
+    border: 1px solid lavender;
+    width: 900px;
+    height: 500px;
+}

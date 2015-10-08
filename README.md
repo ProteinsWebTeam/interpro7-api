@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/ProteinsWebTeam/project-skeleton.svg)](https://travis-ci.org/ProteinsWebTeam/project-skeleton)
+
 ## Project Skeleton
 
 This project is an empty project that follows the recommendations and guidelines presented in the book:

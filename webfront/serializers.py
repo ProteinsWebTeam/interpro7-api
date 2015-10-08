@@ -3,9 +3,14 @@ from webfront.models import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership
 
 
 class PfamaSerializer(serializers.HyperlinkedModelSerializer):
+    link = serializers.SerializerMethodField()
+
+    def get_link(self, obj):
+        return "http://pfam.xfam.org/family/"+obj.pfama_acc
+
     class Meta:
         model = Pfama
-        fields = ('pfama_acc', 'pfama_id', 'num_full')
+        fields = ('pfama_acc', 'pfama_id', 'num_full','link')
 
 
 class Pfama2PfamaHhsearchSerializer(serializers.HyperlinkedModelSerializer):

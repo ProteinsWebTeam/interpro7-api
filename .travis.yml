@@ -5,8 +5,9 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
   - "export DISPLAY=:99.0"
   - sleep 3
-  - python webfront/tests/before_install.py
 install:
   - pip install -r requirements.txt
+before_script:
+  - python webfront/tests/before_install.py
 script:
   - python manage.py test

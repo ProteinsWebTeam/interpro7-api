@@ -7,7 +7,5 @@ before_install:
   - sleep 3
 install:
   - pip install -r requirements.txt
-before_script:
-  - python webfront/tests/before_install.py
 script:
   - python manage.py test

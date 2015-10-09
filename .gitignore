@@ -4,3 +4,4 @@ __pycache__
 unifam/mysql.conf
 *.pyc
 .DS_Store
+unifam/settings-private.py

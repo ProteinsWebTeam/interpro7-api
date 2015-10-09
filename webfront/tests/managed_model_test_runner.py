@@ -28,7 +28,7 @@ if 'test' in sys.argv or 'test_coverage' in sys.argv:  # Covers regular testing 
     DATABASES['pfam_ro']['ENGINE'] = 'django.db.backends.sqlite3'
     DATABASES['pfam_ro']['NAME'] = os.path.join(BASE_DIR, '../database/db2.sqlite3')
     DATABASES['pfam_ro']['TEST'] = {'MIRROR': 'default'}
-    del DATABASES['pfam_ro']['OPTIONS']
+    # del DATABASES['pfam_ro']['OPTIONS']
 
 # DATABASE_ROUTERS = []
 

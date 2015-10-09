@@ -58,8 +58,6 @@ Assume we have a user account at /home/username
     ../virtualenv/bin/pip install -r requirements.txt
     ```
     
-    *Warning* The mysqlclient might be required to be installed globally and under sudo rights. ```pip3 install mysqlclient``` 
-
 5.  Migrate the database models
 
     ```
@@ -72,7 +70,10 @@ Assume we have a user account at /home/username
     ../virtualenv/bin/python manage.py collectstatic --noinput
     ```
     
-7.  Create and configure the ```PROJECT/unifam/mysql.conf``` file
+7.  Edit the file  ```PROJECT/unifam/settings.py``` to include the credential of the PFAM database.
+    
+    **WARNING** If you are contributing to this project make sure you are not including a version of this file that 
+    contains private information 
 
 8.  Start the server
     ```

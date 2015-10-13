@@ -22,7 +22,7 @@ Assume we have a user account at /home/username
     └── SITENAME
          ├── database
          ├── source
-         ├── static
+         ├── static_files
          └── virtualenv
 ```
 
@@ -33,7 +33,7 @@ Assume we have a user account at /home/username
     ```
     mkdir -p PROJECT/database
     mkdir -p PROJECT/source
-    mkdir -p PROJECT/static
+    mkdir -p PROJECT/static_files
     mkdir -p PROJECT/virtualenv
     ```
          

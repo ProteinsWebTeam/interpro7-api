@@ -3,7 +3,7 @@ from webfront import views
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'clans', views.ClanViewSet)
+router.register(r'clans', views.ClanViewSet, base_name="api_clans")
 router.register(r'pfama', views.PFamAViewSet)
 router.register(r'clan_membership', views.MembershipViewSet)
 router.register(r'clan_relationships', views.PFamA2PFamAViewSet)

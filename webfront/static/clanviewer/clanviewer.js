@@ -9526,6 +9526,8 @@ module.exports = clanviewer = function(opts){
     self.width = opts.width?opts.width:900;
     self.height = opts.height?opts.height:500;
     self.r = opts.r?opts.r:5;
+    self.multiple_relationships = opts.multiple_relationships?opts.multiple_relationships:false;
+    self.directional = opts.directional?opts.directional:false;
 
     self.size = d3.scale.linear()
         .range([1, 5*self.r]);
@@ -9602,16 +9604,18 @@ clanviewer.paint = function (data) {
         .nodes(data.members)
         .links(data.relationships)
         .start();
-    self.svg.append("defs").append("marker")
-        .attr("id", "arrowhead")
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 11)
-        .attr("refY", 0)
-        .attr("markerWidth", 2)
-        .attr("markerHeight", 2)
-        .attr("orient", "auto")
-        .append("path")
-        .attr("d", "M0,-5L10,0L0,5");
+
+    if (self.directional)
+        self.svg.append("defs").append("marker")
+            .attr("id", "arrowhead")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 11)
+            .attr("refY", 0)
+            .attr("markerWidth", 2)
+            .attr("markerHeight", 2)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5");
 
     var linkG = self.svg.append("g").attr("class", "links").selectAll(".link")
         .data(data.relationships)
@@ -9620,7 +9624,7 @@ clanviewer.paint = function (data) {
 
     var link = linkG.append("path")
         .style("stroke-width", function(d){ return self.tickness(d.evalue)})
-        .attr("marker-end","url(#arrowhead)");
+        .attr("marker-end",self.directional?"url(#arrowhead)":null);
 
     var label_link = linkG.append("a")
         .attr("xlink:href", function (d){return d["link"]?d["link"]:null;})
@@ -9694,10 +9698,30 @@ clanviewer.processData = function(data){
         nodesA[e["pfama_acc"]]=i;
         max = max<e["num_full"]?e["num_full"]:max;
     });
-    data.relationships.forEach(function(e, i){
-        e.source = nodesA[e["pfama_acc_1"]]
-        e.target = nodesA[e["pfama_acc_2"]]
-    });
+    if (self.multiple_relationships) {
+        data.relationships.forEach(function (e, i) {
+            e.source = nodesA[e["pfama_acc_1"]]
+            e.target = nodesA[e["pfama_acc_2"]]
+        });
+    }else{
+        var tmp_relationships = {};
+        data.relationships.forEach(function (e, i) {
+            var key= e["pfama_acc_1"]+"_"+e["pfama_acc_2"];
+            if (key in tmp_relationships){
+                tmp_relationships[key].evalue =tmp_relationships[key].evalue> e.evalue? e.evalue:tmp_relationships[key].evalue;
+            } else if(e["pfama_acc_2"]+"_"+e["pfama_acc_1"] in tmp_relationships){
+                key = e["pfama_acc_2"]+"_"+e["pfama_acc_1"];
+                tmp_relationships[key].evalue =tmp_relationships[key].evalue> e.evalue? e.evalue:tmp_relationships[key].evalue;
+            } else {
+                tmp_relationships [key] = {
+                    source: nodesA[e["pfama_acc_1"]],
+                    target: nodesA[e["pfama_acc_2"]],
+                    evalue: e.evalue
+                };
+            }
+        });
+        data.relationships = Object.keys(tmp_relationships).map(function (key) {return tmp_relationships[key]});
+    }
     self.size.domain([0,max]);
 };
 

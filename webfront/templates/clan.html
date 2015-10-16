@@ -19,7 +19,7 @@
         // if you don't specify a html file, the sniper will generate a div with id "rootDiv"
         var app = require("clanviewer");
         var instance = new app({el: "#network"});
-        d3.json("{% url 'api_clans-detail' clan.clan_acc %}/?format=json", function(error, data) {
+        d3.json("{% url 'api_clans-detail' clan.clan_acc %}?format=json", function(error, data) {
             instance.paint(data);
         });
     </script>

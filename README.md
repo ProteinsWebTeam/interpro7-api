@@ -1,5 +1,6 @@
 
 [![Build Status](https://travis-ci.org/ProteinsWebTeam/project-skeleton.svg)](https://travis-ci.org/ProteinsWebTeam/project-skeleton)
+[![Coverage Status](https://coveralls.io/repos/ProteinsWebTeam/project-skeleton/badge.svg?branch=master&service=github)](https://coveralls.io/github/ProteinsWebTeam/project-skeleton?branch=master)
 
 ## Project Skeleton
 

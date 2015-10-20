@@ -16,7 +16,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('UNIFAM', header_text)
 
         # The page has a link for clans and the user clicks on it
-        self.browser.find_element_by_css_selector('a.clans_link').click()
+        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.clans_link'))
 
         # The clans page opens and has a title
         self.assertIn('UniFam - Clans', self.browser.title)
@@ -25,7 +25,7 @@ class NewVisitorTest(FunctionalTest):
         clan_li =self.browser.find_element_by_css_selector('li.clan')
         clan_header =clan_li.find_element_by_tag_name('a').text
         # The user chooses a clan
-        clan_li.find_element_by_tag_name("a").click()
+        self.click_link_and_wait(clan_li.find_element_by_tag_name("a"))
 
         # The user will go to the page of the clan
         self.assertIn('UniFam - Clan: '+clan_header, self.browser.title)
@@ -41,10 +41,7 @@ class NewVisitorTest(FunctionalTest):
         self.browser.get(self.server_url+"/api/clans/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
-        try:
-            jsonp = json.loads(content)
-        except ValueError:
-            self.fail("The content is not a json")
+        jsonp = json.loads(content)
 
         self.assertEqual(jsonp["count"],2)
         self.assertEqual(len(jsonp["results"]), jsonp["count"])
@@ -55,10 +52,7 @@ class NewVisitorTest(FunctionalTest):
         self.browser.get(self.server_url+"/api/pfama/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
-        try:
-            jsonp = json.loads(content)
-        except ValueError:
-            self.fail("The content is not a json")
+        jsonp = json.loads(content)
 
         self.assertEqual(jsonp["count"],2)
         self.assertEqual(len(jsonp["results"]),jsonp["count"])
@@ -69,10 +63,7 @@ class NewVisitorTest(FunctionalTest):
         self.browser.get(self.server_url+"/api/clans/TEST_ACC/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
-        try:
-            jsonp = json.loads(content)
-        except ValueError:
-            self.fail("The content is not a json")
+        jsonp = json.loads(content)
 
         self.assertEqual(jsonp["clan_acc"], "TEST_ACC")
         self.assertEqual(sum([x["num_full"] for x in jsonp["members"]]), jsonp["total_occurrences"])

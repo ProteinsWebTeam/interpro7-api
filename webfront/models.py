@@ -53,11 +53,6 @@ class Pfama(models.Model):
     seed_consensus = models.TextField(blank=True, null=True)
     full_consensus = models.TextField(blank=True, null=True)
     number_shuffled_hits = models.IntegerField(blank=True, null=True)
-    number_rp15 = models.IntegerField(blank=True, null=True)
-    number_rp35 = models.IntegerField(blank=True, null=True)
-    number_rp55 = models.IntegerField(blank=True, null=True)
-    number_rp75 = models.IntegerField(blank=True, null=True)
-    number_ref_proteome = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False

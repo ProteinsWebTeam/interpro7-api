@@ -490,11 +490,6 @@ class Migration(migrations.Migration):
                 ('seed_consensus', models.TextField(null=True, blank=True)),
                 ('full_consensus', models.TextField(null=True, blank=True)),
                 ('number_shuffled_hits', models.IntegerField(null=True, blank=True)),
-                ('number_rp15', models.IntegerField(null=True, blank=True)),
-                ('number_rp35', models.IntegerField(null=True, blank=True)),
-                ('number_rp55', models.IntegerField(null=True, blank=True)),
-                ('number_rp75', models.IntegerField(null=True, blank=True)),
-                ('number_ref_proteome', models.IntegerField(null=True, blank=True)),
             ],
             options={
                 'managed': True,

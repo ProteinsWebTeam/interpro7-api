@@ -12,8 +12,11 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,8 +40,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #
     'webfront',
+    # added
     'rest_framework',
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -50,6 +56,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    # added
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'unifam.urls'
@@ -86,15 +94,25 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, '../database/db.sqlite3'),
-        'TEST_NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
+        'TEST': {
+            'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
+        },
     },
     'pfam_ro': {
         'ENGINE': 'django.db.backends.mysql',
-        "NAME": "PFAM_DB",
-        "USER": "PFAM_USER",
-        "PASSWORD": "PFAM_PASSWORD",
-        "HOST": "PFAM_HOST",
-        "PORT": "PORT"
+        'NAME': MYSQL_CONFIG.get('name', 'NAME'),
+        'USER': MYSQL_CONFIG.get('user', 'USER'),
+        'PASSWORD': MYSQL_CONFIG.get('password'),
+        'HOST': MYSQL_CONFIG.get('host', 'HOST'),
+        'PORT': MYSQL_CONFIG.get('port', 4444),
+    },
+    'interpro_ro': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': ORACLE_CONFIG.get('sid', 'INTERPRO_DB'),
+        'USER': ORACLE_CONFIG.get('user', 'USER'),
+        'PASSWORD': ORACLE_CONFIG.get('password'),
+        'HOST': ORACLE_CONFIG.get('host', 'HOST'),
+        'PORT': ORACLE_CONFIG.get('port', 1540),
     }
 }
 TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
@@ -124,7 +142,29 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
-    'PAGE_SIZE': 10
+    'DEFAULT_PAGINATION_CLASS': 'webfront.pagination.CustomPagination',
 }
+
+# Debug toolbar
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+DEBUG_TOOLBAR_CONFIG = {
+    # show the toolbar for all requests (in DEBUG mode)
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}
+DEBUG_TOOLBAR_PANELS = [
+    'debug_toolbar.panels.versions.VersionsPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+    'debug_toolbar.panels.templates.TemplatesPanel',
+    'debug_toolbar.panels.cache.CachePanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
+    'debug_toolbar.panels.redirects.RedirectsPanel',
+    'debug_toolbar.panels.profiling.ProfilingPanel',
+]

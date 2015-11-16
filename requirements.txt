@@ -1,5 +1,7 @@
-Django==1.8.4
-djangorestframework==3.2.4
-PyMySQL==0.6.7
-selenium==2.47.3
-wheel==0.24.0
+Django~=1.8.6
+djangorestframework~=3.3.1
+django-debug-toolbar~=1.4
+PyMySQL~=0.6.7
+PyYAML~=3.11
+selenium~=2.48.0
+wheel~=0.26.0

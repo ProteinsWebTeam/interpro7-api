@@ -6,3 +6,5 @@ unifam/mysql.conf
 .DS_Store
 unifam/settings-private.py
 .coverage
+config
+

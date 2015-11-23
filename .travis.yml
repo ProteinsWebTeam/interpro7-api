@@ -4,7 +4,7 @@ python:
 env:
   - ORACLE_HOME=/home/travis/oracle/ LD_LIBRARY_PATH=/home/travis/oracle/ DYLD_LIBRARY_PATH=/home/travis/oracle/
 before_install:
-  - "wget https://www.ebi.ac.uk/~luciani/Oracle/oracle.zip && unzip oracle.zip"
+  - "wget https://www.ebi.ac.uk/~luciani/Oracle/oracle.zip && unzip oracle.zip -d oracle"
   - "sh -e /etc/init.d/xvfb start"
   - "export DISPLAY=:99.0"
   - sleep 3

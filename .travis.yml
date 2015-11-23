@@ -1,12 +1,13 @@
 language: python
 python:
   - "3.5"
-env:
-  - ORACLE_HOME=$(pwd)/oracle/ LD_LIBRARY_PATH=$(pwd)/oracle/ DYLD_LIBRARY_PATH=$(pwd)/oracle/
 before_install:
   - "wget https://www.ebi.ac.uk/~luciani/Oracle/oracle.zip && unzip oracle.zip -d oracle"
   - "sh -e /etc/init.d/xvfb start"
   - "export DISPLAY=:99.0"
+  - "export ORACLE_HOME=$(pwd)/oracle/"
+  - "export LD_LIBRARY_PATH=$(pwd)/oracle/"
+  - "export DYLD_LIBRARY_PATH=$(pwd)/oracle/"
   - sleep 3
 install:
   - pip install -r requirements.txt

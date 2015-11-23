@@ -2,9 +2,7 @@ language: python
 python:
   - "3.5"
 env:
-  - ORACLE_HOME=/home/travis/oracle/
-  - LD_LIBRARY_PATH=/home/travis/oracle/
-  - DYLD_LIBRARY_PATH=/home/travis/oracle/
+  - ORACLE_HOME=/home/travis/oracle/ LD_LIBRARY_PATH=/home/travis/oracle/ DYLD_LIBRARY_PATH=/home/travis/oracle/
 before_install:
   - "wget https://www.ebi.ac.uk/~luciani/Oracle/oracle.zip && unzip oracle.zip"
   - "sh -e /etc/init.d/xvfb start"
@@ -17,3 +15,6 @@ script:
   - coverage run --source='.' manage.py test
 after_success:
   coveralls
+branches:
+  only:
+    - master

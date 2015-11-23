@@ -1,4 +1,5 @@
 from django.conf.urls import include, url
+# from django.conf import settings
 from webfront import views
 from rest_framework import routers
 
@@ -22,3 +23,9 @@ urlpatterns = [
     url('^', include(base_urlpatterns)), # iff you wish to maintain the un-prefixed URL's too
     url('^skeleton/', include(base_urlpatterns)),
 ]
+
+# if settings.DEBUG:
+#     import debug_toolbar
+#     urlpatterns += patterns('',
+#         url(r'^__debug__/', include(debug_toolbar.urls))
+#     )

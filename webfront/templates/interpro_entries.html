@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %} - Entry - InterPro{% endblock %}
+
+{% block content %}
+<div><h2>InterPro:</h2>
+    <p>Filter by:</p>
+    <!--TODO: Here all the entries of interpro should be listed -->
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Subset:</h3>
+            <ul class="list-inline">
+                <li><a href="{% url 'interpro_filter_page' 'all' %}" class="interpro_all_link">All</a></li>
+                <li><a href="{% url 'interpro_filter_page' 'integrated' %}" class="interpro_link">Integrated</a></li>
+                <li><a href="{% url 'interpro_filter_page' 'unintegrated'%}" class="interpro_unintegrated_link">Unintegrated</a></li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h3>Member database:</h3>
+            <ul class="list-inline">
+                {% for k,m in db_members.items %}
+                    <li>
+                        <a href="{% url 'interpro_member_page' filter k %}" class="interpro_all_link">
+                        {{ m.label }}
+                    </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <p>
+        Here goes the list of <b>{{ list_of_families }}</b> families from interpro!
+    </p>
+</div>
+{% endblock %}

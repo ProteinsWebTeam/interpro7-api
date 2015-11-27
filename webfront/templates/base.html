@@ -12,7 +12,16 @@
         {% block head %}{% endblock %}
     </head>
     <body>
-        <div class="container">
+    <div class="container">
+        <a href="{% url 'home' %}" class="proteins_link"><h1>UniFam</h1></a>
+        <ul class="list-inline">
+            <li><a href="{% url 'entries_page' %}" class="entries_link">Entry</a></li>
+            <li><a href="{% url 'home' %}" class="proteins_link">Protein</a></li>
+            <li><a href="{% url 'home' %}" class="structure_link">Structure</a></li>
+            <li><a href="{% url 'home' %}" class="proteome_link">Proteome</a></li>
+            <li><a href="{% url 'home' %}" class="pathway_link">Pathway</a></li>
+            <li><a href="{% url 'home' %}" class="complexes_link">Complexes</a></li>
+        </ul>
             {% block content %}
             {% endblock %}
         </div>

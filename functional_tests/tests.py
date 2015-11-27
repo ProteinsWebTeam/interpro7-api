@@ -69,3 +69,25 @@ class NewVisitorTest(FunctionalTest):
         self.assertEqual(sum([x["num_full"] for x in jsonp["members"]]), jsonp["total_occurrences"])
 
 
+    def test_can_navigate_active_sites(self):
+        test_family="PF13812"
+
+        # check out its homepage
+        self.browser.get(self.server_url)
+
+        # The page has a link for active sites and the user clicks on it
+        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.active_sites_link'))
+
+        # The active sites page opens and has a title
+        self.assertIn('UniFam - Active Sites', self.browser.title)
+
+        # The user will have to input  a protein family accession
+        input_acc =self.browser.find_element_by_css_selector('input.accession')
+        input_acc.send_keys(test_family)
+        # The user chooses a clan
+        self.click_link_and_wait(self.browser.find_element_by_css_selector("button.search"))
+
+        # The user will go to the page of the clan
+        self.assertIn('UniFam - Active Sites: '+test_family, self.browser.title)
+
+        # The page displays the proteins with the residues where there are active sites

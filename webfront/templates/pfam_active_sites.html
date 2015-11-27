@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %} - Entry - InterPro - {{filter}} - Pfam = {{family.pfama_acc}}{% endblock %}
+
+{% block content %}
+<div><h2>InterPro/{{filter}}/{{member}}/{{family.pfama_acc}}/active_sites:</h2>
+    <!--TODO: Here all the entries of interpro should be listed -->
+    <p>
+        <!-- TODO: Get a table of the active sites for this family-->
+        The seed consensus for this family is:
+        <pre>{{ family.seed_consensus }}</pre>
+    </p>
+</div>
+{% endblock %}

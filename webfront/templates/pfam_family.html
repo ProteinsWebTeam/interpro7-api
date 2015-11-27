@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %} - Entry - InterPro - {{filter}} - Pfam = {{family.pfama_acc}}{% endblock %}
+
+{% block content %}
+<div><h2>InterPro/{{filter}}/{{member}}/{{family.pfama_acc}}:</h2>
+    <!--TODO: Here all the entries of interpro should be listed -->
+    {% if data_types %}
+    <p>Different views at this level:</p>
+    <ul class="list-inline">
+        {% for dt in data_types %}
+        <li><a href="{% url 'interpro_member_filter_acc_page' filter member m_filter dt.filter %} " class="interpro_all_link">{{ dt.label }}</a></li>
+        {% endfor %}
+    </ul>
+    <br/><br/>
+    {% endif %}
+    <br/><br/>
+    <p>
+        The seed consensus for this family is:
+        <pre>{{ family.seed_consensus }}</pre>
+    </p>
+</div>
+{% endblock %}

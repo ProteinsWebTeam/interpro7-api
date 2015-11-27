@@ -3,11 +3,11 @@
 {% block title %} - Clans{% endblock %}
 
 {% block content %}
-<h1>UniFam - Clans</h1>
-<div><h2>Clans:</h2>
+<h2>UniFam - Clans</h2>
+<div>
     <ul class="clans">
         {% for clan in clans %}
-        <li class="clan">{{ forloop.counter }}: <a href="{% url 'view_clan' clan.clan_id %}">{{ clan.clan_id }}</a></li>
+        <li class="clan"><a href="{% url 'interpro_member_filter_acc_page' filter member m_filter clan.clan_acc %}">{{ clan.clan_acc }} ({{ clan.clan_id }})</a></li>
         {% endfor %}
     </ul>
 </div>

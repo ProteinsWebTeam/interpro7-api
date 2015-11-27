@@ -11,11 +11,21 @@ router.register(r'clan_relationships', views.PFamA2PFamAViewSet)
 
 base_urlpatterns = [
     url(r'^$', views.home_page, name='home'),
-    url(r'^clans/$', 'webfront.views.clans_page', name='clans_list'),
-    url(r'^clans/([a-zA-Z0-9_\-]+)/$', 'webfront.views.clan_page', name='view_clan'),
+    # url(r'^clans/$', 'webfront.views.clans_page', name='clans_list'),
+    # url(r'^clans/([a-zA-Z0-9_\-]+)/$', 'webfront.views.clan_page', name='view_clan'),
 
     url(r'^api/', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    # First attempt to the REST schema
+    url(r'^entry/$', 'webfront.views.entries_page', name='entries_page'),
+    url(r'^entry/interpro/$', 'webfront.views.interpro_page', name='interpro_page'),
+    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/$', 'webfront.views.interpro_filter_page', name='interpro_filter_page'),
+    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/$', 'webfront.views.interpro_member_page', name='interpro_member_page'),
+    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/$', 'webfront.views.interpro_member_filter_page', name='interpro_member_filter_page'),
+    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/$', 'webfront.views.interpro_member_filter_acc_page', name='interpro_member_filter_acc_page'),
+#    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/$', 'webfront.views.interpro_member_filter_acc_option_page', name='interpro_member_filter_acc_option_page'),
+
 ]
 
 # This is done to be able to use both the root path and the "skeleton" prefix

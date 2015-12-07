@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from webfront.models import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership
+from webfront.models.pfam import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership
 
 
 class PfamaSerializer(serializers.HyperlinkedModelSerializer):

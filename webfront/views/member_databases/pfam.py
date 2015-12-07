@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from webfront.models import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership
+from webfront.models.pfam import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership
 from rest_framework import viewsets
-from webfront.serializers import ClanSerializer, PfamaSerializer, Pfama2PfamaHhsearchSerializer, MembershipSerializer
+from webfront.serializers.pfam import ClanSerializer, PfamaSerializer, Pfama2PfamaHhsearchSerializer, MembershipSerializer
 
 
 def home_page(request):

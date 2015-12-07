@@ -32,7 +32,7 @@ class CustomView(GenericAPIView):
     #
     # def get_more(self, queryset, *details):
     #     return queryset.prefetch_related(*details)
-
+    #
     # def get_json(self, endpoint_levels, request, *args, **kwargs):
     #     response = {'endpoint_levels': endpoint_levels}
     #     if (self.multiple):

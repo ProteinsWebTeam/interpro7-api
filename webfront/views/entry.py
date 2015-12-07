@@ -41,10 +41,11 @@ class AccesionHandler(CustomView):
     serializer_class = EntrySerializer
 
     def get(self, request, endpoint_levels, json_response, *args, **kwargs):
-        self.queryset = self.get_more(
-            self.queryset.filter(entry_ac=endpoint_levels[self.level-1]),
-            'commons'
-        )
+        # self.queryset = self.get_more(
+        #     self.queryset.filter(entry_ac=endpoint_levels[self.level-1]),
+        #     *request.GET.getlist('content')
+        # )
+        self.queryset = self.queryset.filter(entry_ac=endpoint_levels[self.level-1])
 
 
         return super(AccesionHandler, self).get(
@@ -76,6 +77,7 @@ class InterproHandler(ListModelMixin, CustomView):
         'all':          AllHandler,
         'unintegrated': UnintegratedHandler,
     }
+    serializer_class = EntrySerializer
 
 
 class EntryHandler(CustomView):

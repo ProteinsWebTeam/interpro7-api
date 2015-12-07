@@ -256,7 +256,7 @@ class Entry(models.Model):
     timestamp = models.DateField()
     userstamp = models.CharField(max_length=30)
     short_name = models.CharField(unique=True, max_length=30, blank=True, null=True)
-    commons = models.ManyToManyField(CommonAnnotation, through='Entry2Common')
+    # commons = models.ManyToManyField(CommonAnnotation, through='Entry2Common')
     comps = models.ManyToManyField('Entry', through='Entry2Comp')
     entries = models.ManyToManyField('Entry', through='Entry2Entry')
     ifcs = models.ManyToManyField('CvIfc', through='Entry2Ifc')

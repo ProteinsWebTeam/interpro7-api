@@ -1,9 +1,11 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
-from webfront.models import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership
+from webfront.models import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership,PfamaRegFullSignificant, PfamseqMarkup
 from rest_framework import viewsets
 from webfront.serializers import ClanSerializer, PfamaSerializer, Pfama2PfamaHhsearchSerializer, MembershipSerializer
 from django.http import HttpResponseNotFound
+from subprocess import check_output
+from webfront.active_sites import ActiveSites
 
 db_members = {
     'cath-gene3d': {
@@ -186,10 +188,15 @@ def interpro_member_filter_acc_page(request, i_filter, member, m_filter, option)
         else:
             family = Pfama.objects.using('pfam_ro').get(pfama_acc=m_filter)
             if option == "active_sites":
+                active_sites = ActiveSites(m_filter)
+                active_sites.load_from_DB()
+
+
                 return render(request, 'pfam_active_sites.html', {
                     "filter": i_filter,
                     "member": member,
                     "family":family,
+                    "active_sites": active_sites,
                     "data_types": db_members[member.lower()]['options_per_family'],
                     "list_of_families": get_filtered_information(i_filter,member),
                     "db_members": db_members

@@ -8,7 +8,22 @@
     <p>
         <!-- TODO: Get a table of the active sites for this family-->
         The seed consensus for this family is:
-        <pre>{{ family.seed_consensus }}</pre>
     </p>
+    {% if active_sites %}
+        <h4>Active Sites:</h4>
+        {% for id,values in active_sites.proteins.items %}
+            <div class="row">
+                <div class="col-md-2">{{id}}</div>
+                <div class="col-md-1">{{values}}</div>
+            </div>
+<!--            <div class="row">
+                <pre>{{ r.pfamseq_acc.sequence }}</pre>
+            </div>
+                <div class="row">
+                    {{ m1.auto_pfama_reg_full }}: {{ m1.pfama_acc_id }} - {{ m1.pfamseq_acc_id }} - {{ m1.in_full }} - {{ m1.seq_start }} - {{ m1.seq_end }} - {{ m1.ali_start }} - {{ m1.ali_end }} - {{ m1.model_start }} - {{ m1.model_end }} - {{ m1.domain_bits_score }} - {{ m1.domain_evalue_score }} - {{ m1.sequence_bits_score }} - {{ m1.sequence_evalue_score }} - {{ m1.tree_order }}
+                </div>
+-->
+        {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

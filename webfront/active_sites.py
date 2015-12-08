@@ -1,7 +1,11 @@
-from subprocess import check_output
-from webfront.models import PfamseqMarkup, PfamaRegFullSignificant
+import subprocess
+from django.db import connections
+import random
+from webfront.models import PfamaHmm
 
 hmmer_path = "/Users/gsalazar/Downloads/hmmer-3.1b2-macosx-intel/binaries/"
+tmp_folder = "/tmp/"
+
 
 class ActiveSites():
     def __init__(self, pfama_acc):
@@ -10,28 +14,74 @@ class ActiveSites():
 
     def load_from_DB(self):
         self.proteins = {}
+        cursor = connections['pfam_ro'].cursor()
 
-        residues = PfamseqMarkup.objects.using('pfam_ro').raw("""
-            SELECT m.*
+        cursor.execute("""
+            SELECT r.pfamseq_acc, residue, annotation, seq_start, seq_end, model_start, model_end, ali_start, ali_end, sequence
             FROM pfamA_reg_full_significant r, pfamseq_markup m, pfamseq s
-            WHERE m.pfamseq_acc=r.pfamseq_acc AND m.pfamseq_acc=s.pfamseq_acc AND r.pfamA_acc=%s AND r.in_full=1 AND auto_markup=1""", self.pfama_acc)
+            WHERE m.pfamseq_acc=r.pfamseq_acc AND
+                  m.pfamseq_acc=s.pfamseq_acc AND
+                  r.pfamA_acc=%s AND
+                  r.in_full=1 AND
+                  auto_markup=1""", [self.pfama_acc])
 
-        for r in residues:
-            if r.pfamseq_acc_id not in self.proteins:
-                m = PfamaRegFullSignificant.objects.using('pfam_ro').filter(pfamseq_acc=r.pfamseq_acc,pfama_acc=self.pfama_acc,in_full=1).first()
-                self.proteins[r.pfamseq_acc_id] = {
-                    "seq_start": m.seq_start,
-                    "seq_end": m.seq_end,
-                    "ali_start": m.ali_start,
-                    "ali_end": m.ali_end,
-                    "model_start": m.model_start,
-                    "model_end": m.model_end,
+        for r in cursor:
+            if r[0] not in self.proteins: #r[0] => pfamseq_acc
+                self.proteins[r[0]] = {
+                    "seq_start":   r[3],
+                    "seq_end":     r[4],
+                    "model_start": r[5],
+                    "model_end":   r[6],
+                    "ali_start":   r[7],
+                    "ali_end":     r[8],
+                    "sequence":    str(r[9])[2:-1
+
+                                   ],
                     "residues": []
                 }
-            self.proteins[r.pfamseq_acc_id]["residues"].append(r.residue)
-        print(self.proteins)
+            r_obj ={
+                "residue": r[1], # residue,
+                "annotation": r[2] # annotation
+            }
+            if r_obj not in self.proteins[r[0]]["residues"]:
+                self.proteins[r[0]]["residues"].append(r_obj)
+
         return self.proteins
 
+    def _create_fasta_file(self,path):
+        d_file = open(path,"w")
+        for acc, values in self.proteins.items():
+            d_file.write("> "+acc+"\n")
+            d_file.write(values["sequence"]+"\n\n")
+        d_file.close()
+
+    def _create_hmm_file(self,path):
+        hmm = PfamaHmm.objects.using('pfam_ro').get(pfama_acc=self.pfama_acc)
+        hmm_file = open(path,"w")
+        hmm_file.write(hmm.hmm)
+        hmm_file.close()
+
+    def _reset_alignments(self):
+        for acc in self.proteins:
+            self.proteins[acc]["alignment"] = ""
+
+    def _read_alignments(self,path):
+        self._reset_alignments()
+        a_file = open(path,"r")
+        for line in a_file:
+            if not line.startswith("#") and line.strip()!="":
+                acc, aln = line.split()
+                self.proteins[acc]["alignment"] += aln
+
     def load_alignment(self):
-        output = check_output([hmmer_path+ 'esl-sfetch', '-h'])
-        print(output)
+        rand = random.randint(1,10000)
+        path_fasta = tmp_folder+"fasta"+str(rand)+".txt"
+        path_hmm = tmp_folder+"hmm"+str(rand)+".txt"
+        path_aln = tmp_folder+"out"+str(rand)+".txt"
+
+        self._create_fasta_file(path_fasta)
+        self._create_hmm_file(path_hmm)
+
+        output = subprocess.run([hmmer_path + 'hmmalign', "--outformat", "SELEX", "-o", path_aln, path_hmm, path_fasta])
+
+        self._read_alignments(path_aln)

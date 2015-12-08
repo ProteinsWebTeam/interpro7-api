@@ -190,6 +190,7 @@ def interpro_member_filter_acc_page(request, i_filter, member, m_filter, option)
             if option == "active_sites":
                 active_sites = ActiveSites(m_filter)
                 active_sites.load_from_DB()
+                active_sites.load_alignment()
 
 
                 return render(request, 'pfam_active_sites.html', {

@@ -479,9 +479,9 @@ class Pfama2PfamaScoop(models.Model):
 
 
 class PfamaHmm(models.Model):
-    pfama_acc = models.ForeignKey(Pfama, db_column='pfamA_acc')  # Field name made lowercase.
+    pfama_acc = models.ForeignKey(Pfama, db_column='pfamA_acc',primary_key=True)  # Field name made lowercase.
     hmm = models.TextField(blank=True, null=True)
-    logo = models.TextField(blank=True, null=True)
+    #logo = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False

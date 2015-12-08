@@ -3,7 +3,7 @@
 {% block title %} - Entry - InterPro - {{filter}} - Pfam = {{family.pfama_acc}}{% endblock %}
 
 {% block content %}
-<div><h2>InterPro/{{filter}}/{{member}}/{{family.pfama_acc}}/active_sites:</h2>
+<td><h2>InterPro/{{filter}}/{{member}}/{{family.pfama_acc}}/active_sites:</h2>
     <!--TODO: Here all the entries of interpro should be listed -->
     <p>
         <!-- TODO: Get a table of the active sites for this family-->
@@ -11,19 +11,40 @@
     </p>
     {% if active_sites %}
         <h4>Active Sites:</h4>
+    <table class="table">
+        <tr>
+            <th>Seq ID</th>
+            <th>Seq start</th>
+            <th>Seq end</th>
+            <th>Model start</th>
+            <th>Model end</th>
+            <th>Ali start</th>
+            <th>Ali end</th>
+            <th>Residues</th>
+        </tr>
         {% for id,values in active_sites.proteins.items %}
-            <div class="row">
-                <div class="col-md-2">{{id}}</div>
-                <div class="col-md-1">{{values}}</div>
-            </div>
-<!--            <div class="row">
-                <pre>{{ r.pfamseq_acc.sequence }}</pre>
-            </div>
-                <div class="row">
-                    {{ m1.auto_pfama_reg_full }}: {{ m1.pfama_acc_id }} - {{ m1.pfamseq_acc_id }} - {{ m1.in_full }} - {{ m1.seq_start }} - {{ m1.seq_end }} - {{ m1.ali_start }} - {{ m1.ali_end }} - {{ m1.model_start }} - {{ m1.model_end }} - {{ m1.domain_bits_score }} - {{ m1.domain_evalue_score }} - {{ m1.sequence_bits_score }} - {{ m1.sequence_evalue_score }} - {{ m1.tree_order }}
-                </div>
--->
+        <tr>
+            <td>{{id}}</td>
+            <td>{{values.seq_start}}</td>
+            <td>{{values.seq_end}}</td>
+            <td>{{values.model_start}}</td>
+            <td>{{values.model_end}}</td>
+            <td>{{values.ali_start}}</td>
+            <td>{{values.ali_end}}</td>
+            <td><table class="table">
+                {% for r in values.residues %}
+                <tr>
+                    <td>{{r.residue}}</td>
+                    <td>{{r.annotation}}</td>
+                </tr>
+                {% endfor %}
+            </table></td>
+        </tr>
+        <tr>
+            <td colspan="8"><pre style="width: 800px;">{{values.alignment}}</pre></td>
+        </tr>
         {% endfor %}
+    </table>
     {% endif %}
 </div>
 {% endblock %}

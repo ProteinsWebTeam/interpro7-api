@@ -1,3 +1,4 @@
+import ipdb
 import re
 from django.views.generic import View
 from rest_framework.generics import GenericAPIView
@@ -7,14 +8,24 @@ from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator, EmptyPage
 
 from webfront.models import interpro
+from webfront.pagination import CustomPagination
 
 
 class CustomView(GenericAPIView):
+    # level of the view, to be able to extract the value from the URL
     level = 0
+    # description of the level of the endpoint, for debug purposes
     level_description = 'level'
+    # dict of handlers for lower levels of the endpoint
+    # the key will be regex or string to which the endpoint will be matched
     child_handlers = {}
+    # queryset upon which build new querysets
     queryset = interpro.Entry.objects
+    # will be used for the 'using()' part of the queries
     django_db = 'interpro_ro'
+    # custom pagination class
+    pagination_class = CustomPagination
+    # not used now
     multiple = True
 
     # # TODO: check if we can avoid instantiating at every request
@@ -63,19 +74,21 @@ class CustomView(GenericAPIView):
         if (len(endpoint_levels) == self.level):
             self.queryset = self.queryset.using(self.django_db)
             serialized = self.serializer_class(
-                self.queryset,
+                # passed to DRF's view
+                self.paginate_queryset(self.queryset),
                 many=True,
+                # extracted out in the custom view
                 content=request.GET.getlist('content')
             )
 
             return Response(serialized.data)
-            if json_response:
-                return self.get_json(endpoint_levels, request, *args, **kwargs)
-            else:
-                return self.get_html(endpoint_levels, request, *args, **kwargs)
+            # if json_response:
+            #     return self.get_json(endpoint_levels, request, *args, **kwargs)
+            # else:
+            #     return self.get_html(endpoint_levels, request, *args, **kwargs)
         # if this is not the last level
         else:
-            # get next level name
+            # get next level name provided by the client
             level_name = endpoint_levels[self.level]
             try:
                 # get the corresponding handler name

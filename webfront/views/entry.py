@@ -1,7 +1,8 @@
-from .custom import CustomView
 from webfront.models import interpro
 from rest_framework.mixins import ListModelMixin
+
 from webfront.serializers.interpro import EntrySerializer
+from .custom import CustomView
 
 
 class PfamClanIDHandler(CustomView):

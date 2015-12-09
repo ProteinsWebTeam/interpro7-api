@@ -9,7 +9,7 @@
         <p>Different views at this level:</p>
         <ul class="list-inline">
             {% for dt in data_types %}
-                <li><a href="{% url 'interpro_member_filter_page' filter member dt.filter  %}" class="interpro_all_link">{{ dt.label }}</a></li>
+                <li><a href="{% url 'interpro_member_filter_page' filter member dt.filter  %}" class="interpro_member_option_link {{dt.filter}}">{{ dt.label }}</a></li>
             {% endfor %}
         </ul>
         <br/><br/>

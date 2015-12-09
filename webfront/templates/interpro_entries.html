@@ -20,7 +20,7 @@
             <ul class="list-inline">
                 {% for k,m in db_members.items %}
                     <li>
-                        <a href="{% url 'interpro_member_page' filter k %}" class="interpro_all_link">
+                        <a href="{% url 'interpro_member_page' filter k %}" class="member_db_link {{k}}">
                         {{ m.label }}
                     </a>
                     </li>

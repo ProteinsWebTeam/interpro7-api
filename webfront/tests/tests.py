@@ -26,5 +26,5 @@ class ImportedModelTest(TransactionTestCase):
     def test_clans_returns_correct_html(self):
         c1 = Clan.objects.using('pfam_ro').create(clan_acc="CL0587",clan_id="CL0587",updated=timezone.now())
         c2 = Clan.objects.using('pfam_ro').create(clan_acc="CL0588",clan_id="CL0588",updated=timezone.now())
-        response = self.client.get('/clans/')
+        response = self.client.get('/entry/interpro/all/pfam/clans/')
         self.assertTemplateUsed(response, 'clans.html')

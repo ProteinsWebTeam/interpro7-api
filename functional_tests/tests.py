@@ -15,8 +15,12 @@ class NewVisitorTest(FunctionalTest):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('UNIFAM', header_text)
 
-        # The page has a link for clans and the user clicks on it
-        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.clans_link'))
+        # The User navigates trough the website until it finds the clans page
+        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.entries_link'))
+        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.interpro_link'))
+        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.interpro_all_link'))
+        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.member_db_link.pfam'))
+        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.interpro_member_option_link.clans'))
 
         # The clans page opens and has a title
         self.assertIn('UniFam - Clans', self.browser.title)
@@ -28,13 +32,17 @@ class NewVisitorTest(FunctionalTest):
         self.click_link_and_wait(clan_li.find_element_by_tag_name("a"))
 
         # The user will go to the page of the clan
-        self.assertIn('UniFam - Clan: '+clan_header, self.browser.title)
+        self.assertIn('UniFam - Clan: ', self.browser.title)
 
         # The clan page displays the details of the clan
 
         # The clan page displays a list of the  families of the clan
 
-        # the clan page also displays a table of the relationships
+        # the clan page also displays an SVG
+        svg = self.browser.find_element_by_tag_name("svg")
+        self.assertEqual("clanviewer",svg.get_attribute("class"))
+        node = svg.find_element_by_css_selector(".node")
+        self.assertIn("node_",node.get_attribute("id"))
 
     def test_uses_the_REST_for_clan(self):
         # Test that the server returns JSON

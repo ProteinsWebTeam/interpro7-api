@@ -78,24 +78,21 @@ class NewVisitorTest(FunctionalTest):
 
 
     def test_can_navigate_active_sites(self):
-        test_family="PF13812"
+        test_family="TEST_PFAM_ACC"
 
         # check out its homepage
-        self.browser.get(self.server_url)
+        self.browser.get(self.server_url+"/entry/interpro/all/pfam/"+test_family)
 
         # The page has a link for active sites and the user clicks on it
-        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.active_sites_link'))
+        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.interpro_member_option_link.active_sites'))
 
         # The active sites page opens and has a title
-        self.assertIn('UniFam - Active Sites', self.browser.title)
+        self.assertIn('Active Sites', self.browser.title)
+        self.assertIn(test_family, self.browser.title)
 
         # The user will have to input  a protein family accession
-        input_acc =self.browser.find_element_by_css_selector('input.accession')
-        input_acc.send_keys(test_family)
-        # The user chooses a clan
-        self.click_link_and_wait(self.browser.find_element_by_css_selector("button.search"))
+        content =self.browser.find_element_by_css_selector('.active_sites').text
 
-        # The user will go to the page of the clan
-        self.assertIn('UniFam - Active Sites: '+test_family, self.browser.title)
-
-        # The page displays the proteins with the residues where there are active sites
+        self.assertIn("TEST_SEQ_ACC_1",content)
+        self.assertIn("TEST_SEQ_ACC_2",content)
+        self.assertNotIn("TEST_SEQ_ACC_3",content)

@@ -1,3 +1,4 @@
+import os
 import subprocess
 from django.db import connections
 import random
@@ -73,6 +74,8 @@ class ActiveSites():
                 acc, aln = line.split()
                 self.proteins[acc]["alignment"] += aln
 
+
+
     def load_alignment(self):
         rand = random.randint(1,10000)
         path_fasta = tmp_folder+"fasta"+str(rand)+".txt"
@@ -82,6 +85,10 @@ class ActiveSites():
         self._create_fasta_file(path_fasta)
         self._create_hmm_file(path_hmm)
 
-        output = subprocess.run([hmmer_path + 'hmmalign', "--outformat", "SELEX", "-o", path_aln, path_hmm, path_fasta])
+        subprocess.run([hmmer_path + 'hmmalign', "--outformat", "SELEX", "-o", path_aln, path_hmm, path_fasta])
 
         self._read_alignments(path_aln)
+
+        os.remove(path_fasta)
+        os.remove(path_hmm)
+        os.remove(path_aln)

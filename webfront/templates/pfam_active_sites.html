@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} - Entry - InterPro - {{filter}} - Pfam = {{family.pfama_acc}}{% endblock %}
+{% block title %} - Entry - InterPro - {{filter}} - Pfam - {{family.pfama_acc}} - Active Sites{% endblock %}
 
 {% block content %}
 <h2>InterPro/{{filter}}/{{member}}/{{family.pfama_acc}}/active_sites:</h2>
@@ -11,7 +11,7 @@
     </p>
     {% if active_sites %}
         <h4>Active Sites:</h4>
-    <table class="table">
+    <table class="table active_sites">
         <tr>
             <th>Seq ID</th>
             <th>Seq start</th>

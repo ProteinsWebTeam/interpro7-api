@@ -3,9 +3,7 @@ import subprocess
 from django.db import connections
 import random
 from webfront.models import PfamaHmm
-
-hmmer_path = "/Users/gsalazar/Downloads/hmmer-3.1b2-macosx-intel/binaries/"
-tmp_folder = "/tmp/"
+from unifam.settings import TMP_FOLDER,HMMER_PATH
 
 
 class ActiveSites():
@@ -13,7 +11,7 @@ class ActiveSites():
         self.pfama_acc = pfama_acc
         self.proteins = {}
 
-    def load_from_DB(self):
+    def load_from_db(self):
         self.proteins = {}
         cursor = connections['pfam_ro'].cursor()
 
@@ -74,18 +72,16 @@ class ActiveSites():
                 acc, aln = line.split()
                 self.proteins[acc]["alignment"] += aln
 
-
-
     def load_alignment(self):
         rand = random.randint(1,10000)
-        path_fasta = tmp_folder+"fasta"+str(rand)+".txt"
-        path_hmm = tmp_folder+"hmm"+str(rand)+".txt"
-        path_aln = tmp_folder+"out"+str(rand)+".txt"
+        path_fasta = TMP_FOLDER+"fasta"+str(rand)+".txt"
+        path_hmm = TMP_FOLDER+"hmm"+str(rand)+".txt"
+        path_aln = TMP_FOLDER+"out"+str(rand)+".txt"
 
         self._create_fasta_file(path_fasta)
         self._create_hmm_file(path_hmm)
 
-        subprocess.run([hmmer_path + 'hmmalign', "--outformat", "SELEX", "-o", path_aln, path_hmm, path_fasta])
+        subprocess.run([HMMER_PATH + 'hmmalign', "--outformat", "SELEX", "-o", path_aln, path_hmm, path_fasta])
 
         self._read_alignments(path_aln)
 

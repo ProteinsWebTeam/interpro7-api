@@ -1,6 +1,6 @@
-import time
 from functional_tests.base import FunctionalTest
 import json
+
 
 class NewVisitorTest(FunctionalTest):
     fixtures = ['functional_tests/dummy_data.json']
@@ -26,8 +26,9 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('UniFam - Clans', self.browser.title)
 
         # The user will have a way to choose a clan from the  DB
-        clan_li =self.browser.find_element_by_css_selector('li.clan')
-        clan_header =clan_li.find_element_by_tag_name('a').text
+        clan_li = self.browser.find_element_by_css_selector('li.clan')
+        # clan_header = clan_li.find_element_by_tag_name('a').text
+
         # The user chooses a clan
         self.click_link_and_wait(clan_li.find_element_by_tag_name("a"))
 
@@ -40,9 +41,9 @@ class NewVisitorTest(FunctionalTest):
 
         # the clan page also displays an SVG
         svg = self.browser.find_element_by_tag_name("svg")
-        self.assertEqual("clanviewer",svg.get_attribute("class"))
+        self.assertEqual("clanviewer", svg.get_attribute("class"))
         node = svg.find_element_by_css_selector(".node")
-        self.assertIn("node_",node.get_attribute("id"))
+        self.assertIn("node_", node.get_attribute("id"))
 
     def test_uses_the_REST_for_clan(self):
         # Test that the server returns JSON
@@ -51,7 +52,7 @@ class NewVisitorTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(jsonp["count"],2)
+        self.assertEqual(jsonp["count"], 2)
         self.assertEqual(len(jsonp["results"]), jsonp["count"])
 
         self.assertIn('"TEST_ACC"', content)
@@ -62,8 +63,8 @@ class NewVisitorTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(jsonp["count"],2)
-        self.assertEqual(len(jsonp["results"]),jsonp["count"])
+        self.assertEqual(jsonp["count"], 2)
+        self.assertEqual(len(jsonp["results"]), jsonp["count"])
 
         self.assertIn('"TEST_PFAM_ACC"', content)
         self.assertIn('"TEST_PFAM_ACC_2"', content)
@@ -76,23 +77,22 @@ class NewVisitorTest(FunctionalTest):
         self.assertEqual(jsonp["clan_acc"], "TEST_ACC")
         self.assertEqual(sum([x["num_full"] for x in jsonp["members"]]), jsonp["total_occurrences"])
 
-
     def test_can_navigate_active_sites(self):
-        test_family="TEST_PFAM_ACC"
+        test_family = "TEST_PFAM_ACC"
 
         # check out its homepage
         self.browser.get(self.server_url+"/entry/interpro/all/pfam/"+test_family)
 
         # The page has a link for active sites and the user clicks on it
-        self.click_link_and_wait(self.browser.find_element_by_css_selector('a.interpro_member_option_link.active_sites'))
+        self.click_link_and_wait(
+            self.browser.find_element_by_css_selector('a.interpro_member_option_link.active_sites'))
 
         # The active sites page opens and has a title
         self.assertIn('Active Sites', self.browser.title)
         self.assertIn(test_family, self.browser.title)
 
         # The user will have to input  a protein family accession
-        content =self.browser.find_element_by_css_selector('.active_sites').text
+        content = self.browser.find_element_by_css_selector('.active_sites').text
 
-        self.assertIn("TEST_SEQ_ACC_1",content)
-        self.assertIn("TEST_SEQ_ACC_2",content)
-        self.assertNotIn("TEST_SEQ_ACC_3",content)
+        self.assertIn("TEST_SEQ_ACC_1", content)
+        self.assertNotIn("TEST_SEQ_ACC_3", content)

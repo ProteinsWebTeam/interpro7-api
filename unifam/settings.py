@@ -24,6 +24,10 @@ try:
   MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
 except FileNotFoundError:
   MYSQL_CONFIG = {}
+try:
+    UNIFAM_CONFIG = yaml.safe_load(open('{}/config/unifam.yml'.format(BASE_DIR)))
+except FileNotFoundError:
+    UNIFAM_CONFIG = {}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -150,6 +154,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'webfront.pagination.CustomPagination',
 }
 
+HMMER_PATH = UNIFAM_CONFIG.get('hmmer_path', '/tmp/')
+TMP_FOLDER = UNIFAM_CONFIG.get('tmp_path', '/tmp/')
+
 # # Debug toolbar
 # DEBUG_TOOLBAR_PATCH_SETTINGS = False
 # DEBUG_TOOLBAR_CONFIG = {
@@ -171,3 +178,24 @@ REST_FRAMEWORK = {
 #     'debug_toolbar.panels.redirects.RedirectsPanel',
 #     'debug_toolbar.panels.profiling.ProfilingPanel',
 # ]
+if DEBUG:
+    import logging
+    l = logging.getLogger('django.db.backends')
+    l.setLevel(logging.DEBUG)
+    l.addHandler(logging.StreamHandler())
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
+    },
+}

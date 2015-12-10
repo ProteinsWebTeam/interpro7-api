@@ -189,7 +189,7 @@ def interpro_member_filter_acc_page(request, i_filter, member, m_filter, option)
             family = Pfama.objects.using('pfam_ro').get(pfama_acc=m_filter)
             if option == "active_sites":
                 active_sites = ActiveSites(m_filter)
-                active_sites.load_from_DB()
+                active_sites.load_from_db()
                 active_sites.load_alignment()
 
 

@@ -156,7 +156,7 @@ REST_FRAMEWORK = {
 
 HMMER_PATH = UNIFAM_CONFIG.get('hmmer_path', '/tmp/')
 TMP_FOLDER = UNIFAM_CONFIG.get('tmp_path', '/tmp/')
-
+DB_MEMBERS = UNIFAM_CONFIG.get('members', {})
 # # Debug toolbar
 # DEBUG_TOOLBAR_PATCH_SETTINGS = False
 # DEBUG_TOOLBAR_CONFIG = {

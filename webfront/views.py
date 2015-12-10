@@ -1,92 +1,13 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
+from unifam.settings import DB_MEMBERS
 from webfront.models import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership,PfamaRegFullSignificant, PfamseqMarkup
 from rest_framework import viewsets
 from webfront.serializers import ClanSerializer, PfamaSerializer, Pfama2PfamaHhsearchSerializer, MembershipSerializer
 from django.http import HttpResponseNotFound
-from subprocess import check_output
 from webfront.active_sites import ActiveSites
 
-db_members = {
-    'cath-gene3d': {
-        'filter': 'cath-gene3d',
-        'label': 'CATH-Gene3D',
-        'options': [],
-        'options_per_family': []
-    },
-    'hamap': {
-        'filter': 'hamap',
-        'label': 'HAMAP',
-        'options': [],
-        'options_per_family': []
-    },
-    'panther': {
-        'filter': 'panther',
-        'label': 'PANTHER',
-        'options': [],
-         'options_per_family': []
-    },
-    'pirsf': {
-        'filter': 'pirsf',
-        'label': 'PIRSF',
-        'options': [],
-         'options_per_family': []
-    },
-    'prints': {
-        'filter': 'prints',
-        'label': 'PRINTS',
-        'options': [],
-        'options_per_family': []
-    },
-    'prosite_patterns': {
-        'filter': 'prosite_patterns',
-        'label': 'PROSITE patterns',
-        'options': [],
-        'options_per_family': []
-    },
-    'prosite_profiles': {
-        'filter': 'prosite_profiles',
-        'label': 'PROSITE profiles',
-        'options': [],
-        'options_per_family': []
-    },
-    'pfam': {
-        'filter': 'pfam',
-        'label': 'Pfam',
-        'options': [{
-            "label": "Clans",
-            "filter": "clans"
-        }],
-        'options_per_family': [{
-            "label": "Active Sites",
-            "filter": "active_sites"
-        }]
-    },
-    'prodom': {
-        'filter': 'prodom',
-        'label': 'ProDom',
-        'options': [],
-        'options_per_family': []
-    },
-    'smart': {
-        'filter': 'smart',
-        'label': 'SMART',
-        'options': [],
-        'options_per_family': []
-    },
-    'superfamily': {
-        'filter': 'superfamily',
-        'label': 'SUPERFAMILY',
-        'options': [],
-        'options_per_family': []
-    },
-    'tigrfams': {
-        'filter': 'tigrfams',
-        'label': 'TIGRFAMs',
-        'options': [],
-        'options_per_family': []
-    }
-}
+db_members = DB_MEMBERS
 
 
 def home_page(request):

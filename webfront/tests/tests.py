@@ -1,21 +1,25 @@
+from pathlib import Path
+import unittest
 import os
+import sys
 from django.core.urlresolvers import resolve
 from django.test import TestCase
 from webfront.active_sites import ActiveSites
-from webfront.models import Clan, Pfama, Pfamseq, MarkupKey, PfamseqMarkup, PfamaRegFullSignificant
+from webfront.models import Clan, Pfama, Pfamseq, MarkupKey, PfamseqMarkup, PfamaRegFullSignificant, PfamaHmm
 from django.utils import timezone
 from webfront.views import home_page
+from unifam.settings import TMP_FOLDER,HMMER_PATH
 
 
 class ImportedModelTest(TestCase):
 
     @classmethod
-    def setUpTestData(self):
-        self.c1 = Clan.objects.using('pfam_ro').create(
+    def setUpTestData(cls):
+        cls.c1 = Clan.objects.using('pfam_ro').create(
             clan_acc="CL0587",
             clan_id="CL0587",
             updated=timezone.now())
-        self.c2 = Clan.objects.using('pfam_ro').create(
+        cls.c2 = Clan.objects.using('pfam_ro').create(
             clan_acc="CL0588",
             clan_id="CL0588",
             updated=timezone.now())
@@ -42,7 +46,7 @@ class ActiveSitesTest(TestCase):
 
     @classmethod
     def setUpTestData(self):
-        pfam1 =Pfama.objects.using('pfam_ro').create(
+        pfam1 = Pfama.objects.using('pfam_ro').create(
             pfama_acc="TEST_PFAM_ACC",
             pfama_id="TEST_PFAM_ID",
             updated="2011-09-01T13:20:30+03:00",
@@ -95,7 +99,10 @@ class ActiveSitesTest(TestCase):
             model_end=33,
             in_full=1
         )
-
+        PfamaHmm.objects.using('pfam_ro').create(
+            pfama_acc=pfam1,
+            hmm="| HMMER3/f [3.1b2 | February 2015]\nNAME  TEST_PFAM_NAME\nACC   TEST_PFAM_ACC"
+        )
 
     def test_load_unknown_id_from_db(self):
         active_sites = ActiveSites("unknownID")
@@ -113,21 +120,27 @@ class ActiveSitesTest(TestCase):
     def test_fasta_creation(self):
         active_sites = ActiveSites("TEST_PFAM_ACC")
         proteins = active_sites.load_from_db()
-        file_path = "tmp.fa";
+        file_path = TMP_FOLDER+"tmp.fa";
         active_sites._create_fasta_file(file_path)
-        fasta = open(file_path, "r").read()
-        self.assertIn("TEST_SEQ_ACC_1",fasta)
-        self.assertIn(proteins["TEST_SEQ_ACC_1"]["sequence"],fasta)
+        fasta_f = open(file_path, "r")
+        fasta = fasta_f.read()
+        self.assertIn("TEST_SEQ_ACC_1", fasta)
+        self.assertIn(proteins["TEST_SEQ_ACC_1"]["sequence"], fasta)
+        fasta_f.close()
         os.remove(file_path)
 
     def test_hmm_creation(self):
-        self.fail("not implemented")
+        active_sites = ActiveSites("TEST_PFAM_ACC")
+        file_path = TMP_FOLDER+"tmp.hmm";
+        active_sites._create_hmm_file(file_path)
+        hmm_f = open(file_path, "r")
+        hmm = hmm_f.read()
+        self.assertIn("TEST_PFAM_ACC", hmm)
+        self.assertIn("HMMER", hmm)
+        hmm_f.close()
+        os.remove(file_path)
 
-    def test_hmm_creation(self):
-        self.fail("not implemented")
-
-    def test_parsing_alignments(self):
-        self.fail("not implemented")
-
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_native_execution(self):
-        self.fail("not implemented")
+        self.assertTrue(Path(HMMER_PATH).exists())
+        self.assertTrue(Path(HMMER_PATH+"/hmmalign").is_file())

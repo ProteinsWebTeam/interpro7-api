@@ -45,7 +45,6 @@ def get_filtered_information(i_filter="integrated", member=None):
 
 
 def interpro_filter_page(request, i_filter):
-    print(db_members)
     return render(request, 'interpro_entries.html', {
         "filter": i_filter,
         "list_of_families": get_filtered_information(i_filter),

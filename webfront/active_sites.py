@@ -56,7 +56,7 @@ class ActiveSites():
 
     def _create_hmm_file(self,path):
         hmm = PfamaHmm.objects.using('pfam_ro').get(pfama_acc=self.pfama_acc)
-        hmm_file = open(path,"w")
+        hmm_file = open(path, "w")
         hmm_file.write(hmm.hmm)
         hmm_file.close()
 

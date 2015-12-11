@@ -54,10 +54,12 @@ INSTALLED_APPS = (
     'webfront',
     # added
     'rest_framework',
+    'corsheaders',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',# added
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -142,7 +144,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static_files/'
-STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static_files'))
+STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'static_files'))
 
 
 REST_FRAMEWORK = {
@@ -157,27 +159,7 @@ REST_FRAMEWORK = {
 HMMER_PATH = UNIFAM_CONFIG.get('hmmer_path', '/tmp/')
 TMP_FOLDER = UNIFAM_CONFIG.get('tmp_path', '/tmp/')
 DB_MEMBERS = UNIFAM_CONFIG.get('members', {})
-# # Debug toolbar
-# DEBUG_TOOLBAR_PATCH_SETTINGS = False
-# DEBUG_TOOLBAR_CONFIG = {
-#     # show the toolbar for all requests (in DEBUG mode)
-#     'SHOW_TOOLBAR_CALLBACK': lambda request: True,
-# }
-# DEBUG_TOOLBAR_PANELS = [
-#     'debug_toolbar.panels.versions.VersionsPanel',
-#     'debug_toolbar.panels.timer.TimerPanel',
-#     'debug_toolbar.panels.settings.SettingsPanel',
-#     'debug_toolbar.panels.headers.HeadersPanel',
-#     'debug_toolbar.panels.request.RequestPanel',
-#     'debug_toolbar.panels.sql.SQLPanel',
-#     'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-#     'debug_toolbar.panels.templates.TemplatesPanel',
-#     'debug_toolbar.panels.cache.CachePanel',
-#     'debug_toolbar.panels.signals.SignalsPanel',
-#     'debug_toolbar.panels.logging.LoggingPanel',
-#     'debug_toolbar.panels.redirects.RedirectsPanel',
-#     'debug_toolbar.panels.profiling.ProfilingPanel',
-# ]
+
 if DEBUG:
     import logging
     l = logging.getLogger('django.db.backends')
@@ -199,3 +181,27 @@ LOGGING = {
         },
     },
 }
+
+# Debug toolbar
+# DEBUG_TOOLBAR_PATCH_SETTINGS = False
+# DEBUG_TOOLBAR_CONFIG = {
+#     # show the toolbar for all requests (in DEBUG mode)
+#     'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+# }
+# DEBUG_TOOLBAR_PANELS = [
+#     'debug_toolbar.panels.versions.VersionsPanel',
+#     'debug_toolbar.panels.timer.TimerPanel',
+#     'debug_toolbar.panels.settings.SettingsPanel',
+#     'debug_toolbar.panels.headers.HeadersPanel',
+#     'debug_toolbar.panels.request.RequestPanel',
+#     'debug_toolbar.panels.sql.SQLPanel',
+#     'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+#     'debug_toolbar.panels.templates.TemplatesPanel',
+#     'debug_toolbar.panels.cache.CachePanel',
+#     'debug_toolbar.panels.signals.SignalsPanel',
+#     'debug_toolbar.panels.logging.LoggingPanel',
+#     'debug_toolbar.panels.redirects.RedirectsPanel',
+#     'debug_toolbar.panels.profiling.ProfilingPanel',
+# ]
+
+CORS_ORIGIN_ALLOW_ALL = True

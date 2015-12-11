@@ -1,10 +1,10 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
-from unifam.settings import DB_MEMBERS
-from webfront.models import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership,PfamaRegFullSignificant, PfamseqMarkup
-from rest_framework import viewsets
-from webfront.serializers import ClanSerializer, PfamaSerializer, Pfama2PfamaHhsearchSerializer, MembershipSerializer
 from django.http import HttpResponseNotFound
+from rest_framework import viewsets
+from unifam.settings import DB_MEMBERS
+from webfront.models.pfam import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership,PfamaRegFullSignificant, PfamseqMarkup
+from webfront.serializers.pfam import ClanSerializer, PfamaSerializer, Pfama2PfamaHhsearchSerializer, MembershipSerializer
 from webfront.active_sites import ActiveSites
 
 db_members = DB_MEMBERS
@@ -13,12 +13,6 @@ db_members = DB_MEMBERS
 def home_page(request):
     return render(request, 'home.html')
 
-
-# def clans_page(request):
-#     clans = Clan.objects.using('pfam_ro').all()
-#     return render(request, 'clans.html', {"clans":clans})
-#
-#
 
 def entries_page(request):
     return render(request, 'entries.html')

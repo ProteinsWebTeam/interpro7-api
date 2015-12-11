@@ -1,7 +1,6 @@
 from functional_tests.base import FunctionalTest
 import json
 
-
 class NewVisitorTest(FunctionalTest):
     fixtures = ['functional_tests/dummy_data.json']
 

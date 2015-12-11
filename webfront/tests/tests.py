@@ -1,14 +1,13 @@
 from pathlib import Path
 import unittest
 import os
-import sys
-from django.core.urlresolvers import resolve
 from django.test import TestCase
 from webfront.active_sites import ActiveSites
-from webfront.models import Clan, Pfama, Pfamseq, MarkupKey, PfamseqMarkup, PfamaRegFullSignificant, PfamaHmm
+from webfront.models.pfam import Clan, Pfama, Pfamseq, MarkupKey, PfamseqMarkup, PfamaRegFullSignificant, PfamaHmm
 from django.utils import timezone
-from webfront.views import home_page
+from django.core.urlresolvers import resolve
 from unifam.settings import TMP_FOLDER,HMMER_PATH
+from webfront.views.member_databases.pfam import home_page
 
 
 class ImportedModelTest(TestCase):

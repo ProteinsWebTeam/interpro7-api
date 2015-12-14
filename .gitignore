@@ -6,5 +6,6 @@ unifam/mysql.conf
 .DS_Store
 unifam/settings-private.py
 .coverage
-config
+config/oracle.yml
+config/mysql.yml
 

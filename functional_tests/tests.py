@@ -1,5 +1,8 @@
 from functional_tests.base import FunctionalTest
 import json
+import unittest
+import os
+
 
 class NewVisitorTest(FunctionalTest):
     fixtures = ['functional_tests/dummy_data.json']
@@ -76,6 +79,8 @@ class NewVisitorTest(FunctionalTest):
         self.assertEqual(jsonp["clan_acc"], "TEST_ACC")
         self.assertEqual(sum([x["num_full"] for x in jsonp["members"]]), jsonp["total_occurrences"])
 
+    # skipping this test in travis because there the hmmer binaries are not there
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_can_navigate_active_sites(self):
         test_family = "TEST_PFAM_ACC"
 

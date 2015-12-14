@@ -161,7 +161,7 @@ HMMER_PATH = UNIFAM_CONFIG.get('hmmer_path', '/tmp/')
 TMP_FOLDER = UNIFAM_CONFIG.get('tmp_path', '/tmp/')
 DB_MEMBERS = UNIFAM_CONFIG.get('members', {})
 
-if DEBUG:
+if DEBUG and not("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true"):
     import logging
     l = logging.getLogger('django.db.backends')
     l.setLevel(logging.DEBUG)

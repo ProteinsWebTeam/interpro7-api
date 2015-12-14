@@ -2,7 +2,7 @@ import os
 import subprocess
 from django.db import connections
 import random
-from webfront.models import PfamaHmm
+from webfront.models.pfam import PfamaHmm
 from unifam.settings import TMP_FOLDER,HMMER_PATH
 
 

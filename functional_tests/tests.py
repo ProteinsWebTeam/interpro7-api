@@ -6,7 +6,7 @@ class NewVisitorTest(FunctionalTest):
 
     def test_can_navigate_clans(self):
         # check out its homepage
-        self.browser.get(self.server_url)
+        self.browser.get(self.server_url+"/web")
 
         # the page title and header mention UniFam
         self.assertIn('UniFam', self.browser.title)
@@ -80,7 +80,7 @@ class NewVisitorTest(FunctionalTest):
         test_family = "TEST_PFAM_ACC"
 
         # check out its homepage
-        self.browser.get(self.server_url+"/entry/interpro/all/pfam/"+test_family)
+        self.browser.get(self.server_url+"/web/entry/interpro/all/pfam/"+test_family)
 
         # The page has a link for active sites and the user clicks on it
         self.click_link_and_wait(

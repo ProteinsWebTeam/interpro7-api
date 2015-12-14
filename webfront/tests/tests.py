@@ -24,7 +24,7 @@ class ImportedModelTest(TestCase):
             updated=timezone.now())
 
     def test_root_url_resolves_to_home_page_view(self):
-        found = resolve('/')
+        found = resolve('/web')
         self.assertEqual(found.func, home_page)
 
     def test_saving_clan_in_test_server(self):
@@ -33,11 +33,11 @@ class ImportedModelTest(TestCase):
         self.assertEqual(all_clans[0], self.c1)
 
     def test_home_page_returns_correct_html(self):
-        response = self.client.get('/')
+        response = self.client.get('/web')
         self.assertTemplateUsed(response, 'home.html')
 
     def test_clans_returns_correct_html(self):
-        response = self.client.get('/entry/interpro/all/pfam/clans/')
+        response = self.client.get('/web/entry/interpro/all/pfam/clans/')
         self.assertTemplateUsed(response, 'clans.html')
 
 

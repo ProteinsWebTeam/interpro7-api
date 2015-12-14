@@ -1,6 +1,6 @@
 [
   {
-    "model": "webfront.models.pfam.Clan",
+    "model": "webfront.Clan",
     "fields": {
       "clan_acc": "TEST_ACC",
       "clan_id": "TEST_ID",
@@ -8,7 +8,7 @@
     }
   },
   {
-    "model": "webfront.models.pfamClan",
+    "model": "webfront.Clan",
     "fields": {
       "clan_acc": "TEST_ACC_2",
       "clan_id": "TEST_ID_2",
@@ -16,7 +16,7 @@
     }
   },
   {
-    "model": "webfront.models.pfamPfama",
+    "model": "webfront.Pfama",
     "fields": {
       "pfama_acc": "TEST_PFAM_ACC",
       "pfama_id": "TEST_PFAM_ID",
@@ -25,7 +25,7 @@
     }
   },
   {
-    "model": "webfront.models.pfamPfama",
+    "model": "webfront.Pfama",
     "fields": {
       "pfama_acc": "TEST_PFAM_ACC_2",
       "pfama_id": "TEST_PFAM_ID_2",
@@ -34,7 +34,7 @@
     }
   },
   {
-    "model": "webfront.models.pfamClanMembership",
+    "model": "webfront.ClanMembership",
     "pk":1,
     "fields": {
       "pfama_acc": "TEST_PFAM_ACC",
@@ -42,7 +42,7 @@
     }
   },
   {
-    "model": "webfront.models.pfamClanMembership",
+    "model": "webfront.ClanMembership",
     "pk":2,
     "fields": {
       "pfama_acc": "TEST_PFAM_ACC_2",
@@ -50,7 +50,7 @@
     }
   },
   {
-    "model": "webfront.models.pfamPfama2PfamaHhsearch",
+    "model": "webfront.Pfama2PfamaHhsearch",
     "fields": {
       "pfama_acc_1": "TEST_PFAM_ACC",
       "pfama_acc_2": "TEST_PFAM_ACC_2",

@@ -7,7 +7,7 @@
 <div>
     <ul class="clans">
         {% for clan in clans %}
-        <li class="clan"><a href="{% url 'interpro_member_filter_acc_page' filter member m_filter clan.clan_acc %}">{{ clan.clan_acc }} ({{ clan.clan_id }})</a></li>
+        <li class="clan {{ clan.clan_acc }}"><a href="{% url 'interpro_member_filter_acc_page' filter member m_filter clan.clan_acc %}">{{ clan.clan_acc }} ({{ clan.clan_id }})</a></li>
         {% endfor %}
     </ul>
 </div>

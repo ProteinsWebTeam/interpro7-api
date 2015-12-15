@@ -23,6 +23,12 @@ class ImportedModelTest(TestCase):
             clan_id="CL0588",
             updated=timezone.now())
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.c1.delete()
+        cls.c2.delete()
+        super(ImportedModelTest, cls).tearDownClass()
+
     def test_root_url_resolves_to_home_page_view(self):
         found = resolve('/web')
         self.assertEqual(found.func, home_page)

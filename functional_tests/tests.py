@@ -34,7 +34,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn("TEST_ACC", content)
 
         # The user will have a way to choose a clan from the  DB
-        clan_li = self.browser.find_element_by_css_selector('li.clan')
+        clan_li = self.browser.find_element_by_css_selector('li.clan.TEST_ACC')
         # clan_header = clan_li.find_element_by_tag_name('a').text
 
         # The user chooses a clan

@@ -29,6 +29,9 @@ class NewVisitorTest(FunctionalTest):
 
         # The clans page opens and has a title
         self.assertIn('UniFam - Clans', self.browser.title)
+        content = self.browser.find_element_by_tag_name("body").text
+        print(content)
+        self.assertIn("TEST_ACC", content)
 
         # The user will have a way to choose a clan from the  DB
         clan_li = self.browser.find_element_by_css_selector('li.clan')

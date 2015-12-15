@@ -12,8 +12,6 @@
         <li class="clan"><b>ID:</b> {{ clan.clan_id }}</li>
         <li class="clan"><b>Acc:</b> {{ clan.clan_acc }}</li>
     </ul>
-    <pre id="request" >{% url 'api_clans-detail' clan.clan_acc %}?format=json</pre>
-    <pre id="response" ></pre>
 
     <div id="network" class="box" ></div>
     <script>
@@ -21,8 +19,6 @@
         var app = require("clanviewer");
         var instance = new app({el: "#network"});
         d3.json("{% url 'api_clans-detail' clan.clan_acc %}?format=json", function(error, data) {
-            d3.select("#response")
-                    .text(JSON.stringify(data));
             instance.paint(data);
         });
     </script>

@@ -47,12 +47,15 @@ class NewVisitorTest(FunctionalTest):
         # the clan page also displays an SVG
         svg = self.browser.find_element_by_tag_name("svg")
         self.assertEqual("clanviewer", svg.get_attribute("class"))
+
+        print("\n"+self.browser.find_element_by_id("request").text)
         try:
             node = WebDriverWait(self.browser, 10).until(
                 expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".node")))
         finally:
             content = svg.get_attribute('innerHTML')
-            print(content)
+            print("\n"+content+"\n\n")
+            print("\n"+self.browser.find_element_by_id("response").text)
             self.assertIn("node_", node.get_attribute("id"))
             self.assertIn("circle", content)
 

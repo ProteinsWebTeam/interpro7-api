@@ -1,3 +1,6 @@
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
 from functional_tests.base import FunctionalTest
 import json
 import unittest
@@ -9,7 +12,7 @@ class NewVisitorTest(FunctionalTest):
 
     def test_can_navigate_clans(self):
         # check out its homepage
-        self.browser.get(self.server_url+"/web")
+        self.browser.get(self.server_url + "/web")
 
         # the page title and header mention UniFam
         self.assertIn('UniFam', self.browser.title)
@@ -44,16 +47,18 @@ class NewVisitorTest(FunctionalTest):
         # the clan page also displays an SVG
         svg = self.browser.find_element_by_tag_name("svg")
         self.assertEqual("clanviewer", svg.get_attribute("class"))
-        content = svg.get_attribute('innerHTML')
-        print(content)
-        self.assertIn("circle",content)
-
-        node = svg.find_element_by_css_selector(".node")
-        self.assertIn("node_", node.get_attribute("id"))
+        try:
+            node = WebDriverWait(self.browser, 10).until(
+                expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".node")))
+        finally:
+            content = svg.get_attribute('innerHTML')
+            print(content)
+            self.assertIn("node_", node.get_attribute("id"))
+            self.assertIn("circle", content)
 
     def test_uses_the_REST_for_clan(self):
         # Test that the server returns JSON
-        self.browser.get(self.server_url+"/api/clans/?format=json")
+        self.browser.get(self.server_url + "/api/clans/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
         jsonp = json.loads(content)
@@ -64,7 +69,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('"TEST_ACC"', content)
         self.assertIn('"TEST_ACC_2"', content)
 
-        self.browser.get(self.server_url+"/api/pfama/?format=json")
+        self.browser.get(self.server_url + "/api/pfama/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
         jsonp = json.loads(content)
@@ -75,7 +80,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('"TEST_PFAM_ACC"', content)
         self.assertIn('"TEST_PFAM_ACC_2"', content)
 
-        self.browser.get(self.server_url+"/api/clans/TEST_ACC/?format=json")
+        self.browser.get(self.server_url + "/api/clans/TEST_ACC/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
         jsonp = json.loads(content)
@@ -89,7 +94,7 @@ class NewVisitorTest(FunctionalTest):
         test_family = "TEST_PFAM_ACC"
 
         # check out its homepage
-        self.browser.get(self.server_url+"/web/entry/interpro/all/pfam/"+test_family)
+        self.browser.get(self.server_url + "/web/entry/interpro/all/pfam/" + test_family)
 
         # The page has a link for active sites and the user clicks on it
         self.click_link_and_wait(

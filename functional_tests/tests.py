@@ -44,6 +44,10 @@ class NewVisitorTest(FunctionalTest):
         # the clan page also displays an SVG
         svg = self.browser.find_element_by_tag_name("svg")
         self.assertEqual("clanviewer", svg.get_attribute("class"))
+        content = svg.get_attribute('innerHTML')
+        print(content)
+        self.assertIn("circle",content)
+
         node = svg.find_element_by_css_selector(".node")
         self.assertIn("node_", node.get_attribute("id"))
 

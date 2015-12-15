@@ -161,27 +161,27 @@ HMMER_PATH = UNIFAM_CONFIG.get('hmmer_path', '/tmp/')
 TMP_FOLDER = UNIFAM_CONFIG.get('tmp_path', '/tmp/')
 DB_MEMBERS = UNIFAM_CONFIG.get('members', {})
 
-if DEBUG and ("TRAVIS" not in os.environ or os.environ["TRAVIS"] == "false"):
-    import logging
-    l = logging.getLogger('django.db.backends')
-    l.setLevel(logging.DEBUG)
-    l.addHandler(logging.StreamHandler())
+import logging
+l = logging.getLogger('django.db.backends')
+l.setLevel(logging.DEBUG)
+l.addHandler(logging.StreamHandler())
+if DEBUG and ("TRAVIS" not in os.environ):
 
-LOGGING = {
-    'version': 1,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
+    LOGGING = {
+        'version': 1,
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+            },
         },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
+        'loggers': {
+            'django.db.backends': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+            },
         },
-    },
-}
+    }
 
 # Debug toolbar
 # DEBUG_TOOLBAR_PATCH_SETTINGS = False

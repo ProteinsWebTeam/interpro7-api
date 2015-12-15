@@ -6,7 +6,7 @@ from webfront.active_sites import ActiveSites
 from webfront.models.pfam import Clan, Pfama, Pfamseq, MarkupKey, PfamseqMarkup, PfamaRegFullSignificant, PfamaHmm
 from django.utils import timezone
 from django.core.urlresolvers import resolve
-from unifam.settings import TMP_FOLDER,HMMER_PATH
+from unifam.settings import TMP_FOLDER, HMMER_PATH, DB_MEMBERS
 from webfront.views.member_databases.pfam import home_page
 
 
@@ -39,6 +39,10 @@ class ImportedModelTest(TestCase):
     def test_clans_returns_correct_html(self):
         response = self.client.get('/web/entry/interpro/all/pfam/clans/')
         self.assertTemplateUsed(response, 'clans.html')
+
+    def test_read_the_unifam_settings_file(self):
+        self.assertEqual(TMP_FOLDER,"/tmp/")
+        self.assertGreater(len(DB_MEMBERS.items()),0)
 
 
 class ActiveSitesTest(TestCase):

@@ -30,7 +30,7 @@ class ImportedModelTest(TestCase):
         super(ImportedModelTest, cls).tearDownClass()
 
     def test_root_url_resolves_to_home_page_view(self):
-        found = resolve('/web')
+        found = resolve('/')
         self.assertEqual(found.func, home_page)
 
     def test_saving_clan_in_test_server(self):
@@ -39,11 +39,11 @@ class ImportedModelTest(TestCase):
         self.assertEqual(all_clans[0], self.c1)
 
     def test_home_page_returns_correct_html(self):
-        response = self.client.get('/web')
+        response = self.client.get('/')
         self.assertTemplateUsed(response, 'home.html')
 
     def test_clans_returns_correct_html(self):
-        response = self.client.get('/web/entry/interpro/all/pfam/clans/')
+        response = self.client.get('/entry/interpro/all/pfam/clans/')
         self.assertTemplateUsed(response, 'clans.html')
 
     def test_read_the_unifam_settings_file(self):

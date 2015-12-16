@@ -1,12 +1,24 @@
 from .custom import CustomView
-from webfront.models import interpro
+from webfront.models import interpro, Clan, Pfama
 from rest_framework.mixins import ListModelMixin
 from webfront.serializers.interpro import EntrySerializer
+from webfront.serializers.pfam import ClanSerializer, PfamaSerializer
 
 
 class PfamClanIDHandler(CustomView):
     level = 6
     level_description = 'Pfam clan ID level'
+    serializer_class = ClanSerializer
+    django_db = "pfam_ro"
+    many = False
+
+    def get(self, request, endpoint_levels, *args, **kwargs):
+
+        self.queryset = Clan.objects.all().filter(clan_acc=endpoint_levels[self.level-1])
+
+        return super(PfamClanIDHandler, self).get(
+            request, endpoint_levels, *args, **kwargs
+        )
 
 
 class ClanHandler(CustomView):
@@ -15,11 +27,32 @@ class ClanHandler(CustomView):
     child_handlers = {
         r'CL\d{4}': PfamClanIDHandler,
     }
+    serializer_class = ClanSerializer
+    django_db = "pfam_ro"
+
+    def get(self, request, endpoint_levels, *args, **kwargs):
+
+        self.queryset = Clan.objects.all()
+
+        return super(ClanHandler, self).get(
+            request, endpoint_levels, *args, **kwargs
+        )
 
 
 class PfamIDHandler(CustomView):
     level = 5
     level_description = 'Pfam ID level',
+    serializer_class = PfamaSerializer
+    django_db = "pfam_ro"
+    many = False
+
+    def get(self, request, endpoint_levels, *args, **kwargs):
+
+        self.queryset =  Pfama.objects.all().filter(pfama_acc=endpoint_levels[self.level-1])
+
+        return super(PfamIDHandler, self).get(
+            request, endpoint_levels, *args, **kwargs
+        )
 
 
 class PfamHandler(CustomView):
@@ -29,6 +62,16 @@ class PfamHandler(CustomView):
         r'PF\d{5}': PfamIDHandler,
         'clan':     ClanHandler,
     }
+    serializer_class = PfamaSerializer
+    django_db = "pfam_ro"
+
+    def get(self, request, endpoint_levels, *args, **kwargs):
+
+        self.queryset = Pfama.objects.all()
+
+        return super(PfamHandler, self).get(
+            request, endpoint_levels, *args, **kwargs
+        )
 
 
 class AccesionHandler(CustomView):
@@ -37,19 +80,17 @@ class AccesionHandler(CustomView):
     child_handlers = {
         'pfam': PfamHandler,
     }
-    multiple = False
     serializer_class = EntrySerializer
 
-    def get(self, request, endpoint_levels, json_response, *args, **kwargs):
+    def get(self, request, endpoint_levels, *args, **kwargs):
         # self.queryset = self.get_more(
         #     self.queryset.filter(entry_ac=endpoint_levels[self.level-1]),
         #     *request.GET.getlist('content')
         # )
         self.queryset = self.queryset.filter(entry_ac=endpoint_levels[self.level-1])
 
-
         return super(AccesionHandler, self).get(
-            request, endpoint_levels, json_response, *args, **kwargs
+            request, endpoint_levels, *args, **kwargs
         )
 
 

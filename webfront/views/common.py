@@ -17,13 +17,6 @@ def pagination_information(request):
         'size':  int(request.GET.get('page_size', 10)),
     }
 
-def wants_json(request):
-    if 'json' in request.META.get('HTTP_ACCEPT', 'html').lower():
-        return True
-    if request.GET.get('format', 'html').lower() == 'json':
-        return True
-    return False
-
 
 class GeneralHandler(CustomView):
     http_method_names = ['get']
@@ -37,11 +30,10 @@ class GeneralHandler(CustomView):
     def get(self, request, url = '', *args, **kwargs):
 
         endpoint_levels = map_url_to_levels(url)
-        json_response = wants_json(request)
         pagination = pagination_information(request)
 
         return super(GeneralHandler, self).get(
-            request, endpoint_levels, json_response,
+            request, endpoint_levels,
             pagination=pagination, *args, **kwargs
         )
 

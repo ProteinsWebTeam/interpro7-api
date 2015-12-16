@@ -4,11 +4,11 @@ from django.conf.urls import include, url, patterns
 from webfront import views
 from rest_framework import routers
 #
-router = routers.DefaultRouter()
-router.register(r'clans', views.ClanViewSet, base_name="api_clans")
-router.register(r'pfama', views.PFamAViewSet)
-router.register(r'clan_membership', views.MembershipViewSet)
-router.register(r'clan_relationships', views.PFamA2PFamAViewSet)
+# router = routers.DefaultRouter()
+# router.register(r'clans', views.ClanViewSet, base_name="api_clans")
+# router.register(r'pfama', views.PFamAViewSet)
+# router.register(r'clan_membership', views.MembershipViewSet)
+# router.register(r'clan_relationships', views.PFamA2PFamAViewSet)
 #
 # base_urlpatterns = [
 #     url(r'^$', views.home_page, name='home'),
@@ -73,15 +73,15 @@ def build_common_urls():
 
 urlpatterns = [
     # *build_common_urls(),
-    url(r'^web/?$', 'webfront.views.member_databases.pfam.home_page', name='home'),
-    url(r'^web/entry/?$', 'webfront.views.member_databases.pfam.entries_page', name='entries_page'),
-    url(r'^web/entry/interpro/?$', 'webfront.views.member_databases.pfam.interpro_page', name='interpro_page'),
-    url(r'^web/entry/interpro/([a-zA-Z0-9_\-]+)/?$', 'webfront.views.member_databases.pfam.interpro_filter_page', name='interpro_filter_page'),
-    url(r'^web/entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/?$', 'webfront.views.member_databases.pfam.interpro_member_page', name='interpro_member_page'),
-    url(r'^web/entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/?$', 'webfront.views.member_databases.pfam.interpro_member_filter_page', name='interpro_member_filter_page'),
-    url(r'^web/entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/?$', 'webfront.views.member_databases.pfam.interpro_member_filter_acc_page', name='interpro_member_filter_acc_page'),
-    url(r'^api/', include(router.urls)),
-    url(r'^(?P<url>.*)$', common.GeneralHandler.as_view()),
+    url(r'^/?$', 'webfront.views.member_databases.pfam.home_page', name='home'),
+    url(r'^entry/?$', 'webfront.views.member_databases.pfam.entries_page', name='entries_page'),
+    url(r'^entry/interpro/?$', 'webfront.views.member_databases.pfam.interpro_page', name='interpro_page'),
+    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/?$', 'webfront.views.member_databases.pfam.interpro_filter_page', name='interpro_filter_page'),
+    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/?$', 'webfront.views.member_databases.pfam.interpro_member_page', name='interpro_member_page'),
+    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/?$', 'webfront.views.member_databases.pfam.interpro_member_filter_page', name='interpro_member_filter_page'),
+    url(r'^entry/interpro/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]+)/?$', 'webfront.views.member_databases.pfam.interpro_member_filter_acc_page', name='interpro_member_filter_acc_page'),
+    # url(r'^api/', include(router.urls)),
+    url(r'^api/(?P<url>.*)$', common.GeneralHandler.as_view()),
 ]
 
 # if settings.DEBUG:

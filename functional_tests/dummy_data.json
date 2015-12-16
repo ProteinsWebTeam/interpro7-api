@@ -2,7 +2,7 @@
   {
     "model": "webfront.Clan",
     "fields": {
-      "clan_acc": "TEST_ACC",
+      "clan_acc": "CL9998",
       "clan_id": "TEST_ID",
       "updated": "2011-09-01T13:20:30+03:00"
     }
@@ -10,7 +10,7 @@
   {
     "model": "webfront.Clan",
     "fields": {
-      "clan_acc": "TEST_ACC_2",
+      "clan_acc": "CL9999",
       "clan_id": "TEST_ID_2",
       "updated": "2011-09-01T13:20:30+03:00"
     }
@@ -38,7 +38,7 @@
     "pk":1,
     "fields": {
       "pfama_acc": "TEST_PFAM_ACC",
-      "clan_acc": "TEST_ACC"
+      "clan_acc": "CL9999"
     }
   },
   {
@@ -46,7 +46,7 @@
     "pk":2,
     "fields": {
       "pfama_acc": "TEST_PFAM_ACC_2",
-      "clan_acc": "TEST_ACC"
+      "clan_acc": "CL9999"
     }
   },
   {

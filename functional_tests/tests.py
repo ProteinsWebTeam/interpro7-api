@@ -12,7 +12,7 @@ class NewVisitorTest(FunctionalTest):
 
     def test_can_navigate_clans(self):
         # check out its homepage
-        self.browser.get(self.server_url + "/web")
+        self.browser.get(self.server_url)
 
         # the page title and header mention UniFam
         self.assertIn('UniFam', self.browser.title)
@@ -30,10 +30,10 @@ class NewVisitorTest(FunctionalTest):
         # The clans page opens and has a title
         self.assertIn('UniFam - Clans', self.browser.title)
         content = self.browser.find_element_by_tag_name("body").text
-        self.assertIn("TEST_ACC", content)
+        self.assertIn("CL9999", content)
 
         # The user will have a way to choose a clan from the  DB
-        clan_li = self.browser.find_element_by_css_selector('li.clan.TEST_ACC')
+        clan_li = self.browser.find_element_by_css_selector('li.clan.CL9999')
         # clan_header = clan_li.find_element_by_tag_name('a').text
 
         # The user chooses a clan
@@ -60,35 +60,33 @@ class NewVisitorTest(FunctionalTest):
 
     def test_uses_the_REST_for_clan(self):
         # Test that the server returns JSON
-        self.browser.get(self.server_url + "/api/clans/?format=json")
+        self.browser.get(self.server_url + "/api/entry/interpro/all/pfam/clan/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
         jsonp = json.loads(content)
 
-        self.assertEqual(jsonp["count"], 2)
-        self.assertEqual(len(jsonp["results"]), jsonp["count"])
+        self.assertEqual(len(jsonp), 2)
 
-        self.assertIn('"TEST_ACC"', content)
-        self.assertIn('"TEST_ACC_2"', content)
+        self.assertIn('"CL9999"', content)
+        self.assertIn('"CL9998"', content)
 
-        self.browser.get(self.server_url + "/api/pfama/?format=json")
+        self.browser.get(self.server_url + "/api/entry/interpro/all/pfam/clan/CL9999/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
         jsonp = json.loads(content)
 
-        self.assertEqual(jsonp["count"], 2)
-        self.assertEqual(len(jsonp["results"]), jsonp["count"])
+        self.assertEqual(jsonp["clan_acc"], "CL9999")
+        self.assertEqual(sum([x["num_full"] for x in jsonp["members"]]), jsonp["total_occurrences"])
+
+        self.browser.get(self.server_url + "/api/entry/interpro/all/pfam/?format=json")
+        content = self.browser.find_element_by_tag_name('body').text
+
+        jsonp = json.loads(content)
+
+        self.assertEqual(len(jsonp), 2)
 
         self.assertIn('"TEST_PFAM_ACC"', content)
         self.assertIn('"TEST_PFAM_ACC_2"', content)
-
-        self.browser.get(self.server_url + "/api/clans/TEST_ACC/?format=json")
-        content = self.browser.find_element_by_tag_name('body').text
-
-        jsonp = json.loads(content)
-
-        self.assertEqual(jsonp["clan_acc"], "TEST_ACC")
-        self.assertEqual(sum([x["num_full"] for x in jsonp["members"]]), jsonp["total_occurrences"])
 
     # skipping this test in travis because there the hmmer binaries are not there
     @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
@@ -96,7 +94,7 @@ class NewVisitorTest(FunctionalTest):
         test_family = "TEST_PFAM_ACC"
 
         # check out its homepage
-        self.browser.get(self.server_url + "/web/entry/interpro/all/pfam/" + test_family)
+        self.browser.get(self.server_url + "/entry/interpro/all/pfam/" + test_family)
 
         # The page has a link for active sites and the user clicks on it
         self.click_link_and_wait(

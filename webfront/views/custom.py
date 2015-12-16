@@ -15,7 +15,7 @@ class CustomView(GenericAPIView):
     child_handlers = {}
     queryset = interpro.Entry.objects
     django_db = 'interpro_ro'
-    multiple = True
+    many = True
 
     # # TODO: check if we can avoid instantiating at every request
     # def __init__(self, *args, **kwargs):
@@ -57,22 +57,24 @@ class CustomView(GenericAPIView):
     #     )
 
     def get(
-        self, request, endpoint_levels, json_response=True, *args, **kwargs
+        self, request, endpoint_levels, *args, **kwargs
     ):
         # if this is the last level
         if (len(endpoint_levels) == self.level):
             self.queryset = self.queryset.using(self.django_db)
+            if not self.many:
+                self.queryset = self.queryset.first()
             serialized = self.serializer_class(
                 self.queryset,
-                many=True,
+                many=self.many,
                 content=request.GET.getlist('content')
             )
 
             return Response(serialized.data)
-            if json_response:
-                return self.get_json(endpoint_levels, request, *args, **kwargs)
-            else:
-                return self.get_html(endpoint_levels, request, *args, **kwargs)
+            # if json_response:
+            #     return self.get_json(endpoint_levels, request, *args, **kwargs)
+            # else:
+            #     return self.get_html(endpoint_levels, request, *args, **kwargs)
         # if this is not the last level
         else:
             # get next level name
@@ -90,5 +92,5 @@ class CustomView(GenericAPIView):
                 ))
             # delegate to the lower level handler
             return self.child_handlers[handler_name].as_view()(
-                request, endpoint_levels, json_response, *args, **kwargs
+                request, endpoint_levels, *args, **kwargs
             )

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from webfront.models import interpro
+from webfront.serializers.ModelContentSerializer import ModelContentSerializer
 
 
 class CommonAnnotationSerializer(serializers.ModelSerializer):
@@ -56,7 +57,7 @@ class Entry2CommonSerializer(serializers.ModelSerializer):
         fields = ('order_in', )
 
 
-class EntrySerializer(serializers.ModelSerializer):
+class EntrySerializer(ModelContentSerializer):
     entry_type = CvEntryTypeSerializer()
     commons    = serializers.SerializerMethodField()
     comp       = serializers.SerializerMethodField()
@@ -68,12 +69,12 @@ class EntrySerializer(serializers.ModelSerializer):
     xrefs      = serializers.SerializerMethodField()
     examples   = serializers.SerializerMethodField()
 
-    def __init__(self, *args, **kwargs):
-        content = kwargs.pop('content', [])
-
-        super(EntrySerializer, self).__init__(*args, **kwargs)
-        for to_be_removed in set(self.Meta.optionals) - set(content):
-            self.fields.pop(to_be_removed)
+    # def __init__(self, *args, **kwargs):
+    #     content = kwargs.pop('content', [])
+    #
+    #     super(EntrySerializer, self).__init__(*args, **kwargs)
+    #     for to_be_removed in set(self.Meta.optionals) - set(content):
+    #         self.fields.pop(to_be_removed)
 
     def get_commons(self, obj):
         return obj.entry2common_set.order_by('order_in').values(

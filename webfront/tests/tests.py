@@ -47,14 +47,14 @@ class ImportedModelTest(TestCase):
         self.assertTemplateUsed(response, 'clans.html')
 
     def test_read_the_unifam_settings_file(self):
-        self.assertEqual(TMP_FOLDER,"/tmp/")
-        self.assertGreater(len(DB_MEMBERS.items()),0)
+        self.assertEqual(TMP_FOLDER, "/tmp/")
+        self.assertGreater(len(DB_MEMBERS.items()), 0)
 
 
 class ActiveSitesTest(TestCase):
 
     @classmethod
-    def setUpTestData(self):
+    def setUpTestData(cls):
         pfam1 = Pfama.objects.using('pfam_ro').create(
             pfama_acc="TEST_PFAM_ACC",
             pfama_id="TEST_PFAM_ID",
@@ -129,7 +129,7 @@ class ActiveSitesTest(TestCase):
     def test_fasta_creation(self):
         active_sites = ActiveSites("TEST_PFAM_ACC")
         proteins = active_sites.load_from_db()
-        file_path = TMP_FOLDER+"tmp.fa";
+        file_path = TMP_FOLDER+"tmp.fa"
         active_sites._create_fasta_file(file_path)
         fasta_f = open(file_path, "r")
         fasta = fasta_f.read()
@@ -140,7 +140,7 @@ class ActiveSitesTest(TestCase):
 
     def test_hmm_creation(self):
         active_sites = ActiveSites("TEST_PFAM_ACC")
-        file_path = TMP_FOLDER+"tmp.hmm";
+        file_path = TMP_FOLDER+"tmp.hmm"
         active_sites._create_hmm_file(file_path)
         hmm_f = open(file_path, "r")
         hmm = hmm_f.read()

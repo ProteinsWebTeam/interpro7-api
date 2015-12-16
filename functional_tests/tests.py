@@ -42,10 +42,6 @@ class NewVisitorTest(FunctionalTest):
         # The user will go to the page of the clan
         self.assertIn('UniFam - Clan: ', self.browser.title)
 
-        # The clan page displays the details of the clan
-
-        # The clan page displays a list of the  families of the clan
-
         # the clan page also displays an SVG
         svg = self.browser.find_element_by_tag_name("svg")
         self.assertEqual("clanviewer", svg.get_attribute("class"))

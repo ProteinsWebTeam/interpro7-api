@@ -10,6 +10,7 @@ def map_url_to_levels(url):
         filter(lambda a: len(a) != 0, url.split('/'))
     )
 
+
 def pagination_information(request):
 
     return {
@@ -27,7 +28,7 @@ class GeneralHandler(CustomView):
     }
     queryset = interpro.Entry.objects
 
-    def get(self, request, url = '', *args, **kwargs):
+    def get(self, request, url='', *args, **kwargs):
 
         endpoint_levels = map_url_to_levels(url)
         pagination = pagination_information(request)
@@ -36,35 +37,3 @@ class GeneralHandler(CustomView):
             request, endpoint_levels,
             pagination=pagination, *args, **kwargs
         )
-
-        # if (len(endpoint_levels) == level):
-        #     if (json_response):
-        #         return self.get_json(endpoint_levels)
-        #     else:
-        #         return self.get_html(endpoint_levels)
-        # else:
-        #     section = endpoint_levels[0]
-        #     if (section not in self.child_handlers):
-        #         raise ValueError(
-        #             '{} is not a valid section'.format(section)
-        #         )
-        #
-        #     response = self.child_handlers[section].as_view()(
-        #         request, endpoint_levels, json_response,
-        #         section=section, *args, **kwargs
-        #     )
-        #     return response;
-
-# def page_handler(request, *args):
-#     print(request)
-#     print(dir(request))
-#     print(request.META.get('HTTP_ACCEPT'))
-#     if (request.method != 'GET'):
-#         print('not allowed')
-#         return HttpResponseNotAllowed(['GET'])
-#     if len(args) == 0:
-#         return render(request, 'home.html')
-#     else:
-#         kwargs = map_args_to_kwargs(args)
-#         print(kwargs)
-#         return render(request, 'home.html')

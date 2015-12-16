@@ -1,1 +1,1 @@
-from rest_framework.routers import Route DynamicDetailRoute, SimpleRouter
+from rest_framework.routers import Route

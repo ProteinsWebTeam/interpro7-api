@@ -1,10 +1,6 @@
 import re
-from django.views.generic import View
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.serializers import ListSerializer
-from django.http import HttpResponse, JsonResponse
-from django.core.paginator import Paginator, EmptyPage
 
 from webfront.models import interpro
 
@@ -71,11 +67,6 @@ class CustomView(GenericAPIView):
             )
 
             return Response(serialized.data)
-            # if json_response:
-            #     return self.get_json(endpoint_levels, request, *args, **kwargs)
-            # else:
-            #     return self.get_html(endpoint_levels, request, *args, **kwargs)
-        # if this is not the last level
         else:
             # get next level name
             level_name = endpoint_levels[self.level]

@@ -93,12 +93,6 @@ WSGI_APPLICATION = 'unifam.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -139,8 +133,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
@@ -183,6 +175,8 @@ if DEBUG and ("TRAVIS" not in os.environ):
         },
     }
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 # Debug toolbar
 # DEBUG_TOOLBAR_PATCH_SETTINGS = False
 # DEBUG_TOOLBAR_CONFIG = {
@@ -205,4 +199,3 @@ if DEBUG and ("TRAVIS" not in os.environ):
 #     'debug_toolbar.panels.profiling.ProfilingPanel',
 # ]
 
-CORS_ORIGIN_ALLOW_ALL = True

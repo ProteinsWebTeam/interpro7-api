@@ -12,6 +12,7 @@ class CustomView(GenericAPIView):
     queryset = interpro.Entry.objects
     django_db = 'interpro_ro'
     many = True
+    from_model = True
 
     # # TODO: check if we can avoid instantiating at every request
     # def __init__(self, *args, **kwargs):
@@ -57,9 +58,10 @@ class CustomView(GenericAPIView):
     ):
         # if this is the last level
         if (len(endpoint_levels) == self.level):
-            self.queryset = self.queryset.using(self.django_db)
-            if not self.many:
-                self.queryset = self.queryset.first()
+            if self.from_model:
+                self.queryset = self.queryset.using(self.django_db)
+                if not self.many:
+                    self.queryset = self.queryset.first()
             serialized = self.serializer_class(
                 self.queryset,
                 many=self.many,

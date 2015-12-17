@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from webfront.models import interpro
-from webfront.serializers.ModelContentSerializer import ModelContentSerializer
+from webfront.serializers.content_serializers import ModelContentSerializer
 
 
 class CommonAnnotationSerializer(serializers.ModelSerializer):

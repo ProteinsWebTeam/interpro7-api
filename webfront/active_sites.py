@@ -6,7 +6,7 @@ from webfront.models.pfam import PfamaHmm
 from unifam.settings import TMP_FOLDER,HMMER_PATH
 
 
-class ActiveSites():
+class ActiveSites:
     def __init__(self, pfama_acc):
         self.pfama_acc = pfama_acc
         self.proteins = {}

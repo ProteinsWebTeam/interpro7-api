@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from webfront.active_sites import ActiveSites
 from webfront.models.pfam import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership
-from webfront.serializers.ModelContentSerializer import ModelContentSerializer
+from webfront.serializers.content_serializers import ModelContentSerializer, ContentSerializer
 
 
 class PfamaSerializer(ModelContentSerializer):
@@ -43,6 +44,7 @@ class ClanSerializer(ModelContentSerializer):
     class Meta:
         model = Clan
         fields = ('clan_acc', 'clan_id', 'total_occurrences', 'members', 'relationships')
+
 
 class MembershipSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

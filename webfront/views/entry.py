@@ -1,8 +1,10 @@
+from rest_framework.response import Response
 from .custom import CustomView
+from webfront.active_sites import ActiveSites
 from webfront.models import interpro, Clan, Pfama
 from rest_framework.mixins import ListModelMixin
 from webfront.serializers.interpro import EntrySerializer
-from webfront.serializers.pfam import ClanSerializer, PfamaSerializer
+from webfront.serializers.pfam import ClanSerializer, PfamaSerializer, ActiveSitesSerializer
 
 
 class PfamClanIDHandler(CustomView):
@@ -39,16 +41,39 @@ class ClanHandler(CustomView):
         )
 
 
+class ActiveSitesHandler(CustomView):
+    level = 6
+    level_description = 'Pfam ID level',
+    django_db = "pfam_ro"
+    from_model = False
+    many = False
+
+    def get(self, request, endpoint_levels, *args, **kwargs):
+        active_sites = ActiveSites(endpoint_levels[self.level-2])
+        active_sites.load_from_db()
+        active_sites.load_alignment()
+
+        self.queryset = active_sites.proteins
+
+        return Response(active_sites.proteins)
+        # return super(ActiveSitesHandler, self).get(
+        #     request, endpoint_levels, *args, **kwargs
+        # )
+
+
 class PfamIDHandler(CustomView):
     level = 5
     level_description = 'Pfam ID level',
     serializer_class = PfamaSerializer
     django_db = "pfam_ro"
     many = False
+    child_handlers = {
+        'active_sites': ActiveSitesHandler,
+    }
 
     def get(self, request, endpoint_levels, *args, **kwargs):
 
-        self.queryset =  Pfama.objects.all().filter(pfama_acc=endpoint_levels[self.level-1])
+        self.queryset = Pfama.objects.all().filter(pfama_acc=endpoint_levels[self.level-1])
 
         return super(PfamIDHandler, self).get(
             request, endpoint_levels, *args, **kwargs

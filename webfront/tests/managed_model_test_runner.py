@@ -1,5 +1,7 @@
+import ipdb
 from django.test.runner import DiscoverRunner
 import sys
+import re
 from unifam.settings import *
 
 
@@ -16,6 +18,8 @@ class UnManagedModelTestRunner(DiscoverRunner):
         self.unmanaged_models = [m for m in myapp.models.values() if not m._meta.managed]
         for m in self.unmanaged_models:
             m._meta.managed = True
+            m._meta.db_table = re.sub(r'^"([^"]+)"\."([^"]+)"$', r'\1_\2', m._meta.db_table)
+
         super(UnManagedModelTestRunner, self).setup_test_environment(*args, **kwargs)
 
     def teardown_test_environment(self, *args, **kwargs):

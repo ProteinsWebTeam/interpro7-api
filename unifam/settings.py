@@ -198,4 +198,3 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'debug_toolbar.panels.redirects.RedirectsPanel',
 #     'debug_toolbar.panels.profiling.ProfilingPanel',
 # ]
-

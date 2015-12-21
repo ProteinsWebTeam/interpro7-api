@@ -61,7 +61,7 @@ class Entry2CommonSerializer(serializers.ModelSerializer):
 class EntrySerializer(serializers.ModelSerializer):
     entry_type = CvEntryTypeSerializer()
     commons    = serializers.SerializerMethodField()
-    comp       = serializers.SerializerMethodField()
+    comps      = serializers.SerializerMethodField()
     entries    = serializers.SerializerMethodField()
     ifcs       = serializers.SerializerMethodField()
     methods    = serializers.SerializerMethodField()
@@ -86,7 +86,7 @@ class EntrySerializer(serializers.ModelSerializer):
             )
         ]
 
-    def get_comp(self, obj):
+    def get_comps(self, obj):
         return [
             flat_to_nested(related) for related in
             obj.entry2comp_set.values(
@@ -182,8 +182,8 @@ class EntrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = interpro.Entry
-        fields = ('entry_ac', 'entry_type', 'name', 'checked', 'created', 'timestamp', 'userstamp', 'short_name', 'commons', 'comp', 'entries', 'ifcs', 'methods', 'citations', 'accpairs', 'xrefs', 'examples')
-        optionals = ('commons', 'comp', 'entries', 'ifcs', 'methods', 'citations', 'accpairs', 'xrefs', 'examples')
+        fields = ('entry_ac', 'entry_type', 'name', 'checked', 'created', 'timestamp', 'userstamp', 'short_name', 'commons', 'comps', 'entries', 'ifcs', 'methods', 'citations', 'accpairs', 'xrefs', 'examples')
+        optionals = ('commons', 'comps', 'entries', 'ifcs', 'methods', 'citations', 'accpairs', 'xrefs', 'examples')
 
 # class EntrySerializer(serializers.ModelSerializer):
 #     class Meta:

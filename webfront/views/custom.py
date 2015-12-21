@@ -1,4 +1,3 @@
-import ipdb
 import re
 from django.views.generic import View
 from rest_framework.generics import GenericAPIView

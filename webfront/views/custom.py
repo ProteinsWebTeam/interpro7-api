@@ -1,10 +1,6 @@
 import re
-from django.views.generic import View
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.serializers import ListSerializer
-from django.http import HttpResponse, JsonResponse
-from django.core.paginator import Paginator, EmptyPage
 
 from webfront.models import interpro
 from webfront.pagination import CustomPagination
@@ -25,7 +21,7 @@ class CustomView(GenericAPIView):
     # custom pagination class
     pagination_class = CustomPagination
     # not used now
-    multiple = True
+    many = True
 
     # # TODO: check if we can avoid instantiating at every request
     # def __init__(self, *args, **kwargs):
@@ -67,25 +63,23 @@ class CustomView(GenericAPIView):
     #     )
 
     def get(
-        self, request, endpoint_levels, json_response=True, *args, **kwargs
+        self, request, endpoint_levels, *args, **kwargs
     ):
         # if this is the last level
         if (len(endpoint_levels) == self.level):
             self.queryset = self.queryset.using(self.django_db)
+            if not self.many:
+                self.queryset = self.queryset.first()
             serialized = self.serializer_class(
                 # passed to DRF's view
                 self.paginate_queryset(self.queryset),
-                many=True,
+                many=self.many,
                 # extracted out in the custom view
                 content=request.GET.getlist('content')
             )
 
             return Response(serialized.data)
-            # if json_response:
-            #     return self.get_json(endpoint_levels, request, *args, **kwargs)
-            # else:
-            #     return self.get_html(endpoint_levels, request, *args, **kwargs)
-        # if this is not the last level
+
         else:
             # get next level name provided by the client
             level_name = endpoint_levels[self.level]
@@ -102,5 +96,5 @@ class CustomView(GenericAPIView):
                 ))
             # delegate to the lower level handler
             return self.child_handlers[handler_name].as_view()(
-                request, endpoint_levels, json_response, *args, **kwargs
+                request, endpoint_levels, *args, **kwargs
             )

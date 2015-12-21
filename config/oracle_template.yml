@@ -1,0 +1,5 @@
+host: db_host
+port: 'port'
+sid: db_SID
+user: db_user
+password: db_pass

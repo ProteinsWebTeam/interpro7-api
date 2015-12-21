@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %} - Entries{% endblock %}
+
+{% block content %}
+<div><h2>Entries:</h2>
+    <p>Pages for protein families</p>
+    <ul class="list-inline">
+        <a href="{% url 'interpro_page' %}" class="interpro_link">InterPro</a></li>
+    </ul>
+        <!--TODO: Here all the entries of interpro should be listed -->
+</div>
+{% endblock %}

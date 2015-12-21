@@ -24,6 +24,10 @@ try:
   MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
 except FileNotFoundError:
   MYSQL_CONFIG = {}
+try:
+    UNIFAM_CONFIG = yaml.safe_load(open('{}/config/unifam.yml'.format(BASE_DIR)))
+except FileNotFoundError:
+    UNIFAM_CONFIG = {}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -89,12 +93,6 @@ WSGI_APPLICATION = 'unifam.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -135,7 +133,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
@@ -152,29 +149,35 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'webfront.pagination.CustomPagination',
 }
 
-if DEBUG:
-    import logging
-    l = logging.getLogger('django.db.backends')
-    l.setLevel(logging.DEBUG)
-    l.addHandler(logging.StreamHandler())
+HMMER_PATH = UNIFAM_CONFIG.get('hmmer_path', '/tmp/')
+TMP_FOLDER = UNIFAM_CONFIG.get('tmp_path', '/tmp/')
+DB_MEMBERS = UNIFAM_CONFIG.get('members', {})
 
-LOGGING = {
-    'version': 1,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-        },
-    },
-}
+import logging
+l = logging.getLogger('django.db.backends')
+l.setLevel(logging.DEBUG)
+l.addHandler(logging.StreamHandler())
+if DEBUG and ("TRAVIS" not in os.environ):
 
-# # Debug toolbar
+    LOGGING = {
+        'version': 1,
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+            },
+        },
+    }
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+# Debug toolbar
 # DEBUG_TOOLBAR_PATCH_SETTINGS = False
 # DEBUG_TOOLBAR_CONFIG = {
 #     # show the toolbar for all requests (in DEBUG mode)
@@ -196,4 +199,3 @@ LOGGING = {
 #     'debug_toolbar.panels.profiling.ProfilingPanel',
 # ]
 
-CORS_ORIGIN_ALLOW_ALL = True

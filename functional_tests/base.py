@@ -23,12 +23,8 @@ class FunctionalTest(StaticLiveServerTestCase):  #1
     def setUp(self):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
-        # self.browser.get(self.server_url+"?testing=create")
-        # self.factory = APIRequestFactory()
-        # self.client = APIClient()
 
     def tearDown(self):
-        # self.browser.get(self.server_url+"?testing=remove")
         self.browser.quit()
 
     def click_link_and_wait(self, link):

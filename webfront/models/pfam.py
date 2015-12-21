@@ -479,9 +479,9 @@ class Pfama2PfamaScoop(models.Model):
 
 
 class PfamaHmm(models.Model):
-    pfama_acc = models.ForeignKey(Pfama, db_column='pfamA_acc')  # Field name made lowercase.
+    pfama_acc = models.ForeignKey(Pfama, db_column='pfamA_acc',primary_key=True)  # Field name made lowercase.
     hmm = models.TextField(blank=True, null=True)
-    logo = models.TextField(blank=True, null=True)
+    #logo = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -587,15 +587,15 @@ class PfamaRegFullSignificant(models.Model):
     ali_end = models.IntegerField()
     model_start = models.IntegerField()
     model_end = models.IntegerField()
-    domain_bits_score = models.FloatField()
+    domain_bits_score = models.FloatField(null=True)
     domain_evalue_score = models.CharField(max_length=15)
-    sequence_bits_score = models.FloatField()
+    sequence_bits_score = models.FloatField(null=True)
     sequence_evalue_score = models.CharField(max_length=15)
     cigar = models.TextField(blank=True, null=True)
     in_full = models.IntegerField()
     tree_order = models.IntegerField(blank=True, null=True)
-    domain_order = models.IntegerField(blank=True, null=True)
-    domain_oder = models.IntegerField(blank=True, null=True)
+    # domain_order = models.IntegerField(blank=True, null=True)
+    # domain_oder = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -657,29 +657,29 @@ class PfamAnnseq(models.Model):
 class Pfamseq(models.Model):
     pfamseq_acc = models.CharField(primary_key=True, max_length=10)
     pfamseq_id = models.CharField(max_length=16)
-    seq_version = models.IntegerField()
+    seq_version = models.IntegerField(blank=True, null=True)
     crc64 = models.CharField(max_length=16)
     md5 = models.CharField(max_length=32)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     evidence = models.ForeignKey(Evidence, db_column='evidence')
-    length = models.IntegerField()
-    species = models.TextField()
+    length = models.IntegerField(null=True)
+    species = models.TextField(blank=True, null=True)
     taxonomy = models.TextField(blank=True, null=True)
     is_fragment = models.IntegerField(blank=True, null=True)
-    sequence = models.TextField()
-    updated = models.DateTimeField()
+    sequence = models.TextField(null=True)
+    updated = models.DateTimeField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
-    ncbi_taxid = models.IntegerField()
+    ncbi_taxid = models.IntegerField(null=True)
     genome_seq = models.IntegerField(blank=True, null=True)
     auto_architecture = models.BigIntegerField(blank=True, null=True)
     treefam_acc = models.CharField(max_length=8, blank=True, null=True)
-    rp15 = models.IntegerField(blank=True, null=True)
-    rp35 = models.IntegerField(blank=True, null=True)
-    rp55 = models.IntegerField(blank=True, null=True)
-    rp75 = models.IntegerField(blank=True, null=True)
-    ref_proteome = models.IntegerField(blank=True, null=True)
-    complete_proteome = models.IntegerField(blank=True, null=True)
-    field_live_ref_proteome = models.IntegerField(db_column='_live_ref_proteome', blank=True, null=True)  # Field renamed because it started with '_'.
+    # rp15 = models.IntegerField(blank=True, null=True)
+    # rp35 = models.IntegerField(blank=True, null=True)
+    # rp55 = models.IntegerField(blank=True, null=True)
+    # rp75 = models.IntegerField(blank=True, null=True)
+    # ref_proteome = models.IntegerField(blank=True, null=True)
+    # complete_proteome = models.IntegerField(blank=True, null=True)
+    # field_live_ref_proteome = models.IntegerField(db_column='_live_ref_proteome', blank=True, null=True)  # Field renamed because it started with '_'.
 
     class Meta:
         managed = False
@@ -719,14 +719,15 @@ class PfamseqDisulphide(models.Model):
 
 
 class PfamseqMarkup(models.Model):
-    pfamseq_acc = models.ForeignKey(Pfamseq, db_column='pfamseq_acc')
-    auto_markup = models.ForeignKey(MarkupKey, db_column='auto_markup')
-    residue = models.IntegerField()
+    pfamseq_acc = models.ForeignKey(Pfamseq, db_column='pfamseq_acc',primary_key=True)
+    auto_markup = models.ForeignKey(MarkupKey, db_column='auto_markup',primary_key=True)
+    residue = models.IntegerField(primary_key=True)
     annotation = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'pfamseq_markup'
+        unique_together = (('pfamseq_acc', 'auto_markup', 'residue'),)
 
 
 class PfamseqNcbi(models.Model):

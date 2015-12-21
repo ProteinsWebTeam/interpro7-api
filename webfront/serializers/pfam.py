@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from webfront.models.pfam import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership
+from webfront.serializers.ModelContentSerializer import ModelContentSerializer
 
 
-class PfamaSerializer(serializers.HyperlinkedModelSerializer):
+class PfamaSerializer(ModelContentSerializer):
     link = serializers.SerializerMethodField()
 
     def get_link(self, obj):
@@ -23,7 +24,7 @@ class Pfama2PfamaHhsearchSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('pfama_acc_1','pfama_acc_2','evalue')
 
 
-class ClanSerializer(serializers.HyperlinkedModelSerializer):
+class ClanSerializer(ModelContentSerializer):
     members = PfamaSerializer(many=True, read_only=True)
     relationships = serializers.SerializerMethodField()
     total_occurrences = serializers.SerializerMethodField()

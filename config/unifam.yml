@@ -1,0 +1,70 @@
+hmmer_path: "/Users/gsalazar/Downloads/hmmer-3.1b2-macosx-intel/binaries/"
+tmp_path: "/tmp/"
+
+members:
+  cath-gene3d:
+    filter: "cath-gene3d"
+    label: "CATH-Gene3D"
+    options: []
+    options_per_family: []
+  hamap:
+    filter: "hamap"
+    label: "HAMAP"
+    options: []
+    options_per_family: []
+  panther:
+    filter: "panther"
+    label: "PANTHER"
+    options: []
+    options_per_family: []
+  pirsf:
+    filter: "pirsf"
+    label: "PIRSF"
+    options: []
+    options_per_family: []
+  prints:
+    filter: "prints"
+    label: "PRINTS"
+    options: []
+    options_per_family: []
+  prosite_patterns:
+    filter: "prosite_patterns"
+    label: "PROSITE patterns"
+    options: []
+    options_per_family: []
+  prosite_profiles:
+    filter: "prosite_profiles"
+    label: "PROSITE profiles"
+    options: []
+    options_per_family: []
+  pfam:
+    filter: "pfam"
+    label: "Pfam"
+    options:
+      -
+        label: "Clans"
+        filter: "clans"
+    options_per_family:
+      -
+        label: "Active Sites"
+        filter: "active_sites"
+  prodom:
+    filter: "prodom"
+    label: "ProDom"
+    options: []
+    options_per_family: []
+  smart:
+    filter: "smart"
+    label: "SMART"
+    options: []
+    options_per_family: []
+  superfamily:
+    filter: "superfamily"
+    label: "SUPERFAMILY"
+    options: []
+    options_per_family: []
+  tigrfams:
+    filter: "tigrfams"
+    label: "TIGRFAMs"
+    options: []
+    options_per_family: []

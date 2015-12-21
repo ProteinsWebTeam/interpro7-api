@@ -68,11 +68,14 @@ class CustomView(GenericAPIView):
         # if this is the last level
         if (len(endpoint_levels) == self.level):
             self.queryset = self.queryset.using(self.django_db)
-            if not self.many:
+            if self.many:
+                self.queryset = self.paginate_queryset(self.queryset)
+            else:
                 self.queryset = self.queryset.first()
+
             serialized = self.serializer_class(
                 # passed to DRF's view
-                self.paginate_queryset(self.queryset),
+                self.queryset,
                 many=self.many,
                 # extracted out in the custom view
                 content=request.GET.getlist('content')

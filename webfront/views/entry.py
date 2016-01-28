@@ -1,8 +1,8 @@
 from rest_framework.response import Response
+from rest_framework.mixins import ListModelMixin
 from .custom import CustomView
 from webfront.active_sites import ActiveSites
 from webfront.models import interpro, Clan, Pfama
-from rest_framework.mixins import ListModelMixin
 from webfront.serializers.interpro import EntrySerializer
 from webfront.serializers.pfam import ClanSerializer, PfamaSerializer
 

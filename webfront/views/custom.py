@@ -3,14 +3,24 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from webfront.models import interpro
+from webfront.pagination import CustomPagination
 
 
 class CustomView(GenericAPIView):
+    # level of the view, to be able to extract the value from the URL
     level = 0
+    # description of the level of the endpoint, for debug purposes
     level_description = 'level'
+    # dict of handlers for lower levels of the endpoint
+    # the key will be regex or string to which the endpoint will be matched
     child_handlers = {}
+    # queryset upon which build new querysets
     queryset = interpro.Entry.objects
+    # will be used for the 'using()' part of the queries
     django_db = 'interpro_ro'
+    # custom pagination class
+    pagination_class = CustomPagination
+    # not used now
     many = True
     from_model = True
 
@@ -60,17 +70,23 @@ class CustomView(GenericAPIView):
         if (len(endpoint_levels) == self.level):
             if self.from_model:
                 self.queryset = self.queryset.using(self.django_db)
-                if not self.many:
+                if self.many:
+                    self.queryset = self.paginate_queryset(self.queryset)
+                else:
                     self.queryset = self.queryset.first()
+
             serialized = self.serializer_class(
+                # passed to DRF's view
                 self.queryset,
                 many=self.many,
+                # extracted out in the custom view
                 content=request.GET.getlist('content')
             )
 
             return Response(serialized.data)
+
         else:
-            # get next level name
+            # get next level name provided by the client
             level_name = endpoint_levels[self.level]
             try:
                 # get the corresponding handler name

@@ -458,7 +458,8 @@ class PdbResidueData(models.Model):
 
 
 class Pfama2PfamaHhsearch(models.Model):
-    pfama_acc_1 = models.ForeignKey(Pfama, db_column='pfamA_acc_1', related_name='relationship_source', primary_key=True)  # Field name made lowercase.
+    # pfama_acc_1 = models.ForeignKey(Pfama, db_column='pfamA_acc_1', related_name='relationship_source', primary_key=True)  # Field name made lowercase.
+    pfama_acc_1 = models.OneToOneField(Pfama, db_column='pfamA_acc_1', related_name='relationship_source', primary_key=True)  # Field name made lowercase.
     pfama_acc_2 = models.ForeignKey(Pfama, db_column='pfamA_acc_2', related_name='relationship_target')  # Field name made lowercase.
     evalue = models.CharField(max_length=25)
 
@@ -479,7 +480,8 @@ class Pfama2PfamaScoop(models.Model):
 
 
 class PfamaHmm(models.Model):
-    pfama_acc = models.ForeignKey(Pfama, db_column='pfamA_acc',primary_key=True)  # Field name made lowercase.
+    # pfama_acc = models.ForeignKey(Pfama, db_column='pfamA_acc',primary_key=True)  # Field name made lowercase.
+    pfama_acc = models.OneToOneField(Pfama, db_column='pfamA_acc',primary_key=True)  # Field name made lowercase.
     hmm = models.TextField(blank=True, null=True)
     #logo = models.TextField(blank=True, null=True)
 
@@ -719,8 +721,10 @@ class PfamseqDisulphide(models.Model):
 
 
 class PfamseqMarkup(models.Model):
-    pfamseq_acc = models.ForeignKey(Pfamseq, db_column='pfamseq_acc',primary_key=True)
-    auto_markup = models.ForeignKey(MarkupKey, db_column='auto_markup',primary_key=True)
+    # pfamseq_acc = models.ForeignKey(Pfamseq, db_column='pfamseq_acc',primary_key=True)
+    pfamseq_acc = models.OneToOneField(Pfamseq, db_column='pfamseq_acc',primary_key=True)
+    # auto_markup = models.ForeignKey(MarkupKey, db_column='auto_markup',primary_key=True)
+    auto_markup = models.OneToOneField(MarkupKey, db_column='auto_markup',primary_key=True)
     residue = models.IntegerField(primary_key=True)
     annotation = models.TextField(blank=True, null=True)
 

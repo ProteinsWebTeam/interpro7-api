@@ -199,7 +199,8 @@ class DatabaseCount(models.Model):
 
 
 class DbVersion(models.Model):
-    dbcode = models.ForeignKey(CvDatabase, db_column='dbcode', primary_key=True)
+    # dbcode = models.ForeignKey(CvDatabase, db_column='dbcode', primary_key=True)
+    dbcode = models.OneToOneField(CvDatabase, db_column='dbcode', primary_key=True)
     version = models.CharField(max_length=20)
     entry_count = models.IntegerField()
     file_date = models.DateField()
@@ -257,8 +258,8 @@ class Entry(models.Model):
     userstamp = models.CharField(max_length=30)
     short_name = models.CharField(unique=True, max_length=30, blank=True, null=True)
     # commons = models.ManyToManyField(CommonAnnotation, through='Entry2Common')
-    comps = models.ManyToManyField('Entry', through='Entry2Comp')
-    entries = models.ManyToManyField('Entry', through='Entry2Entry')
+    comps = models.ManyToManyField('Entry', through='Entry2Comp', related_name='EntryThroughComp')
+    entries = models.ManyToManyField('Entry', through='Entry2Entry', related_name='EntryThroughEntry')
     ifcs = models.ManyToManyField('CvIfc', through='Entry2Ifc')
 
     class Meta:
@@ -267,14 +268,15 @@ class Entry(models.Model):
 
 
 class Entry2Common(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
     ann = models.ForeignKey(CommonAnnotation)
     order_in = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = '"INTERPRO"."entry2common"'
-        unique_together = (('entry_ac', 'ann_id'), ('entry_ac', 'ann_id', 'order_in'), ('entry_ac', 'order_in'))
+        unique_together = (('entry_ac', 'ann'), ('entry_ac', 'ann', 'order_in'), ('entry_ac', 'order_in'))
 
 
 class Entry2CommonAudit(models.Model):
@@ -293,8 +295,9 @@ class Entry2CommonAudit(models.Model):
 
 
 class Entry2Comp(models.Model):
-    entry1_ac = models.ForeignKey(Entry, db_column='entry1_ac', primary_key=True)
-    entry2_ac = models.ForeignKey(Entry, db_column='entry2_ac')
+    # entry1_ac = models.ForeignKey(Entry, db_column='entry1_ac', primary_key=True)
+    entry1_ac = models.OneToOneField(Entry, db_column='entry1_ac', primary_key=True, related_name='Entry1')
+    entry2_ac = models.ForeignKey(Entry, db_column='entry2_ac', related_name='Entry2')
     relation = models.ForeignKey(CvRelation, db_column='relation')
     timestamp = models.DateField()
     userstamp = models.CharField(max_length=30)
@@ -321,8 +324,9 @@ class Entry2CompAudit(models.Model):
 
 
 class Entry2Entry(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', unique=True, primary_key=True)
-    parent_ac = models.ForeignKey(Entry, db_column='parent_ac')
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', unique=True, primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', unique=True, primary_key=True)
+    parent_ac = models.ForeignKey(Entry, db_column='parent_ac', related_name='ParentEntry')
     relation = models.ForeignKey(CvRelation, db_column='relation')
     timestamp = models.DateField()
     userstamp = models.CharField(max_length=30)
@@ -349,7 +353,8 @@ class Entry2EntryAudit(models.Model):
 
 
 class Entry2Ifc(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
     code = models.ForeignKey(CvIfc, db_column='code')
 
     class Meta:
@@ -359,8 +364,10 @@ class Entry2Ifc(models.Model):
 
 
 class Entry2Method(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
-    method_ac = models.ForeignKey('Method', db_column='method_ac', unique=True)
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
+    # method_ac = models.ForeignKey('Method', db_column='method_ac', unique=True)
+    method_ac = models.OneToOneField('Method', db_column='method_ac', unique=True)
     evidence = models.ForeignKey(CvEvidence, db_column='evidence')
     timestamp = models.DateField()
     userstamp = models.CharField(max_length=30)
@@ -399,14 +406,15 @@ class Entry2Pathway(models.Model):
 
 
 class Entry2Pub(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
     order_in = models.IntegerField()
     pub = models.ForeignKey(Citation)
 
     class Meta:
         managed = False
         db_table = '"INTERPRO"."entry2pub"'
-        unique_together = (('entry_ac', 'pub_id'), ('entry_ac', 'order_in'))
+        unique_together = (('entry_ac', 'pub'), ('entry_ac', 'order_in'))
 
 
 class Entry2PubAudit(models.Model):
@@ -425,7 +433,8 @@ class Entry2PubAudit(models.Model):
 
 
 class EntryAccpair(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
     secondary_ac = models.CharField(max_length=9)
     timestamp = models.DateField()
     userstamp = models.CharField(max_length=30)
@@ -506,7 +515,8 @@ class EntryFriends(models.Model):
 
 
 class EntryXref(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
     dbcode = models.ForeignKey(CvDatabase, db_column='dbcode')
     ac = models.CharField(max_length=70)
     name = models.CharField(max_length=300, blank=True, null=True)
@@ -551,7 +561,8 @@ class Etaxi(models.Model):
 
 
 class Example(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
     protein_ac = models.ForeignKey('Protein', db_column='protein_ac')
 
     class Meta:
@@ -869,7 +880,7 @@ class MatchStruct(models.Model):
     class Meta:
         managed = False
         db_table = '"INTERPRO"."match_struct"'
-        unique_together = (('protein_ac', 'domain_id', 'pos_from'),)
+        unique_together = (('protein_ac', 'domain', 'pos_from'),)
 
 
 class Merops(models.Model):
@@ -940,7 +951,7 @@ class Method2Pub(models.Model):
     class Meta:
         managed = False
         db_table = '"INTERPRO"."method2pub"'
-        unique_together = (('method_ac', 'pub_id'),)
+        unique_together = (('method_ac', 'pub'),)
 
 
 class Method2SwissDe(models.Model):
@@ -1057,7 +1068,8 @@ class MvEntry2UniparcTrue(models.Model):
 
 
 class MvEntryMatch(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
     protein_count = models.IntegerField()
     match_count = models.IntegerField()
 
@@ -1078,7 +1090,8 @@ class MvMethod2Protein(models.Model):
 
 
 class MvMethodMatch(models.Model):
-    method_ac = models.ForeignKey(Method, db_column='method_ac', primary_key=True)
+    # method_ac = models.ForeignKey(Method, db_column='method_ac', primary_key=True)
+    method_ac = models.OneToOneField(Method, db_column='method_ac', primary_key=True)
     protein_count = models.IntegerField()
     match_count = models.IntegerField()
 
@@ -1215,7 +1228,7 @@ class Pdb2Pub(models.Model):
     class Meta:
         managed = False
         db_table = '"INTERPRO"."pdb2pub"'
-        unique_together = (('domain_id', 'pub_id'),)
+        unique_together = (('domain_id', 'pub'),)
 
 
 class PdbPubAdditional(models.Model):
@@ -1413,7 +1426,8 @@ class ProteinChangesTmp(models.Model):
 
 
 class ProteinIda(models.Model):
-    protein_ac = models.ForeignKey(Protein, db_column='protein_ac', primary_key=True)
+    # protein_ac = models.ForeignKey(Protein, db_column='protein_ac', primary_key=True)
+    protein_ac = models.OneToOneField(Protein, db_column='protein_ac', primary_key=True)
     ida = models.CharField(max_length=2000, blank=True, null=True)
 
     class Meta:
@@ -1713,7 +1727,7 @@ class TempTaxHierarchy(models.Model):
 
 
 class TextIndexEntry(models.Model):
-    id = models.CharField(max_length=9, blank=True, null=True)
+    id = models.CharField(max_length=9, primary_key=True)
     field = models.CharField(max_length=20, blank=True, null=True)
     text = models.CharField(max_length=100, blank=True, null=True)
 

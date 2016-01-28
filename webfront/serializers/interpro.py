@@ -1,6 +1,8 @@
 from rest_framework import serializers
+
 from webfront.models import interpro
 from webfront.serializers.content_serializers import ModelContentSerializer
+from .utils import flat_to_nested
 
 
 class CommonAnnotationSerializer(serializers.ModelSerializer):
@@ -55,99 +57,130 @@ class Entry2CommonSerializer(serializers.ModelSerializer):
 
 class EntrySerializer(ModelContentSerializer):
     entry_type = CvEntryTypeSerializer()
-    commons = serializers.SerializerMethodField()
-    comp = serializers.SerializerMethodField()
-    entries = serializers.SerializerMethodField()
-    ifcs = serializers.SerializerMethodField()
-    methods = serializers.SerializerMethodField()
-    citations = serializers.SerializerMethodField()
-    accpairs = serializers.SerializerMethodField()
-    xrefs = serializers.SerializerMethodField()
-    examples = serializers.SerializerMethodField()
+    commons    = serializers.SerializerMethodField()
+    comps      = serializers.SerializerMethodField()
+    entries    = serializers.SerializerMethodField()
+    ifcs       = serializers.SerializerMethodField()
+    methods    = serializers.SerializerMethodField()
+    citations  = serializers.SerializerMethodField()
+    accpairs   = serializers.SerializerMethodField()
+    xrefs      = serializers.SerializerMethodField()
+    examples   = serializers.SerializerMethodField()
 
-    @staticmethod
-    def get_commons(obj):
-        return obj.entry2common_set.order_by('order_in').values(
-            'order_in', 'ann_id',
-            'ann_id__name', 'ann_id__text', 'ann_id__comments'
-        )
+    def __init__(self, *args, **kwargs):
+        content = kwargs.pop('content', [])
 
-    def get_comp(self, obj):
-        return obj.entry2comp_set.values(
-            'timestamp', 'userstamp', 'entry2_ac', 'entry2_ac__entry_type',
-            'entry2_ac__entry_type__abbrev',
-            'entry2_ac__entry_type__description', 'entry2_ac__name',
-            'entry2_ac__checked', 'entry2_ac__created', 'entry2_ac__timestamp',
-            'entry2_ac__userstamp', 'entry2_ac__short_name', 'relation',
-            'relation__abbrev', 'relation__description', 'relation__forward',
-            'relation__reverse'
-        )
+        super(EntrySerializer, self).__init__(*args, **kwargs)
+        for to_be_removed in set(self.Meta.optionals) - set(content):
+            self.fields.pop(to_be_removed)
+
+    def get_commons(self, obj):
+        return [
+            flat_to_nested(related) for related in
+            obj.entry2common_set.order_by('order_in').values(
+                'order_in', 'ann_id__ann_id',
+                'ann_id__name', 'ann_id__text', 'ann_id__comments'
+            )
+        ]
+
+    def get_comps(self, obj):
+        return [
+            flat_to_nested(related) for related in
+            obj.entry2comp_set.values(
+                'timestamp', 'userstamp', 'entry2_ac', 'entry2_ac__entry_type',
+                'entry2_ac__entry_type__abbrev',
+                'entry2_ac__entry_type__description', 'entry2_ac__name',
+                'entry2_ac__checked', 'entry2_ac__created', 'entry2_ac__timestamp',
+                'entry2_ac__userstamp', 'entry2_ac__short_name', 'relation',
+                'relation__abbrev', 'relation__description', 'relation__forward',
+                'relation__reverse'
+            )
+        ]
 
     def get_entries(self, obj):
-        return obj.entry2entry_set.values(
-            'timestamp', 'userstamp', 'parent_ac', 'parent_ac__entry_type',
-            'parent_ac__entry_type__abbrev',
-            'parent_ac__entry_type__description', 'parent_ac__name',
-            'parent_ac__checked', 'parent_ac__created', 'parent_ac__timestamp',
-            'parent_ac__userstamp', 'parent_ac__short_name', 'relation',
-            'relation__abbrev', 'relation__description', 'relation__forward',
-            'relation__reverse'
-        )
+        return [
+            flat_to_nested(related) for related in
+            obj.entry2entry_set.values(
+                'timestamp', 'userstamp', 'parent_ac', 'parent_ac__entry_type',
+                'parent_ac__entry_type__abbrev',
+                'parent_ac__entry_type__description', 'parent_ac__name',
+                'parent_ac__checked', 'parent_ac__created', 'parent_ac__timestamp',
+                'parent_ac__userstamp', 'parent_ac__short_name', 'relation',
+                'relation__abbrev', 'relation__description', 'relation__forward',
+                'relation__reverse'
+            )
+        ]
 
     def get_ifcs(self, obj):
-        return obj.entry2ifc_set.values(
-            'code', 'code__name'
-        )
+        return [
+            flat_to_nested(related) for related in
+            obj.entry2ifc_set.values(
+                'code', 'code__name'
+            )
+        ]
 
     def get_methods(self, obj):
-        return obj.entry2method_set.order_by(
-            'method_ac__dbcode__dborder'
-        ).values(
-            'timestamp', 'userstamp', 'ida', 'method_ac', 'method_ac__name',
-            'method_ac__dbcode', 'method_ac__dbcode__dbname',
-            'method_ac__dbcode__dborder', 'method_ac__dbcode__dbshort',
-            'method_ac__method_date', 'method_ac__timestamp',
-            'method_ac__userstamp', 'method_ac__skip_flag',
-            'method_ac__candidate', 'method_ac__description',
-            'method_ac__sig_type', 'method_ac__sig_type__abbrev',
-            'method_ac__sig_type__description', 'method_ac__abstract',
-            'method_ac__abstract_long', 'method_ac__deleted', 'evidence',
-            'evidence__abbrev', 'evidence__description'
-        )
+        return [
+            flat_to_nested(related) for related in
+            obj.entry2method_set.order_by('method_ac__dbcode__dborder').values(
+                'timestamp', 'userstamp', 'ida', 'method_ac__method_ac', 'method_ac__name',
+                'method_ac__dbcode__dbcode', 'method_ac__dbcode__dbname',
+                'method_ac__dbcode__dborder', 'method_ac__dbcode__dbshort',
+                'method_ac__method_date', 'method_ac__timestamp',
+                'method_ac__userstamp', 'method_ac__skip_flag',
+                'method_ac__candidate', 'method_ac__description',
+                'method_ac__sig_type__code', 'method_ac__sig_type__abbrev',
+                'method_ac__sig_type__description', 'method_ac__abstract',
+                'method_ac__abstract_long', 'method_ac__deleted', 'evidence__code',
+                'evidence__abbrev', 'evidence__description'
+            )
+        ]
 
     def get_citations(self, obj):
-        return obj.entry2pub_set.order_by('order_in').values(
-            'pub_id', 'pub_id__pub_type', 'pub_id__pubmed_id', 'pub_id__isbn',
-            'pub_id__volume', 'pub_id__issue', 'pub_id__year', 'pub_id__title',
-            'pub_id__url', 'pub_id__rawpages', 'pub_id__medline_journal',
-            'pub_id__iso_journal', 'pub_id__authors', 'pub_id__doi_url'
-        )
+        return [
+            flat_to_nested(related) for related in
+            obj.entry2pub_set.order_by('order_in').values(
+                'pub_id__pub_id', 'pub_id__pub_type', 'pub_id__pubmed_id', 'pub_id__isbn',
+                'pub_id__volume', 'pub_id__issue', 'pub_id__year', 'pub_id__title',
+                'pub_id__url', 'pub_id__rawpages', 'pub_id__medline_journal',
+                'pub_id__iso_journal', 'pub_id__authors', 'pub_id__doi_url'
+            )
+        ]
 
     def get_accpairs(self, obj):
-        return obj.entryaccpair_set.values(
-            'secondary_ac', 'timestamp', 'userstamp'
-        )
+        return [
+            flat_to_nested(related) for related in
+            obj.entryaccpair_set.values(
+                'secondary_ac', 'timestamp', 'userstamp'
+            )
+        ]
 
     def get_xrefs(self, obj):
-        return obj.entryxref_set.order_by('dbcode__dborder').values(
-            'name', 'ac', 'dbcode',
-            'dbcode__dbname', 'dbcode__dborder', 'dbcode__dbshort'
-        )
+        return [
+            flat_to_nested(related) for related in
+            obj.entryxref_set.order_by('dbcode__dborder').values(
+                'name', 'ac', 'dbcode__dbcode',
+                'dbcode__dbname', 'dbcode__dborder', 'dbcode__dbshort'
+            )
+        ]
 
     def get_examples(self, obj):
-        return obj.example_set.order_by('protein_ac__dbcode__dborder').values(
-            'protein_ac', 'protein_ac__name', 'protein_ac__crc64',
-            'protein_ac__len', 'protein_ac__timestamp',
-            'protein_ac__userstamp', 'protein_ac__fragment',
-            'protein_ac__struct_flag', 'protein_ac__tax_id',
-            'protein_ac__dbcode', 'protein_ac__dbcode__dbname',
-            'protein_ac__dbcode__dborder', 'protein_ac__dbcode__dbshort'
-        )
+        return [
+            flat_to_nested(related) for related in
+            obj.example_set.order_by('protein_ac__dbcode__dborder').values(
+                'protein_ac', 'protein_ac__name', 'protein_ac__crc64',
+                'protein_ac__len', 'protein_ac__timestamp',
+                'protein_ac__userstamp', 'protein_ac__fragment',
+                'protein_ac__struct_flag', 'protein_ac__tax_id',
+                'protein_ac__dbcode', 'protein_ac__dbcode__dbname',
+                'protein_ac__dbcode__dborder', 'protein_ac__dbcode__dbshort'
+            )
+        ]
 
     class Meta:
         model = interpro.Entry
-        fields = ('entry_ac', 'entry_type', 'name', 'checked', 'created', 'timestamp', 'userstamp', 'short_name', 'commons', 'comp', 'entries', 'ifcs', 'methods', 'citations', 'accpairs', 'xrefs', 'examples')
-        optionals = ('commons', 'comp', 'entries', 'ifcs', 'methods', 'citations', 'accpairs', 'xrefs', 'examples')
+        fields = ('entry_ac', 'entry_type', 'name', 'checked', 'created', 'timestamp', 'userstamp', 'short_name', 'commons', 'comps', 'entries', 'ifcs', 'methods', 'citations', 'accpairs', 'xrefs', 'examples')
+        optionals = ('commons', 'comps', 'entries', 'ifcs', 'methods', 'citations', 'accpairs', 'xrefs', 'examples')
 
 
 class EntrySerializerFlat(serializers.ModelSerializer):

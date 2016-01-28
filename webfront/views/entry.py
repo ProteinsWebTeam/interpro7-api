@@ -4,7 +4,7 @@ from webfront.active_sites import ActiveSites
 from webfront.models import interpro, Clan, Pfama
 from rest_framework.mixins import ListModelMixin
 from webfront.serializers.interpro import EntrySerializer
-from webfront.serializers.pfam import ClanSerializer, PfamaSerializer, ActiveSitesSerializer
+from webfront.serializers.pfam import ClanSerializer, PfamaSerializer
 
 
 class PfamClanIDHandler(CustomView):

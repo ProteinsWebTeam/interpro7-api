@@ -31,7 +31,7 @@ def get_filtered_information(i_filter="integrated", member=None):
     elif i_filter == "integrated":
         list_of_families = "Integrated" # query to get integrated
     else:
-        list_of_families =  i_filter# query to get the specific family
+        list_of_families = i_filter# query to get the specific family
 
     if member != None:
         list_of_families += " - "+member

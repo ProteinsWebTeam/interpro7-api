@@ -85,6 +85,6 @@ class ActiveSites:
 
         self._read_alignments(path_aln)
 
-        os.remove(path_fasta)
-        os.remove(path_hmm)
-        os.remove(path_aln)
+        # os.remove(path_fasta)
+        # os.remove(path_hmm)
+        # os.remove(path_aln)

@@ -189,7 +189,7 @@ class CvSynonym(models.Model):
 
 
 class DatabaseCount(models.Model):
-    dbcode = models.CharField(max_length=1)
+    dbcode = models.CharField(max_length=1, primary_key=True)
     what = models.CharField(max_length=40)
     total = models.BigIntegerField()
 
@@ -261,6 +261,7 @@ class Entry(models.Model):
     comps = models.ManyToManyField('Entry', through='Entry2Comp', related_name='EntryThroughComp')
     entries = models.ManyToManyField('Entry', through='Entry2Entry', related_name='EntryThroughEntry')
     ifcs = models.ManyToManyField('CvIfc', through='Entry2Ifc')
+    proteins = models.ManyToManyField('Protein', through='MvEntry2Protein')
 
     class Meta:
         managed = False

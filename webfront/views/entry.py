@@ -3,7 +3,7 @@ from rest_framework.mixins import ListModelMixin
 from .custom import CustomView
 from webfront.active_sites import ActiveSites
 from webfront.models import interpro, Clan, Pfama
-from webfront.serializers.interpro import EntrySerializer
+from webfront.serializers.interpro import EntrySerializer, EntryOverviewSerializer
 from webfront.serializers.pfam import ClanSerializer, PfamaSerializer
 
 
@@ -152,3 +152,5 @@ class EntryHandler(CustomView):
     child_handlers = {
         'interpro': InterproHandler,
     }
+    queryset = interpro.CvDatabase.objects
+    serializer_class = EntryOverviewSerializer

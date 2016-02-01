@@ -2,6 +2,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
+from webfront.views.protein import ProteinHandler
 from webfront.models import interpro
 
 
@@ -23,9 +24,11 @@ class GeneralHandler(CustomView):
     http_method_names = ['get']
     level = 0
     level_description = 'home level'
-    child_handlers = {
+    available_endpoint_handlers = {
         'entry': EntryHandler,
+        'protein': ProteinHandler,
     }
+    child_handlers = {}
     queryset = interpro.Entry.objects
 
     def get(self, request, url='', *args, **kwargs):
@@ -33,7 +36,11 @@ class GeneralHandler(CustomView):
         endpoint_levels = map_url_to_levels(url)
         pagination = pagination_information(request)
 
+
         return super(GeneralHandler, self).get(
             request, endpoint_levels,
-            pagination=pagination, *args, **kwargs
+            pagination=pagination,
+            available_endpoint_handlers=self.available_endpoint_handlers,
+            *args, **kwargs
+
         )

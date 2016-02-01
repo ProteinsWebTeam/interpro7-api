@@ -14,6 +14,8 @@ class CustomView(GenericAPIView):
     # dict of handlers for lower levels of the endpoint
     # the key will be regex or string to which the endpoint will be matched
     child_handlers = {}
+    # dictionary with the high level endpoints that havent been used yet in the URL
+    available_endpoint_handlers = {}
     # queryset upon which build new querysets
     queryset = interpro.Entry.objects
     # will be used for the 'using()' part of the queries
@@ -23,6 +25,9 @@ class CustomView(GenericAPIView):
     # not used now
     many = True
     from_model = True
+
+
+    solved_levels = 0
 
     # # TODO: check if we can avoid instantiating at every request
     # def __init__(self, *args, **kwargs):
@@ -63,9 +68,7 @@ class CustomView(GenericAPIView):
     #         'http response: {}'.format('→'.join(['Home', *endpoint_levels]))
     #     )
 
-    def get(
-        self, request, endpoint_levels, *args, **kwargs
-    ):
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, *args, **kwargs):
         # if this is the last level
         if (len(endpoint_levels) == self.level):
             if self.from_model:
@@ -80,18 +83,23 @@ class CustomView(GenericAPIView):
                 self.queryset,
                 many=self.many,
                 # extracted out in the custom view
-                content=request.GET.getlist('content')
+                content=request.GET.getlist('content'),
+                context={"request":request}
             )
 
             return Response(serialized.data)
 
         else:
+            # combine the children handlers with the available endpoints
+            endpoints = available_endpoint_handlers.copy()
+            handlers = {**self.child_handlers, **endpoints}
+
             # get next level name provided by the client
             level_name = endpoint_levels[self.level]
             try:
                 # get the corresponding handler name
                 handler_name = next(
-                    h for h in self.child_handlers
+                    h for h in handlers
                     if re.match(r'(?i)^{}$'.format(h), level_name)
                 )
             except StopIteration:
@@ -99,7 +107,15 @@ class CustomView(GenericAPIView):
                 raise ValueError('the level \'{}\' is not a valid {}'.format(
                     level_name, self.level_description
                 ))
+
+            #if the handler name is one of the endpoints thisone should be removed of the available ones
+            if handler_name in endpoints:
+                endpoints.pop(handler_name)
+                #removing the current
+                endpoint_levels = endpoint_levels[self.level:]
+
             # delegate to the lower level handler
-            return self.child_handlers[handler_name].as_view()(
-                request, endpoint_levels, *args, **kwargs
+            return handlers[handler_name].as_view()(
+                request, endpoint_levels, endpoints,
+                *args, **kwargs
             )

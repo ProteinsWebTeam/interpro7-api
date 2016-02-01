@@ -72,7 +72,11 @@ class EntrySerializer(ModelContentSerializer):
 
         super(EntrySerializer, self).__init__(*args, **kwargs)
         for to_be_removed in set(self.Meta.optionals) - set(content):
-            self.fields.pop(to_be_removed)
+            try:
+                self.fields.pop(to_be_removed)
+            except KeyError:
+                #TODO: key error
+                print("Key error")
 
     def get_commons(self, obj):
         return [
@@ -285,3 +289,10 @@ class ExampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = interpro.Example
         fields = ('entry_ac', 'protein_ac')
+
+
+class EntryOverviewSerializer(ModelContentSerializer):
+
+    class Meta:
+        model = interpro.CvDatabase
+        fields = ('dbcode', 'dbname','dborder','dbshort')

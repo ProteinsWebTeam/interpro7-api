@@ -4,6 +4,7 @@ from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
 from webfront.views.protein import ProteinHandler
 from webfront.models import interpro
+from webfront.views.structure import StructureHandler
 
 
 def map_url_to_levels(url):
@@ -27,6 +28,7 @@ class GeneralHandler(CustomView):
     available_endpoint_handlers = {
         'entry': EntryHandler,
         'protein': ProteinHandler,
+        'structure': StructureHandler,
     }
     child_handlers = {}
     queryset = interpro.Entry.objects

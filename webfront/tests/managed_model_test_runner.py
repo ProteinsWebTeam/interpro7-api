@@ -35,3 +35,6 @@ if 'test' in sys.argv or 'test_coverage' in sys.argv:  # Covers regular testing 
     DATABASES['interpro_ro']['ENGINE'] = 'django.db.backends.sqlite3'
     DATABASES['interpro_ro']['NAME'] = os.path.join(BASE_DIR, '../database/db3.sqlite3')
     DATABASES['interpro_ro']['TEST'] = {'MIRROR': 'default'}
+    DATABASES['interpro_dw']['ENGINE'] = 'django.db.backends.sqlite3'
+    DATABASES['interpro_dw']['NAME'] = os.path.join(BASE_DIR, '../database/db4.sqlite3')
+    DATABASES['interpro_dw']['TEST'] = {'MIRROR': 'default'}

@@ -21,6 +21,10 @@ try:
 except FileNotFoundError:
   ORACLE_CONFIG = {}
 try:
+    ORACLE_DW_CONFIG = yaml.safe_load(open('{}/config/oracle_dw.yml'.format(BASE_DIR)))
+except FileNotFoundError:
+    ORACLE_DW_CONFIG = {}
+try:
   MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
 except FileNotFoundError:
   MYSQL_CONFIG = {}
@@ -116,6 +120,14 @@ DATABASES = {
         'PASSWORD': ORACLE_CONFIG.get('password'),
         'HOST': ORACLE_CONFIG.get('host', 'HOST'),
         'PORT': ORACLE_CONFIG.get('port', 1540),
+    },
+    'interpro_dw': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': ORACLE_DW_CONFIG.get('sid', 'INTERPRO_DB'),
+        'USER': ORACLE_DW_CONFIG.get('user', 'USER'),
+        'PASSWORD': ORACLE_DW_CONFIG.get('password'),
+        'HOST': ORACLE_DW_CONFIG.get('host', 'HOST'),
+        'PORT': ORACLE_DW_CONFIG.get('port', 1540),
     }
 }
 TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'

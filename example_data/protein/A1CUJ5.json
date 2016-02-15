@@ -1,0 +1,78 @@
+{
+  "metadata" : {
+    "accession": "A1CUJ5",
+    "id": "CBPYA_ASPCL",
+    "sourceOrganism": {
+      "name": "Aspergillus clavatus (strain ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1)",
+      "taxid": 344612
+    },
+    "name": {
+      "name": "Carboxypeptidase Y homolog A",
+      "short": null,
+      "other": []
+    },
+    "description": "Vacuolar carboxypeptidase involved in degradation of small peptides. Digests preferentially peptides containing an aliphatic or hydrophobic residue in P1' position, as well as methionine, leucine or phenylalanine in P1 position of ester substrate (By similarity).",
+    "length": 543,
+    "sequence": "MRVLPATLLVGAATAAVPPFQQILGLPKKGADTLSKPLHDFQEQLKTLSDDARRLWDEVAKHFPDSMDHNPVFSLPKKHTRRPDSHWDHIVRGADVQSVWVTGANGEKEREVDGKLEAYDLRVKTTDPGALGIDPGVKQYTGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFLELGPSSIDSKIKPVYNDFAWNSNASVIFLDQPVNVGYSYSGSAVSDTVAAGKDVYALLTLFFKQFPEYAKQDFHIAGESYAGHYIPVFASEILSHKKRNINLKSVLIGNGLTDPLTQYDHYRPMACGDGGYPAVLDEASCQSMDNALPRCKSMIESCYNTESSWVCVPASIYCNNALIGPYQRTGQNVYDVRGKCEDESNLCYKGMGYVSEYLNKREVREAVGAEVDGYDSCNFDINRNFLFHGDWMKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEYASAELEDLVIEQNEHQGKKIGQIKSHGNFTFMRLYGGGHMVPMDQPEASLEFFNRWIGGEWF",
+    "proteome": "UP000006701",
+    "gene": "cpyA",
+    "GO": {
+      "biologicalProcess": [
+        {
+          "id": "GO:0006508",
+          "termName": "proteolysis"
+        }
+      ],
+      "molecularFunction": [
+        {
+          "id": "GO:0004185",
+          "termName": "serine-type carboxypeptidase activity"
+        }
+      ],
+      "cellularComponent": [
+        {
+          "id": "GO:0005773",
+          "termName": "vacuole"
+        }
+      ]
+    },
+    "proteinEvidence": 3
+  },
+  "representation": {
+    "entries": [
+      {
+        "id": "IPR001563",
+        "name": "Peptidase S10, serine carboxypeptidase",
+        "type": "family"
+      },
+      {
+        "id": "IPR008442",
+        "name": "Propeptide, carboxypeptidase Y",
+        "type": "domain"
+      },
+      {
+        "id": "IPR029058",
+        "name": "Alpha/Beta hydrolase fold",
+        "type": "domain"
+      },
+      {
+        "id": "IPR018202",
+        "name": "Peptidase S10, serine carboxypeptidase, active site",
+        "type": "activeSite"
+      }
+    ],
+    "signalPeptide": [],
+    "transmembrane": [],
+    "coiledCoil": [],
+    "lowComplexity_disorder": [],
+    "activeSites": [],
+    "perResidueFeatures": [],
+    "disulphideBridges": []
+  },
+  "structure": {
+    "chains": []
+  },
+  "genomicContext": {
+    "DNA": ""
+  }
+}

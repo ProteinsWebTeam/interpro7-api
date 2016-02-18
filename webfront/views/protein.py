@@ -4,24 +4,22 @@ from webfront.views import CustomView
 from django.db.models import Count
 
 class UniprotAccessionHandler(CustomView):
-    level = 3
     level_description = 'uniprot accession level'
     queryset = DwEntryProteinsMatched.objects
     django_db = 'interpro_dw'
 
-    def get(self, request, endpoint_levels, *args, **kwargs):
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
 
-        self.queryset = self.queryset.filter(protein_ac=endpoint_levels[self.level-1])
+        self.queryset = self.queryset.filter(protein_ac=endpoint_levels[level-1])
 
         return super(UniprotAccessionHandler, self).get(
-            request, endpoint_levels, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
         )
 
     serializer_class = ProteinSerializer
 
 
 class UniprotHandler(CustomView):
-    level = 2
     level_description = 'uniprot level'
     django_db = 'interpro_dw'
     child_handlers = {
@@ -32,7 +30,6 @@ class UniprotHandler(CustomView):
 
 
 class ProteinHandler(CustomView):
-    level = 1
     level_description = 'section level'
     from_model = False
     many = False

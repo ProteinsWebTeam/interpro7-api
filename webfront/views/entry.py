@@ -9,23 +9,20 @@ from webfront.serializers.pfam import ClanSerializer, PfamaSerializer
 
 
 class PfamClanIDHandler(CustomView):
-    level = 6
     level_description = 'Pfam clan ID level'
     serializer_class = ClanSerializer
     django_db = "pfam_ro"
     many = False
 
-    def get(self, request, endpoint_levels, *args, **kwargs):
-
-        self.queryset = Clan.objects.all().filter(clan_acc=endpoint_levels[self.level-1])
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
+        self.queryset = Clan.objects.all().filter(clan_acc=endpoint_levels[level-1])
 
         return super(PfamClanIDHandler, self).get(
-            request, endpoint_levels, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
         )
 
 
 class ClanHandler(CustomView):
-    level = 5
     level_description = 'Pfam clan level'
     child_handlers = {
         r'CL\d{4}': PfamClanIDHandler,
@@ -43,14 +40,13 @@ class ClanHandler(CustomView):
 
 
 class ActiveSitesHandler(CustomView):
-    level = 6
     level_description = 'Pfam ID level',
     django_db = "pfam_ro"
     from_model = False
     many = False
 
-    def get(self, request, endpoint_levels, *args, **kwargs):
-        active_sites = ActiveSites(endpoint_levels[self.level-2])
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
+        active_sites = ActiveSites(endpoint_levels[level-2])
         active_sites.load_from_db()
         active_sites.load_alignment()
 
@@ -81,7 +77,6 @@ class PfamIDHandler(CustomView):
 
 
 class PfamHandler(CustomView):
-    level = 4
     level_description = 'DB member level'
     child_handlers = {
         r'PF\d{5}': PfamIDHandler,
@@ -100,7 +95,6 @@ class PfamHandler(CustomView):
 
 
 class AccesionHandler(CustomView):
-    level = 3
     level_description = 'interpro accession level'
     child_handlers = {
         'pfam': PfamHandler,
@@ -109,22 +103,17 @@ class AccesionHandler(CustomView):
     queryset = DwEntry.objects
     django_db = 'interpro_dw'
 
-    def get(self, request, endpoint_levels, *args, **kwargs):
-        # self.queryset = self.get_more(
-        #     self.queryset.filter(entry_ac=endpoint_levels[self.level-1]),
-        #     *request.GET.getlist('content')
-        # )
-        self.queryset = self.queryset.filter(entry_ac=endpoint_levels[self.level-1])
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
+        self.queryset = self.queryset.filter(entry_ac=endpoint_levels[level-1])
 
         return super(AccesionHandler, self).get(
-            request, endpoint_levels, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
         )
 
 
 
 
 class UnintegratedHandler(CustomView):
-    level = 3
     level_description = 'interpro accession level'
     child_handlers = {
         'pfam': PfamHandler,
@@ -132,7 +121,6 @@ class UnintegratedHandler(CustomView):
 
 
 class InterproHandler(ListModelMixin, CustomView):
-    level = 2
     level_description = 'interpro level'
     queryset = DwEntry.objects
     django_db = 'interpro_dw'
@@ -145,7 +133,6 @@ class InterproHandler(ListModelMixin, CustomView):
 
 
 class EntryHandler(CustomView):
-    level = 1
     level_description = 'section level'
     child_handlers = {
         'interpro': InterproHandler,

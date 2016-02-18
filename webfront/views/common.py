@@ -1,5 +1,3 @@
-from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
-
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
 from webfront.views.protein import ProteinHandler
@@ -23,7 +21,6 @@ def pagination_information(request):
 
 class GeneralHandler(CustomView):
     http_method_names = ['get']
-    level = 0
     level_description = 'home level'
     available_endpoint_handlers = {
         'entry': EntryHandler,
@@ -38,11 +35,11 @@ class GeneralHandler(CustomView):
         endpoint_levels = map_url_to_levels(url)
         pagination = pagination_information(request)
 
-
         return super(GeneralHandler, self).get(
             request, endpoint_levels,
             pagination=pagination,
             available_endpoint_handlers=self.available_endpoint_handlers,
+            level=0,
             *args, **kwargs
 
         )

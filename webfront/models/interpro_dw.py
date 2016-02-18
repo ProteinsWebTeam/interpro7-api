@@ -132,7 +132,7 @@ class DwEntryPathway(models.Model):
 
 
 class DwEntryProteinsMatched(models.Model):
-    pm_pk = models.FloatField(blank=True, null=True)
+    pm_pk = models.FloatField(blank=True, primary_key=True)
     entry_fk = models.FloatField()
     dbid = models.IntegerField()
     xref_fk = models.FloatField(blank=True, null=True)

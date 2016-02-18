@@ -7,8 +7,6 @@ from webfront.pagination import CustomPagination
 
 
 class CustomView(GenericAPIView):
-    # level of the view, to be able to extract the value from the URL
-    level = 0
     # description of the level of the endpoint, for debug purposes
     level_description = 'level'
     # dict of handlers for lower levels of the endpoint
@@ -26,51 +24,9 @@ class CustomView(GenericAPIView):
     many = True
     from_model = True
 
-
-    solved_levels = 0
-
-    # # TODO: check if we can avoid instantiating at every request
-    # def __init__(self, *args, **kwargs):
-    #     print('instantiating {}'.format(self))
-
-    # def query_to_page(self, query, pagination = {}, *args, **kwargs):
-    #     paginator = Paginator(query, pagination['size'])
-    #     paginator = self.pagination_class
-    #     try:
-    #         subset = paginator.page(pagination['index'])
-    #     except EmptyPage:
-    #         subset = paginator.page(paginator.num_pages)
-    #     return subset.object_list.values()
-    #
-    # def get_more(self, queryset, *details):
-    #     return queryset.prefetch_related(*details)
-    #
-    # def get_json(self, endpoint_levels, request, *args, **kwargs):
-    #     response = {'endpoint_levels': endpoint_levels}
-    #     if (self.multiple):
-    #         response = {
-    #             **response,
-    #             'query': list(map(lambda a: a, self.query_to_page(
-    #                 self.queryset.using(self.django_db), *args, **kwargs
-    #             ))),
-    #         }
-    #     else:
-    #         response = {
-    #             **response,
-    #             # 'query': self.queryset.using(self.django_db).first(),
-    #             'query': self.queryset.using(self.django_db).values()[0],
-    #         }
-    #     return Response(response)
-    #
-    # def get_html(self, endpoint_levels, request, *args, **kwargs):
-    #     return Response(self.queryset.using(self.django_db).values())
-    #     return HttpResponse(
-    #         'http response: {}'.format('→'.join(['Home', *endpoint_levels]))
-    #     )
-
-    def get(self, request, endpoint_levels, available_endpoint_handlers={}, *args, **kwargs):
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
         # if this is the last level
-        if (len(endpoint_levels) == self.level):
+        if (len(endpoint_levels) == level):
             if self.from_model:
                 self.queryset = self.queryset.using(self.django_db)
                 if self.many:
@@ -95,7 +51,7 @@ class CustomView(GenericAPIView):
             handlers = {**self.child_handlers, **endpoints}
 
             # get next level name provided by the client
-            level_name = endpoint_levels[self.level]
+            level_name = endpoint_levels[level]
             try:
                 # get the corresponding handler name
                 handler_name = next(
@@ -112,10 +68,11 @@ class CustomView(GenericAPIView):
             if handler_name in endpoints:
                 endpoints.pop(handler_name)
                 #removing the current
-                endpoint_levels = endpoint_levels[self.level:]
+                endpoint_levels = endpoint_levels[level:]
+                level=0
 
             # delegate to the lower level handler
             return handlers[handler_name].as_view()(
-                request, endpoint_levels, endpoints,
+                request, endpoint_levels, endpoints, level+1,
                 *args, **kwargs
             )

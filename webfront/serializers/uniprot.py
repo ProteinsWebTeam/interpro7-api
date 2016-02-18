@@ -1,27 +1,14 @@
 from rest_framework import serializers
+from webfront.models import DwEntryProteinsMatched
 
-from webfront.models import Protein, Entry
 from webfront.serializers.content_serializers import ModelContentSerializer,ContentSerializer
 
 
 class ProteinSerializer(ModelContentSerializer):
 
     class Meta:
-        model = Protein
-        fields = ('protein_ac', 'name', 'dbcode', 'crc64', 'len', 'timestamp', 'userstamp', 'fragment', 'struct_flag', 'tax_id')
-
-
-class EntryProteinSerializer(ModelContentSerializer):
-    proteins = serializers.SerializerMethodField()
-
-    def get_proteins(self, entry):
-        Protein.objects.filter()
-        serializer = ProteinSerializer(many=True)
-        return serializer.data
-
-    class Meta:
-        model = Entry
-        fields = ('entry_ac','proteins')
+        model = DwEntryProteinsMatched
+        fields = ('protein_ac', 'entry_fk', 'dbid', 'xref_fk', 'protein_ac', 'description', 'tax_id', 'taxonomy_full_name', 'len', 'struct_flag', 'ida', 'ida_fk', 'materialised_path', 'seq_fk', 'entry_list')
 
 
 class ProteinOverviewSerializer(ContentSerializer):

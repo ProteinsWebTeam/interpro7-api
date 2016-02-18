@@ -11,7 +11,8 @@ class PDBAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, *args, **kwargs):
 
-        self.queryset = self.queryset.filter(xref_identifier=endpoint_levels[self.level-1])
+        self.queryset = self.queryset.filter(xref_identifier=endpoint_levels[self.level-1].lower()
+                                            )
 
         return super(PDBAccessionHandler, self).get(
             request, endpoint_levels, *args, **kwargs

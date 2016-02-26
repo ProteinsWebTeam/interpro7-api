@@ -22,7 +22,7 @@
       "cellularComponent": [
         {
           "id": "GO:0016020",
-          "termName": "membrane"
+          "name": "membrane"
         }
       ]
     },

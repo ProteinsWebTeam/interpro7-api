@@ -26,21 +26,21 @@
       "molecularFunction": [
         {
           "id": "GO:0004930",
-          "termName": "G-protein coupled receptor activity"
+          "name": "G-protein coupled receptor activity"
         },
         {
           "id": "GO:0004964",
-          "termName": "luteinizing hormone receptor activity"
+          "name": "luteinizing hormone receptor activity"
         },
         {
           "id": "GO:0016500",
-          "termName": "protein-hormone receptor activity"
+          "name": "protein-hormone receptor activity"
         }
       ],
       "cellularComponent": [
         {
           "id": "GO:0016021",
-          "termName": "integral component of membrane"
+          "name": "integral component of membrane"
         }
       ]
     },

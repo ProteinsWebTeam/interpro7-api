@@ -20,23 +20,23 @@
       "biologicalProcess": [
         {
           "id": "GO:0055114",
-          "termName": "oxidation-reduction process"
+          "name": "oxidation-reduction process"
         }
       ],
       "molecularFunction": [
         {
           "id": "GO:0016651",
-          "termName": "oxidoreductase activity, acting on NAD(P)H"
+          "name": "oxidoreductase activity, acting on NAD(P)H"
         },
         {
           "id": "GO:0051539",
-          "termName": "4 iron, 4 sulfur cluster binding"
+          "name": "4 iron, 4 sulfur cluster binding"
         }
       ],
       "cellularComponent": [
         {
           "id": "GO:0016020",
-          "termName": "membrane"
+          "name": "membrane"
         }
       ]
     },

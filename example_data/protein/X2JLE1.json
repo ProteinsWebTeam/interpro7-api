@@ -20,19 +20,19 @@
       "biologicalProcess": [
         {
           "id": "GO:0007186",
-          "termName": "G-protein coupled receptor signaling pathway"
+          "name": "G-protein coupled receptor signaling pathway"
         }
       ],
       "molecularFunction": [
         {
           "id": "GO:0004930",
-          "termName": "G-protein coupled receptor activity"
+          "name": "G-protein coupled receptor activity"
         }
       ],
       "cellularComponent": [
         {
           "id": "GO:0016021",
-          "termName": "integral component of membrane"
+          "name": "integral component of membrane"
         }
       ]
     },

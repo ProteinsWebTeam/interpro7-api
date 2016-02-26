@@ -20,19 +20,19 @@
       "biologicalProcess": [
         {
           "id": "GO:0006508",
-          "termName": "proteolysis"
+          "name": "proteolysis"
         }
       ],
       "molecularFunction": [
         {
           "id": "GO:0004185",
-          "termName": "serine-type carboxypeptidase activity"
+          "name": "serine-type carboxypeptidase activity"
         }
       ],
       "cellularComponent": [
         {
           "id": "GO:0005773",
-          "termName": "vacuole"
+          "name": "vacuole"
         }
       ]
     },
@@ -65,7 +65,12 @@
     "transmembrane": [],
     "coiledCoil": [],
     "lowComplexity_disorder": [],
-    "activeSites": [],
+    "activeSites": [
+      {
+        "id": "IPR018202",
+        "name": "Peptidase S10, serine carboxypeptidase, active site"
+      }
+    ],
     "perResidueFeatures": [],
     "disulphideBridges": []
   },

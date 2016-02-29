@@ -1,0 +1,68 @@
+{
+  "metadata" : {
+    "accession": "X2JLE1",
+    "id": "X2JLE1_DROME",
+    "sourceOrganism": {
+      "name": "Drosophila melanogaster (Fruit fly)",
+      "taxid": 7227
+    },
+    "name": {
+      "name": "Dopamine 2-like receptor, isoform G",
+      "short": null,
+      "other": []
+    },
+    "description": null,
+    "length": 897,
+    "sequence": "MLSPFDWRRGISSSGTGGTMAAQPLSSTAATTAAATGATAATAATAATTSATLSTAAASTSTTAAPSAGATWINHHLAVEADSSQPANGSDAQAGVEGPTMPAGYLPLYEDVETAAEDAGYALIDDISEWLLGSVGSEAAVGGPENSTNLAVTGANGTLAWLEALNSTQPAQSNSSAEDGERGRYSLRSFVEQQLAGGGAAGAGDGGDAGIALIDSGEEAALDNVADAETDYGMLGGFGDAELLQRTATVARETLGNRTAPSTTSYDGGGSGDVGVAGGLAGTAGGGVGGAGGSGGSTFMLLLENFNDYFPNYNGSTVSGTSTIAPGVAITGSRGSGLLLEQNLTGLYLDGYRLNCTNETLNLTDSCGELRVVDHNYWALILILFPILTLFGNILVILSVCRERSLQTVTNYFIVSLAIADLLVAVVVMPFAVYFLVNGAWALPDVVCDFYIAMDVICSTSSIFNLVAISIDRYIAVTQPIKYAKHKNSRRVCLTILLVWAISAAIGSPIVLGLNNTPNREPDVCAFYNADFILYSSLSSFYIPCIIMVFLYWNIFKALRSRARKQRAARKPHLSELTGGSVIENIAQTRRLAETALDSSRHASRILPDEAATNTASGSNEEEDENAISPDIDDCHVIVNDKSTEFMLATVVEETGNSVVAQITTQPQLVVADPNGNHDSGYAASNVDDVLAGVAPASASAATSAAPRSSGSPPDSPLPSGATLQRSSVSSQRRPTGDDSPKRGEPALSVAMKPLSFVRYGVQEAMTLARNDSTLSTTSKTSSRKDKKNSQASRFTIYKVHKASKKKREKSSAKKERKATKTLAIVLGVFLFCWLPFFSCNIMDAMCAKFKKDCRPGLTAYMMTTWLGYINSFVNPVIYTIFNPEFRKAFKKIMHMG",
+    "proteome": "UP000000803",
+    "gene": "Dop2R",
+    "GO": {
+      "biologicalProcess": [
+        {
+          "id": "GO:0007186",
+          "name": "G-protein coupled receptor signaling pathway"
+        }
+      ],
+      "molecularFunction": [
+        {
+          "id": "GO:0004930",
+          "name": "G-protein coupled receptor activity"
+        }
+      ],
+      "cellularComponent": [
+        {
+          "id": "GO:0016021",
+          "name": "integral component of membrane"
+        }
+      ]
+    },
+    "proteinEvidence": 1
+  },
+  "representation": {
+    "entries": [
+      {
+        "id": "IPR000276",
+        "name": "G protein-coupled receptor, rhodopsin-like",
+        "type": "family"
+      },
+      {
+        "id": "IPR017452",
+        "name": "GPCR, rhodopsin-like, 7TM",
+        "type": "domain"
+      }
+    ],
+    "signalPeptide": [],
+    "transmembrane": [],
+    "coiledCoil": [],
+    "lowComplexity_disorder": [],
+    "activeSites": [],
+    "perResidueFeatures": [],
+    "disulphideBridges": []
+  },
+  "structure": {
+    "chains": []
+  },
+  "genomicContext": {
+    "DNA": ""
+  }
+}

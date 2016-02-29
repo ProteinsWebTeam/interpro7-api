@@ -1,0 +1,58 @@
+{
+  "metadata" : {
+    "accession": "M5ADK6",
+    "id": "M5ADK6_LACBR",
+    "sourceOrganism": {
+      "name": "Lactobacillus brevis KB290",
+      "taxid": 1001583
+    },
+    "name": {
+      "name": "Band 7 protein",
+      "short": null,
+      "other": []
+    },
+    "description": null,
+    "length": 297,
+    "sequence": "MESGIIEILIRNGVSHMTEKPVFHINGYLGLILVLVILGLGVYLSVVGWGVLGVILVVLAVLAASSLTIIEPNQSKVLTFFGRYIGTIKESGLYLTVPLTTKTTVSLRVRNFNSAILKVNDLQGNPVEIAAVIVFKVVDTSKALFAVEDYEKFVEIQSESAIRHVASEYAYDNFGDHQALTLRSNPTEVSNHLTEELQARLEVAGVQIIETRLTHLAYATEIASAMLQRQQSQAILSARKIIVEGAVSITEGAIEQLAAETDLHLTDNQKLQLINNMMVSIINERGSQPVINTGKVE",
+    "proteome": "UP000012042",
+    "gene": "LVISKB_0797",
+    "GO": {
+      "biologicalProcess": [],
+      "molecularFunction": [],
+      "cellularComponent": [
+        {
+          "id": "GO:0016020",
+          "name": "membrane"
+        }
+      ]
+    },
+    "proteinEvidence": 1
+  },
+  "representation": {
+    "entries": [
+      {
+        "id": "IPR001972",
+        "name": "Stomatin family",
+        "type": "family"
+      },
+      {
+        "id": "IPR001107",
+        "name": "Band 7 domain",
+        "type": "domain"
+      }
+    ],
+    "signalPeptide": [],
+    "transmembrane": [],
+    "coiledCoil": [],
+    "lowComplexity_disorder": [],
+    "activeSites": [],
+    "perResidueFeatures": [],
+    "disulphideBridges": []
+  },
+  "structure": {
+    "chains": []
+  },
+  "genomicContext": {
+    "DNA": ""
+  }
+}

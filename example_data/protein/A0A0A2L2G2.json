@@ -1,0 +1,83 @@
+{
+  "metadata" : {
+    "accession": "A0A0A2L2G2",
+    "id": "A0A0A2L2G2_PENIT",
+    "sourceOrganism": {
+      "name": "Penicillium italicum",
+      "taxid": 40296
+    },
+    "name": {
+      "name": "Propeptide, carboxypeptidase Y",
+      "short": null,
+      "other": []
+    },
+    "description": null,
+    "length": 550,
+    "sequence": "MRVLSTTLLVGAASAAAPSFQQVLGAHSEHAENVAQQGADAFKPLQHLQDQFKSLSSEARQLWEEVSNYFPESMGSAPMLSLPKKHTRRPDSHWDYHVSGAKVQDIWVSGAEGTKEREVDGKLEDYALRAKKVDPSALGIDPGVKQYSGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFMELGPSSIGANIKPIYNDFSWNNNASVIFLDQPINVGYSYSGSSVSDTVAAGKDVYALLTLFFKQFPEYATQDFHIAGESYAGHYIPVMASEILSHKKRNINLKSVLIGNGLTDGLTQYEYYRPMACGEGGYPAVLDESTCQSMDNALSRCQSMIQSCYNSESPWVCVPASIYCNNAMLGPYQRTGQNVYDVRGKCEDESNLCYKGLGYVSEYLGQESVREAVGAEVDGYDSCNFDINRNFLFNGDWFKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEFASAELEDLKIVQNEHVGKKIGQIKSHGNFTFMRIFGGGHMVPMDQPESGLEFFNRWIGGEWF",
+    "proteome": "UP000030104",
+    "gene": "PITC_084940",
+    "GO": {
+      "biologicalProcess": [
+        {
+          "id": "GO:0006508",
+          "name": "proteolysis"
+        }
+      ],
+      "molecularFunction": [
+        {
+          "id": "GO:0004185",
+          "name": "serine-type carboxypeptidase activity"
+        }
+      ],
+      "cellularComponent": [
+        {
+          "id": "GO:0005773",
+          "name": "vacuole"
+        }
+      ]
+    },
+    "proteinEvidence": 1
+  },
+  "representation": {
+    "entries": [
+      {
+        "id": "IPR001563",
+        "name": "Peptidase S10, serine carboxypeptidase",
+        "type": "family"
+      },
+      {
+        "id": "IPR008442",
+        "name": "Propeptide, carboxypeptidase Y",
+        "type": "domain"
+      },
+      {
+        "id": "IPR029058",
+        "name": "Alpha/Beta hydrolase fold",
+        "type": "domain"
+      },
+      {
+        "id": "IPR018202",
+        "name": "Peptidase S10, serine carboxypeptidase, active site",
+        "type": "activeSite"
+      }
+    ],
+    "signalPeptide": [],
+    "transmembrane": [],
+    "coiledCoil": [],
+    "lowComplexity_disorder": [],
+    "activeSites": [
+      {
+        "id": "IPR018202",
+        "name": "Peptidase S10, serine carboxypeptidase, active site"
+      }
+    ],
+    "perResidueFeatures": [],
+    "disulphideBridges": []
+  },
+  "structure": {
+    "chains": []
+  },
+  "genomicContext": {
+    "DNA": ""
+  }
+}

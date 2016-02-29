@@ -13,7 +13,12 @@
       ],
       "cellularComponent": []
     },
-    "sourceDB": {},
+    "sourceDataBase": "InterPro",
+    "memberDataBases": {
+      "SMART": ["SM00950"],
+      "PROSITEProfiles": ["PS50822"],
+      "Pfam": ["PF02171"],
+    },
     "name": {
       "name": "Piwi domain",
       "short": "Piwi",

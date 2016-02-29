@@ -19,6 +19,7 @@
       "PROSITEProfiles": ["PS50822"],
       "Pfam": ["PF02171"],
     },
+    "integrated": null,
     "name": {
       "name": "Piwi domain",
       "short": "Piwi",

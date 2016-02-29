@@ -15,6 +15,7 @@
     },
     "sourceDataBase": "Pfam",
     "memberDataBases": {},
+    "integrated": "IPR003165",
     "name": {
       "name": "Piwi domain",
       "short": "Piwi",

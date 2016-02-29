@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "accession": "IPR003165",
+    "accession": "PF02171",
     "id": "",
     "type": "domain",
     "GO": {
@@ -13,19 +13,15 @@
       ],
       "cellularComponent": []
     },
-    "sourceDataBase": "InterPro",
-    "memberDataBases": {
-      "SMART": ["SM00950"],
-      "PROSITEProfiles": ["PS50822"],
-      "Pfam": ["PF02171"],
-    },
+    "sourceDataBase": "Pfam",
+    "memberDataBases": {},
     "name": {
       "name": "Piwi domain",
       "short": "Piwi",
       "other": []
     },
-    "description": "The piwi domain [PUB00020128] is a protein domain found in piwi proteins and a large number of related nucleic acid-binding proteins, especially those that bind and cleave RNA. The function of the domain is double stranded-RNA-guided hydrolysis of single stranded-RNA, as has been determined in the argonaute family of related proteins [PUB00018283].",
-    "wikipedia": "",
+    "description": "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA.",
+    "wikipedia": "Piwi",
     "literature": {
       "PUB00020128": {
         "PMID": 15284453,
@@ -56,42 +52,6 @@
         "ISOJournal": "Trends Biochem. Sci.",
         "authors": "Cerutti L, Mian N, Bateman A.",
         "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8",
-      },
-      "PUB00050034": {
-        "PMID": 19187762
-      },
-      "PUB00033445": {
-        "PMID": 14749716
-      },
-      "PUB00033483": {
-        "PMID": 12526743
-      },
-      "PUB00053929": {
-        "PMID": 20211138
-      },
-      "PUB00006604": {
-        "PMID": 9851978
-      },
-      "PUB00018289": {
-        "PMID": 9927466
-      },
-      "PUB00036180": {
-        "PMID": 16815998
-      },
-      "PUB00018290": {
-        "PMID": 10631171
-      },
-      "PUB00040580": {
-        "PMID": 17027504
-      },
-      "PUB00042042": {
-        "PMID": 17130125
-      },
-      "PUB00032750": {
-        "PMID": 15800628
-      },
-      "PUB00038628": {
-        "PMID": 15800629
       }
     }
   }

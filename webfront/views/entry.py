@@ -1,6 +1,4 @@
 from django.db.models import Count
-from rest_framework.response import Response
-#from rest_framework.mixins import ListModelMixin
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
 from .custom import CustomView
@@ -96,6 +94,8 @@ from .custom import CustomView
 #         )
 #
 #
+
+
 class AccesionHandler(CustomView):
     level_description = 'interpro accession level'
     # child_handlers = {
@@ -111,17 +111,16 @@ class AccesionHandler(CustomView):
         return super(AccesionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
         )
-#
-#
-#
-#
-# class UnintegratedHandler(CustomView):
-#     level_description = 'interpro accession level'
-#     child_handlers = {
-#         'pfam': PfamHandler,
-#     }
-#
-#
+
+
+class UnintegratedHandler(CustomView):
+    level_description = 'interpro accession level'
+    queryset = Entry.objects.all().exclude(source_database__iexact="interpro").filter(integrated__isnull=True)
+    serializer_class = EntrySerializer
+    # child_handlers = {
+    #     'pfam': PfamHandler,
+    # }
+
 
 class InterproHandler(CustomView):
     level_description = 'interpro level'
@@ -129,7 +128,6 @@ class InterproHandler(CustomView):
     child_handlers = {
         r'IPR\d{6}':    AccesionHandler,
         # 'pfam': PfamHandler,
-        # 'unintegrated': UnintegratedHandler,
     }
     serializer_class = EntrySerializer
 #
@@ -139,6 +137,7 @@ class EntryHandler(CustomView):
     from_model = False
     child_handlers = {
         'interpro': InterproHandler,
+        'unintegrated': UnintegratedHandler,
         # 'pfam': PfamHandler,
     }
 
@@ -157,7 +156,6 @@ class EntryHandler(CustomView):
 
         output["unintegrated"] = Entry.objects.all().exclude(source_database__iexact="interpro").filter(integrated__isnull=True).count()
         self.queryset = output
-        # return Response(output)
         return super(EntryHandler, self).get(
             request, endpoint_levels, *args, **kwargs
         )

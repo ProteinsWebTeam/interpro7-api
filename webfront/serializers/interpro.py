@@ -221,9 +221,9 @@ class EntryOverviewSerializer(ModelContentSerializer):
 
     @staticmethod
     def get_member_database(obj):
-        return databases[obj["source_database"]]
+        return obj["source_database"]
 
     class Meta:
         model = Entry
-        fields = ('source_database', 'total')
+        fields = ('member_database', 'total')
 

@@ -17,8 +17,8 @@ class EntrySerializer(ModelContentSerializer):
             'id': instance.id,
             'accession': instance.accession,
             'type': instance.type,
-            'GO': instance.go_terms,
-            'sourceDataBase': instance.source_database,
+            'go_terms': instance.go_terms,
+            'source_dataBase': instance.source_database,
             'member_databases': instance.member_databases,
             'integrated': instance.integrated,
             'name': {

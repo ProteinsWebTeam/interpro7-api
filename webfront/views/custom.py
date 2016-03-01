@@ -2,7 +2,8 @@ import re
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from webfront.models import interpro
+#from webfront.models import interpro
+from webfront.models import Entry
 from webfront.pagination import CustomPagination
 
 
@@ -15,7 +16,7 @@ class CustomView(GenericAPIView):
     # dictionary with the high level endpoints that havent been used yet in the URL
     available_endpoint_handlers = {}
     # queryset upon which build new querysets
-    queryset = interpro.Entry.objects
+    queryset = Entry.objects
     # will be used for the 'using()' part of the queries
     django_db = 'interpro_ro'
     # custom pagination class

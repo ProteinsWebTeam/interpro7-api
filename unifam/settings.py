@@ -17,18 +17,6 @@ import yaml
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 try:
-  ORACLE_CONFIG = yaml.safe_load(open('{}/config/oracle.yml'.format(BASE_DIR)))
-except FileNotFoundError:
-  ORACLE_CONFIG = {}
-try:
-    ORACLE_DW_CONFIG = yaml.safe_load(open('{}/config/oracle_dw.yml'.format(BASE_DIR)))
-except FileNotFoundError:
-    ORACLE_DW_CONFIG = {}
-try:
-  MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
-except FileNotFoundError:
-  MYSQL_CONFIG = {}
-try:
     UNIFAM_CONFIG = yaml.safe_load(open('{}/config/unifam.yml'.format(BASE_DIR)))
 except FileNotFoundError:
     UNIFAM_CONFIG = {}
@@ -105,32 +93,8 @@ DATABASES = {
             'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
         },
     },
-    'pfam_ro': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': MYSQL_CONFIG.get('name', 'NAME'),
-        'USER': MYSQL_CONFIG.get('user', 'USER'),
-        'PASSWORD': MYSQL_CONFIG.get('password'),
-        'HOST': MYSQL_CONFIG.get('host', 'HOST'),
-        'PORT': MYSQL_CONFIG.get('port', 4444),
-    },
-    'interpro_ro': {
-        'ENGINE': 'django.db.backends.oracle',
-        'NAME': ORACLE_CONFIG.get('sid', 'INTERPRO_DB'),
-        'USER': ORACLE_CONFIG.get('user', 'USER'),
-        'PASSWORD': ORACLE_CONFIG.get('password'),
-        'HOST': ORACLE_CONFIG.get('host', 'HOST'),
-        'PORT': ORACLE_CONFIG.get('port', 1540),
-    },
-    'interpro_dw': {
-        'ENGINE': 'django.db.backends.oracle',
-        'NAME': ORACLE_DW_CONFIG.get('sid', 'INTERPRO_DB'),
-        'USER': ORACLE_DW_CONFIG.get('user', 'USER'),
-        'PASSWORD': ORACLE_DW_CONFIG.get('password'),
-        'HOST': ORACLE_DW_CONFIG.get('host', 'HOST'),
-        'PORT': ORACLE_DW_CONFIG.get('port', 1540),
-    }
 }
-TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
+#TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

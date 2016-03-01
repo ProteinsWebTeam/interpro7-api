@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "accession": "PF17180",
+    "id": "",
+    "type": "domain",
+    "GO": {
+      "biologicalProcess": [],
+      "molecularFunction": [],
+      "cellularComponent": []
+    },
+    "sourceDataBase": "Pfam",
+    "memberDataBases": {},
+    "integrated": null,
+    "name": {
+      "name": "Zinc-binding domain",
+      "short": "zf-3CxxC_2",
+      "other": []
+    },
+    "description": "",
+    "wikipedia": "",
+    "literature": {}
+  }
+}

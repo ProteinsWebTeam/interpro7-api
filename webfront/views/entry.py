@@ -2,7 +2,7 @@ from django.db.models import Count
 from rest_framework.response import Response
 #from rest_framework.mixins import ListModelMixin
 from webfront.models import Entry
-from webfront.serializers.interpro import EntryOverviewSerializer
+from webfront.serializers.interpro import EntrySerializer
 from .custom import CustomView
 # from webfront.active_sites import ActiveSites
 # from webfront.models import Clan, Pfama, DwEntrySignature,DwEntry
@@ -96,21 +96,21 @@ from .custom import CustomView
 #         )
 #
 #
-# class AccesionHandler(CustomView):
-#     level_description = 'interpro accession level'
-#     child_handlers = {
-#         'pfam': PfamHandler,
-#     }
-#     serializer_class = EntryDWSerializer
-#     queryset = DwEntry.objects
-#     django_db = 'interpro_dw'
-#
-#     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
-#         self.queryset = self.queryset.filter(entry_ac=endpoint_levels[level-1])
-#
-#         return super(AccesionHandler, self).get(
-#             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
-#         )
+class AccesionHandler(CustomView):
+    level_description = 'interpro accession level'
+    # child_handlers = {
+    #     'pfam': PfamHandler,
+    # }
+    serializer_class = EntrySerializer
+    queryset = Entry.objects
+    many = False
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
+        self.queryset = self.queryset.filter(accession=endpoint_levels[level-1])
+
+        return super(AccesionHandler, self).get(
+            request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
+        )
 #
 #
 #
@@ -122,30 +122,43 @@ from .custom import CustomView
 #     }
 #
 #
-# class InterproHandler(ListModelMixin, CustomView):
-#     level_description = 'interpro level'
-#     queryset = DwEntry.objects
-#     django_db = 'interpro_dw'
-#     child_handlers = {
-#         r'IPR\d{6}':    AccesionHandler,
-#         'pfam': PfamHandler,
-#         'unintegrated': UnintegratedHandler,
-#     }
-#     serializer_class = EntryDWSerializer
+
+class InterproHandler(CustomView):
+    level_description = 'interpro level'
+    queryset = Entry.objects.filter(source_database__iexact="interpro")
+    child_handlers = {
+        r'IPR\d{6}':    AccesionHandler,
+        # 'pfam': PfamHandler,
+        # 'unintegrated': UnintegratedHandler,
+    }
+    serializer_class = EntrySerializer
 #
 #
 class EntryHandler(CustomView):
     level_description = 'section level'
     from_model = False
-    # child_handlers = {
-    #     'interpro': InterproHandler,
-    #     'pfam': PfamHandler,
-    # }
-    #django_db = 'interpro_dw'
+    child_handlers = {
+        'interpro': InterproHandler,
+        # 'pfam': PfamHandler,
+    }
 
     def get(self, request, endpoint_levels, *args, **kwargs):
-        self.queryset = Entry.objects.all().values('source_database').annotate(total=Count('source_database'))
+        entry_counter = Entry.objects.all().values('source_database').annotate(total=Count('source_database'))
+        output = {
+            "interpro": 0,
+            "unintegrated": 0,
+            "member_databases": {}
+        }
+        for row in entry_counter:
+            if row["source_database"].lower() == "interpro" :
+                output["interpro"] = row ["total"]
+            else:
+                output["member_databases"][row["source_database"].lower()] = row["total"]
+
+        output["unintegrated"] = Entry.objects.all().exclude(source_database__iexact="interpro").filter(integrated__isnull=True).count()
+        self.queryset = output
+        # return Response(output)
         return super(EntryHandler, self).get(
             request, endpoint_levels, *args, **kwargs
         )
-    serializer_class = EntryOverviewSerializer
+    # serializer_class = EntryOverviewSerializer

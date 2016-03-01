@@ -18,7 +18,7 @@ class CustomView(GenericAPIView):
     # queryset upon which build new querysets
     queryset = Entry.objects
     # will be used for the 'using()' part of the queries
-    django_db = 'interpro_ro'
+    # django_db = 'interpro_ro'
     # custom pagination class
     pagination_class = CustomPagination
     # not used now
@@ -29,22 +29,23 @@ class CustomView(GenericAPIView):
         # if this is the last level
         if (len(endpoint_levels) == level):
             if self.from_model:
-                self.queryset = self.queryset.using(self.django_db)
+                # self.queryset = self.queryset.using(self.django_db)
                 if self.many:
                     self.queryset = self.paginate_queryset(self.queryset)
                 else:
                     self.queryset = self.queryset.first()
 
-            serialized = self.serializer_class(
-                # passed to DRF's view
-                self.queryset,
-                many=self.many,
-                # extracted out in the custom view
-                content=request.GET.getlist('content'),
-                context={"request":request}
-            )
+                serialized = self.serializer_class(
+                    # passed to DRF's view
+                    self.queryset,
+                    many=self.many,
+                    # extracted out in the custom view
+                    content=request.GET.getlist('content'),
+                    context={"request":request}
+                )
+                return Response(serialized.data)
+            return Response(self.queryset)
 
-            return Response(serialized.data)
 
         else:
             # combine the children handlers with the available endpoints

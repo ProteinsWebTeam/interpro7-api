@@ -152,5 +152,50 @@
         }
       }
     }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "accession": "PF17180",
+      "id": "id3",
+      "type": "domain",
+      "go_terms": {
+        "biologicalProcess": [],
+        "molecularFunction": [],
+        "cellularComponent": []
+      },
+      "source_database": "Pfam",
+      "member_databases": {},
+      "integrated": null,
+      "name": "Zinc-binding domain",
+      "short_name": "zf-3CxxC_2",
+      "other_names": [],
+      "description": "",
+      "wikipedia": "",
+      "literature": {}
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "accession": "PF17176",
+      "id": "id4",
+      "type": "domain",
+      "go_terms": {
+        "biologicalProcess": [],
+        "molecularFunction": [],
+        "cellularComponent": []
+      },
+      "source_database": "Pfam",
+      "member_databases": {},
+      "integrated": null,
+      "name": "tRNA-binding domain",
+      "short_name": "tRNA_bind_3",
+      "other_names": [],
+      "description": "",
+      "wikipedia": "",
+      "literature": {}
+    }
+
   }
 ]

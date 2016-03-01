@@ -205,11 +205,14 @@ databases = {
 #         fields = ('entry_ac', 'protein_ac')
 #
 #
-# class EntryDWSerializer(ModelContentSerializer):
-#     class Meta:
-#         model = DwEntry
-#         fields = ('entry_ac', 'entry_type', 'checked', 'name', 'short_name', 'annotation', 'pathways_and_interactions', 'proteins_matched', 'domain_organisations', 'structures', 'related_resources', 'citations')
-#
+
+
+class EntrySerializer(ModelContentSerializer):
+    class Meta:
+        model = Entry
+        fields = ('id', 'accession', 'type', 'name', 'short_name', 'other_names', 'source_database', 'member_databases',
+                  'integrated', 'go_terms', 'description', 'wikipedia', 'literature')
+
 
 class EntryOverviewSerializer(ModelContentSerializer):
     member_database = serializers.SerializerMethodField()

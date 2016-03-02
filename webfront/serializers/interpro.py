@@ -13,14 +13,14 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance):
-        return {
+        obj = {
             'id': instance.id,
             'accession': instance.accession,
             'type': instance.type,
             'go_terms': instance.go_terms,
             'source_dataBase': instance.source_database,
             'member_databases': instance.member_databases,
-            'integrated': instance.integrated,
+            # 'integrated': instance.integrated,
             'name': {
                 'name': instance.name,
                 'short': instance.short_name,
@@ -30,6 +30,10 @@ class EntrySerializer(ModelContentSerializer):
             "wikipedia": instance.wikipedia,
             "literature": instance.literature
         }
+        # Just showing the accesion number instead of recursively show the entry to which has been integrated
+        if instance.integrated:
+            obj["integrated"] = instance.integrated.accession
+        return obj
 
     class Meta:
         model = Entry

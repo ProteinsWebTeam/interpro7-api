@@ -1,10 +1,11 @@
 from webfront.models import Entry
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
+from rest_framework import status
 # from webfront.views.protein import ProteinHandler
 # from webfront.models import interpro
 # from webfront.views.structure import StructureHandler
-
+from rest_framework.response import Response
 
 def map_url_to_levels(url):
     return list(
@@ -36,11 +37,14 @@ class GeneralHandler(CustomView):
         endpoint_levels = map_url_to_levels(url)
         pagination = pagination_information(request)
 
-        return super(GeneralHandler, self).get(
-            request, endpoint_levels,
-            pagination=pagination,
-            available_endpoint_handlers=self.available_endpoint_handlers,
-            level=0,
-            *args, **kwargs
-
-        )
+        try:
+            return super(GeneralHandler, self).get(
+                request, endpoint_levels,
+                pagination=pagination,
+                available_endpoint_handlers=self.available_endpoint_handlers,
+                level=0,
+                *args, **kwargs
+            )
+        except Exception as e:
+            content = {'Error': e.args[0]}
+            return Response(content, status=status.HTTP_404_NOT_FOUND)

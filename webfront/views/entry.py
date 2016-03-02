@@ -76,24 +76,14 @@ from .custom import CustomView
 #         )
 #
 #
-# class PfamHandler(CustomView):
-#     level_description = 'DB member level'
-#     child_handlers = {
-#         r'PF\d{5}': PfamIDHandler,
-#         'clan':     ClanHandler,
-#     }
-#     serializer_class = PfamaSerializer
-#     django_db = "pfam_ro"
-#
-#     def get(self, request, endpoint_levels, *args, **kwargs):
-#
-#         self.queryset = Pfama.objects.all()
-#
-#         return super(PfamHandler, self).get(
-#             request, endpoint_levels, *args, **kwargs
-#         )
-#
-#
+class PfamHandler(CustomView):
+    level_description = 'DB member level'
+    queryset = Entry.objects.filter(source_database__iexact="pfam")
+    # child_handlers = {
+    #     r'PF\d{5}': PfamIDHandler,
+    #     'clan':     ClanHandler,
+    # }
+    serializer_class = EntrySerializer
 
 
 class AccesionHandler(CustomView):
@@ -107,7 +97,8 @@ class AccesionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
         self.queryset = self.queryset.filter(accession=endpoint_levels[level-1])
-
+        if self.queryset.count()==0:
+            raise Exception("The ID '{}' has not been found in {}".format(endpoint_levels[level-1], endpoint_levels[level-2]))
         return super(AccesionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
         )
@@ -138,7 +129,7 @@ class EntryHandler(CustomView):
     child_handlers = {
         'interpro': InterproHandler,
         'unintegrated': UnintegratedHandler,
-        # 'pfam': PfamHandler,
+        'pfam': PfamHandler,
     }
 
     def get(self, request, endpoint_levels, *args, **kwargs):

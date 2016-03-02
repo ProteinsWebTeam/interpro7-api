@@ -2,7 +2,6 @@ import re
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-#from webfront.models import interpro
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
 
@@ -46,7 +45,6 @@ class CustomView(GenericAPIView):
                 return Response(serialized.data)
             return Response(self.queryset)
 
-
         else:
             # combine the children handlers with the available endpoints
             endpoints = available_endpoint_handlers.copy()
@@ -66,7 +64,7 @@ class CustomView(GenericAPIView):
                     level_name, self.level_description
                 ))
 
-            #if the handler name is one of the endpoints thisone should be removed of the available ones
+            #if the handler name is one of the endpoints this one should be removed of the available ones
             if handler_name in endpoints:
                 endpoints.pop(handler_name)
                 #removing the current

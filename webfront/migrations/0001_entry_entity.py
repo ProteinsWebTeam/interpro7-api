@@ -14,8 +14,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Entry',
             fields=[
-                ('id', models.CharField(max_length=10, serialize=False, primary_key=True)),
-                ('accession', models.CharField(max_length=10)),
+                ('entry_id', models.CharField(max_length=10)),
+                ('accession', models.CharField(max_length=10, primary_key=True, serialize=False)),
                 ('type', models.CharField(max_length=10)),
                 ('name', models.TextField()),
                 ('short_name', models.CharField(max_length=12)),
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('wikipedia', models.TextField()),
                 ('literature', jsonfield.fields.JSONField()),
-                ('integrated', models.ForeignKey(null=True, to='webfront.Entry', blank=True)),
+                ('integrated', models.ForeignKey(to='webfront.Entry', null=True, blank=True)),
             ],
         ),
     ]

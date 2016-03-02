@@ -3,8 +3,8 @@ from jsonfield import JSONField
 
 
 class Entry(models.Model):
-    id = models.CharField(primary_key=True, max_length=10)
-    accession = models.CharField(max_length=10)
+    entry_id = models.CharField(max_length=10)
+    accession = models.CharField(primary_key=True, max_length=10)
     type = models.CharField(max_length=10)
     name = models.TextField()
     short_name = models.CharField(max_length=12)

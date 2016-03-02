@@ -78,12 +78,18 @@ from .custom import CustomView
 #
 class PfamHandler(CustomView):
     level_description = 'DB member level'
-    queryset = Entry.objects.filter(source_database__iexact="pfam")
+    #queryset = Entry.objects
     # child_handlers = {
     #     r'PF\d{5}': PfamIDHandler,
     #     'clan':     ClanHandler,
     # }
     serializer_class = EntrySerializer
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
+        self.queryset = self.queryset.filter(source_database__iexact="pfam")
+
+        return super(PfamHandler, self).get(
+            request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
+        )
 
 
 class AccesionHandler(CustomView):
@@ -118,7 +124,7 @@ class InterproHandler(CustomView):
     queryset = Entry.objects.filter(source_database__iexact="interpro")
     child_handlers = {
         r'IPR\d{6}':    AccesionHandler,
-        # 'pfam': PfamHandler,
+        'pfam': PfamHandler,
     }
     serializer_class = EntrySerializer
 #

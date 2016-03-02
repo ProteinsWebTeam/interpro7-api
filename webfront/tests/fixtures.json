@@ -2,7 +2,7 @@
   {
     "model": "webfront.Entry",
     "fields": {
-      "id" : "id1",
+      "entry_id" : "id1",
       "accession" : "IPR003165",
       "type" : "domain",
       "name" : "Piwi domain",
@@ -98,7 +98,7 @@
   {
     "model": "webfront.Entry",
     "fields":{
-      "id": "id2",
+      "entry_id": "id2",
       "accession": "PF02171",
       "type": "domain",
       "name": "Piwi domain",
@@ -116,7 +116,7 @@
       },
       "source_database": "pfam",
       "member_databases": null,
-      "integrated": "id1",
+      "integrated": "IPR003165",
       "description": "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA.",
       "wikipedia": "Piwi",
       "literature": {
@@ -157,7 +157,7 @@
     "model": "webfront.Entry",
     "fields":{
       "accession": "PF17180",
-      "id": "id3",
+      "entry_id": "id3",
       "type": "domain",
       "go_terms": {
         "biological_process": [],
@@ -179,7 +179,7 @@
     "model": "webfront.Entry",
     "fields":{
       "accession": "PF17176",
-      "id": "id4",
+      "entry_id": "id4",
       "type": "domain",
       "go_terms": {
         "biological_process": [],

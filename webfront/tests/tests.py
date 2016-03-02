@@ -54,3 +54,8 @@ class EntryRESTTest(APITransactionTestCase):
         response = self.client.get("/api/entry/pfam")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)
+
+    def test_can_read_entry_interpro_pfam(self):
+        response = self.client.get("/api/entry/interpro/pfam")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)

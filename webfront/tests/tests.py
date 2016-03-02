@@ -12,7 +12,7 @@ class ModelTest(TransactionTestCase):
         self.assertEqual(Entry.objects.filter(source_database="interpro").first().accession, "IPR003165")
 
     def test_content_of_a_json_attribute(self):
-        entry = Entry.objects.get(id="id1")
+        entry = Entry.objects.get(accession="IPR003165")
         self.assertEqual(entry.member_databases["pfam"][0], "PF02171")
 
 

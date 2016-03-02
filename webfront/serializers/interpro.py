@@ -14,8 +14,8 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_metadata_representation(instance):
         obj = {
-            'id': instance.id,
             'accession': instance.accession,
+            'entry_id': instance.entry_id,
             'type': instance.type,
             'go_terms': instance.go_terms,
             'source_dataBase': instance.source_database,

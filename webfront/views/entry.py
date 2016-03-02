@@ -84,8 +84,16 @@ class PfamHandler(CustomView):
     #     'clan':     ClanHandler,
     # }
     serializer_class = EntrySerializer
+
     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
         self.queryset = self.queryset.filter(source_database__iexact="pfam")
+        if level == 3:
+            if endpoint_levels[level-2] == "interpro":
+                self.queryset = self.queryset.filter(integrated__isnull=False)
+            elif endpoint_levels[level-2] == "unintegrated":
+                self.queryset = self.queryset.filter(integrated__isnull=True)
+        elif level == 4:
+            self.queryset = self.queryset.filter(integrated=endpoint_levels[level-2])
 
         return super(PfamHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
@@ -94,9 +102,9 @@ class PfamHandler(CustomView):
 
 class AccesionHandler(CustomView):
     level_description = 'interpro accession level'
-    # child_handlers = {
-    #     'pfam': PfamHandler,
-    # }
+    child_handlers = {
+        'pfam': PfamHandler,
+    }
     serializer_class = EntrySerializer
     queryset = Entry.objects
     many = False
@@ -114,9 +122,9 @@ class UnintegratedHandler(CustomView):
     level_description = 'interpro accession level'
     queryset = Entry.objects.all().exclude(source_database__iexact="interpro").filter(integrated__isnull=True)
     serializer_class = EntrySerializer
-    # child_handlers = {
-    #     'pfam': PfamHandler,
-    # }
+    child_handlers = {
+        'pfam': PfamHandler,
+    }
 
 
 class InterproHandler(CustomView):
@@ -127,8 +135,8 @@ class InterproHandler(CustomView):
         'pfam': PfamHandler,
     }
     serializer_class = EntrySerializer
-#
-#
+
+
 class EntryHandler(CustomView):
     level_description = 'section level'
     from_model = False

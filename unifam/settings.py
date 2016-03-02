@@ -20,6 +20,10 @@ try:
     UNIFAM_CONFIG = yaml.safe_load(open('{}/config/unifam.yml'.format(BASE_DIR)))
 except FileNotFoundError:
     UNIFAM_CONFIG = {}
+try:
+    ORACLE_CONFIG = yaml.safe_load(open('{}/config/oracle.yml'.format(BASE_DIR)))
+except FileNotFoundError:
+    ORACLE_CONFIG = {}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -92,6 +96,14 @@ DATABASES = {
         'TEST': {
             'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
         },
+    },
+    'interpro_ro': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': ORACLE_CONFIG.get('sid', 'INTERPRO_DB'),
+        'USER': ORACLE_CONFIG.get('user', 'USER'),
+        'PASSWORD': ORACLE_CONFIG.get('password'),
+        'HOST': ORACLE_CONFIG.get('host', 'HOST'),
+        'PORT': ORACLE_CONFIG.get('port', 1540),
     },
 }
 #TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'

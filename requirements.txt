@@ -5,6 +5,8 @@ PyYAML~=3.11
 selenium~=2.48.0
 wheel~=0.26.0
 
+cx_Oracle~=5.2.1
+
 django-debug-toolbar~=1.4
 ipdb~=0.8.1
 jsonfield~=1.0.3

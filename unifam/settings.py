@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     #
     'webfront',
+    'release',
     # added
     'rest_framework',
     'corsheaders',

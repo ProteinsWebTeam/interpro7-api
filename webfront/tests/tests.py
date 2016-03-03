@@ -18,6 +18,11 @@ class ModelTest(TransactionTestCase):
 
 class EntryRESTTest(APITransactionTestCase):
     fixtures = ['webfront/tests/fixtures.json']
+    db_members = {
+        "pfam": 3,
+        "smart": 2,
+        "prosite_profiles": 2,
+    }
 
     def test_can_read_entry_overview(self):
         response = self.client.get("/api/entry")
@@ -34,7 +39,7 @@ class EntryRESTTest(APITransactionTestCase):
     def test_can_read_entry_unintegrated(self):
         response = self.client.get("/api/entry/unintegrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 4)
 
     def test_can_read_entry_interpro_id(self):
         acc = "IPR003165"
@@ -50,27 +55,31 @@ class EntryRESTTest(APITransactionTestCase):
         response = self.client.get("/api/bad_entry_point")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_can_read_entry_pfam(self):
-        response = self.client.get("/api/entry/pfam")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
+    def test_can_read_entry_member(self):
+        for member in self.db_members:
+            response = self.client.get("/api/entry/"+member)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), self.db_members[member])
 
-    def test_can_read_entry_interpro_pfam(self):
-        response = self.client.get("/api/entry/interpro/pfam")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+    def test_can_read_entry_interpro_member(self):
+        for member in self.db_members:
+            response = self.client.get("/api/entry/interpro/"+member)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), 1, "The dataset only has one interpro entry with 1 member entry")
 
-    def test_can_read_entry_unintegrated_pfam(self):
-        response = self.client.get("/api/entry/unintegrated/pfam")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+    def test_can_read_entry_unintegrated_member(self):
+        for member in self.db_members:
+            response = self.client.get("/api/entry/unintegrated/"+member)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), self.db_members[member]-1)
 
-    def test_can_read_entry_interpro_id_pfam(self):
+    def test_can_read_entry_interpro_id_member(self):
         acc = "IPR003165"
-        response = self.client.get("/api/entry/interpro/"+acc+"/pfam")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(acc, response.data[0]["metadata"]["integrated"])
+        for member in self.db_members:
+            response = self.client.get("/api/entry/interpro/"+acc+"/"+member)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data), 1)
+            self.assertEqual(acc, response.data[0]["metadata"]["integrated"])
 
     def test_can_read_entry_interpro_id_pfam_id(self):
         acc = "IPR003165"
@@ -83,7 +92,7 @@ class EntryRESTTest(APITransactionTestCase):
     def test_cant_read_entry_interpro_id_pfam_id_not_in_entry(self):
         acc = "IPR003165"
         pfam = "PF17180"
-        response = self.client.get("/api/entry/interpro/"+acc+"/pfam"+pfam)
+        response = self.client.get("/api/entry/interpro/"+acc+"/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_can_read_entry_unintegrated_pfam_id(self):
@@ -94,5 +103,5 @@ class EntryRESTTest(APITransactionTestCase):
 
     def test_cant_read_entry_unintegrated_pfam_id_integrated(self):
         pfam = "PF02171"
-        response = self.client.get("/api/entry/unintegrated/pfam"+pfam)
+        response = self.client.get("/api/entry/unintegrated/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

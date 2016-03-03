@@ -73,8 +73,8 @@ from .custom import CustomView
 #             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
 #         )
 #
-class PFamAccesionHandler(CustomView):
-    level_description = 'pfam accession level'
+class MemberAccesionHandler(CustomView):
+    level_description = 'DB member accession level'
     serializer_class = EntrySerializer
     many = False
 
@@ -84,28 +84,26 @@ class PFamAccesionHandler(CustomView):
         self.queryset = self.queryset.filter(accession=endpoint_levels[level-1])
         if self.queryset.count()==0:
             raise Exception("The ID '{}' has not been found in {}".format(endpoint_levels[level-1], "/".join(endpoint_levels[:level-1])))
-        return super(PFamAccesionHandler, self).get(
+        return super(MemberAccesionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
         )
 
 
+db_members = r'(pfam)|(smart)|(prosite_profiles)'
 
-
-
-class PfamHandler(CustomView):
+class MemberHandler(CustomView):
     level_description = 'DB member level'
-    #queryset = Entry.objects
     child_handlers = {
-        r'PF\d{5}': PFamAccesionHandler,
+        r'PF\d{5}': MemberAccesionHandler,
         # 'clan':     ClanHandler,
     }
     serializer_class = EntrySerializer
 
     def get_queryset(self, endpoint_levels=None, level=None):
         if level is None or endpoint_levels is None:
-            super(PfamHandler, self).get_queryset()
+            return super(MemberHandler, self).get_queryset()
 
-        self.queryset = self.queryset.filter(source_database__iexact="pfam")
+        self.queryset = self.queryset.filter(source_database__iexact=endpoint_levels[level-1])
         if level == 3:
             if endpoint_levels[level-2] == "interpro":
                 self.queryset = self.queryset.filter(integrated__isnull=False)
@@ -118,7 +116,7 @@ class PfamHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, parent_queryset=None, *args, **kwargs):
         parent_queryset = self.get_queryset(endpoint_levels,level)
 
-        return super(PfamHandler, self).get(
+        return super(MemberHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, *args, **kwargs
         )
 
@@ -126,7 +124,7 @@ class PfamHandler(CustomView):
 class AccesionHandler(CustomView):
     level_description = 'interpro accession level'
     child_handlers = {
-        'pfam': PfamHandler,
+        db_members: MemberHandler,
     }
     serializer_class = EntrySerializer
     queryset = Entry.objects
@@ -146,7 +144,7 @@ class UnintegratedHandler(CustomView):
     queryset = Entry.objects.all().exclude(source_database__iexact="interpro").filter(integrated__isnull=True)
     serializer_class = EntrySerializer
     child_handlers = {
-        'pfam': PfamHandler,
+        db_members: MemberHandler,
     }
 
 
@@ -155,7 +153,7 @@ class InterproHandler(CustomView):
     queryset = Entry.objects.filter(source_database__iexact="interpro")
     child_handlers = {
         r'IPR\d{6}':    AccesionHandler,
-        'pfam': PfamHandler,
+        db_members: MemberHandler,
     }
     serializer_class = EntrySerializer
 
@@ -166,10 +164,10 @@ class EntryHandler(CustomView):
     child_handlers = {
         'interpro': InterproHandler,
         'unintegrated': UnintegratedHandler,
-        'pfam': PfamHandler,
+        db_members: MemberHandler,
     }
 
-    def get(self, request, endpoint_levels, *args, **kwargs):
+    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, parent_queryset=None, *args, **kwargs):
         entry_counter = Entry.objects.all().values('source_database').annotate(total=Count('source_database'))
         output = {
             "interpro": 0,
@@ -185,6 +183,6 @@ class EntryHandler(CustomView):
         output["unintegrated"] = Entry.objects.all().exclude(source_database__iexact="interpro").filter(integrated__isnull=True).count()
         self.queryset = output
         return super(EntryHandler, self).get(
-            request, endpoint_levels, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
         )
     # serializer_class = EntryOverviewSerializer

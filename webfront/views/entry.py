@@ -94,7 +94,7 @@ db_members = r'(pfam)|(smart)|(prosite_profiles)'
 class MemberHandler(CustomView):
     level_description = 'DB member level'
     child_handlers = {
-        r'PF\d{5}': MemberAccesionHandler,
+        r'PF\d{5}|SM\d{5}|PS\d{5}': MemberAccesionHandler,
         # 'clan':     ClanHandler,
     }
     serializer_class = EntrySerializer

@@ -43,6 +43,7 @@ class GeneralHandler(CustomView):
                 pagination=pagination,
                 available_endpoint_handlers=self.available_endpoint_handlers,
                 level=0,
+                parent_queryset = self.queryset,
                 *args, **kwargs
             )
         except Exception as e:

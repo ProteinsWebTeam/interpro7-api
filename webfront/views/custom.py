@@ -24,15 +24,18 @@ class CustomView(GenericAPIView):
     many = True
     from_model = True
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, *args, **kwargs):
+        if available_endpoint_handlers is None:
+            available_endpoint_handlers = {}
         # if this is the last level
-        if (len(endpoint_levels) == level):
+        if len(endpoint_levels) == level:
             if self.from_model:
                 # self.queryset = self.queryset.using(self.django_db)
                 if self.many:
-                    self.queryset = self.paginate_queryset(self.queryset)
+                    self.queryset = self.paginate_queryset(self.get_queryset())
                 else:
-                    self.queryset = self.queryset.first()
+                    self.queryset = self.get_queryset().first()
 
                 serialized = self.serializer_class(
                     # passed to DRF's view
@@ -40,7 +43,7 @@ class CustomView(GenericAPIView):
                     many=self.many,
                     # extracted out in the custom view
                     content=request.GET.getlist('content'),
-                    context={"request":request}
+                    context={"request": request}
                 )
                 return Response(serialized.data)
             return Response(self.queryset)
@@ -64,15 +67,16 @@ class CustomView(GenericAPIView):
                     level_name, self.level_description
                 ))
 
-            #if the handler name is one of the endpoints this one should be removed of the available ones
+            # if the handler name is one of the endpoints this one should be removed of the available ones
             if handler_name in endpoints:
                 endpoints.pop(handler_name)
-                #removing the current
+                # removing the current
                 endpoint_levels = endpoint_levels[level:]
-                level=0
+                level = 0
 
             # delegate to the lower level handler
             return handlers[handler_name].as_view()(
                 request, endpoint_levels, endpoints, level+1,
+                parent_queryset,
                 *args, **kwargs
             )

@@ -107,7 +107,7 @@ DATABASES = {
         'PORT': ORACLE_CONFIG.get('port', 1540),
     },
 }
-#TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
+TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

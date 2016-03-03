@@ -1,4 +1,4 @@
-from unifam.release import oracle, db
+from release import oracle, db
 from django.conf import settings
 
 _db_info = settings.DATABASES["interpro_ro"]

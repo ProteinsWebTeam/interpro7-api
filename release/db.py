@@ -30,5 +30,4 @@ class Template:
         query += "{} ".format(self.table)
         if conditions:
             query += "WHERE {}".format(" AND ".join(conditions))
-        print(query)
         return query

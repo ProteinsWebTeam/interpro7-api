@@ -37,13 +37,14 @@ def get_member_db_entries(n):
 # turn this into a decorator? (not important (at all))
 def log(n, kind, source='IPREL'):
     message = '  -> Putting {n} {kind}{plural} from {source}'.format(
-        n=n, kind=kind, plural=('s' if n <= 1 else '', source=source)
+        n=n, kind=kind, plural=('s' if n <= 1 else ''), source=source
     )
     print('STARTING')
     print(message)
-    return def end():
+    def end():
         print('ENDED')
         print(message)
+    return end
 
 
 class Command(BaseCommand):

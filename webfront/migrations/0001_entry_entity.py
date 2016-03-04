@@ -14,8 +14,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Entry',
             fields=[
-                ('entry_id', models.CharField(max_length=10)),
-                ('accession', models.CharField(max_length=10, primary_key=True, serialize=False)),
+                ('entry_id', models.CharField(max_length=10, null=True)),
+                ('accession', models.CharField(serialize=False, primary_key=True, max_length=10)),
                 ('type', models.CharField(max_length=10)),
                 ('name', models.TextField()),
                 ('short_name', models.CharField(max_length=12)),
@@ -24,9 +24,9 @@ class Migration(migrations.Migration):
                 ('member_databases', jsonfield.fields.JSONField()),
                 ('go_terms', jsonfield.fields.JSONField()),
                 ('description', models.TextField()),
-                ('wikipedia', models.TextField()),
+                ('wikipedia', models.TextField(null=True)),
                 ('literature', jsonfield.fields.JSONField()),
-                ('integrated', models.ForeignKey(to='webfront.Entry', null=True, blank=True)),
+                ('integrated', models.ForeignKey(to='webfront.Entry', blank=True, null=True)),
             ],
         ),
     ]

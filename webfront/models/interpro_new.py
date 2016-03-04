@@ -3,7 +3,7 @@ from jsonfield import JSONField
 
 
 class Entry(models.Model):
-    entry_id = models.CharField(max_length=10)
+    entry_id = models.CharField(max_length=10,null=True)
     accession = models.CharField(primary_key=True, max_length=10)
     type = models.CharField(max_length=10)
     name = models.TextField()
@@ -14,5 +14,5 @@ class Entry(models.Model):
     integrated = models.ForeignKey("Entry",null=True,blank=True)
     go_terms = JSONField()
     description = models.TextField()
-    wikipedia = models.TextField()
+    wikipedia = models.TextField(null=True)
     literature = JSONField()

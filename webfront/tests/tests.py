@@ -5,7 +5,8 @@ from rest_framework.test import APITransactionTestCase
 
 
 class ModelTest(TransactionTestCase):
-    fixtures = ['webfront/tests/fixtures.json']
+    #fixtures = ['webfront/tests/fixtures.json']
+    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
 
     def test_dummy_dataset_is_loaded(self):
         self.assertGreater(Entry.objects.all().count(), 0, "The dataset has to have at least one Entry")

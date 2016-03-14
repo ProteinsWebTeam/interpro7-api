@@ -44,9 +44,14 @@ def extract_member_db(acc):
 def get_interpro_entries(n):
     for input in iprel.Entry.objects.using("interpro_ro").all()[:n]:
         output = Entry(
-            accession=input.entry_ac, type=input.entry_type_id, name=input.name,
-            short_name=input.short_name, other_names=[],
-            member_databases=extract_member_db(input.entry_ac), go_terms={},
+            accession=input.entry_ac,
+            type=input.entry_type_id,
+            name=input.name,
+            short_name=input.short_name,
+            other_names=[],# TODO
+            source_database='InterPro',
+            member_databases=extract_member_db(input.entry_ac),
+            go_terms={},# TODO
             literature=extract_pubs(input.entry2pub_set.all())
         )
         output.save()
@@ -55,9 +60,15 @@ def get_interpro_entries(n):
 def get_member_db_entries(n):
     for input in iprel.Method.objects.using("interpro_ro").all()[:n]:
         output = Entry(
-            accession=input.method_ac, type=input.sig_type_id, name=input.name,
-            short_name="", other_names=[], member_databases={},
-            go_terms={}, literature=[]
+            accession=input.method_ac,
+            type=input.sig_type_id,
+            name=input.name,
+            short_name="",# TODO
+            other_names=[],# TODO
+            source_database=input.dbcode.dbshort,
+            member_databases={},
+            go_terms={},# TODO
+            literature=[]# TODO
         )
         output.save()
 

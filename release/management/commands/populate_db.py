@@ -3,6 +3,18 @@ from django.core.management.base import BaseCommand
 from release.models import iprel
 from webfront.models import Entry
 
+def log(kind, source="IPREL"):
+    def wrapper1(fn):
+        def wrapper2(n, *args, **kwargs):
+            message = " -> Put {n} {kind}{plural} from {source}".format(
+                n=n, kind=kind, plural=("s" if n <= 1 else ""), source=source
+            )
+            print("STARTING{}".format(message))
+            output = fn(n, *args, **kwargs)
+            print("ENDED{}".format(message))
+            return output
+        return wrapper2
+    return wrapper1
 
 # TODO: put all these functions into their own file (could that be a view?)
 def extract_pubs(joins):
@@ -16,35 +28,38 @@ def extract_pubs(joins):
         for p in [j.pub for j in joins]
     ]
 
+def extract_member_db(acc):
+    output = {}
+    methods = iprel.Entry2Method.objects.using('interpro_ro').filter(entry_ac=acc).all()
+    for method in methods:
+        db = method.method_ac.dbcode.dbshort
+        id = method.method_ac_id
+        if db in output:
+            output[db].append(id)
+        else:
+            output[db] = [id]
+    return output
+
+@log("interpro entry object")
 def get_interpro_entries(n):
     for input in iprel.Entry.objects.using("interpro_ro").all()[:n]:
         output = Entry(
             accession=input.entry_ac, type=input.entry_type_id, name=input.name,
-            short_name=input.short_name, other_names=[], member_databases={},
-            go_terms={}, literature=[extract_pubs(input.entry2pub_set.all())]
+            short_name=input.short_name, other_names=[],
+            member_databases=extract_member_db(input.entry_ac), go_terms={},
+            literature=extract_pubs(input.entry2pub_set.all())
         )
         output.save()
 
+@log("member db entry object")
 def get_member_db_entries(n):
     for input in iprel.Method.objects.using("interpro_ro").all()[:n]:
         output = Entry(
             accession=input.method_ac, type=input.sig_type_id, name=input.name,
-            short_name='', other_names=[], member_databases={},
+            short_name="", other_names=[], member_databases={},
             go_terms={}, literature=[]
         )
         output.save()
-
-# turn this into a decorator? (not important (at all))
-def log(n, kind, source='IPREL'):
-    message = '  -> Putting {n} {kind}{plural} from {source}'.format(
-        n=n, kind=kind, plural=('s' if n <= 1 else ''), source=source
-    )
-    print('STARTING')
-    print(message)
-    def end():
-        print('ENDED')
-        print(message)
-    return end
 
 
 class Command(BaseCommand):
@@ -60,9 +75,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         n = options["number"]
-        end = log(n, 'interpro entry object')
         get_interpro_entries(n)
-        end()
-        end = log(n, 'member db entry object')
         get_member_db_entries(n)
-        end()

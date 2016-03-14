@@ -282,7 +282,7 @@ class IntactData(models.Model):
 
 
 class Interpro2Go(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac')
+    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
     go_id = models.CharField(max_length=10)
     source = models.CharField(max_length=4)
 

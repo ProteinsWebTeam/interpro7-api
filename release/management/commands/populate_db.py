@@ -30,7 +30,7 @@ def extract_pubs(joins):
 
 def extract_member_db(acc):
     output = {}
-    methods = iprel.Entry2Method.objects.using('interpro_ro').filter(entry_ac=acc).all()
+    methods = iprel.Entry2Method.objects.using("interpro_ro").filter(entry_ac=acc).all()
     for method in methods:
         db = method.method_ac.dbcode.dbshort
         id = method.method_ac_id
@@ -38,6 +38,20 @@ def extract_member_db(acc):
             output[db].append(id)
         else:
             output[db] = [id]
+    return output
+
+def extract_go(joins):
+    output = {
+        "biologicalProcess": [],
+        "molecularFunction": [],
+        "cellularComponent": [],
+    }
+    for join in joins:
+        # TODO: check which kind of GO they are to assign to the right one
+        output['biologicalProcess'].append({
+            "id": join.go_id,
+            "name": "",# TODO
+        })
     return output
 
 @log("interpro entry object")
@@ -49,9 +63,9 @@ def get_interpro_entries(n):
             name=input.name,
             short_name=input.short_name,
             other_names=[],# TODO
-            source_database='InterPro',
+            source_database="InterPro",
             member_databases=extract_member_db(input.entry_ac),
-            go_terms={},# TODO
+            go_terms=extract_go(input.interpro2go_set.all()),# TODO
             literature=extract_pubs(input.entry2pub_set.all())
         )
         output.save()

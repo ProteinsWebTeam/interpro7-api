@@ -24,7 +24,7 @@ class Protein(models.Model):
     name = models.CharField(max_length=20)
     short_name = models.CharField(max_length=20, null=True)
     other_names = JSONField()
-    description = models.TextField(null=True)
+    description = JSONField()
     sequence = models.TextField(null=False)
     length = models.IntegerField(null=False)
     proteome = models.CharField(max_length=20)

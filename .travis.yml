@@ -11,7 +11,7 @@ before_install:
   - sleep 3
 install:
   - pip install -r requirements.txt
-  - pip install coveralls
+  - pip install -r dev_requirements.txt
 script:
   - coverage run --source='.' manage.py test
 after_success:

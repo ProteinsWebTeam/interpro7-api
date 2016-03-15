@@ -11,9 +11,9 @@ class Entry(models.Model):
     other_names = JSONField()
     source_database = models.CharField(max_length=20)
     member_databases = JSONField()
-    integrated = models.ForeignKey("Entry",null=True,blank=True)
+    integrated = models.ForeignKey("Entry", null=True)
     go_terms = JSONField()
-    description = models.TextField()
+    description = JSONField()
     wikipedia = models.TextField(null=True)
     literature = JSONField()
 

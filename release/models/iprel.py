@@ -118,8 +118,8 @@ class Entry(models.Model):
 
 
 class Entry2Common(models.Model):
-    # entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
-    entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
+    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    # entry_ac = models.OneToOneField(Entry, db_column='entry_ac', primary_key=True)
     ann = models.ForeignKey(CommonAnnotation)
     order_in = models.IntegerField()
 

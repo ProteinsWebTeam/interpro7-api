@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Protein',
             fields=[
-                ('identifier', models.CharField(primary_key=True, unique=True, max_length=20, serialize=False)),
+                ('identifier', models.CharField(primary_key=True, max_length=20, serialize=False, unique=True)),
                 ('accession', models.CharField(max_length=20)),
                 ('organism', jsonfield.fields.JSONField()),
                 ('name', models.CharField(max_length=20)),
-                ('short_name', models.CharField(null=True, max_length=20)),
+                ('short_name', models.CharField(max_length=20, null=True)),
                 ('other_names', jsonfield.fields.JSONField()),
                 ('description', models.TextField(null=True)),
                 ('sequence', models.TextField()),
@@ -31,12 +31,13 @@ class Migration(migrations.Migration):
                 ('feature', jsonfield.fields.JSONField()),
                 ('structure', jsonfield.fields.JSONField()),
                 ('genomic_context', jsonfield.fields.JSONField()),
+                ('source_database', models.CharField(max_length=20, default='uniprot')),
             ],
         ),
         migrations.CreateModel(
             name='ProteinEntryFeature',
             fields=[
-                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('match_start', models.IntegerField()),
                 ('match_end', models.IntegerField()),
                 ('entry', models.ForeignKey(to='webfront.Entry')),

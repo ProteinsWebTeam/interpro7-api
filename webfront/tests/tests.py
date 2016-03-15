@@ -1,4 +1,6 @@
 from django.test import TransactionTestCase
+
+from unifam import settings
 from webfront.models import Entry
 from rest_framework import status
 from rest_framework.test import APITransactionTestCase
@@ -49,12 +51,18 @@ class EntryRESTTest(APITransactionTestCase):
         self.assertEqual(acc, response.data["metadata"]["accession"])
 
     def test_fail_entry_interpro_unknown_id(self):
+        prev = settings.DEBUG
+        settings.DEBUG = False
         response = self.client.get("/api/entry/interpro/IPR999999")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        settings.DEBUG = prev
 
     def test_bad_entry_point(self):
+        prev = settings.DEBUG
+        settings.DEBUG = False
         response = self.client.get("/api/bad_entry_point")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        settings.DEBUG = prev
 
     def test_can_read_entry_member(self):
         for member in self.db_members:
@@ -91,10 +99,13 @@ class EntryRESTTest(APITransactionTestCase):
         self.assertEqual(acc, response.data["metadata"]["integrated"])
 
     def test_cant_read_entry_interpro_id_pfam_id_not_in_entry(self):
+        prev = settings.DEBUG
+        settings.DEBUG = False
         acc = "IPR003165"
         pfam = "PF17180"
         response = self.client.get("/api/entry/interpro/"+acc+"/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        settings.DEBUG = prev
 
     def test_can_read_entry_unintegrated_pfam_id(self):
         pfam = "PF17180"
@@ -103,9 +114,12 @@ class EntryRESTTest(APITransactionTestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_cant_read_entry_unintegrated_pfam_id_integrated(self):
+        prev = settings.DEBUG
+        settings.DEBUG = False
         pfam = "PF02171"
         response = self.client.get("/api/entry/unintegrated/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        settings.DEBUG = prev
 
 
 class ProteinRESTTest(APITransactionTestCase):

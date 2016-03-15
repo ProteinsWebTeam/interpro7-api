@@ -13,7 +13,7 @@ class Entry(models.Model):
     member_databases = JSONField()
     integrated = models.ForeignKey("Entry", null=True,blank=True)
     go_terms = JSONField()
-    description = models.TextField()
+    description = JSONField()
     wikipedia = models.TextField(null=True)
     literature = JSONField()
 
@@ -25,7 +25,7 @@ class Protein(models.Model):
     name = models.CharField(max_length=20)
     short_name = models.CharField(max_length=20, null=True)
     other_names = JSONField()
-    description = models.TextField(null=True)
+    description = JSONField()
     sequence = models.TextField(null=False)
     length = models.IntegerField(null=False)
     proteome = models.CharField(max_length=20)

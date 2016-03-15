@@ -11,6 +11,11 @@ def log(kind, source="IPREL"):
             )
             print("STARTING{}".format(message))
             output = fn(n, *args, **kwargs)
+            if not hasattr(output, '__iter__'):
+                output = [output]
+            for [i, step] in enumerate(output, 1):
+                print("{:9d}: processed {}".format(i, step))
+
             print("ENDED{}".format(message))
             return output
         return wrapper2
@@ -30,48 +35,83 @@ def extract_pubs(joins):
 
 def extract_member_db(acc):
     output = {}
-    methods = iprel.Entry2Method.objects.using('interpro_ro').filter(entry_ac=acc).all()
+    ids = []
+    methods = iprel.Entry2Method.objects.using("interpro_ro").filter(entry_ac=acc).all()
     for method in methods:
         db = method.method_ac.dbcode.dbshort
         id = method.method_ac_id
+        ids.append(id)
         if db in output:
             output[db].append(id)
         else:
             output[db] = [id]
+    return [output, ids]
+
+def extract_go(joins):
+    output = {
+        "biologicalProcess": [],
+        "molecularFunction": [],
+        "cellularComponent": [],
+    }
+    for join in joins:
+        # TODO: check which kind of GO they are to assign to the right one
+        output['biologicalProcess'].append({
+            "id": join.go_id,
+            "name": "",# TODO
+        })
     return output
 
-@log("interpro entry object")
+@log("interpro entry objects (and their contributing signatures)")
 def get_interpro_entries(n):
     for input in iprel.Entry.objects.using("interpro_ro").all()[:n]:
+        acc = input.entry_ac
+        [members_dbs, member_db_accs] = extract_member_db(input.entry_ac)
         output = Entry(
-            accession=input.entry_ac,
-            type=input.entry_type_id,
+            accession=acc,
+            entry_id="",# TODO
+            type=input.entry_type.abbrev,
+            go_terms=extract_go(input.interpro2go_set.all()),# TODO
+            source_database="InterPro",
+            member_databases=members_dbs,
+            integrated=None,
             name=input.name,
             short_name=input.short_name,
             other_names=[],# TODO
-            source_database='InterPro',
-            member_databases=extract_member_db(input.entry_ac),
-            go_terms={},# TODO
+            description=[join.ann.text for join in input.entry2common_set.all()],
             literature=extract_pubs(input.entry2pub_set.all())
         )
         output.save()
+        yield acc
+        for acc in member_db_accs:
+            set_member_db_entry(
+                iprel.Method.objects.using("interpro_ro").get(pk=acc),
+                output
+            )
+            yield acc
 
-@log("member db entry object")
-def get_member_db_entries(n):
-    for input in iprel.Method.objects.using("interpro_ro").all()[:n]:
-        output = Entry(
-            accession=input.method_ac,
-            type=input.sig_type_id,
-            name=input.name,
-            short_name="",# TODO
-            other_names=[],# TODO
-            source_database=input.dbcode.dbshort,
-            member_databases={},
-            go_terms={},# TODO
-            literature=[]# TODO
-        )
-        output.save()
+def set_member_db_entry(input, integrated=None):
+    acc = input.method_ac
+    output = Entry(
+        accession=acc,
+        entry_id="",# TODO
+        type=input.sig_type.abbrev,
+        go_terms={},# TODO
+        source_database=input.dbcode.dbshort,
+        member_databases={},
+        integrated=integrated,
+        name=input.description,
+        short_name=input.name,
+        other_names=[],# TODO
+        description=[input.abstract] if input.abstract else [],
+        literature=[]# TODO
+    )
+    output.save()
+    return acc
 
+@log("unintegrated entry objects")
+def get_n_unintegrated_member_db_entries(n):
+    for input in iprel.Method.objects.using("interpro_ro").filter(entry2method__isnull=True).all()[:n]:
+        yield set_member_db_entry(input)
 
 class Command(BaseCommand):
     help = "populate db"
@@ -87,4 +127,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         n = options["number"]
         get_interpro_entries(n)
-        get_member_db_entries(n)
+        get_n_unintegrated_member_db_entries(n)

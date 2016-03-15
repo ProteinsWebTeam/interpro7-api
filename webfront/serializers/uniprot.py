@@ -4,18 +4,11 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 
 
 class ProteinSerializer(ModelContentSerializer):
-    content = "ALL"
-
-    def to_representation(self, instance):
-        representation = {}
-        if self.content == "ALL":
-            representation["metadata"] = self.to_metadata_representation(instance)
-        return representation
 
     @staticmethod
-    def to_metadata_representation(instance):
+    def to_representation(instance):
         obj = {
-            "metadata" : {
+            "metadata": {
                 "accession": instance.accession,
                 "id": instance.identifier,
                 "sourceOrganism": instance.organism,
@@ -29,7 +22,7 @@ class ProteinSerializer(ModelContentSerializer):
                 "sequence": instance.sequence,
                 "proteome": instance.proteome,
                 "gene": instance.gene,
-                "GO": instance.go_terms,
+                "go_terms": instance.go_terms,
                 "proteinEvidence": 4
             },
             "representation": instance.feature,

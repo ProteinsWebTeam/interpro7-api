@@ -17,19 +17,19 @@
       "proteome": "UP000006701",
       "gene": "cpyA",
       "go_terms": {
-        "biologicalProcess": [
+        "biological_process": [
           {
             "id": "GO:0006508",
             "name": "proteolysis"
           }
         ],
-        "molecularFunction": [
+        "molecular_function": [
           {
             "id": "GO:0004185",
             "name": "serine-type carboxypeptidase activity"
           }
         ],
-        "cellularComponent": [
+        "cellular_component": [
           {
             "id": "GO:0005773",
             "name": "vacuole"
@@ -102,9 +102,9 @@
       "proteome": "UP000012042",
       "gene": "LVISKB_0797",
       "go_terms": {
-        "biologicalProcess": [],
-        "molecularFunction": [],
-        "cellularComponent": [
+        "biological_process": [],
+        "molecular_function": [],
+        "cellular_component": [
           {
             "id": "GO:0016020",
             "name": "membrane"
@@ -159,19 +159,19 @@
       "proteome": "UP000030104",
       "gene": "PITC_084940",
       "go_terms": {
-        "biologicalProcess": [
+        "biological_process": [
           {
             "id": "GO:0006508",
             "name": "proteolysis"
           }
         ],
-        "molecularFunction": [
+        "molecular_function": [
           {
             "id": "GO:0004185",
             "name": "serine-type carboxypeptidase activity"
           }
         ],
-        "cellularComponent": [
+        "cellular_component": [
           {
             "id": "GO:0005773",
             "name": "vacuole"
@@ -242,13 +242,13 @@
       "proteome": "UP000008227",
       "gene": "LHCGR",
       "go_terms": {
-        "biologicalProcess": [
+        "biological_process": [
           {
             "id": "GO:0007186",
             "termName": "G-protein coupled receptor signaling pathway"
           }
         ],
-        "molecularFunction": [
+        "molecular_function": [
           {
             "id": "GO:0004930",
             "name": "G-protein coupled receptor activity"
@@ -262,7 +262,7 @@
             "name": "protein-hormone receptor activity"
           }
         ],
-        "cellularComponent": [
+        "cellular_component": [
           {
             "id": "GO:0016021",
             "name": "integral component of membrane"

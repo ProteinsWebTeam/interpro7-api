@@ -7,7 +7,6 @@ from rest_framework.test import APITransactionTestCase
 
 
 class ModelTest(TransactionTestCase):
-    #fixtures = ['webfront/tests/fixtures.json']
     fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
 
     def test_dummy_dataset_is_loaded(self):

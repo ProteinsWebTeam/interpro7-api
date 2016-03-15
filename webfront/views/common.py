@@ -1,8 +1,9 @@
+from unifam import settings
 from webfront.models import Entry
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
 from rest_framework import status
-# from webfront.views.protein import ProteinHandler
+from webfront.views.protein import ProteinHandler
 # from webfront.models import interpro
 # from webfront.views.structure import StructureHandler
 from rest_framework.response import Response
@@ -26,7 +27,7 @@ class GeneralHandler(CustomView):
     level_description = 'home level'
     available_endpoint_handlers = {
         'entry': EntryHandler,
-        # 'protein': ProteinHandler,
+        'protein': ProteinHandler,
         # 'structure': StructureHandler,
     }
     child_handlers = {}
@@ -47,5 +48,7 @@ class GeneralHandler(CustomView):
                 *args, **kwargs
             )
         except Exception as e:
+            if settings.DEBUG:
+                raise
             content = {'Error': e.args[0]}
             return Response(content, status=status.HTTP_404_NOT_FOUND)

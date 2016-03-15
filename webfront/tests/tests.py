@@ -18,7 +18,7 @@ class ModelTest(TransactionTestCase):
 
 
 class EntryRESTTest(APITransactionTestCase):
-    fixtures = ['webfront/tests/fixtures.json']
+    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
     db_members = {
         "pfam": 3,
         "smart": 2,
@@ -106,3 +106,23 @@ class EntryRESTTest(APITransactionTestCase):
         pfam = "PF02171"
         response = self.client.get("/api/entry/unintegrated/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class ProteinRESTTest(APITransactionTestCase):
+    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
+
+    def test_can_read_protein_overview(self):
+        response = self.client.get("/api/protein")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("uniprot", response.data)
+
+    def test_can_read_protein_uniprot(self):
+        response = self.client.get("/api/protein/uniprot")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 4)
+
+    def test_can_read_protein_uniprot_id(self):
+        response = self.client.get("/api/protein/uniprot/P16582")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("metadata", response.data)
+

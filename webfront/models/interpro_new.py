@@ -3,7 +3,7 @@ from jsonfield import JSONField
 
 
 class Entry(models.Model):
-    entry_id = models.CharField(max_length=10,null=True)
+    entry_id = models.CharField(max_length=10, null=True)
     accession = models.CharField(primary_key=True, max_length=10)
     type = models.CharField(max_length=10)
     name = models.TextField()
@@ -11,11 +11,12 @@ class Entry(models.Model):
     other_names = JSONField()
     source_database = models.CharField(max_length=20)
     member_databases = JSONField()
-    integrated = models.ForeignKey("Entry",null=True,blank=True)
+    integrated = models.ForeignKey("Entry", null=True,blank=True)
     go_terms = JSONField()
     description = models.TextField()
     wikipedia = models.TextField(null=True)
     literature = JSONField()
+
 
 class Protein(models.Model):
     identifier = models.CharField(max_length=20, unique=True, null=False, primary_key=True)
@@ -30,10 +31,12 @@ class Protein(models.Model):
     proteome = models.CharField(max_length=20)
     gene = models.CharField(max_length=20, null=False)
     go_terms = JSONField()
-    evidence_code  = models.IntegerField()
-    feature  = JSONField() #signalpeptide, transmembrane, coiledCoil, lowComplexityDisorder, activeSites. PerResidue, diSulphideBridges
+    evidence_code = models.IntegerField()
+    feature = JSONField() #signalpeptide, transmembrane, coiledCoil, lowComplexityDisorder, activeSites. PerResidue, diSulphideBridges
     structure = JSONField()
     genomic_context = JSONField()
+    source_database = models.CharField(max_length=20, default="uniprot")
+
 
 class ProteinEntryFeature(models.Model):
     protein = models.ForeignKey("Protein", null=False)

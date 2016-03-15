@@ -78,7 +78,8 @@
       },
       "genomic_context": {
         "DNA": ""
-      }
+      },
+      "source_database": "uniprot"
     }
   },
   {
@@ -136,7 +137,8 @@
       },
       "genomic_context": {
         "DNA": ""
-      }
+      },
+      "source_database": "uniprot"
     }
   },
   {
@@ -218,7 +220,8 @@
       },
       "genomic_context": {
         "DNA": ""
-      }
+      },
+      "source_database": "uniprot"
     }
   },
   {
@@ -318,7 +321,8 @@
       },
       "genomic_context": {
         "DNA": ""
-      }
+      },
+      "source_database": "uniprot"
     }
   }
 ]

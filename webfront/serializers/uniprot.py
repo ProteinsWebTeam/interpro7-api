@@ -1,13 +1,25 @@
 from webfront.models import Protein
 
 from webfront.serializers.content_serializers import ModelContentSerializer
+from webfront.views.custom import SerializerDetail
 
 
 class ProteinSerializer(ModelContentSerializer):
 
+    def to_representation(self,instance):
+        if self.detail == SerializerDetail.ALL:
+            return self.to_metadata_representation(instance)
+        if self.detail == SerializerDetail.HEADERS:
+            return self.to_headers_representation(instance)
+
     @staticmethod
-    def to_representation(instance):
-        obj = {
+    def to_headers_representation(instance):
+        return {"accession": instance.accession}
+
+
+    @staticmethod
+    def to_metadata_representation(instance):
+        return {
             "metadata": {
                 "accession": instance.accession,
                 "id": instance.identifier,
@@ -30,7 +42,6 @@ class ProteinSerializer(ModelContentSerializer):
             "genomicContext": instance.genomic_context,
             "source_database": instance.source_database
         }
-        return obj
 
     class Meta:
         model = Protein

@@ -1,9 +1,16 @@
+from enum import Enum
+
 import re
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
+
+
+class SerializerDetail(Enum):
+    ALL = 1
+    HEADERS = 2
 
 
 class CustomView(GenericAPIView):
@@ -23,6 +30,9 @@ class CustomView(GenericAPIView):
     # not used now
     many = True
     from_model = True
+    # A serializer can have different levels of details. e.g. we can use the same seializer for the list of proteins
+    # and protein details showing only the accession in the first case
+    serializer_detail = SerializerDetail.ALL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, *args, **kwargs):
@@ -43,7 +53,8 @@ class CustomView(GenericAPIView):
                     many=self.many,
                     # extracted out in the custom view
                     content=request.GET.getlist('content'),
-                    context={"request": request}
+                    context={"request": request},
+                    serializer_detail=self.serializer_detail
                 )
                 return Response(serialized.data)
             return Response(self.queryset)
@@ -51,15 +62,16 @@ class CustomView(GenericAPIView):
         else:
             # combine the children handlers with the available endpoints
             endpoints = available_endpoint_handlers.copy()
-            handlers = {**self.child_handlers, **endpoints}
+            # handlers = {**self.child_handlers, **endpoints}
+            handlers = endpoints + self.child_handlers
 
             # get next level name provided by the client
             level_name = endpoint_levels[level]
             try:
                 # get the corresponding handler name
-                handler_name = next(
+                handler_name, handler = next(
                     h for h in handlers
-                    if re.match(r'(?i)^{}$'.format(h), level_name)
+                    if re.match(r'(?i)^{}$'.format(h[0]), level_name)
                 )
             except StopIteration:
                 # no handler has been found
@@ -68,14 +80,16 @@ class CustomView(GenericAPIView):
                 ))
 
             # if the handler name is one of the endpoints this one should be removed of the available ones
-            if handler_name in endpoints:
-                endpoints.pop(handler_name)
+            try:
+                index = [e[0] for e in endpoints].index(handler_name)
+                endpoints.pop(index)
                 # removing the current
                 endpoint_levels = endpoint_levels[level:]
                 level = 0
+            except: pass
 
             # delegate to the lower level handler
-            return handlers[handler_name].as_view()(
+            return handler.as_view()(
                 request, endpoint_levels, endpoints, level+1,
                 parent_queryset,
                 *args, **kwargs

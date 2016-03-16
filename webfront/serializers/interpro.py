@@ -1,13 +1,13 @@
 from webfront.models import Entry
 from webfront.serializers.content_serializers import ModelContentSerializer
+from webfront.views.custom import SerializerDetail
 
 
 class EntrySerializer(ModelContentSerializer):
-    content = "ALL"
 
     def to_representation(self, instance):
         representation = {}
-        if self.content == "ALL":
+        if self.detail==SerializerDetail.ALL:
             representation["metadata"] = self.to_metadata_representation(instance)
         return representation
 

@@ -93,10 +93,10 @@ db_members = r'(pfam)|(smart)|(prosite_profiles)'
 
 class MemberHandler(CustomView):
     level_description = 'DB member level'
-    child_handlers = {
-        r'PF\d{5}|SM\d{5}|PS\d{5}': MemberAccesionHandler,
+    child_handlers = [
+        (r'PF\d{5}|SM\d{5}|PS\d{5}', MemberAccesionHandler),
         # 'clan':     ClanHandler,
-    }
+    ]
     serializer_class = EntrySerializer
 
     def get_queryset(self, endpoint_levels=None, level=None):
@@ -123,9 +123,9 @@ class MemberHandler(CustomView):
 
 class AccesionHandler(CustomView):
     level_description = 'interpro accession level'
-    child_handlers = {
-        db_members: MemberHandler,
-    }
+    child_handlers = [
+        (db_members, MemberHandler)
+    ]
     serializer_class = EntrySerializer
     queryset = Entry.objects
     many = False
@@ -143,29 +143,29 @@ class UnintegratedHandler(CustomView):
     level_description = 'interpro accession level'
     queryset = Entry.objects.all().exclude(source_database__iexact="interpro").filter(integrated__isnull=True)
     serializer_class = EntrySerializer
-    child_handlers = {
-        db_members: MemberHandler,
-    }
+    child_handlers = [
+        (db_members, MemberHandler)
+    ]
 
 
 class InterproHandler(CustomView):
     level_description = 'interpro level'
     queryset = Entry.objects.filter(source_database__iexact="interpro")
-    child_handlers = {
-        r'IPR\d{6}':    AccesionHandler,
-        db_members: MemberHandler,
-    }
+    child_handlers = [
+        (r'IPR\d{6}',    AccesionHandler),
+        (db_members, MemberHandler),
+    ]
     serializer_class = EntrySerializer
 
 
 class EntryHandler(CustomView):
     level_description = 'section level'
     from_model = False
-    child_handlers = {
-        'interpro': InterproHandler,
-        'unintegrated': UnintegratedHandler,
-        db_members: MemberHandler,
-    }
+    child_handlers = [
+        ('interpro', InterproHandler),
+        ('unintegrated', UnintegratedHandler),
+        (db_members, MemberHandler),
+    ]
 
     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, parent_queryset=None, *args, **kwargs):
         entry_counter = Entry.objects.all().values('source_database').annotate(total=Count('source_database'))

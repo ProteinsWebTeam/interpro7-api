@@ -25,12 +25,12 @@ def pagination_information(request):
 class GeneralHandler(CustomView):
     http_method_names = ['get']
     level_description = 'home level'
-    available_endpoint_handlers = {
-        'entry': EntryHandler,
-        'protein': ProteinHandler,
+    available_endpoint_handlers = [
+        ('entry', EntryHandler),
+        ('protein', ProteinHandler),
         # 'structure': StructureHandler,
-    }
-    child_handlers = {}
+    ]
+    child_handlers = []
     queryset = Entry.objects
 
     def get(self, request, url='', *args, **kwargs):

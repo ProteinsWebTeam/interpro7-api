@@ -134,8 +134,12 @@ class ProteinRESTTest(APITransactionTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 4)
 
-    def test_can_read_protein_uniprot_id(self):
+    def test_can_read_protein_uniprot_accession(self):
         response = self.client.get("/api/protein/uniprot/P16582")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
 
+    def test_can_read_protein_id(self):
+        response = self.client.get("/api/protein/uniprot/CBPYA_ASPCL")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("metadata", response.data)

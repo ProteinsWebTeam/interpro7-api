@@ -19,8 +19,8 @@ class Entry(models.Model):
 
 
 class Protein(models.Model):
-    identifier = models.CharField(max_length=20, unique=True, null=False, primary_key=True)
-    accession = models.CharField(max_length=20)
+    accession = models.CharField(max_length=20,primary_key=True)
+    identifier = models.CharField(max_length=20, unique=True, null=False)
     organism = JSONField()
     name = models.CharField(max_length=20)
     short_name = models.CharField(max_length=20, null=True)

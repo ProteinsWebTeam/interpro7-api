@@ -6,16 +6,18 @@ from webfront.views.custom import SerializerDetail
 
 class ProteinSerializer(ModelContentSerializer):
 
-    def to_representation(self,instance):
+    def to_representation(self, instance):
+        representation = {}
         if self.detail == SerializerDetail.ALL:
-            return self.to_metadata_representation(instance)
+            representation = self.to_metadata_representation(instance)
+            representation["entries"] = self.to_entries_representation(instance)
         if self.detail == SerializerDetail.HEADERS:
             return self.to_headers_representation(instance)
+        return representation
 
     @staticmethod
     def to_headers_representation(instance):
         return {"accession": instance.accession}
-
 
     @staticmethod
     def to_metadata_representation(instance):
@@ -42,6 +44,17 @@ class ProteinSerializer(ModelContentSerializer):
             "genomicContext": instance.genomic_context,
             "source_database": instance.source_database
         }
+
+    @staticmethod
+    def to_entries_representation(instance):
+        return [
+            {
+                "accession": match.entry_id,
+                "match_start": match.match_start,
+                "match_end": match.match_end
+            }
+            for match in instance.proteinentryfeature_set.all()
+        ]
 
     class Meta:
         model = Protein

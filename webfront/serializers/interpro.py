@@ -7,8 +7,9 @@ class EntrySerializer(ModelContentSerializer):
 
     def to_representation(self, instance):
         representation = {}
-        if self.detail==SerializerDetail.ALL:
+        if self.detail == SerializerDetail.ALL:
             representation["metadata"] = self.to_metadata_representation(instance)
+            representation["proteins"] = self.to_proteins_representation(instance)
         return representation
 
     @staticmethod
@@ -34,6 +35,17 @@ class EntrySerializer(ModelContentSerializer):
         if instance.integrated:
             obj["integrated"] = instance.integrated.accession
         return obj
+
+    @staticmethod
+    def to_proteins_representation(instance):
+        return [
+            {
+                "accession": match.protein_id,
+                "match_start": match.match_start,
+                "match_end": match.match_end
+            }
+            for match in instance.proteinentryfeature_set.all()
+        ]
 
     class Meta:
         model = Entry

@@ -15,13 +15,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Protein',
             fields=[
-                ('identifier', models.CharField(primary_key=True, max_length=20, serialize=False, unique=True)),
-                ('accession', models.CharField(max_length=20)),
+                ('accession', models.CharField(max_length=20, primary_key=True, serialize=False)),
+                ('identifier', models.CharField(max_length=20, unique=True)),
                 ('organism', jsonfield.fields.JSONField()),
                 ('name', models.CharField(max_length=20)),
                 ('short_name', models.CharField(max_length=20, null=True)),
                 ('other_names', jsonfield.fields.JSONField()),
-                ('description', models.TextField(null=True)),
+                ('description', jsonfield.fields.JSONField()),
                 ('sequence', models.TextField()),
                 ('length', models.IntegerField()),
                 ('proteome', models.CharField(max_length=20)),
@@ -37,11 +37,24 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ProteinEntryFeature',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('match_start', models.IntegerField()),
                 ('match_end', models.IntegerField()),
-                ('entry', models.ForeignKey(to='webfront.Entry')),
-                ('protein', models.ForeignKey(to='webfront.Protein')),
             ],
+        ),
+        migrations.AlterField(
+            model_name='entry',
+            name='description',
+            field=jsonfield.fields.JSONField(),
+        ),
+        migrations.AddField(
+            model_name='proteinentryfeature',
+            name='entry',
+            field=models.ForeignKey(to='webfront.Entry'),
+        ),
+        migrations.AddField(
+            model_name='proteinentryfeature',
+            name='protein',
+            field=models.ForeignKey(to='webfront.Protein'),
         ),
     ]

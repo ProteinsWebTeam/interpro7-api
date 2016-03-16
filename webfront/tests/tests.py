@@ -94,7 +94,6 @@ class EntryRESTTest(APITransactionTestCase):
         pfam = "PF02171"
         response = self.client.get("/api/entry/interpro/"+acc+"/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
         self.assertEqual(acc, response.data["metadata"]["integrated"])
 
     def test_cant_read_entry_interpro_id_pfam_id_not_in_entry(self):
@@ -110,7 +109,8 @@ class EntryRESTTest(APITransactionTestCase):
         pfam = "PF17180"
         response = self.client.get("/api/entry/unintegrated/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertIn("metadata", response.data.keys())
+        self.assertIn("proteins", response.data.keys())
 
     def test_cant_read_entry_unintegrated_pfam_id_integrated(self):
         prev = settings.DEBUG
@@ -138,8 +138,66 @@ class ProteinRESTTest(APITransactionTestCase):
         response = self.client.get("/api/protein/uniprot/P16582")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
+        self.assertIn("metadata", response.data)
 
     def test_can_read_protein_id(self):
         response = self.client.get("/api/protein/uniprot/CBPYA_ASPCL")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
+
+    def test_can_read_protein_id(self):
+        response = self.client.get("/api/protein/uniprot/CBPYA_ASPCL")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("metadata", response.data)
+
+
+class ProteinEntryRESTTest(APITransactionTestCase):
+    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
+
+    def test_can_get_proteins_from_interpro_id(self):
+        acc = "IPR003165"
+        response = self.client.get("/api/entry/interpro/"+acc)
+        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+        self.assertEqual(len(response.data["proteins"]), 2)
+        ids = [x["accession"] for x in response.data["proteins"]]
+        self.assertIn("A1CUJ5", ids)
+        self.assertIn("P16582", ids)
+
+    def test_can_get_proteins_from_pfam_id(self):
+        pfam = "PF02171"
+        response = self.client.get("/api/entry/pfam/"+pfam)
+        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+        self.assertEqual(len(response.data["proteins"]), 1)
+        ids = [x["accession"] for x in response.data["proteins"]]
+        self.assertIn("A1CUJ5", ids)
+        self.assertNotIn("P16582", ids)
+
+    def test_can_get_proteins_from_unintegrated_pfam_id(self):
+        pfam = "PF17180"
+        response = self.client.get("/api/entry/unintegrated/pfam/"+pfam)
+        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+        self.assertEqual(len(response.data["proteins"]), 1)
+        ids = [x["accession"] for x in response.data["proteins"]]
+        self.assertIn("M5ADK6", ids)
+        self.assertNotIn("P16582", ids)
+
+    def test_gets_empty_protein_array_for_entry_with_no_matches(self):
+        pfam = "PF17176"
+        response = self.client.get("/api/entry/unintegrated/pfam/"+pfam)
+        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+        self.assertEqual(len(response.data["proteins"]), 0)
+
+    def test_can_get_entries_from_protein_id(self):
+        acc = "P16582"
+        response = self.client.get("/api/protein/uniprot/"+acc)
+        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+        self.assertEqual(len(response.data["entries"]), 2)
+        ids = [x["accession"] for x in response.data["entries"]]
+        self.assertIn("IPR003165", ids)
+        self.assertIn("PS50822", ids)
+
+    def test_gets_empty_entries_array_for_protein_with_no_matches(self):
+        acc = "A0A0A2L2G2"
+        response = self.client.get("/api/protein/uniprot/"+acc)
+        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+        self.assertEqual(len(response.data["entries"]), 0)

@@ -176,7 +176,7 @@ class EntryHandler(CustomView):
         }
         for row in entry_counter:
             if row["source_database"].lower() == "interpro" :
-                output["interpro"] = row ["total"]
+                output["interpro"] += row["total"]
             else:
                 output["member_databases"][row["source_database"].lower()] = row["total"]
 

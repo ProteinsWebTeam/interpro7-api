@@ -324,5 +324,59 @@
       },
       "source_database": "uniprot"
     }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "protein": "A1CUJ5",
+      "match_start": 27,
+      "match_end": 80
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "PF02171",
+      "protein": "A1CUJ5",
+      "match_start": 17,
+      "match_end": 70
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "SM00950",
+      "protein": "A1CUJ5",
+      "match_start": 37,
+      "match_end": 90
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "protein": "P16582",
+      "match_start": 48,
+      "match_end": 101
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "PS50822",
+      "protein": "P16582",
+      "match_start": 48,
+      "match_end": 101
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "PF17180",
+      "protein": "M5ADK6",
+      "match_start": 48,
+      "match_end": 101
+    }
   }
 ]

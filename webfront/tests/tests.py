@@ -231,14 +231,15 @@ class ProteinEntryRESTTest(APITransactionTestCase):
         self.assertIn("IPR003165", ids)
         self.assertIn("PS50822", ids)
 
-    def test_can_get_entries_from_protein_id_interpro(self):
-        acc = "P16582"
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertEqual(len(response.data["entries"]), 1)
-        ids = [x["accession"] for x in response.data["entries"]]
-        self.assertIn("IPR003165", ids)
-        self.assertNotIn("PS50822", ids)
+
+    # def test_can_get_entries_from_protein_id_interpro(self):
+    #     acc = "P16582"
+    #     response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro")
+    #     self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+    #     self.assertEqual(len(response.data["entries"]), 1)
+    #     ids = [x["accession"] for x in response.data["entries"]]
+    #     self.assertIn("IPR003165", ids)
+    #     self.assertNotIn("PS50822", ids)
 
     def test_gets_empty_entries_array_for_protein_with_no_matches(self):
         acc = "A0A0A2L2G2"

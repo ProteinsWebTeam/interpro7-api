@@ -52,6 +52,14 @@ class UniprotAccessionHandler(CustomView):
         # return ProteinEntryFeature.objects.filter(entry__in=queryset, protein_id=level_name)
         return queryset.filter(proteinentryfeature__protein=level_name)
 
+    @staticmethod
+    def post_serializer(obj, level_name=""):
+        if not isinstance(obj.serializer,ProteinSerializer):
+            for p in obj["proteins"]:
+                if p["accession"] != level_name:
+                    obj["proteins"].remove(p)
+        return obj
+
 
 class IDAccessionHandler(CustomView):
     level_description = 'uniprot accession level'
@@ -114,10 +122,11 @@ class UniprotHandler(CustomView):
 
     @staticmethod
     def post_serializer(obj, level_name=""):
-        if level_name != "uniprot":
-            for p in obj["proteins"]:
-                if p["source_database"]!=level_name:
-                    obj["proteins"].remove(p)
+        if not isinstance(obj.serializer,ProteinSerializer):
+            if level_name != "uniprot":
+                for p in obj["proteins"]:
+                    if p["source_database"]!=level_name:
+                        obj["proteins"].remove(p)
         return obj
 
 class ProteinHandler(CustomView):

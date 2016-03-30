@@ -97,6 +97,31 @@
   },
   {
     "model": "webfront.Entry",
+    "fields": {
+      "entry_id" : "id10",
+      "accession" : "IPR001165",
+      "type" : "domain",
+      "name" : "Qiwi domain",
+      "short_name" : "Qiwi",
+      "other_names" : [],
+      "source_database" : "interpro",
+      "member_databases" : {},
+      "integrated" : null,
+      "go_terms" : {
+        "biological_process": [],
+        "molecular_function": [{
+          "id": "GO:0003676",
+          "name": "nucleic acid binding"
+        }],
+        "cellular_component": []
+      },
+      "description" : ["The qiwi domain "],
+      "wikipedia" : "",
+      "literature": {}
+    }
+  },
+  {
+    "model": "webfront.Entry",
     "fields":{
       "entry_id": "id2",
       "accession": "PF02171",

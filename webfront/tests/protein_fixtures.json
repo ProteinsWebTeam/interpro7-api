@@ -79,7 +79,7 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "uniprot"
+      "source_database": "swissprot"
     }
   },
   {
@@ -138,7 +138,7 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "uniprot"
+      "source_database": "swissprot"
     }
   },
   {
@@ -221,7 +221,7 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "uniprot"
+      "source_database": "trembl"
     }
   },
   {
@@ -322,7 +322,7 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "uniprot"
+      "source_database": "trembl"
     }
   },
   {
@@ -377,6 +377,15 @@
       "protein": "M5ADK6",
       "match_start": 48,
       "match_end": 101
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "IPR001165",
+      "protein": "A1CUJ5",
+      "match_start": 148,
+      "match_end": 201
     }
   }
 ]

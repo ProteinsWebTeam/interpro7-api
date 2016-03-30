@@ -1,5 +1,6 @@
 from webfront.models import Entry
 from webfront.serializers.content_serializers import ModelContentSerializer
+from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import SerializerDetail
 
 
@@ -9,7 +10,18 @@ class EntrySerializer(ModelContentSerializer):
         representation = {}
         if self.detail == SerializerDetail.ALL:
             representation["metadata"] = self.to_metadata_representation(instance)
-            representation["proteins"] = self.to_proteins_representation(instance)
+            representation["proteins"] = self.to_proteins_count_representation(instance)
+        elif self.detail == SerializerDetail.PROTEIN_OVERVIEW:
+            representation["metadata"] = self.to_metadata_representation(instance)
+            representation["proteins"] = self.to_proteins_overview_representation(instance)
+        elif self.detail == SerializerDetail.PROTEIN_DETAIL:
+            representation["metadata"] = self.to_metadata_representation(instance)
+            representation["proteins"] = self.to_proteins_detail_representation(instance)
+        elif self.detail == SerializerDetail.PROTEIN_ENTRY_DETAIL:
+            representation["metadata"] = self.to_metadata_representation(instance)
+            representation["proteins"] = self.to_proteins_detail_representation(instance)
+            # representation["metadata"] = self.to_metadata_representation(instance.entry)
+            # representation["proteins"] = [ProteinSerializer.to_metadata_representation(instance.protein)]
         return representation
 
     @staticmethod
@@ -37,15 +49,30 @@ class EntrySerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def to_proteins_representation(instance):
+    def to_proteins_count_representation(instance):
+        return instance.proteinentryfeature_set.count()
+
+    @staticmethod
+    def to_proteins_overview_representation(instance):
         return [
-            {
-                "accession": match.protein_id,
-                "match_start": match.match_start,
-                "match_end": match.match_end
-            }
+            EntrySerializer.to_match_representation(match)
             for match in instance.proteinentryfeature_set.all()
         ]
 
+    @staticmethod
+    def to_match_representation(match):
+        return {
+            "accession": match.protein_id,
+            "match_start": match.match_start,
+            "match_end": match.match_end
+        }
+    @staticmethod
+    def to_proteins_detail_representation(instance):
+        return [
+            { **EntrySerializer.to_match_representation(match),
+              **ProteinSerializer.to_metadata_representation(match.protein)
+            }
+            for match in instance.proteinentryfeature_set.all()
+        ]
     class Meta:
         model = Entry

@@ -18,7 +18,7 @@ class RESTRequestsTest(FunctionalTest):
         self.assertIn('"unintegrated"', content)
 
         num_interpro = jsonp["interpro"]
-        self.assertEqual(num_interpro, 1, "the fistres dataset only includes one interpro entry")
+        self.assertEqual(num_interpro, 2, "the fixtures dataset only includes two interpro entry")
 
         self.browser.get(self.server_url + "/api/entry/interpro?format=json")
         content = self.browser.find_element_by_tag_name('body').text
@@ -38,8 +38,7 @@ class RESTRequestsTest(FunctionalTest):
         self.assertEqual(acc, jsonp["metadata"]["accession"],
                          "The accession in the response object should be the same as reequested")
 
-        self.assertIn("A1CUJ5", content)
-        self.assertIn("P16582", content)
+        self.assertEqual(jsonp["proteins"], 2)
 
     def test_request_protein_endpoint(self):
         self.browser.get(self.server_url + "/api/protein/?format=json")
@@ -47,7 +46,7 @@ class RESTRequestsTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp), 1, "the output has exactly 1 keys")
+        self.assertEqual(len(jsonp), 3, "the output has exactly 1 keys")
 
         self.assertIn('"uniprot"', content)
 

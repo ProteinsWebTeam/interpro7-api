@@ -16,6 +16,7 @@ class Entry(models.Model):
     description = JSONField()
     wikipedia = models.TextField(null=True)
     literature = JSONField()
+    proteins = models.ManyToManyField('Protein', through='ProteinEntryFeature')
 
 
 class Protein(models.Model):
@@ -43,3 +44,4 @@ class ProteinEntryFeature(models.Model):
     entry = models.ForeignKey("Entry", null=False)
     match_start = models.IntegerField()
     match_end = models.IntegerField()
+

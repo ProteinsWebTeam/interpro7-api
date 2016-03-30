@@ -8,12 +8,27 @@ class ProteinSerializer(ModelContentSerializer):
 
     def to_representation(self, instance):
         representation = {}
-        if self.detail == SerializerDetail.ALL:
-            representation = self.to_metadata_representation(instance)
+        if self.detail == SerializerDetail.ALL or self.detail == SerializerDetail.ENTRY_OVERVIEW:
+            representation = self.to_full_representation(instance)
+
+        if self.detail == SerializerDetail.ENTRY_OVERVIEW:
             representation["entries"] = self.to_entries_representation(instance)
-        if self.detail == SerializerDetail.HEADERS:
-            return self.to_headers_representation(instance)
+        elif self.detail == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+            representation = self.to_full_representation(instance.protein)
+            representation["entries"] = self.to_match_representation(instance)
+        elif self.detail == SerializerDetail.HEADERS:
+            representation = self.to_headers_representation(instance)
         return representation
+
+    def to_full_representation(self, instance):
+        return {
+            "metadata": self.to_metadata_representation(instance),
+            "entries": self.to_entries_count_representation(instance),
+            "representation": instance.feature,
+            "structure": instance.structure,
+            "genomicContext": instance.genomic_context,
+            "source_database": instance.source_database
+        }
 
     @staticmethod
     def to_headers_representation(instance):
@@ -22,39 +37,43 @@ class ProteinSerializer(ModelContentSerializer):
     @staticmethod
     def to_metadata_representation(instance):
         return {
-            "metadata": {
-                "accession": instance.accession,
-                "id": instance.identifier,
-                "sourceOrganism": instance.organism,
-                "name": {
-                    "full": instance.name,
-                    "short": instance.short_name,
-                    "other": instance.other_names
-                },
-                "description": instance.description,
-                "length": instance.length,
-                "sequence": instance.sequence,
-                "proteome": instance.proteome,
-                "gene": instance.gene,
-                "go_terms": instance.go_terms,
-                "proteinEvidence": 4
+            "accession": instance.accession,
+            "id": instance.identifier,
+            "sourceOrganism": instance.organism,
+            "name": {
+                "full": instance.name,
+                "short": instance.short_name,
+                "other": instance.other_names
             },
-            "representation": instance.feature,
-            "structure": instance.structure,
-            "genomicContext": instance.genomic_context,
+            "description": instance.description,
+            "length": instance.length,
+            "sequence": instance.sequence,
+            "proteome": instance.proteome,
+            "gene": instance.gene,
+            "go_terms": instance.go_terms,
+            "proteinEvidence": 4,
             "source_database": instance.source_database
         }
 
+
     @staticmethod
-    def to_entries_representation(instance):
-        return [
-            {
+    def to_match_representation(match):
+        return {
                 "accession": match.entry_id,
                 "match_start": match.match_start,
                 "match_end": match.match_end
             }
+
+    @staticmethod
+    def to_entries_representation(instance):
+        return [
+            ProteinSerializer.to_match_representation(match)
             for match in instance.proteinentryfeature_set.all()
         ]
+
+    @staticmethod
+    def to_entries_count_representation(instance):
+        return instance.proteinentryfeature_set.count()
 
     class Meta:
         model = Protein

@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from release.models import iprel
-from webfront.models import Entry
+from webfront.models import Entry, Protein
 
 def log(kind, source="IPREL"):
     def wrapper1(fn):
@@ -61,6 +61,13 @@ def extract_go(joins):
         })
     return output
 
+def get_tax_name_from_id(id):
+    try:
+        return iprel.TaxNameToId.objects.using('interpro_ro').get(pk=id).tax_name
+    except iprel.TaxNameToId.DoesNotExist:
+        pass
+
+
 @log("interpro entry objects (and their contributing signatures)")
 def get_interpro_entries(n):
     for input in iprel.Entry.objects.using("interpro_ro").all()[:n]:
@@ -81,13 +88,21 @@ def get_interpro_entries(n):
             literature=extract_pubs(input.entry2pub_set.all())
         )
         output.save()
-        yield acc
+        yield "{}, entry from InterPro".format(acc)
+        for prot in (_.protein_ac for _ in input.mventry2proteintrue_set.all()):
+            set_protein(prot)
+            yield "{}, protein".format(prot.protein_ac)
         for acc in member_db_accs:
             set_member_db_entry(
                 iprel.Method.objects.using("interpro_ro").get(pk=acc),
                 output
             )
-            yield acc
+            yield "{}, entry from a member database".format(acc)
+
+@log("unintegrated entry objects")
+def get_n_unintegrated_member_db_entries(n):
+    for input in iprel.Method.objects.using("interpro_ro").filter(entry2method__isnull=True).all()[:n]:
+        yield from set_member_db_entry(input)
 
 def set_member_db_entry(input, integrated=None):
     acc = input.method_ac
@@ -103,15 +118,40 @@ def set_member_db_entry(input, integrated=None):
         short_name=input.name,
         other_names=[],# TODO
         description=[input.abstract] if input.abstract else [],
-        literature=[]# TODO
+        literature=extract_pubs(input.method2pub_set.all())
     )
     output.save()
-    return acc
+    for prot in (_.protein_ac for _ in input.mvmethod2protein_set.all()):
+        set_protein(prot)
+        yield "{}, protein".format(prot.protein_ac)
+    yield acc
 
-@log("unintegrated entry objects")
-def get_n_unintegrated_member_db_entries(n):
-    for input in iprel.Method.objects.using("interpro_ro").filter(entry2method__isnull=True).all()[:n]:
-        yield set_member_db_entry(input)
+def set_protein(input):
+    tax_name = get_tax_name_from_id(input.tax_id)
+    tax = {"taxid": input.tax_id}
+    if tax_name:
+        tax["name"] = tax_name
+    output = Protein(
+        accession=input.protein_ac,
+        identifier=input.name,
+        organism=tax,
+        name="",# TODO
+        short_name="",# TODO
+        other_names=[],# TODO
+        description=[],# TODO
+        sequence="",# TODO
+        length=input.len,
+        proteome="",# TODO
+        gene="",# TODO
+        go_terms={},# TODO
+        evidence_code=0,# TODO
+        feature={},# TODO
+        structure={},# TODO
+        genomic_context={},# TODO
+        source_database=input.dbcode.dbshort
+    )
+    output.save()
+    return input.protein_ac
 
 class Command(BaseCommand):
     help = "populate db"

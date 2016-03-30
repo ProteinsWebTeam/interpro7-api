@@ -377,7 +377,7 @@ class Method(models.Model):
 
 class Method2Pub(models.Model):
     pub = models.ForeignKey(Citation)
-    method_ac = models.ForeignKey(Method, db_column='method_ac')
+    method_ac = models.ForeignKey(Method, db_column='method_ac', primary_key=True)
 
     class Meta:
         managed = False
@@ -386,19 +386,19 @@ class Method2Pub(models.Model):
 
 
 class MvEntry2ProteinTrue(models.Model):
-    entry_ac = models.ForeignKey(Entry, db_column='entry_ac')
-    protein_ac = models.ForeignKey('Protein', db_column='protein_ac')
+    entry_ac = models.ForeignKey(Entry, db_column='entry_ac', primary_key=True)
+    protein_ac = models.ForeignKey('Protein', db_column='protein_ac', primary_key=True)
     match_count = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = '"INTERPRO"."mv_entry2protein_true"'
-        unique_together = (('entry_ac', 'protein_ac', 'entry_ac', 'protein_ac'),)
+        unique_together = (('entry_ac', 'protein_ac'),)
 
 
 class MvMethod2Protein(models.Model):
-    method_ac = models.ForeignKey(Method, db_column='method_ac')
-    protein_ac = models.ForeignKey('Protein', db_column='protein_ac')
+    method_ac = models.ForeignKey(Method, db_column='method_ac', primary_key=True)
+    protein_ac = models.ForeignKey('Protein', db_column='protein_ac', primary_key=True)
     match_count = models.IntegerField()
 
     class Meta:
@@ -499,8 +499,8 @@ class Supermatch(models.Model):
 
 
 class TaxNameToId(models.Model):
-    tax_name = models.CharField(max_length=30, blank=True, null=True)
-    tax_id = models.BigIntegerField(blank=True, null=True)
+    tax_name = models.CharField(max_length=30, blank=True)
+    tax_id = models.BigIntegerField(blank=True, primary_key=True)
     parent = models.BigIntegerField(blank=True, null=True)
 
     class Meta:
@@ -528,7 +528,7 @@ class UniprotPdbe(models.Model):
 
 
 class UniprotTaxonomy(models.Model):
-    protein_ac = models.CharField(max_length=15)
+    protein_ac = models.CharField(max_length=15, primary_key=True)
     tax_id = models.BigIntegerField(blank=True, null=True)
     left_number = models.FloatField(blank=True, null=True)
     right_number = models.FloatField(blank=True, null=True)

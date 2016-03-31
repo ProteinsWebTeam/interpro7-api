@@ -25,12 +25,12 @@ class RESTRequestsTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp), num_interpro, "The response should have as many entries as reported in /entry ")
-        self.assertIn("metadata", jsonp[0].keys(), "'metadata' should be one of the keys in the response")
-        self.assertIn("molecular_function", jsonp[0]["metadata"]["go_terms"],
+        self.assertEqual(len(jsonp["results"]), num_interpro, "The response should have as many entries as reported in /entry ")
+        self.assertIn("metadata", jsonp["results"][0].keys(), "'metadata' should be one of the keys in the response")
+        self.assertIn("molecular_function", jsonp["results"][0]["metadata"]["go_terms"],
                       "the key is part of the go_terms and has been parsed OK")
 
-        acc = jsonp[0]["metadata"]["accession"]
+        acc = jsonp["results"][0]["metadata"]["accession"]
         self.browser.get(self.server_url + "/api/entry/interpro/"+acc+"?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
@@ -59,7 +59,7 @@ class RESTRequestsTest(FunctionalTest):
         jsonp = json.loads(content)
 
         self.assertEqual(len(jsonp), num_uniprot, "The response should have as many entries as reported in /entry ")
-        acc = jsonp[0]["accession"]
+        acc = jsonp["results"][0]["accession"]
 
         self.browser.get(self.server_url + "/api/protein/uniprot/"+acc+"?format=json")
         content = self.browser.find_element_by_tag_name('body').text

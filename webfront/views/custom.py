@@ -65,7 +65,12 @@ class CustomView(GenericAPIView):
                     serializer_detail=self.serializer_detail,
                 )
                 data_tmp= self.post_serializer(serialized.data, endpoint_levels[level-1])
-                return Response(data_tmp)
+
+                if self.many:
+                    return self.get_paginated_response(data_tmp)
+                else:
+                    return Response(data_tmp)
+
             return Response(self.queryset)
 
         else:

@@ -36,12 +36,12 @@ class EntryRESTTest(APITransactionTestCase):
     def test_can_read_entry_interpro(self):
         response = self.client.get("/api/entry/interpro")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data["results"]), 2)
 
     def test_can_read_entry_unintegrated(self):
         response = self.client.get("/api/entry/unintegrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 4)
+        self.assertEqual(len(response.data["results"]), 4)
 
     def test_can_read_entry_interpro_id(self):
         acc = "IPR003165"
@@ -67,27 +67,27 @@ class EntryRESTTest(APITransactionTestCase):
         for member in self.db_members:
             response = self.client.get("/api/entry/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(response.data), self.db_members[member])
+            self.assertEqual(len(response.data["results"]), self.db_members[member])
 
     def test_can_read_entry_interpro_member(self):
         for member in self.db_members:
             response = self.client.get("/api/entry/interpro/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(response.data), 1, "The dataset only has one interpro entry with 1 member entry")
+            self.assertEqual(len(response.data["results"]), 1, "The dataset only has one interpro entry with 1 member entry")
 
     def test_can_read_entry_unintegrated_member(self):
         for member in self.db_members:
             response = self.client.get("/api/entry/unintegrated/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(response.data), self.db_members[member]-1)
+            self.assertEqual(len(response.data["results"]), self.db_members[member]-1)
 
     def test_can_read_entry_interpro_id_member(self):
         acc = "IPR003165"
         for member in self.db_members:
             response = self.client.get("/api/entry/interpro/"+acc+"/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(response.data), 1)
-            self.assertEqual(acc, response.data[0]["metadata"]["integrated"])
+            self.assertEqual(len(response.data["results"]), 1)
+            self.assertEqual(acc, response.data["results"][0]["metadata"]["integrated"])
 
     def test_can_read_entry_interpro_id_pfam_id(self):
         acc = "IPR003165"
@@ -162,8 +162,8 @@ class ProteinEntryRESTTest(APITransactionTestCase):
     def test_can_get_protein_amount_from_interpro_id_pfam(self):
         acc = "IPR003165"
         response = self.client.get("/api/entry/interpro/"+acc+"/pfam")
-        self.assertIn("proteins", response.data[0], "'proteins' should be one of the keys in the response")
-        self.assertEqual(response.data[0]["proteins"], 1)
+        self.assertIn("proteins", response.data["results"][0], "'proteins' should be one of the keys in the response")
+        self.assertEqual(response.data["results"][0]["proteins"], 1)
 
     def test_can_get_protein_overview_from_interpro_id_protein(self):
         acc = "IPR003165"

@@ -33,7 +33,7 @@ class EntrySerializer(ModelContentSerializer):
             'go_terms': instance.go_terms,
             'source_dataBase': instance.source_database,
             'member_databases': instance.member_databases,
-            # 'integrated': instance.integrated,
+            'integrated': instance.integrated,
             'name': {
                 'name': instance.name,
                 'short': instance.short_name,

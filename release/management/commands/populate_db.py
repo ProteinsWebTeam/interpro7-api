@@ -93,11 +93,11 @@ def get_interpro_entries(n):
             set_protein(prot)
             yield "{}, protein".format(prot.protein_ac)
         for acc in member_db_accs:
-            set_member_db_entry(
+            res = set_member_db_entry(
                 iprel.Method.objects.using("interpro_ro").get(pk=acc),
                 output
             )
-            yield "{}, entry from a member database".format(acc)
+            yield "{}, entry from a member database".format(next(res))
 
 @log("unintegrated entry objects")
 def get_n_unintegrated_member_db_entries(n):

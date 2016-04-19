@@ -11,7 +11,7 @@ class Entry(models.Model):
     other_names = JSONField()
     source_database = models.CharField(max_length=20)
     member_databases = JSONField()
-    integrated = models.ForeignKey("Entry", null=True,blank=True)
+    integrated = models.ForeignKey("Entry", null=True, blank=True)
     go_terms = JSONField()
     description = JSONField()
     wikipedia = models.TextField(null=True)
@@ -20,7 +20,7 @@ class Entry(models.Model):
 
 
 class Protein(models.Model):
-    accession = models.CharField(max_length=20,primary_key=True)
+    accession = models.CharField(max_length=20, primary_key=True)
     identifier = models.CharField(max_length=20, unique=True, null=False)
     organism = JSONField()
     name = models.CharField(max_length=20)
@@ -44,4 +44,3 @@ class ProteinEntryFeature(models.Model):
     entry = models.ForeignKey("Entry", null=False)
     match_start = models.IntegerField()
     match_end = models.IntegerField()
-

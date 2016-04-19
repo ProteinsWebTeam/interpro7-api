@@ -84,7 +84,7 @@ class MemberAccesionHandler(CustomView):
             parent_queryset=None, handler=None, *args, **kwargs):
         if parent_queryset is not None:
             self.queryset = parent_queryset
-        self.queryset = self.queryset.filter(accession=endpoint_levels[level-1])
+        self.queryset = self.queryset.filter(accession__iexact=endpoint_levels[level-1])
         if self.queryset.count()==0:
             raise Exception("The ID '{}' has not been found in {}".format(endpoint_levels[level-1], "/".join(endpoint_levels[:level-1])))
         return super(MemberAccesionHandler, self).get(

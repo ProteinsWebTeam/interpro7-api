@@ -136,7 +136,7 @@ class AccesionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
-        self.queryset = self.queryset.filter(accession=endpoint_levels[level-1])
+        self.queryset = self.queryset.filter(accession__iexact=endpoint_levels[level-1])
         if self.queryset.count()==0:
             raise Exception("The ID '{}' has not been found in {}".format(endpoint_levels[level-1], endpoint_levels[level-2]))
         return super(AccesionHandler, self).get(
@@ -159,7 +159,7 @@ class InterproHandler(CustomView):
     level_description = 'interpro level'
     queryset = Entry.objects.filter(source_database__iexact="interpro")
     child_handlers = [
-        (r'IPR\d{6}',    AccesionHandler),
+        (r'IPR\d{6}', AccesionHandler),
         (db_members, MemberHandler),
     ]
     serializer_class = EntrySerializer

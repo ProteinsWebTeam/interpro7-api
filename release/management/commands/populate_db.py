@@ -28,7 +28,7 @@ def extract_pubs(joins):
             PMID=int(p.pubmed_id), type=p.pub_type, ISBN=p.isbn,
             volume=p.volume, issue=p.issue, year=int(p.year), title=p.title,
             URL=p.url, rawPages=p.rawpages, medlineJournal=p.medline_journal,
-            ISOJournal=p.iso_journal, authors=p.authors, DOI_URL=p.doi_url
+            ISOJournal=p.iso_journal, authors=p.authors, DOI_URL=p.doi_url, PUB_ID=p.pub_id
         )
         for p in [j.pub for j in joins]
     ]

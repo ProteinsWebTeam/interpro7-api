@@ -1,6 +1,7 @@
 from webfront.models import Protein
 
 from webfront.serializers.content_serializers import ModelContentSerializer
+import webfront.serializers.interpro
 from webfront.views.custom import SerializerDetail
 
 
@@ -13,9 +14,12 @@ class ProteinSerializer(ModelContentSerializer):
 
         if self.detail == SerializerDetail.ENTRY_OVERVIEW:
             representation["entries"] = self.to_entries_representation(instance)
-        elif self.detail == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+        elif self.detail == SerializerDetail.ENTRY_PROTEIN:
             representation = self.to_full_representation(instance.protein)
             representation["entries"] = self.to_match_representation(instance)
+        elif self.detail == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+            representation = self.to_full_representation(instance.protein)
+            representation["entries"] = self.to_match_representation(instance, True)
         elif self.detail == SerializerDetail.HEADERS:
             representation = self.to_headers_representation(instance)
         return representation
@@ -57,12 +61,17 @@ class ProteinSerializer(ModelContentSerializer):
 
 
     @staticmethod
-    def to_match_representation(match):
-        return {
-                "accession": match.entry_id,
-                "match_start": match.match_start,
-                "match_end": match.match_end
-            }
+    def to_match_representation(match, full=False):
+        output = {
+            "match_start": match.match_start,
+            "match_end": match.match_end
+        }
+        if full:
+            output["entry"] = webfront.serializers.interpro.EntrySerializer.to_metadata_representation(match.entry)
+        else:
+            output["accession"] = match.entry_id
+
+        return output
 
     @staticmethod
     def to_entries_representation(instance):

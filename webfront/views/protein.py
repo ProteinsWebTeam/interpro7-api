@@ -30,7 +30,7 @@ class UniprotAccessionHandler(CustomView):
     serializer_class = ProteinSerializer
     queryset = Protein.objects
     many = False
-    serializer_detail_filter = SerializerDetail.PROTEIN_ENTRY_DETAIL
+    serializer_detail_filter = SerializerDetail.PROTEIN_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
@@ -49,8 +49,9 @@ class UniprotAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name=""):
-        # return ProteinEntryFeature.objects.filter(entry__in=queryset, protein_id=level_name)
         return queryset.filter(proteinentryfeature__protein=level_name)
+        # return ProteinEntryFeature.objects.filter(entry__in=queryset, protein_id=level_name)
+        # return queryset.filter(proteinentryfeature__protein=level_name)
 
     @staticmethod
     def post_serializer(obj, level_name=""):

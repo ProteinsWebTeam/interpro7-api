@@ -131,6 +131,7 @@ class AccesionHandler(CustomView):
         (db_members, MemberHandler)
     ]
     serializer_class = EntrySerializer
+    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_DETAIL
     queryset = Entry.objects
     many = False
 
@@ -142,6 +143,8 @@ class AccesionHandler(CustomView):
         return super(AccesionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, *args, **kwargs
         )
+    def filter(queryset, level_name=""):
+        return queryset.filter(entry=level_name)
 
 
 class UnintegratedHandler(CustomView):
@@ -163,7 +166,7 @@ class InterproHandler(CustomView):
         (db_members, MemberHandler),
     ]
     serializer_class = EntrySerializer
-    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_DETAIL
+    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN
 
     @staticmethod
     def filter(queryset, level_name=""):

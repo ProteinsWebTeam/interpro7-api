@@ -69,8 +69,9 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_proteins_detail_representation(instance):
         return [
-            { **EntrySerializer.to_match_representation(match),
-              **ProteinSerializer.to_metadata_representation(match.protein)
+            {
+                **EntrySerializer.to_match_representation(match),
+                **ProteinSerializer.to_metadata_representation(match.protein)
             }
             for match in instance.proteinentryfeature_set.all()
         ]

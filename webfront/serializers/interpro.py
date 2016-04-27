@@ -18,8 +18,8 @@ class EntrySerializer(ModelContentSerializer):
             representation["metadata"] = self.to_metadata_representation(instance)
             representation["proteins"] = self.to_proteins_detail_representation(instance)
         elif self.detail == SerializerDetail.PROTEIN_ENTRY_DETAIL:
-            representation["metadata"] = self.to_metadata_representation(instance)
-            representation["proteins"] = self.to_proteins_detail_representation(instance)
+            representation["metadata"] = self.to_metadata_representation(instance.entry)
+            representation["proteins"] = self.to_proteins_detail_representation(instance.protein)
             # representation["metadata"] = self.to_metadata_representation(instance.entry)
             # representation["proteins"] = [ProteinSerializer.to_metadata_representation(instance.protein)]
         return representation

@@ -39,28 +39,6 @@
     "proteinEvidence": 3
   },
   "representation": {
-    "entries": [
-      {
-        "id": "IPR001563",
-        "name": "Peptidase S10, serine carboxypeptidase",
-        "type": "family"
-      },
-      {
-        "id": "IPR008442",
-        "name": "Propeptide, carboxypeptidase Y",
-        "type": "domain"
-      },
-      {
-        "id": "IPR029058",
-        "name": "Alpha/Beta hydrolase fold",
-        "type": "domain"
-      },
-      {
-        "id": "IPR018202",
-        "name": "Peptidase S10, serine carboxypeptidase, active site",
-        "type": "activeSite"
-      }
-    ],
     "signalPeptide": [],
     "transmembrane": [],
     "coiledCoil": [],

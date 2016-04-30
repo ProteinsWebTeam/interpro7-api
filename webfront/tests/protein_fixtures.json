@@ -38,28 +38,6 @@
       },
       "evidence_code": 3,
       "feature": {
-        "entries": [
-          {
-            "id": "IPR001563",
-            "name": "Peptidase S10, serine carboxypeptidase",
-            "type": "family"
-          },
-          {
-            "id": "IPR008442",
-            "name": "Propeptide, carboxypeptidase Y",
-            "type": "domain"
-          },
-          {
-            "id": "IPR029058",
-            "name": "Alpha/Beta hydrolase fold",
-            "type": "domain"
-          },
-          {
-            "id": "IPR018202",
-            "name": "Peptidase S10, serine carboxypeptidase, active site",
-            "type": "activeSite"
-          }
-        ],
         "signalPeptide": [],
         "transmembrane": [],
         "coiledCoil": [],
@@ -112,18 +90,7 @@
         ]
       },
       "evidence_code": 1,
-      "feature": {"entries": [
-        {
-          "id": "IPR001972",
-          "name": "Stomatin family",
-          "type": "family"
-        },
-        {
-          "id": "IPR001107",
-          "name": "Band 7 domain",
-          "type": "domain"
-        }
-      ],
+      "feature": {
         "signalPeptide": [],
         "transmembrane": [],
         "coiledCoil": [],
@@ -180,28 +147,6 @@
       },
       "evidence_code": 1,
       "feature": {
-        "entries": [
-          {
-            "id": "IPR001563",
-            "name": "Peptidase S10, serine carboxypeptidase",
-            "type": "family"
-          },
-          {
-            "id": "IPR008442",
-            "name": "Propeptide, carboxypeptidase Y",
-            "type": "domain"
-          },
-          {
-            "id": "IPR029058",
-            "name": "Alpha/Beta hydrolase fold",
-            "type": "domain"
-          },
-          {
-            "id": "IPR018202",
-            "name": "Peptidase S10, serine carboxypeptidase, active site",
-            "type": "activeSite"
-          }
-        ],
         "signalPeptide": [],
         "transmembrane": [],
         "coiledCoil": [],
@@ -271,43 +216,6 @@
       },
       "evidence_code": 4,
       "feature": {
-        "entries": [
-          {
-            "id": "IPR000276",
-            "name": "G protein-coupled receptor, rhodopsin-like",
-            "type": "family"
-          },
-          {
-            "id": "IPR002131",
-            "name": "Glycoprotein hormone receptor family",
-            "type": "family"
-          },
-          {
-            "id": "IPR002273",
-            "name": "Lutropin-choriogonadotropic hormone receptor",
-            "type": "family"
-          },
-          {
-            "id": "IPR000372",
-            "name": "Leucine-rich repeat N-terminal domain",
-            "type": "domain"
-          },
-          {
-            "id": "IPR032675",
-            "name": "Leucine-rich repeat domain, L domain-like",
-            "type": "domain"
-          },
-          {
-            "id": "IPR017452",
-            "name": "GPCR, rhodopsin-like, 7TM",
-            "type": "domain"
-          },
-          {
-            "id": "IPR026906",
-            "name": "Repeat Leucine rich repeat 5",
-            "type": "repeat"
-          }
-        ],
         "signalPeptide": [],
         "transmembrane": [],
         "coiledCoil": [],

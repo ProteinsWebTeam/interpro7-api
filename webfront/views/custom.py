@@ -10,13 +10,14 @@ from webfront.pagination import CustomPagination
 
 class SerializerDetail(Enum):
     ALL = 1
-    HEADERS = 2
 
+    ENTRY_HEADERS = 100
     ENTRY_OVERVIEW = 101
     ENTRY_DETAIL = 102
     ENTRY_PROTEIN = 103
     ENTRY_PROTEIN_DETAIL = 104
 
+    PROTEIN_HEADERS = 200
     PROTEIN_OVERVIEW = 201
     PROTEIN_DETAIL = 202
     PROTEIN_ENTRY_DETAIL = 203
@@ -44,7 +45,7 @@ class CustomView(GenericAPIView):
     serializer_detail_filter = SerializerDetail.ALL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
         # if this is the last level
@@ -65,7 +66,9 @@ class CustomView(GenericAPIView):
                     context={"request": request},
                     serializer_detail=self.serializer_detail,
                 )
-                data_tmp= self.post_serializer(serialized.data, endpoint_levels[level-1])
+                data_tmp= self.post_serializer(serialized.data,
+                                               endpoint_levels[level-1],
+                                               general_handler)
 
                 if self.many:
                     return self.get_paginated_response(data_tmp)
@@ -93,6 +96,7 @@ class CustomView(GenericAPIView):
                 raise ValueError('the level \'{}\' is not a valid {}'.format(
                     level_name, self.level_description
                 ))
+            handler_view = handler_class.as_view()
 
             # if the handler name is one of the endpoints this one should be removed of the available ones
             try:
@@ -102,28 +106,26 @@ class CustomView(GenericAPIView):
                 endpoint_levels = endpoint_levels[level:]
                 level = 0
                 if handler is not None:
-                    self.filter_entrypoint(handler_name, handler_class,endpoint_levels, endpoints)
+                    self.filter_entrypoint(handler_name, handler_class, endpoint_levels, endpoints, general_handler)
                     return super(handler, self).get(
                         request, endpoint_levels, endpoints, len(endpoint_levels),
-                        parent_queryset, handler,
+                        parent_queryset, handler, general_handler,
                         *args, **kwargs
             )
             except ValueError:
                 pass
 
-            handler= handler_class
-
             # delegate to the lower level handler
-            return handler_class.as_view()(
+            return handler_view(
                 request, endpoint_levels, endpoints, level+1,
-                parent_queryset, handler,
+                self.queryset, handler_class, general_handler,
                 *args, **kwargs
             )
 
-    def filter_entrypoint(self, handler_name, handler_class, endpoint_levels, endpoints):
+    def filter_entrypoint(self, handler_name, handler_class, endpoint_levels, endpoints, general_handler):
         for level in range(len(endpoint_levels)):
             self.serializer_detail = handler_class.serializer_detail_filter
-            self.queryset = handler_class.filter(self.queryset,endpoint_levels[level])
+            self.queryset = handler_class.filter(self.queryset, endpoint_levels[level], general_handler)
             self.post_serializer = handler_class.post_serializer
 
             # handlers = {**self.child_handlers, **endpoints}
@@ -152,9 +154,9 @@ class CustomView(GenericAPIView):
                 pass
 
     @staticmethod
-    def filter(queryset, level_name=""):
+    def filter(queryset, level_name="", general_handler=None):
         return queryset
 
     @staticmethod
-    def post_serializer(obj, level_name=""):
+    def post_serializer(obj, level_name="", general_handler=None):
         return obj

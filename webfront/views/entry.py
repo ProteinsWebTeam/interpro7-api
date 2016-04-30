@@ -1,98 +1,31 @@
-from django.db.models import Count
+from django.db.models import Count, QuerySet
 from webfront.models import Entry, ProteinEntryFeature
 from webfront.serializers.interpro import EntrySerializer
 from .custom import CustomView, SerializerDetail
 
+db_members = r'(pfam)|(smart)|(prosite_profiles)'
 
-# from webfront.active_sites import ActiveSites
-# from webfront.models import Clan, Pfama, DwEntrySignature,DwEntry
-#from webfront.serializers.interpro import EntryOverviewSerializer, EntryDWSerializer
-#from webfront.serializers.pfam import ClanSerializer, PfamaSerializer
 
-#
-# class PfamClanIDHandler(CustomView):
-#     level_description = 'Pfam clan ID level'
-#     serializer_class = ClanSerializer
-#     django_db = "pfam_ro"
-#     many = False
-#
-#     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
-#         self.queryset = Clan.objects.all().filter(clan_acc=endpoint_levels[level-1])
-#
-#         return super(PfamClanIDHandler, self).get(
-#             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
-#         )
-#
-#
-# class ClanHandler(CustomView):
-#     level_description = 'Pfam clan level'
-#     child_handlers = {
-#         r'CL\d{4}': PfamClanIDHandler,
-#     }
-#     serializer_class = ClanSerializer
-#     django_db = "pfam_ro"
-#
-#     def get(self, request, endpoint_levels, *args, **kwargs):
-#
-#         self.queryset = Clan.objects.all()
-#
-#         return super(ClanHandler, self).get(
-#             request, endpoint_levels, *args, **kwargs
-#         )
-#
-#
-# class ActiveSitesHandler(CustomView):
-#     level_description = 'Pfam ID level',
-#     django_db = "pfam_ro"
-#     from_model = False
-#     many = False
-#
-#     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
-#         active_sites = ActiveSites(endpoint_levels[level-2])
-#         active_sites.load_from_db()
-#         active_sites.load_alignment()
-#
-#         self.queryset = active_sites.proteins
-#
-#         return Response(active_sites.proteins)
-#         # return super(ActiveSitesHandler, self).get(
-#         #     request, endpoint_levels, *args, **kwargs
-#         # )
-#
-#
-#     level_description = 'Pfam ID level'
-#     serializer_class = EntrySerializer
-#     many = False
-#     # child_handlers = {
-#     #     'active_sites': ActiveSitesHandler,
-#     # }
-#
-#     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
-#
-#         self.queryset = Pfama.objects.all().filter(pfama_acc=endpoint_levels[level-1])
-#
-#         return super(PfamIDHandler, self).get(
-#             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
-#         )
-#
 class MemberAccesionHandler(CustomView):
     level_description = 'DB member accession level'
     serializer_class = EntrySerializer
     many = False
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0,
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
+        if available_endpoint_handlers is None:
+            available_endpoint_handlers = {}
         if parent_queryset is not None:
             self.queryset = parent_queryset
         self.queryset = self.queryset.filter(accession__iexact=endpoint_levels[level-1])
-        if self.queryset.count()==0:
-            raise Exception("The ID '{}' has not been found in {}".format(endpoint_levels[level-1], "/".join(endpoint_levels[:level-1])))
+        if self.queryset.count() == 0:
+            raise Exception("The ID '{}' has not been found in {}"
+                            .format(endpoint_levels[level-1], "/".join(endpoint_levels[:level-1])))
         return super(MemberAccesionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, *args, **kwargs
         )
+    # TODO: Check the filter option for endpoints combinations
 
-
-db_members = r'(pfam)|(smart)|(prosite_profiles)'
 
 class MemberHandler(CustomView):
     level_description = 'DB member level'
@@ -101,24 +34,20 @@ class MemberHandler(CustomView):
         # 'clan':     ClanHandler,
     ]
     serializer_class = EntrySerializer
+    serializer_detail = SerializerDetail.ENTRY_HEADERS
 
-    def get_queryset(self, endpoint_levels=None, level=None):
-        if level is None or endpoint_levels is None:
-            return super(MemberHandler, self).get_queryset()
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, *args, **kwargs):
+        if available_endpoint_handlers is None:
+            available_endpoint_handlers = {}
+
+        if parent_queryset is not None and isinstance(parent_queryset, QuerySet):
+            if endpoint_levels[level-2] == "unintegrated":
+                self.queryset = parent_queryset.filter(integrated__isnull=True)
+            else:
+                self.queryset = Entry.objects.filter(integrated__in=parent_queryset)
 
         self.queryset = self.queryset.filter(source_database__iexact=endpoint_levels[level-1])
-        if level == 3:
-            if endpoint_levels[level-2] == "interpro":
-                self.queryset = self.queryset.filter(integrated__isnull=False)
-            elif endpoint_levels[level-2] == "unintegrated":
-                self.queryset = self.queryset.filter(integrated__isnull=True)
-        elif level == 4:
-            self.queryset = self.queryset.filter(integrated=endpoint_levels[level-2])
-        return self.queryset
-
-    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
-        parent_queryset = self.get_queryset(endpoint_levels,level)
 
         return super(MemberHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler, *args, **kwargs
@@ -131,20 +60,29 @@ class AccesionHandler(CustomView):
         (db_members, MemberHandler)
     ]
     serializer_class = EntrySerializer
+    serializer_detail = SerializerDetail.ENTRY_DETAIL
     serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_DETAIL
     queryset = Entry.objects
     many = False
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0,
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
+        if available_endpoint_handlers is None:
+            available_endpoint_handlers = {}
+        if parent_queryset is not None:
+            self.queryset = parent_queryset
         self.queryset = self.queryset.filter(accession__iexact=endpoint_levels[level-1])
-        if self.queryset.count()==0:
-            raise Exception("The ID '{}' has not been found in {}".format(endpoint_levels[level-1], endpoint_levels[level-2]))
+        if self.queryset.count() == 0:
+            raise Exception("The ID '{}' has not been found in {}"
+                            .format(endpoint_levels[level-1], endpoint_levels[level-2]))
         return super(AccesionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler, *args, **kwargs
         )
-    def filter(queryset, level_name=""):
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
         return queryset.filter(entry=level_name)
+        # TODO: Check this filter
 
 
 class UnintegratedHandler(CustomView):
@@ -153,9 +91,11 @@ class UnintegratedHandler(CustomView):
         .exclude(source_database__iexact="interpro")\
         .filter(integrated__isnull=True)
     serializer_class = EntrySerializer
+    serializer_detail = SerializerDetail.ENTRY_HEADERS
     child_handlers = [
         (db_members, MemberHandler)
     ]
+    # TODO: Check the filter option for endpoints combinations
 
 
 class InterproHandler(CustomView):
@@ -166,18 +106,19 @@ class InterproHandler(CustomView):
         (db_members, MemberHandler),
     ]
     serializer_class = EntrySerializer
+    serializer_detail = SerializerDetail.ENTRY_HEADERS
     serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN
 
     @staticmethod
-    def filter(queryset, level_name=""):
-#        return queryset.filter(entry__source_database__iexact="interpro")
+    def filter(queryset, level_name="", general_handler=None):
         return ProteinEntryFeature.objects.filter(protein__in=queryset, entry__source_database__iexact="interpro")
-        # TOOO: what if the model has a
+#        return queryset.filter(entry__source_database__iexact="interpro")
+    # TODO: Check this filter
 
 
 class EntryHandler(CustomView):
     level_description = 'section level'
-    from_model = False
+    from_model = False  # The object generated will be serialized as JSON, without checking the model
     child_handlers = [
         ('interpro', InterproHandler),
         ('unintegrated', UnintegratedHandler),
@@ -186,10 +127,9 @@ class EntryHandler(CustomView):
     serializer_detail_filter = SerializerDetail.ENTRY_OVERVIEW
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
-
         entry_counter = Entry.objects.all()\
             .values('source_database')\
             .annotate(total=Count('source_database'))
@@ -209,5 +149,6 @@ class EntryHandler(CustomView):
             .filter(integrated__isnull=True).count()
         self.queryset = output
         return super(EntryHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, general_handler, *args, **kwargs
         )
+    # TODO: Check the filter option for endpoints combinations

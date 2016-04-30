@@ -32,6 +32,7 @@ class GeneralHandler(CustomView):
     ]
     child_handlers = []
     queryset = Entry.objects
+    store = {}
 
     def get(self, request, url='', *args, **kwargs):
 
@@ -44,7 +45,8 @@ class GeneralHandler(CustomView):
                 pagination=pagination,
                 available_endpoint_handlers=self.available_endpoint_handlers,
                 level=0,
-                parent_queryset = self.queryset,
+                parent_queryset=self.queryset,
+                general_handler=self,
                 *args, **kwargs
             )
         except Exception as e:
@@ -52,3 +54,17 @@ class GeneralHandler(CustomView):
                 raise
             content = {'Error': e.args[0]}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+    def set_in_store(self, handler_class, key, value):
+        if handler_class not in self.store:
+            self.store[handler_class] = {}
+        self.store[handler_class][key] = value
+
+    def get_from_store(self, handler_class, key):
+        if handler_class not in self.store:
+            raise IndexError("The general handler store doesn't have {} registered"
+                             .format(handler_class))
+        if key not in self.store[handler_class]:
+            raise KeyError("The general handler store doesn't have the key {} registered under {}"
+                             .format(key, handler_class))
+        return self.store[handler_class][key]

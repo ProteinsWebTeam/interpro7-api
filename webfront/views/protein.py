@@ -1,26 +1,9 @@
 
-# class UniprotAccessionHandler(CustomView):
-#     level_description = 'uniprot accession level'
-#     queryset = DwEntryProteinsMatched.objects
-#     django_db = 'interpro_dw'
-#
-#     def get(self, request, endpoint_levels, available_endpoint_handlers={}, level=0, *args, **kwargs):
-#
-#         self.queryset = self.queryset.filter(protein_ac=endpoint_levels[level-1])
-#
-#         return super(UniprotAccessionHandler, self).get(
-#             request, endpoint_levels, available_endpoint_handlers, level, *args, **kwargs
-#         )
-#
-#     serializer_class = ProteinSerializer
-#
-#
-
 from django.db.models import Count
 
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.models import Protein, ProteinEntryFeature
+from webfront.models import Protein  # , ProteinEntryFeature
 
 db_members = r'(uniprot)|(trembl)|(swissprot)'
 
@@ -48,26 +31,22 @@ class UniprotAccessionHandler(CustomView):
         )
 
     @staticmethod
-    def filter(queryset, level_name=""):
+    def filter(queryset, level_name="", general_handler=None):
         return queryset.filter(proteinentryfeature__protein=level_name)
         # return ProteinEntryFeature.objects.filter(entry__in=queryset, protein_id=level_name)
         # return queryset.filter(proteinentryfeature__protein=level_name)
 
     @staticmethod
-    def post_serializer(obj, level_name=""):
-        if not isinstance(obj.serializer,ProteinSerializer):
+    def post_serializer(obj, level_name="", general_handler=None):
+        if not isinstance(obj.serializer, ProteinSerializer):
             for p in obj["proteins"]:
                 if p["accession"] != level_name:
                     obj["proteins"].remove(p)
         return obj
 
 
-class IDAccessionHandler(CustomView):
-    level_description = 'uniprot accession level'
-    serializer_class = ProteinSerializer
-    queryset = Protein.objects
-    many = False
-    serializer_detail_filter = SerializerDetail.PROTEIN_DETAIL
+class IDAccessionHandler(UniprotAccessionHandler):
+    level_description = 'uniprot id level'
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
@@ -79,14 +58,16 @@ class IDAccessionHandler(CustomView):
         if self.queryset.count() == 0:
             raise Exception("The ID '{}' has not been found in {}".format(
                 endpoint_levels[level-1], endpoint_levels[level-2]))
+        endpoint_levels[level-1] = self.queryset.first().accession
         return super(IDAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, *args, **kwargs
         )
 
-    @staticmethod
-    def filter(queryset, level_name=""):
-        return queryset.filter(proteinentryfeature__protein=level_name)
+    # @staticmethod
+    # def filter(queryset, level_name=""):
+    #     return queryset.filter(proteinentryfeature__protein=level_name)
+        # TODO: Check this filter
 
 
 class UniprotHandler(CustomView):
@@ -97,7 +78,7 @@ class UniprotHandler(CustomView):
     ]
     queryset = Protein.objects.all()
     serializer_class = ProteinSerializer
-    serializer_detail = SerializerDetail.HEADERS
+    serializer_detail = SerializerDetail.PROTEIN_HEADERS
     serializer_detail_filter = SerializerDetail.PROTEIN_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
@@ -116,19 +97,21 @@ class UniprotHandler(CustomView):
         )
 
     @staticmethod
-    def filter(queryset, level_name=""):
+    def filter(queryset, level_name="", general_handler=None):
         if level_name != "uniprot":
             queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
         return queryset
+        # TODO: Check this filter
 
     @staticmethod
-    def post_serializer(obj, level_name=""):
-        if not isinstance(obj.serializer,ProteinSerializer):
+    def post_serializer(obj, level_name="", general_handler=None):
+        if not isinstance(obj.serializer, ProteinSerializer):
             if level_name != "uniprot":
                 for p in obj["proteins"]:
-                    if p["source_database"]!=level_name:
+                    if p["source_database"] != level_name:
                         obj["proteins"].remove(p)
         return obj
+
 
 class ProteinHandler(CustomView):
     level_description = 'section level'
@@ -136,25 +119,42 @@ class ProteinHandler(CustomView):
     child_handlers = [
         (db_members, UniprotHandler),
     ]
-    serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW
+    to_add = None
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
-        protein_counter = Protein.objects.all().values('source_database').annotate(total=Count('source_database'))
+    @staticmethod
+    def getDatabaseContributions(queryset):
+        protein_counter = queryset.values('source_database').annotate(total=Count('source_database'))
         output = {}
         for row in protein_counter:
             output[row["source_database"]] = row["total"]
 
         output["uniprot"] = sum(output.values())
+        print(output)
+        return output
 
-        self.queryset = output
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, *args, **kwargs):
+        if available_endpoint_handlers is None:
+            available_endpoint_handlers = {}
+
+        self.queryset = ProteinHandler.getDatabaseContributions(Protein.objects.all())
+
         return super(ProteinHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset):
-    #     queryset.other = "AHA"
+    # TODO: Check the filter option for endpoints combinations
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.set_in_store(ProteinHandler,
+                                    "protein_overview",
+                                    ProteinHandler.getDatabaseContributions(
+                                        Protein.objects.filter(accession__in=queryset.values('proteins'))))
+        return queryset
+
+    @staticmethod
+    def post_serializer(obj, level_name="", general_handler=None):
+        obj["proteins"] = general_handler.get_from_store(ProteinHandler,
+                                                      "protein_overview")
+        return obj

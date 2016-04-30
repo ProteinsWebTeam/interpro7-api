@@ -303,10 +303,10 @@ class Iprscan2Dbcode(models.Model):
 
 
 class Match(models.Model):
-    protein_ac = models.ForeignKey('Protein', db_column='protein_ac')
-    method_ac = models.ForeignKey('Method', db_column='method_ac')
-    pos_from = models.IntegerField()
-    pos_to = models.IntegerField()
+    protein_ac = models.ForeignKey('Protein', db_column='protein_ac', primary_key=True)
+    method_ac = models.ForeignKey('Method', db_column='method_ac', primary_key=True)
+    pos_from = models.IntegerField(primary_key=True)
+    pos_to = models.IntegerField(primary_key=True)
     status = models.CharField(max_length=1)
     dbcode = models.ForeignKey(CvDatabase, db_column='dbcode')
     evidence = models.ForeignKey(CvEvidence, db_column='evidence', blank=True, null=True)

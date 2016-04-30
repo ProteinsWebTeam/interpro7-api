@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from release.models import iprel
-from webfront.models import Entry, Protein
+from webfront.models import Entry, Protein, ProteinEntryFeature
 
 def log(kind, source="IPREL"):
     def wrapper1(fn):
@@ -121,9 +121,24 @@ def set_member_db_entry(input, integrated=None):
         literature=extract_pubs(input.method2pub_set.all())
     )
     output.save()
-    for prot in (_.protein_ac for _ in input.mvmethod2protein_set.all()):
-        set_protein(prot)
-        yield "{}, protein".format(prot.protein_ac)
+    already_added_proteins = dict()
+    for match in input.match_set.all():
+        protein_id = match.protein_ac_id
+        protein = already_added_proteins.get(protein_id, None)
+        if not protein:
+            protein = set_protein(match.protein_ac)
+            yield "{}, protein".format(protein_id)
+            already_added_proteins[protein_id] = protein
+        pef = set_protein_entry_feature(protein, output, match)
+        yield "{}<->{}, protein/entry feature".format(
+            pef.protein.identifier, pef.entry.accession
+        )
+    if integrated:
+        for protein in already_added_proteins.values():
+            pef = set_protein_entry_feature(protein, integrated)
+            yield "{}<->{}, protein/entry feature".format(
+                pef.protein.identifier, pef.entry.accession
+            )
     yield acc
 
 def set_protein(input):
@@ -151,7 +166,17 @@ def set_protein(input):
         source_database=input.dbcode.dbshort
     )
     output.save()
-    return input.protein_ac
+    return output
+
+def set_protein_entry_feature(protein, entry, feat = None):
+    pef = ProteinEntryFeature(
+        protein=protein,
+        entry=entry,
+        match_start=feat.pos_from if feat else None,
+        match_end=feat.pos_to if feat else None
+    )
+    pef.save()
+    return pef
 
 class Command(BaseCommand):
     help = "populate db"

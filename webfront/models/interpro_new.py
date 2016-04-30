@@ -42,5 +42,5 @@ class Protein(models.Model):
 class ProteinEntryFeature(models.Model):
     protein = models.ForeignKey("Protein", null=False)
     entry = models.ForeignKey("Entry", null=False)
-    match_start = models.IntegerField()
-    match_end = models.IntegerField()
+    match_start = models.IntegerField(null=True)
+    match_end = models.IntegerField(null=True)

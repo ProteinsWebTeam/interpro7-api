@@ -178,10 +178,64 @@ class EntryProteinRESTTest(APITransactionTestCase):
         self.assertIn("A1CUJ5", ids)
         self.assertIn("P16582", ids)
 
+    def test_can_get_swissprot_proteins_from_interpro_id_protein(self):
+        acc = "IPR003165"
+        response = self.client.get("/api/entry/interpro/"+acc+"/protein/swissprot")
+        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+        self.assertEqual(len(response.data["proteins"]), 1)
+        ids = [x["accession"] for x in response.data["proteins"]]
+        self.assertIn("A1CUJ5", ids)
+        self.assertNotIn("P16582", ids)
+
     def test_can_get_proteins_from_interpro_id_protein_id(self):
         acc = "IPR003165"
+        prot = "A1CUJ5"
+        response = self.client.get("/api/entry/interpro/"+acc+"/protein/uniprot/"+prot)
+        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+        self.assertEqual(len(response.data["proteins"]), 1)
+        ids = [x["accession"] for x in response.data["proteins"]]
+        self.assertIn("A1CUJ5", ids)
+        self.assertNotIn("P16582", ids)
+
+    def test_can_get_proteins_from_interpro_protein(self):
+        response = self.client.get("/api/entry/interpro/protein/uniprot")
+        self.assertEqual(len(response.data["results"]), 2)
+        has_one = False
+        has_two = False
+        for result in response.data["results"]:
+            if len(result["proteins"]) == 1:
+                has_one = True
+            elif len(result["proteins"]) == 2:
+                has_two = True
+        self.assertTrue(has_one and has_two,
+                        "One of the entries should have one protein and the other one should have two")
+
+    def test_fails_when_both_protein_and_entry_are_specified_but_non_existing(self):
+        prev = settings.DEBUG
+        settings.DEBUG = False
+        acc = "IPR003165"
+        tr = "A1CUJ5"
+        response = self.client.get("/api/entry/interpro/"+acc+"/protein/trembl/"+tr)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        settings.DEBUG = prev
+
+    def test_can_get_swissprot_from_interpro_protein(self):
+        response = self.client.get("/api/entry/interpro/protein/swissprot")
+        self.assertEqual(len(response.data["results"]), 2)
+        has_one=False
+        has_two=False
+        for result in response.data["results"]:
+            if len(result["proteins"]) == 1:
+                has_one = True
+            elif len(result["proteins"]) == 2:
+                has_two = True
+        self.assertTrue(has_one and not has_two,
+                        "One of the entries should have one protein and the other one should have two")
+
+    def test_can_get_swissprot_from_interpro_id_protein_id(self):
+        acc = "IPR003165"
         uni = "A1CUJ5"
-        response = self.client.get("/api/entry/interpro/"+acc+"/protein/uniprot/"+uni)
+        response = self.client.get("/api/entry/interpro/"+acc+"/protein/swissprot/"+uni)
         self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
         self.assertEqual(len(response.data["proteins"]), 1)
         ids = [x["accession"] for x in response.data["proteins"]]
@@ -235,7 +289,6 @@ class ProteinEntryRESTTest(APITransactionTestCase):
         ids = [x["accession"] for x in response.data["entries"]]
         self.assertIn("IPR003165", ids)
         self.assertIn("PS50822", ids)
-
 
     def test_can_get_entries_from_protein_id_interpro(self):
         acc = "P16582"

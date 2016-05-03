@@ -61,20 +61,23 @@ class EntrySerializer(ModelContentSerializer):
             ]
 
     @staticmethod
-    def to_match_representation(match):
-        return {
+    def to_match_representation(match, full=False):
+        output = {
             "accession": match.protein_id,
             "match_start": match.match_start,
-            "match_end": match.match_end
+            "match_end": match.match_end,
+            "length": match.protein.length,
+            "source_database": match.protein.source_database
         }
+        if full:
+            output["protein"] = ProteinSerializer.to_metadata_representation(match.protein)
+
+        return output
 
     @staticmethod
     def to_proteins_detail_representation(instance):
         return [
-            {
-                **EntrySerializer.to_match_representation(match),
-                **ProteinSerializer.to_metadata_representation(match.protein)
-            }
+            EntrySerializer.to_match_representation(match, True)
             for match in instance.proteinentryfeature_set.all()
         ]
 

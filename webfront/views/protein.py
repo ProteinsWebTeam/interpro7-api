@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.shortcuts import redirect
 
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
@@ -55,20 +56,14 @@ class IDAccessionHandler(UniprotAccessionHandler):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
         if parent_queryset is not None:
             self.queryset = parent_queryset
         self.queryset = self.queryset.filter(identifier=endpoint_levels[level - 1])
         if self.queryset.count() == 0:
             raise Exception("The ID '{}' has not been found in {}".format(
                 endpoint_levels[level - 1], endpoint_levels[level - 2]))
-        endpoint_levels[level - 1] = self.queryset.first().accession
-        return super(IDAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, *args, **kwargs
-        )
-    # TODO: Check this filter
+        new_url = request.get_full_path().replace(endpoint_levels[level - 1],self.queryset.first().accession)
+        return redirect(new_url)
 
 
 class UniprotHandler(CustomView):
@@ -152,7 +147,6 @@ class ProteinHandler(CustomView):
             self.queryset, handler, *args, **kwargs
         )
 
-    # TODO: Check the filter option for endpoints combinations
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
@@ -165,6 +159,5 @@ class ProteinHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         if not isinstance(obj, list):
-            obj["proteins"] = general_handler.get_from_store(ProteinHandler,
-                                                             "protein_count")
+            obj["proteins"] = general_handler.get_from_store(ProteinHandler, "protein_count")
         return obj

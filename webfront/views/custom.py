@@ -4,8 +4,9 @@ import re
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from webfront.models import Entry
+from webfront.models import Entry, ProteinEntryFeature
 from webfront.pagination import CustomPagination
+from webfront.serializers.ProteinEntryConsolidator import consolidate_protein_entry
 
 
 class SerializerDetail(Enum):
@@ -44,6 +45,7 @@ class CustomView(GenericAPIView):
     serializer_detail = SerializerDetail.ALL
     serializer_detail_filter = SerializerDetail.ALL
 
+
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
@@ -51,7 +53,13 @@ class CustomView(GenericAPIView):
         # if this is the last level
         if len(endpoint_levels) == level:
             if self.from_model:
-                # self.queryset = self.queryset.using(self.django_db)
+                # TODO: Evaluate if the queryset is a ProteinEntryFeature and aggregate results in one object
+                # TODO: check http://localhost:8007/api/protein/uniprot/A1CUJ5/entry/interpro/
+
+                consolidation = consolidate_protein_entry(self)
+                if consolidation is not None:
+                    return Response(consolidation)
+
                 if self.many:
                     self.queryset = self.paginate_queryset(self.get_queryset())
                 else:
@@ -66,7 +74,7 @@ class CustomView(GenericAPIView):
                     context={"request": request},
                     serializer_detail=self.serializer_detail,
                 )
-                data_tmp= self.post_serializer(serialized.data,
+                data_tmp = self.post_serializer(serialized.data,
                                                endpoint_levels[level-1],
                                                general_handler)
 
@@ -96,11 +104,15 @@ class CustomView(GenericAPIView):
                 raise ValueError('the level \'{}\' is not a valid {}'.format(
                     level_name, self.level_description
                 ))
-            handler_view = handler_class.as_view()
 
             # if the handler name is one of the endpoints this one should be removed of the available ones
+            index = -1
             try:
                 index = [e[0] for e in endpoints].index(handler_name)
+            except ValueError:
+                pass
+
+            if index != -1:
                 endpoints.pop(index)
                 # removing the current
                 endpoint_levels = endpoint_levels[level:]
@@ -111,12 +123,10 @@ class CustomView(GenericAPIView):
                         request, endpoint_levels, endpoints, len(endpoint_levels),
                         parent_queryset, handler, general_handler,
                         *args, **kwargs
-            )
-            except ValueError:
-                pass
+                    )
 
             # delegate to the lower level handler
-            return handler_view(
+            return handler_class.as_view()(
                 request, endpoint_levels, endpoints, level+1,
                 self.queryset, handler_class, general_handler,
                 *args, **kwargs

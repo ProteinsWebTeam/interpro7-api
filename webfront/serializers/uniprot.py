@@ -12,9 +12,7 @@ class ProteinSerializer(ModelContentSerializer):
         if self.detail == SerializerDetail.ALL or self.detail == SerializerDetail.ENTRY_OVERVIEW:
             representation = self.to_full_representation(instance)
 
-        if self.detail == SerializerDetail.ENTRY_OVERVIEW:
-            representation["entries"] = self.to_entries_representation(instance)
-        elif self.detail == SerializerDetail.ENTRY_PROTEIN:
+        if self.detail == SerializerDetail.ENTRY_PROTEIN:
             representation = self.to_full_representation(instance.protein)
             representation["entries"] = [self.to_match_representation(instance)]
         elif self.detail == SerializerDetail.ENTRY_PROTEIN_DETAIL:
@@ -24,10 +22,11 @@ class ProteinSerializer(ModelContentSerializer):
             representation = self.to_headers_representation(instance)
         return representation
 
-    def to_full_representation(self, instance):
+    @staticmethod
+    def to_full_representation(instance):
         return {
-            "metadata": self.to_metadata_representation(instance),
-            "entries": self.to_entries_count_representation(instance),
+            "metadata": ProteinSerializer.to_metadata_representation(instance),
+            "entries": ProteinSerializer.to_entries_count_representation(instance),
             "representation": instance.feature,
             "structure": instance.structure,
             "genomicContext": instance.genomic_context,
@@ -64,7 +63,9 @@ class ProteinSerializer(ModelContentSerializer):
         output = {
             "match_start": match.match_start,
             "match_end": match.match_end,
-            "accession": match.entry_id
+            "accession": match.entry_id,
+            # "length": match.protein.length,
+            # "source_database": match.protein.source_database
         }
         if full:
             output["entry"] = webfront.serializers.interpro.EntrySerializer.to_metadata_representation(match.entry)

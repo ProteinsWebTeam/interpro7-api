@@ -35,6 +35,7 @@ class MemberHandler(CustomView):
     ]
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
+    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
@@ -53,6 +54,9 @@ class MemberHandler(CustomView):
             request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler, *args, **kwargs
         )
 
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        return ProteinEntryFeature.objects.filter(protein__in=queryset, entry__source_database__iexact=level_name)
 
 class AccesionHandler(CustomView):
     level_description = 'interpro accession level'
@@ -92,10 +96,19 @@ class UnintegratedHandler(CustomView):
         .filter(integrated__isnull=True)
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
+    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN
     child_handlers = [
         (db_members, MemberHandler)
     ]
-    # TODO: Check the filter option for endpoints combinations
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        qs = ProteinEntryFeature.objects \
+            .filter(protein__in=queryset, entry__integrated__isnull=True) \
+            .exclude(entry__source_database__iexact="interpro")
+        if qs.count() == 0:
+            raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+        return qs
 
 
 class InterproHandler(CustomView):
@@ -126,13 +139,9 @@ class EntryHandler(CustomView):
     ]
     serializer_detail_filter = SerializerDetail.ENTRY_OVERVIEW
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
-        entry_counter = Entry.objects.all()\
-            .values('source_database')\
-            .annotate(total=Count('source_database'))
+    @staticmethod
+    def get_database_contributions(queryset):
+        entry_counter = queryset.values('source_database').annotate(total=Count('source_database'))
         output = {
             "interpro": 0,
             "unintegrated": 0,
@@ -144,11 +153,32 @@ class EntryHandler(CustomView):
             else:
                 output["member_databases"][row["source_database"].lower()] = row["total"]
 
-        output["unintegrated"] = Entry.objects.all()\
+        output["unintegrated"] = queryset\
             .exclude(source_database__iexact="interpro")\
             .filter(integrated__isnull=True).count()
-        self.queryset = output
+        return output
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+        if available_endpoint_handlers is None:
+            available_endpoint_handlers = {}
+        self.queryset = EntryHandler.get_database_contributions(Entry.objects.all())
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, general_handler, *args, **kwargs
         )
     # TODO: Check the filter option for endpoints combinations
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
+        general_handler.set_in_store(EntryHandler,
+                                     "entry_count",
+                                     EntryHandler.get_database_contributions(
+                                         Entry.objects.filter(accession__in=queryset.values('proteinentryfeature__entry'))))
+        return queryset
+
+    @staticmethod
+    def post_serializer(obj, level_name="", general_handler=None):
+        if not isinstance(obj, list):
+            obj["entries"] = general_handler.get_from_store(EntryHandler, "entry_count")
+        return obj

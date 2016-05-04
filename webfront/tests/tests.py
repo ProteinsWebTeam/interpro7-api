@@ -141,9 +141,10 @@ class ProteinRESTTest(APITransactionTestCase):
         self.assertIn("metadata", response.data)
 
     def test_can_read_protein_id(self):
-        response = self.client.get("/api/protein/uniprot/CBPYA_ASPCL")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("metadata", response.data)
+        url_id = "/api/protein/uniprot/CBPYA_ASPCL"
+        response = self.client.get(url_id)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertIn("A1CUJ5", response.url)
 
 
 class EntryProteinRESTTest(APITransactionTestCase):
@@ -282,25 +283,69 @@ class ProteinEntryRESTTest(APITransactionTestCase):
     fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
 
     def test_can_get_entries_from_protein_id(self):
-        acc = "P16582"
+        acc = "A1CUJ5"
         response = self.client.get("/api/protein/uniprot/"+acc+"/entry/")
         self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertEqual(len(response.data["entries"]), 2)
-        ids = [x["accession"] for x in response.data["entries"]]
-        self.assertIn("IPR003165", ids)
-        self.assertIn("PS50822", ids)
-
-    def test_can_get_entries_from_protein_id_interpro(self):
-        acc = "P16582"
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertEqual(len(response.data["entries"]), 1)
-        ids = [x["accession"] for x in response.data["entries"]]
-        self.assertIn("IPR003165", ids)
-        self.assertNotIn("PS50822", ids)
+        self.assertIn("member_databases", response.data["entries"])
+        self.assertIn("interpro", response.data["entries"])
+        self.assertIn("unintegrated", response.data["entries"])
 
     def test_gets_empty_entries_array_for_protein_with_no_matches(self):
         acc = "A0A0A2L2G2"
         response = self.client.get("/api/protein/uniprot/"+acc+"/entry/")
         self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertEqual(len(response.data["entries"]), 0)
+        self.assertIn("member_databases", response.data["entries"])
+        self.assertIn("interpro", response.data["entries"])
+        self.assertIn("unintegrated", response.data["entries"])
+        self.assertDictEqual(response.data["entries"]["member_databases"], {},
+                             "there should not be reports of member db")
+        self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
+        self.assertEqual(response.data["entries"]["unintegrated"], 0, "no unintegrated entries")
+
+    def test_can_get_entries_from_protein_id_unintegrated(self):
+        acc = "M5ADK6"
+        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/unintegrated")
+        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+        self.assertEqual(len(response.data["entries"]), 1)
+        self.assertEqual("PF17180", response.data["entries"][0]["accession"])
+
+    def test_can_get_empty_entries_from_protein_id_unitegrated(self):
+        acc = "P16582"
+        prev = settings.DEBUG
+        settings.DEBUG = False
+        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/unintegrated")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        settings.DEBUG = prev
+
+    def test_can_get_entries_from_protein_id_interpro(self):
+        acc = "A1CUJ5"
+        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro")
+        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+        self.assertEqual(len(response.data["entries"]), 2)
+        ids = [x["accession"] for x in response.data["entries"]]
+        self.assertIn("IPR003165", ids)
+        self.assertIn("IPR001165", ids)
+        self.assertNotIn("PS50822", ids)
+
+    def test_can_get_entries_from_protein_id_interpro_ids(self):
+        acc = "A1CUJ5"
+        ips = ["IPR001165","IPR003165"]
+        for ip in ips:
+            response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro/"+ip)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("entries", response.data)
+            self.assertEqual(len(response.data["entries"]), 1,
+                             "only one entry should be included when the ID is specified")
+            self.assertIn("entry", response.data["entries"][0])
+            self.assertIn("entry_id", response.data["entries"][0]["entry"])
+            # TODO: Check it contain details
+
+    def test_can_get_entries_from_protein_id_pfam(self):
+        acc = "A1CUJ5"
+        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/pfam")
+        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+        self.assertEqual(len(response.data["entries"]), 1)
+        ids = [x["accession"] for x in response.data["entries"]]
+        self.assertIn("PF02171", ids)
+        # self.assertIn("PF17180", ids)
+        # TODO: Add fixture of an unintegrated pfam for this protein

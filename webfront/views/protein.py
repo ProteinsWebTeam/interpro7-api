@@ -101,9 +101,10 @@ class UniprotHandler(CustomView):
 
     @staticmethod
     def remove_proteins(obj, protein_source):
-        for p in obj["proteins"]:
-            if p["source_database"] != protein_source:
-                obj["proteins"].remove(p)
+        if "proteins" in obj:
+            for p in obj["proteins"]:
+                if "source_database"in p and p["source_database"] != protein_source:
+                    obj["proteins"].remove(p)
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):

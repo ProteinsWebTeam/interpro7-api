@@ -10,6 +10,7 @@ class MemberAccesionHandler(CustomView):
     level_description = 'DB member accession level'
     serializer_class = EntrySerializer
     many = False
+    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
@@ -24,7 +25,10 @@ class MemberAccesionHandler(CustomView):
         return super(MemberAccesionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, *args, **kwargs
         )
-    # TODO: Check the filter option for endpoints combinations
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        return queryset.filter(entry=level_name)
 
 
 class MemberHandler(CustomView):

@@ -1,13 +1,60 @@
-from django.test import TransactionTestCase
-
 from unifam import settings
 from webfront.models import Entry
 from rest_framework import status
 from rest_framework.test import APITransactionTestCase
 
 
-class ModelTest(TransactionTestCase):
+class InterproRESTTestCase(APITransactionTestCase):
     fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
+
+    def _check_single_entry_response(self, response):
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("entries", response.data)
+        self.assertEqual(len(response.data["entries"]), 1,
+                         "only one entry should be included when the ID is specified")
+        self.assertIn("entry", response.data["entries"][0])
+        self._check_entry_details(response.data["entries"][0]["entry"])
+
+    def _check_entry_details(self, obj):
+        self.assertIn("entry_id", obj)
+        self.assertIn("type", obj)
+        self.assertIn("literature", obj)
+        self.assertIn("integrated", obj)
+        self.assertIn("member_databases", obj)
+        self.assertIn("accession", obj)
+
+    def _check_entry_count_overview(self, obj):
+        self.assertIn("member_databases", obj)
+        self.assertIn("interpro", obj)
+        self.assertIn("unintegrated", obj)
+
+    def _check_is_list_of_objects_with_accession(self, _list):
+        for obj in _list:
+            self.assertIn("accession", obj)
+
+    def _check_HTTP_response_code(self, url, code=status.HTTP_404_NOT_FOUND):
+        prev = settings.DEBUG
+        settings.DEBUG = False
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, code)
+        settings.DEBUG = prev
+
+    def _check_protein_count_overview(self, obj):
+        self.assertIn("uniprot", obj)
+        if obj["uniprot"] > 0:
+            self.assertTrue("trembl" in obj or "swissprot" in obj,
+                            "If there is a uniprot protein then it should either be reported in swissprot or trembl")
+
+    def _check_protein_details(self, obj):
+        self.assertIn("description", obj)
+        self.assertIn("name", obj)
+        self.assertIn("proteinEvidence", obj)
+        self.assertIn("sourceOrganism", obj)
+        self.assertIn("length", obj)
+        self.assertIn("accession", obj)
+
+
+class ModelTest(InterproRESTTestCase):
 
     def test_dummy_dataset_is_loaded(self):
         self.assertGreater(Entry.objects.all().count(), 0, "The dataset has to have at least one Entry")
@@ -18,8 +65,7 @@ class ModelTest(TransactionTestCase):
         self.assertEqual(entry.member_databases["pfam"][0], "PF02171")
 
 
-class EntryRESTTest(APITransactionTestCase):
-    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
+class EntryRESTTest(InterproRESTTestCase):
     db_members = {
         "pfam": 3,
         "smart": 2,
@@ -29,45 +75,38 @@ class EntryRESTTest(APITransactionTestCase):
     def test_can_read_entry_overview(self):
         response = self.client.get("/api/entry")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("member_databases", response.data)
-        self.assertIn("interpro", response.data)
-        self.assertIn("unintegrated", response.data)
+        self._check_entry_count_overview(response.data)
 
     def test_can_read_entry_interpro(self):
         response = self.client.get("/api/entry/interpro")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_is_list_of_objects_with_accession(response.data["results"])
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_can_read_entry_unintegrated(self):
         response = self.client.get("/api/entry/unintegrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_is_list_of_objects_with_accession(response.data["results"])
         self.assertEqual(len(response.data["results"]), 4)
 
     def test_can_read_entry_interpro_id(self):
         acc = "IPR003165"
         response = self.client.get("/api/entry/interpro/"+acc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(acc, response.data["metadata"]["accession"])
+        self._check_entry_details(response.data["metadata"])
 
     def test_fail_entry_interpro_unknown_id(self):
-        prev = settings.DEBUG
-        settings.DEBUG = False
-        response = self.client.get("/api/entry/interpro/IPR999999")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        settings.DEBUG = prev
+        self._check_HTTP_response_code("/api/entry/interpro/IPR999999")
 
     def test_bad_entry_point(self):
-        prev = settings.DEBUG
-        settings.DEBUG = False
-        response = self.client.get("/api/bad_entry_point")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        settings.DEBUG = prev
+        self._check_HTTP_response_code("/api/bad_entry_point")
 
     def test_can_read_entry_member(self):
         for member in self.db_members:
             response = self.client.get("/api/entry/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), self.db_members[member])
+            self._check_is_list_of_objects_with_accession(response.data["results"])
 
     def test_can_read_entry_interpro_member(self):
         for member in self.db_members:
@@ -75,12 +114,14 @@ class EntryRESTTest(APITransactionTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), 1,
                              "The testdataset only has one interpro entry with 1 member entry")
+            self._check_is_list_of_objects_with_accession(response.data["results"])
 
     def test_can_read_entry_unintegrated_member(self):
         for member in self.db_members:
             response = self.client.get("/api/entry/unintegrated/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), self.db_members[member]-1)
+            self._check_is_list_of_objects_with_accession(response.data["results"])
 
     def test_can_read_entry_interpro_id_member(self):
         acc = "IPR003165"
@@ -88,7 +129,7 @@ class EntryRESTTest(APITransactionTestCase):
             response = self.client.get("/api/entry/interpro/"+acc+"/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), 1)
-            # self.assertEqual(acc, response.data["results"][0]["metadata"]["integrated"])
+            self._check_is_list_of_objects_with_accession(response.data["results"])
 
     def test_can_read_entry_interpro_id_pfam_id(self):
         acc = "IPR003165"
@@ -96,15 +137,20 @@ class EntryRESTTest(APITransactionTestCase):
         response = self.client.get("/api/entry/interpro/"+acc+"/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(acc, response.data["metadata"]["integrated"])
+        self._check_entry_details(response.data["metadata"])
 
     def test_cant_read_entry_interpro_id_pfam_id_not_in_entry(self):
-        prev = settings.DEBUG
-        settings.DEBUG = False
         acc = "IPR003165"
         pfam = "PF17180"
-        response = self.client.get("/api/entry/interpro/"+acc+"/pfam/"+pfam)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        settings.DEBUG = prev
+        self._check_HTTP_response_code("/api/entry/interpro/"+acc+"/pfam/"+pfam)
+
+    def test_can_read_entry_pfam_id(self):
+        pfam = "PF17180"
+        response = self.client.get("/api/entry/pfam/"+pfam)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("metadata", response.data.keys())
+        self.assertIn("proteins", response.data.keys())
+        self._check_entry_details(response.data["metadata"])
 
     def test_can_read_entry_unintegrated_pfam_id(self):
         pfam = "PF17180"
@@ -112,33 +158,31 @@ class EntryRESTTest(APITransactionTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data.keys())
         self.assertIn("proteins", response.data.keys())
+        self._check_entry_details(response.data["metadata"])
 
     def test_cant_read_entry_unintegrated_pfam_id_integrated(self):
-        prev = settings.DEBUG
-        settings.DEBUG = False
         pfam = "PF02171"
-        response = self.client.get("/api/entry/unintegrated/pfam/"+pfam)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        settings.DEBUG = prev
+        self._check_HTTP_response_code("/api/entry/unintegrated/pfam/"+pfam)
 
 
-class ProteinRESTTest(APITransactionTestCase):
-    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
+class ProteinRESTTest(InterproRESTTestCase):
 
     def test_can_read_protein_overview(self):
         response = self.client.get("/api/protein")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("uniprot", response.data)
+        self._check_protein_count_overview(response.data)
 
     def test_can_read_protein_uniprot(self):
         response = self.client.get("/api/protein/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 4)
+        self._check_is_list_of_objects_with_accession(response.data["results"])
+        self.assertEqual(len(response.data["results"]), 4)
 
     def test_can_read_protein_uniprot_accession(self):
         response = self.client.get("/api/protein/uniprot/P16582")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
+        self._check_protein_details(response.data["metadata"])
 
     def test_can_read_protein_id(self):
         url_id = "/api/protein/uniprot/CBPYA_ASPCL"
@@ -146,9 +190,26 @@ class ProteinRESTTest(APITransactionTestCase):
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("A1CUJ5", response.url)
 
+    def test_can_read_protein_swissprot(self):
+        response = self.client.get("/api/protein/swissprot")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_is_list_of_objects_with_accession(response.data["results"])
+        self.assertEqual(len(response.data["results"]), 2)
 
-class EntryProteinRESTTest(APITransactionTestCase):
-    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
+    def test_can_read_protein_swissprot_accession(self):
+        response = self.client.get("/api/protein/swissprot/A1CUJ5")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("metadata", response.data)
+        self._check_protein_details(response.data["metadata"])
+
+    def test_cant_read_protein_bad_db(self):
+        self._check_HTTP_response_code("/api/protein/bad_db")
+
+    def test_cant_read_protein_uniprot_bad_id(self):
+        self._check_HTTP_response_code("/api/protein/uniprot/bad_id")
+
+
+class EntryProteinRESTTest(InterproRESTTestCase):
 
     def test_can_get_protein_amount_from_interpro_id(self):
         acc = "IPR003165"
@@ -223,8 +284,8 @@ class EntryProteinRESTTest(APITransactionTestCase):
     def test_can_get_swissprot_from_interpro_protein(self):
         response = self.client.get("/api/entry/interpro/protein/swissprot")
         self.assertEqual(len(response.data["results"]), 2)
-        has_one=False
-        has_two=False
+        has_one = False
+        has_two = False
         for result in response.data["results"]:
             if len(result["proteins"]) == 1:
                 has_one = True
@@ -279,24 +340,19 @@ class EntryProteinRESTTest(APITransactionTestCase):
         self.assertEqual(len(response.data["proteins"]), 0)
 
 
-class ProteinEntryRESTTest(APITransactionTestCase):
-    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
+class ProteinEntryRESTTest(InterproRESTTestCase):
 
     def test_can_get_entries_from_protein_id(self):
         acc = "A1CUJ5"
         response = self.client.get("/api/protein/uniprot/"+acc+"/entry/")
         self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertIn("member_databases", response.data["entries"])
-        self.assertIn("interpro", response.data["entries"])
-        self.assertIn("unintegrated", response.data["entries"])
+        self._check_entry_count_overview(response.data["entries"])
 
     def test_gets_empty_entries_array_for_protein_with_no_matches(self):
         acc = "A0A0A2L2G2"
         response = self.client.get("/api/protein/uniprot/"+acc+"/entry/")
         self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertIn("member_databases", response.data["entries"])
-        self.assertIn("interpro", response.data["entries"])
-        self.assertIn("unintegrated", response.data["entries"])
+        self._check_entry_count_overview(response.data["entries"])
         self.assertDictEqual(response.data["entries"]["member_databases"], {},
                              "there should not be reports of member db")
         self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
@@ -329,16 +385,10 @@ class ProteinEntryRESTTest(APITransactionTestCase):
 
     def test_can_get_entries_from_protein_id_interpro_ids(self):
         acc = "A1CUJ5"
-        ips = ["IPR001165","IPR003165"]
+        ips = ["IPR001165", "IPR003165"]
         for ip in ips:
             response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro/"+ip)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIn("entries", response.data)
-            self.assertEqual(len(response.data["entries"]), 1,
-                             "only one entry should be included when the ID is specified")
-            self.assertIn("entry", response.data["entries"][0])
-            self.assertIn("entry_id", response.data["entries"][0]["entry"])
-            # TODO: Check it contain details
+            self._check_single_entry_response(response)
 
     def test_can_get_entries_from_protein_id_pfam(self):
         acc = "A1CUJ5"
@@ -348,4 +398,9 @@ class ProteinEntryRESTTest(APITransactionTestCase):
         ids = [x["accession"] for x in response.data["entries"]]
         self.assertIn("PF02171", ids)
         self.assertIn("PF17176", ids)
-        # TODO: Add fixture of an unintegrated pfam for this protein
+
+    def test_can_get_entries_from_protein_id_pfam_id(self):
+        acc = "A1CUJ5"
+        pfam = "PF02171"
+        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/pfam/"+pfam)
+        self._check_single_entry_response(response)

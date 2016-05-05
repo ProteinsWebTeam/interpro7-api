@@ -12,13 +12,14 @@ class ProteinSerializer(ModelContentSerializer):
         if self.detail == SerializerDetail.ALL or self.detail == SerializerDetail.ENTRY_OVERVIEW:
             representation = self.to_full_representation(instance)
 
-        if self.detail == SerializerDetail.ENTRY_PROTEIN:
-            representation = self.to_full_representation(instance.protein)
-            representation["entries"] = [self.to_match_representation(instance)]
-        elif self.detail == SerializerDetail.ENTRY_PROTEIN_DETAIL:
-            representation = self.to_full_representation(instance.protein)
-            representation["entries"] = [self.to_match_representation(instance, True)]
-        elif self.detail == SerializerDetail.PROTEIN_HEADERS:
+        # if self.detail == SerializerDetail.ENTRY_PROTEIN:
+        #     representation = self.to_full_representation(instance.protein)
+        #     representation["entries"] = [self.to_match_representation(instance)]
+        # elif self.detail == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+        #     representation = self.to_full_representation(instance.protein)
+        #     representation["entries"] = [self.to_match_representation(instance, True)]
+        # el
+        if self.detail == SerializerDetail.PROTEIN_HEADERS:
             representation = self.to_headers_representation(instance)
         return representation
 
@@ -72,12 +73,12 @@ class ProteinSerializer(ModelContentSerializer):
 
         return output
 
-    @staticmethod
-    def to_entries_representation(instance):
-        return [
-            ProteinSerializer.to_match_representation(match)
-            for match in instance.proteinentryfeature_set.all()
-        ]
+    # @staticmethod
+    # def to_entries_representation(instance):
+    #     return [
+    #         ProteinSerializer.to_match_representation(match)
+    #         for match in instance.proteinentryfeature_set.all()
+    #     ]
 
     @staticmethod
     def to_entries_count_representation(instance):

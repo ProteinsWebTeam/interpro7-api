@@ -295,5 +295,14 @@
       "match_start": 148,
       "match_end": 201
     }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "PF17176",
+      "protein": "A1CUJ5",
+      "match_start": 48,
+      "match_end": 101
+    }
   }
 ]

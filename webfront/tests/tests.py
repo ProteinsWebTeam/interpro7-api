@@ -273,8 +273,8 @@ class EntryProteinRESTTest(APITransactionTestCase):
         self.assertNotIn("P16582", ids)
 
     def test_gets_empty_protein_array_for_entry_with_no_matches(self):
-        pfam = "PF17176"
-        response = self.client.get("/api/entry/unintegrated/pfam/"+pfam+"/protein/uniprot")
+        pfam = "SM00002"
+        response = self.client.get("/api/entry/unintegrated/smart/"+pfam+"/protein/uniprot")
         self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
         self.assertEqual(len(response.data["proteins"]), 0)
 
@@ -344,8 +344,8 @@ class ProteinEntryRESTTest(APITransactionTestCase):
         acc = "A1CUJ5"
         response = self.client.get("/api/protein/uniprot/"+acc+"/entry/pfam")
         self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertEqual(len(response.data["entries"]), 1)
+        self.assertEqual(len(response.data["entries"]), 2)
         ids = [x["accession"] for x in response.data["entries"]]
         self.assertIn("PF02171", ids)
-        # self.assertIn("PF17180", ids)
+        self.assertIn("PF17176", ids)
         # TODO: Add fixture of an unintegrated pfam for this protein

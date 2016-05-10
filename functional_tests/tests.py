@@ -1,6 +1,6 @@
 from functional_tests.base import FunctionalTest
 import json
-
+import re
 
 class RESTRequestsTest(FunctionalTest):
     fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
@@ -77,3 +77,25 @@ class RESTRequestsTest(FunctionalTest):
         self.assertEqual(jsonp, jsonp2,
                          "The recovered JSON object when quierying by accession should be the same than the "
                          "correspondent search by ID")
+
+    def test_request_to_api_frontend(self):
+        url = "/api/entry/"
+        self.browser.get(self.server_url + url)
+
+        req_info = self.browser.find_element_by_css_selector(".request-info").text
+
+        self.assertIn("GET", req_info)
+        self.assertIn(url, req_info)
+
+        response = self.browser.find_element_by_css_selector(".response-info").text
+        match = re.search("[\{\[]", response)
+        json_frontend = json.loads(response[match.start():])
+
+        self.browser.find_element_by_css_selector(".format-selection button").click()
+        self.click_link_and_wait(self.browser.find_element_by_css_selector(".js-tooltip.format-option"))
+
+        content = self.browser.find_element_by_tag_name('body').text
+
+        jsonp = json.loads(content)
+
+        self.assertEqual(json_frontend, jsonp)

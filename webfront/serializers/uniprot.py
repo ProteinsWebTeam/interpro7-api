@@ -9,18 +9,32 @@ class ProteinSerializer(ModelContentSerializer):
 
     def to_representation(self, instance):
         representation = {}
-        if self.detail == SerializerDetail.ALL or self.detail == SerializerDetail.ENTRY_OVERVIEW:
-            representation = self.to_full_representation(instance)
 
+        representation = self.endpoint_representation(representation, instance, self.detail)
+        representation = self.filter_representation(representation, instance, self.detail_filter)
+
+        return representation
+
+    @staticmethod
+    def endpoint_representation(representation, instance, detail):
+        if detail == SerializerDetail.ALL:
+            representation = ProteinSerializer.to_full_representation(instance)
         # if self.detail == SerializerDetail.ENTRY_PROTEIN:
         #     representation = self.to_full_representation(instance.protein)
         #     representation["entries"] = [self.to_match_representation(instance)]
-        # elif self.detail == SerializerDetail.ENTRY_PROTEIN_DETAIL:
-        #     representation = self.to_full_representation(instance.protein)
-        #     representation["entries"] = [self.to_match_representation(instance, True)]
         # el
-        if self.detail == SerializerDetail.PROTEIN_HEADERS:
-            representation = self.to_headers_representation(instance)
+        elif detail == SerializerDetail.PROTEIN_HEADERS:
+            representation = ProteinSerializer.to_headers_representation(instance)
+        return representation
+
+    @staticmethod
+    def filter_representation(representation, instance, detail_filter):
+        if detail_filter == SerializerDetail.ENTRY_OVERVIEW:
+            representation = ProteinSerializer.to_full_representation(instance)
+        elif detail_filter == SerializerDetail.ENTRY_PROTEIN:
+            representation = ProteinSerializer.to_match_representation(instance, False)
+        elif detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+            representation = ProteinSerializer.to_match_representation(instance, True)
         return representation
 
     @staticmethod

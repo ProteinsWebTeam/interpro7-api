@@ -175,14 +175,19 @@ class EntryHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
+        qs = Entry.objects.all()
+        if not isinstance(queryset, dict):
+            qs = Entry.objects.filter(accession__in=queryset.values('proteinentryfeature__entry'))
         general_handler.set_in_store(EntryHandler,
                                      "entry_count",
-                                     EntryHandler.get_database_contributions(
-                                         Entry.objects.filter(accession__in=queryset.values('proteinentryfeature__entry'))))
+                                     EntryHandler.get_database_contributions(qs))
         return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         if not isinstance(obj, list):
-            obj["entries"] = general_handler.get_from_store(EntryHandler, "entry_count")
+            try:
+                obj["entries"] = general_handler.get_from_store(EntryHandler, "entry_count")
+            finally:
+                return obj
         return obj

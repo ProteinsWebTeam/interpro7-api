@@ -35,7 +35,7 @@ class GeneralHandler(CustomView):
     store = {}
 
     def get(self, request, url='', *args, **kwargs):
-
+        self.store = {}
         endpoint_levels = map_url_to_levels(url)
         pagination = pagination_information(request)
 

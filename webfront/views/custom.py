@@ -17,11 +17,13 @@ class SerializerDetail(Enum):
     ENTRY_DETAIL = 102
     ENTRY_PROTEIN = 103
     ENTRY_PROTEIN_DETAIL = 104
+    ENTRY_PROTEIN_HEADERS = 105
 
     PROTEIN_HEADERS = 200
     PROTEIN_OVERVIEW = 201
     PROTEIN_DETAIL = 202
     PROTEIN_ENTRY_DETAIL = 203
+
 
 class CustomView(GenericAPIView):
     # description of the level of the endpoint, for debug purposes
@@ -44,7 +46,6 @@ class CustomView(GenericAPIView):
     # and protein details showing only the accession in the first case
     serializer_detail = SerializerDetail.ALL
     serializer_detail_filter = SerializerDetail.ALL
-
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -73,17 +74,21 @@ class CustomView(GenericAPIView):
                     content=request.GET.getlist('content'),
                     context={"request": request},
                     serializer_detail=self.serializer_detail,
+                    serializer_detail_filter=self.serializer_detail_filter,
                 )
                 data_tmp = self.post_serializer(serialized.data,
-                                               endpoint_levels[level-1],
-                                               general_handler)
+                                                endpoint_levels[level - 1],
+                                                general_handler)
 
                 if self.many:
                     return self.get_paginated_response(data_tmp)
                 else:
                     return Response(data_tmp)
 
-            return Response(self.queryset)
+            data_tmp = self.post_serializer(self.queryset,
+                                            endpoint_levels[level - 1],
+                                            general_handler)
+            return Response(data_tmp)
 
         else:
             # combine the children handlers with the available endpoints
@@ -127,14 +132,14 @@ class CustomView(GenericAPIView):
 
             # delegate to the lower level handler
             return handler_class.as_view()(
-                request, endpoint_levels, endpoints, level+1,
+                request, endpoint_levels, endpoints, level + 1,
                 self.queryset, handler_class, general_handler,
                 *args, **kwargs
             )
 
     def filter_entrypoint(self, handler_name, handler_class, endpoint_levels, endpoints, general_handler):
         for level in range(len(endpoint_levels)):
-            self.serializer_detail = handler_class.serializer_detail_filter
+            self.serializer_detail_filter = handler_class.serializer_detail_filter
             self.queryset = handler_class.filter(self.queryset, endpoint_levels[level], general_handler)
             self.post_serializer = handler_class.post_serializer
 
@@ -142,7 +147,7 @@ class CustomView(GenericAPIView):
             handlers = endpoints + handler_class.child_handlers
 
             try:
-                level_name = endpoint_levels[level+1]
+                level_name = endpoint_levels[level + 1]
             except IndexError:
                 return
 

@@ -20,6 +20,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         content = kwargs.pop('content', [])
         self.detail = kwargs.pop('serializer_detail', SerializerDetail.ALL)
+        self.detail_filter = kwargs.pop('serializer_detail_filter', SerializerDetail.ALL)
 
         super(ModelContentSerializer, self).__init__(*args, **kwargs)
         try:

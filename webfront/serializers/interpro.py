@@ -9,13 +9,7 @@ class EntrySerializer(ModelContentSerializer):
         representation = {}
         if self.detail == SerializerDetail.ALL or self.detail == SerializerDetail.ENTRY_DETAIL:
             representation["metadata"] = self.to_metadata_representation(instance)
-            representation["proteins"] = self.to_proteins_count_representation(instance)
-        elif self.detail == SerializerDetail.PROTEIN_OVERVIEW:
-            representation["metadata"] = self.to_metadata_representation(instance)
-            representation["proteins"] = self.to_proteins_overview_representation(instance)
-        elif self.detail == SerializerDetail.PROTEIN_DETAIL:
-            representation["metadata"] = self.to_metadata_representation(instance)
-            representation["proteins"] = self.to_proteins_detail_representation(instance)
+
         # elif self.detail == SerializerDetail.PROTEIN_ENTRY_DETAIL:
         #     representation["metadata"] = self.to_metadata_representation(instance.entry)
         #     representation["proteins"] = self.to_proteins_detail_representation(instance.protein)
@@ -23,6 +17,15 @@ class EntrySerializer(ModelContentSerializer):
             representation = self.to_headers_representation(instance)
             # representation["metadata"] = self.to_metadata_representation(instance.entry)
             # representation["proteins"] = [ProteinSerializer.to_metadata_representation(instance.protein)]
+
+        if self.detail_filter == SerializerDetail.PROTEIN_OVERVIEW:
+            representation["proteins"] = self.to_proteins_overview_representation(instance)
+        elif self.detail_filter == SerializerDetail.PROTEIN_DETAIL:
+            representation["proteins"] = self.to_proteins_detail_representation(instance)
+        elif self.detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
+                self.detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+            representation["proteins"] = self.to_proteins_count_representation(instance)
+
         return representation
 
     @staticmethod
@@ -79,7 +82,7 @@ class EntrySerializer(ModelContentSerializer):
         return [
             EntrySerializer.to_match_representation(match, True)
             for match in instance.proteinentryfeature_set.all()
-        ]
+            ]
 
     @staticmethod
     def to_headers_representation(instance):
@@ -87,4 +90,3 @@ class EntrySerializer(ModelContentSerializer):
 
     class Meta:
         model = Entry
-

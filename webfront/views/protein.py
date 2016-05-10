@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.models import Protein
+from webfront.models import Protein, Entry
 
 db_members = r'(uniprot)|(trembl)|(swissprot)'
 
@@ -95,8 +95,15 @@ class UniprotHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(UniprotHandler, "protein_db", level_name)
-        if level_name != "uniprot":
-            queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
+        if not isinstance(queryset, dict):
+            if level_name != "uniprot":
+                queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
+            general_handler.set_in_store(UniprotHandler, "protein_queryset", queryset.values("proteins").exclude(proteins=None).distinct())
+        else:
+            qs = Entry.objects.all()
+            if level_name != "uniprot":
+                qs = qs.filter(proteinentryfeature__protein__source_database__iexact=level_name)
+            general_handler.set_in_store(UniprotHandler, "protein_queryset", qs.values("proteins").exclude(proteins=None).distinct())
         return queryset
 
     @staticmethod
@@ -108,14 +115,18 @@ class UniprotHandler(CustomView):
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
-        if not isinstance(obj.serializer, ProteinSerializer):
+        if hasattr(obj, 'serializer') and not isinstance(obj.serializer, ProteinSerializer):
             if level_name != "uniprot":
                 if isinstance(obj, list):
                     for o in obj:
                         UniprotHandler.remove_proteins(o, level_name)
                 else:
                     UniprotHandler.remove_proteins(obj, level_name)
-        return obj
+        try:
+            if "proteins" not in obj:
+                obj["proteins"] = general_handler.get_from_store(UniprotHandler, "protein_queryset").count()
+        finally:
+            return obj
 
 
 class ProteinHandler(CustomView):
@@ -125,6 +136,7 @@ class ProteinHandler(CustomView):
         (db_members, UniprotHandler),
     ]
     to_add = None
+    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_HEADERS
 
     @staticmethod
     def get_database_contributions(queryset):
@@ -151,14 +163,19 @@ class ProteinHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
+        qs = Protein.objects.all()
+        if not isinstance(queryset, dict):
+            qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
         general_handler.set_in_store(ProteinHandler,
                                      "protein_count",
-                                     ProteinHandler.get_database_contributions(
-                                         Protein.objects.filter(accession__in=queryset.values('proteins'))))
+                                     ProteinHandler.get_database_contributions(qs))
         return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         if not isinstance(obj, list):
-            obj["proteins"] = general_handler.get_from_store(ProteinHandler, "protein_count")
+            try:
+                obj["proteins"] = general_handler.get_from_store(ProteinHandler, "protein_count")
+            finally:
+                return obj
         return obj

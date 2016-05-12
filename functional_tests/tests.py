@@ -58,7 +58,7 @@ class RESTRequestsTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp), num_uniprot, "The response should have as many entries as reported in /entry ")
+        self.assertEqual(len(jsonp["results"]), num_uniprot, "The response should have as many entries as reported in /entry ")
         acc = jsonp["results"][0]["accession"]
 
         self.browser.get(self.server_url + "/api/protein/uniprot/"+acc+"?format=json")

@@ -54,12 +54,10 @@ class CustomView(GenericAPIView):
         # if this is the last level
         if len(endpoint_levels) == level:
             if self.from_model:
-                # TODO: Evaluate if the queryset is a ProteinEntryFeature and aggregate results in one object
-                # TODO: check http://localhost:8007/api/protein/uniprot/A1CUJ5/entry/interpro/
 
                 consolidation = consolidate_protein_entry(self)
                 if consolidation is not None:
-                    return Response(consolidation)
+                    return consolidation
 
                 if self.many:
                     self.queryset = self.paginate_queryset(self.get_queryset())

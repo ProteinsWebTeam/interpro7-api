@@ -7,24 +7,35 @@ from webfront.views.custom import SerializerDetail
 class EntrySerializer(ModelContentSerializer):
     def to_representation(self, instance):
         representation = {}
-        if self.detail == SerializerDetail.ALL or self.detail == SerializerDetail.ENTRY_DETAIL:
-            representation["metadata"] = self.to_metadata_representation(instance)
+
+        representation = self.endpoint_representation(representation, instance, self.detail)
+        representation = self.filter_representation(representation, instance, self.detail_filter)
+
+        return representation
+
+    @staticmethod
+    def endpoint_representation(representation, instance, detail):
+        if detail == SerializerDetail.ALL or detail == SerializerDetail.ENTRY_DETAIL:
+            representation["metadata"] = EntrySerializer.to_metadata_representation(instance)
 
         # elif self.detail == SerializerDetail.PROTEIN_ENTRY_DETAIL:
         #     representation["metadata"] = self.to_metadata_representation(instance.entry)
         #     representation["proteins"] = self.to_proteins_detail_representation(instance.protein)
-        elif self.detail == SerializerDetail.ENTRY_HEADERS:
-            representation = self.to_headers_representation(instance)
+        elif detail == SerializerDetail.ENTRY_HEADERS:
+            representation = EntrySerializer.to_headers_representation(instance)
             # representation["metadata"] = self.to_metadata_representation(instance.entry)
             # representation["proteins"] = [ProteinSerializer.to_metadata_representation(instance.protein)]
+        return representation
 
-        if self.detail_filter == SerializerDetail.PROTEIN_OVERVIEW:
-            representation["proteins"] = self.to_proteins_overview_representation(instance)
-        elif self.detail_filter == SerializerDetail.PROTEIN_DETAIL:
-            representation["proteins"] = self.to_proteins_detail_representation(instance)
-        elif self.detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
-                self.detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
-            representation["proteins"] = self.to_proteins_count_representation(instance)
+    @staticmethod
+    def filter_representation(representation, instance, detail_filter):
+        if detail_filter == SerializerDetail.PROTEIN_OVERVIEW:
+            representation["proteins"] = EntrySerializer.to_proteins_overview_representation(instance)
+        elif detail_filter == SerializerDetail.PROTEIN_DETAIL:
+            representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance)
+        elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
+                detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+            representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
 
         return representation
 

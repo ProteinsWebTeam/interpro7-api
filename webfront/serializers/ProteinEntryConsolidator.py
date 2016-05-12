@@ -7,21 +7,32 @@
 def consolidate_protein_entry(view):
     from webfront.models import ProteinEntryFeature
     from webfront.serializers.uniprot import ProteinSerializer
-    from webfront.views.custom import SerializerDetail
+    from rest_framework.response import Response
+
     queryset = view.queryset
     serializer_class = view.serializer_class
     serializer_detail = view.serializer_detail
     serializer_detail_filter = view.serializer_detail_filter
-    if queryset.model is ProteinEntryFeature:
+
+    if hasattr(queryset, "model") and queryset.model is ProteinEntryFeature:
         if serializer_class == ProteinSerializer:
-            obj = None
+            ordering = view.pagination_class.ordering
+            view.pagination_class.ordering = "-protein_id"
+            queryset = view.paginate_queryset(queryset)
+            view.pagination_class.ordering = ordering
+            proteins = {}
             for row in queryset:
-                if obj is None:
-                    obj = ProteinSerializer.endpoint_representation({}, row.protein, serializer_detail)
-                    obj["entries"] = []
+                if row.protein not in proteins:
+                    proteins[row.protein] = ProteinSerializer.endpoint_representation(
+                        {}, row.protein, serializer_detail)
+                    proteins[row.protein]["entries"] = []
                 # obj["entries"].append(ProteinSerializer.to_match_representation(
                 #     row,
                 #     serializer_detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL))
-                obj["entries"].append(ProteinSerializer.filter_representation({}, row, serializer_detail_filter))
-            return obj
+                proteins[row.protein]["entries"].append(
+                    ProteinSerializer.filter_representation({}, row, serializer_detail_filter))
+            if view.many:
+                return view.get_paginated_response(list(proteins.values()))
+            else:
+                return Response(list(proteins.values())[0])
     return None

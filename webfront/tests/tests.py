@@ -409,7 +409,36 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_accession(response.data["results"])
             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
 
-    def test_urls_that_return_list_of_matches(self):
+    def test_can_get_entries_from_protein_id(self):
+        swissprot = "A1CUJ5"
+        trembl = "P16582"
+        urls = [
+            "/api/protein/uniprot/"+swissprot+"/entry/",
+            "/api/protein/uniprot/"+trembl+"/entry/",
+            "/api/protein/swissprot/"+swissprot+"/entry/",
+            "/api/protein/trembl/"+trembl+"/entry/",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self._check_protein_details(response.data["metadata"])
+            self._check_entry_count_overview(response.data["entries"])
+
+    def test_gets_empty_entries_array_for_protein_with_no_matches(self):
+        acc = "A0A0A2L2G2"
+        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/")
+        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+        self._check_protein_details(response.data["metadata"])
+        self._check_entry_count_overview(response.data["entries"])
+        self.assertDictEqual(response.data["entries"]["member_databases"], {},
+                             "there should not be reports of member db")
+        self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
+        self.assertEqual(response.data["entries"]["unintegrated"], 0, "no unintegrated entries")
+
+
+class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
+
+    def test_urls_that_return_list_of_protein_accessions_with_matches(self):
         urls = [
             "/api/protein/uniprot/entry/interpro",
             "/api/protein/swissprot/entry/interpro",
@@ -425,51 +454,42 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
                 for match in protein["entries"]:
                     self._check_match(match)
 
+    def test_urls_that_return_a_protein_details_with_matches(self):
+        sp_1 = "M5ADK6"
+        sp_2 = "A1CUJ5"
+        acc = "IPR003165"
+        urls = {
+            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated": ["PF17180"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro": ["IPR003165", "IPR001165"],
+            "/api/protein/uniprot/"+sp_2+"/entry/pfam": ["PF17176", "PF02171"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro/pfam": ["PF02171"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro/smart": ["SM00950"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/smart": ["SM00950"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/pfam": ["PF02171"],
+            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated/pfam": ["PF17180"],
+        }
+        for url in urls:
+            response = self.client.get(url)
+            self._check_protein_details(response.data["metadata"])
+            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self.assertEqual(len(response.data["entries"]), len(urls[url]),
+                             "The nember of entries dhould be the sem URL: [{}]".format(url))
+            self.assertIn(response.data["entries"][0]["accession"], urls[url])
+
+    def test_urls_that_should_fails(self):
+        tr_1 = "P16582"
+        sp_1 = "M5ADK6"
+        tests = [
+            "/api/protein/uniprot/"+tr_1+"/entry/unintegrated",
+            "/api/protein/swissprot/"+tr_1+"/entry/unintegrated",
+            "/api/protein/trembl/"+sp_1+"/entry/unintegrated",
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
 
-class ProteinEntryRESTTest(InterproRESTTestCase):
+class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
     # TODO: Organise as in the ENtry Filter Protein testcase
-
-    def test_can_get_entries_from_protein_id(self):
-        acc = "A1CUJ5"
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self._check_entry_count_overview(response.data["entries"])
-
-    def test_gets_empty_entries_array_for_protein_with_no_matches(self):
-        acc = "A0A0A2L2G2"
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self._check_entry_count_overview(response.data["entries"])
-        self.assertDictEqual(response.data["entries"]["member_databases"], {},
-                             "there should not be reports of member db")
-        self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
-        self.assertEqual(response.data["entries"]["unintegrated"], 0, "no unintegrated entries")
-
-    def test_can_get_entries_from_protein_id_unintegrated(self):
-        acc = "M5ADK6"
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/unintegrated")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertEqual(len(response.data["entries"]), 1)
-        self.assertEqual("PF17180", response.data["entries"][0]["accession"])
-
-    def test_can_get_empty_entries_from_protein_id_unitegrated(self):
-        acc = "P16582"
-        prev = settings.DEBUG
-        settings.DEBUG = False
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/unintegrated")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        settings.DEBUG = prev
-
-    def test_can_get_entries_from_protein_id_interpro(self):
-        acc = "A1CUJ5"
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertEqual(len(response.data["entries"]), 2)
-        ids = [x["accession"] for x in response.data["entries"]]
-        self.assertIn("IPR003165", ids)
-        self.assertIn("IPR001165", ids)
-        self.assertNotIn("PS50822", ids)
 
     def test_can_get_entries_from_protein_id_interpro_ids(self):
         acc = "A1CUJ5"
@@ -478,14 +498,6 @@ class ProteinEntryRESTTest(InterproRESTTestCase):
             response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro/"+ip)
             self._check_single_entry_response(response)
 
-    def test_can_get_entries_from_protein_id_pfam(self):
-        acc = "A1CUJ5"
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/pfam")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self.assertEqual(len(response.data["entries"]), 2)
-        ids = [x["accession"] for x in response.data["entries"]]
-        self.assertIn("PF02171", ids)
-        self.assertIn("PF17176", ids)
 
     def test_can_get_entries_from_protein_id_pfam_id(self):
         acc = "A1CUJ5"

@@ -60,7 +60,18 @@ class MemberHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        if hasattr(queryset, "model") and queryset.model is ProteinEntryFeature:
+            try:
+                is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
+            except:
+                is_unintegrated = False
+            if is_unintegrated:
+                return queryset.filter(entry__source_database__iexact=level_name)
+            return ProteinEntryFeature.objects.filter(
+                entry__integrated__in=queryset.values("entry").distinct(),
+                entry__source_database__iexact=level_name)
         return ProteinEntryFeature.objects.filter(protein__in=queryset, entry__source_database__iexact=level_name)
+
 
 class AccesionHandler(CustomView):
     level_description = 'interpro accession level'
@@ -112,6 +123,9 @@ class UnintegratedHandler(CustomView):
             .exclude(entry__source_database__iexact="interpro")
         if qs.count() == 0:
             raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+
+        general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
+
         return qs
 
 

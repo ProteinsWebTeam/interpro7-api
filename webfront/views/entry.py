@@ -1,3 +1,5 @@
+from numbers import Number
+
 from django.db.models import Count, QuerySet
 from webfront.models import Entry, ProteinEntryFeature
 from webfront.serializers.interpro import EntrySerializer
@@ -28,6 +30,23 @@ class MemberAccesionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        try:
+            is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
+        except (IndexError, KeyError):
+            is_unintegrated = False
+        if isinstance(queryset, dict) and "uniprot" in queryset:
+            for prot_db in queryset:
+                matches = ProteinEntryFeature.objects.filter(entry=level_name)
+                # Under the assumption that a pfam family cannot be part of more than one Interpro domain.
+                if prot_db != "uniprot":
+                    matches = matches.filter(protein__source_database__iexact=prot_db)
+                if is_unintegrated:
+                    matches = matches.filter(entry__integrated__isnull=True)
+                queryset[prot_db] = {
+                    "proteins": matches.values("protein").distinct().count(),
+                    "entries": matches.values("entry").distinct().count()
+                }
+            return queryset
         return queryset.filter(entry=level_name)
 
 
@@ -60,11 +79,38 @@ class MemberHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        try:
+            is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
+        except (IndexError, KeyError):
+            is_unintegrated = False
+        try:
+            is_interpro = general_handler.get_from_store(InterproHandler, "interpro")
+        except (IndexError, KeyError):
+            is_interpro = False
+        try:
+            interpro_acc = general_handler.get_from_store(AccesionHandler, "accession")
+        except (IndexError, KeyError):
+            interpro_acc = None
+
+        if isinstance(queryset, dict) and "uniprot" in queryset:
+            for prot_db in queryset:
+                matches = ProteinEntryFeature.objects.filter(entry__source_database__iexact=level_name)
+                if prot_db != "uniprot":
+                    matches = matches.filter(protein__source_database__iexact=prot_db)
+
+                if is_unintegrated:
+                    matches = matches.filter(entry__integrated__isnull=True)
+                elif interpro_acc is not None:
+                    matches = matches.filter(entry__integrated=interpro_acc)
+                elif is_interpro:
+                    matches = matches.filter(entry__integrated__isnull=False)
+                queryset[prot_db] = {
+                    "proteins": matches.values("protein").distinct().count(),
+                    "entries": matches.values("entry").distinct().count()
+                }
+            return queryset
+
         if hasattr(queryset, "model") and queryset.model is ProteinEntryFeature:
-            try:
-                is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
-            except:
-                is_unintegrated = False
             if is_unintegrated:
                 return queryset.filter(entry__source_database__iexact=level_name)
             return ProteinEntryFeature.objects.filter(
@@ -100,6 +146,17 @@ class AccesionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        general_handler.set_in_store(AccesionHandler, "accession", level_name)
+        if isinstance(queryset, dict) and "uniprot" in queryset:
+            for prot_db in queryset:
+                matches = ProteinEntryFeature.objects.filter(entry=level_name)
+                if prot_db != "uniprot":
+                    matches = matches.filter(protein__source_database__iexact=prot_db)
+                queryset[prot_db] = {
+                    "proteins": matches.values("protein").distinct().count(),
+                    "entries": matches.values("entry").distinct().count()
+                }
+            return queryset
         return queryset.filter(entry=level_name)
         # TODO: Check this filter
 
@@ -118,14 +175,24 @@ class UnintegratedHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
+        if isinstance(queryset, dict) and "uniprot" in queryset:
+            for prot_db in queryset:
+                matches = ProteinEntryFeature.objects\
+                    .filter(entry__integrated__isnull=True)\
+                    .exclude(entry__source_database__iexact="interpro")
+                if prot_db != "uniprot":
+                    matches = matches.filter(protein__source_database__iexact=prot_db)
+                queryset[prot_db] = {
+                    "proteins": matches.values("protein").distinct().count(),
+                    "entries": matches.values("entry").distinct().count()
+                }
+            return queryset
         qs = ProteinEntryFeature.objects \
             .filter(protein__in=queryset, entry__integrated__isnull=True) \
             .exclude(entry__source_database__iexact="interpro")
         if qs.count() == 0:
             raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
-
-        general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
-
         return qs
 
 
@@ -142,6 +209,17 @@ class InterproHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        general_handler.set_in_store(InterproHandler, "interpro", True)
+        if isinstance(queryset, dict) and "uniprot" in queryset:
+            for prot_db in queryset:
+                matches = ProteinEntryFeature.objects.filter(entry__source_database__iexact="interpro")
+                if prot_db != "uniprot":
+                    matches = matches.filter(protein__source_database__iexact=prot_db)
+                queryset[prot_db] = {
+                    "proteins": matches.values("protein").distinct().count(),
+                    "entries": matches.values("entry").distinct().count()
+                }
+            return queryset
         return ProteinEntryFeature.objects.filter(protein__in=queryset, entry__source_database__iexact="interpro")
 #        return queryset.filter(entry__source_database__iexact="interpro")
     # TODO: Check this filter

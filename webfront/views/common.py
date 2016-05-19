@@ -4,9 +4,8 @@ from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
 from rest_framework import status
 from webfront.views.protein import ProteinHandler
-# from webfront.models import interpro
-# from webfront.views.structure import StructureHandler
 from rest_framework.response import Response
+
 
 def map_url_to_levels(url):
     return list(
@@ -66,5 +65,5 @@ class GeneralHandler(CustomView):
                              .format(handler_class))
         if key not in self.store[handler_class]:
             raise KeyError("The general handler store doesn't have the key {} registered under {}"
-                             .format(key, handler_class))
+                           .format(key, handler_class))
         return self.store[handler_class][key]

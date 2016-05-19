@@ -4,7 +4,7 @@ import re
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from webfront.models import Entry, ProteinEntryFeature
+from webfront.models import Entry
 from webfront.pagination import CustomPagination
 from webfront.serializers.ProteinEntryConsolidator import consolidate_protein_entry
 
@@ -50,7 +50,7 @@ class CustomView(GenericAPIView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
+            available_endpoint_handlers = []
         # if this is the last level
         if len(endpoint_levels) == level:
             if self.from_model:

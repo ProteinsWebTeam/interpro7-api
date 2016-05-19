@@ -1,5 +1,3 @@
-from numbers import Number
-
 from django.db.models import Count, QuerySet
 from webfront.models import Entry, ProteinEntryFeature
 from webfront.serializers.interpro import EntrySerializer
@@ -260,7 +258,8 @@ class EntryHandler(CustomView):
             available_endpoint_handlers = {}
         self.queryset = EntryHandler.get_database_contributions(Entry.objects.all())
         return super(EntryHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, general_handler, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, *args, **kwargs
         )
     # TODO: Check the filter option for endpoints combinations
 

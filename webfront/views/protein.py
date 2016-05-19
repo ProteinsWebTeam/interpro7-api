@@ -62,7 +62,7 @@ class IDAccessionHandler(UniprotAccessionHandler):
         if self.queryset.count() == 0:
             raise Exception("The ID '{}' has not been found in {}".format(
                 endpoint_levels[level - 1], endpoint_levels[level - 2]))
-        new_url = request.get_full_path().replace(endpoint_levels[level - 1],self.queryset.first().accession)
+        new_url = request.get_full_path().replace(endpoint_levels[level - 1], self.queryset.first().accession)
         return redirect(new_url)
 
 
@@ -98,12 +98,16 @@ class UniprotHandler(CustomView):
         if not isinstance(queryset, dict):
             if level_name != "uniprot":
                 queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
-            general_handler.set_in_store(UniprotHandler, "protein_queryset", queryset.values("proteins").exclude(proteins=None).distinct())
+            general_handler.set_in_store(UniprotHandler,
+                                         "protein_queryset",
+                                         queryset.values("proteins").exclude(proteins=None).distinct())
         else:
             qs = Entry.objects.all()
             if level_name != "uniprot":
                 qs = qs.filter(proteinentryfeature__protein__source_database__iexact=level_name)
-            general_handler.set_in_store(UniprotHandler, "protein_queryset", qs.values("proteins").exclude(proteins=None).distinct())
+            general_handler.set_in_store(UniprotHandler,
+                                         "protein_queryset",
+                                         qs.values("proteins").exclude(proteins=None).distinct())
         return queryset
 
     @staticmethod
@@ -124,7 +128,8 @@ class UniprotHandler(CustomView):
                     UniprotHandler.remove_proteins(obj, level_name)
         try:
             if "proteins" not in obj:
-                obj["proteins"] = general_handler.get_from_store(UniprotHandler, "protein_queryset").count()
+                obj["proteins"] = general_handler.get_from_store(UniprotHandler,
+                                                                 "protein_queryset").count()
         finally:
             return obj
 

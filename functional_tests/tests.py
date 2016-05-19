@@ -2,6 +2,7 @@ from functional_tests.base import FunctionalTest
 import json
 import re
 
+
 class RESTRequestsTest(FunctionalTest):
     fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
 
@@ -25,7 +26,8 @@ class RESTRequestsTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp["results"]), num_interpro, "The response should have as many entries as reported in /entry ")
+        self.assertEqual(len(jsonp["results"]), num_interpro,
+                         "The response should have as many entries as reported in /entry ")
 
         acc = jsonp["results"][0]["accession"]
         self.browser.get(self.server_url + "/api/entry/interpro/"+acc+"?format=json")
@@ -58,7 +60,8 @@ class RESTRequestsTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp["results"]), num_uniprot, "The response should have as many entries as reported in /entry ")
+        self.assertEqual(len(jsonp["results"]), num_uniprot,
+                         "The response should have as many entries as reported in /entry ")
         acc = jsonp["results"][0]["accession"]
 
         self.browser.get(self.server_url + "/api/protein/uniprot/"+acc+"?format=json")

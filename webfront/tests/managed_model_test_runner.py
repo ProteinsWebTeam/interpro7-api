@@ -1,4 +1,3 @@
-import ipdb
 from django.test.runner import DiscoverRunner
 import sys
 import re

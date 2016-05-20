@@ -369,6 +369,30 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
             ids = [x["accession"] for x in response.data["proteins"]]
             self.assertEqual(tests[url], ids)
 
+    def test_can_get_proteins_from_entr_db_protein_id(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_u = "PF17180"
+        prot = "A1CUJ5"
+        prot_u = "M5ADK6"
+
+        tests = {
+            "/api/entry/interpro/protein/uniprot/"+prot: ["A1CUJ5"],
+            "/api/entry/interpro/protein/swissprot/"+prot: ["A1CUJ5"],
+            "/api/entry/interpro/"+acc+"/pfam//protein/uniprot/"+prot: ["A1CUJ5"],
+            "/api/entry/pfam/protein/uniprot/"+prot: ["A1CUJ5"],
+            "/api/entry/unintegrated/pfam/protein/uniprot/"+prot_u: ["M5ADK6"],
+        }
+        for url in tests:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_accession(response.data["results"])
+            for entry in response.data["results"]:
+                self.assertIn("proteins", entry, "'proteins' should be one of the keys in the response")
+                for match in entry["proteins"]:
+                    self._check_match(match)
+                    self._check_protein_details(match["protein"])
+
     def test_urls_that_should_fails(self):
         acc = "IPR003165"
         pfam = "PF02171"
@@ -377,7 +401,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_u = "M5ADK6"
         tests = [
             "/api/entry/protein/uniprot/"+prot,
-            "/api/entry/interpro/protein/uniprot/"+prot,
+            "/api/entry/interpro/protein/uniprot/"+prot_u,
             "/api/entry/interpro/"+acc+"/protein/trembl/"+prot,
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/trembl/"+prot,
             "/api/entry/interpro/"+acc+"/smart/"+pfam+"/protein/trembl/"+prot,

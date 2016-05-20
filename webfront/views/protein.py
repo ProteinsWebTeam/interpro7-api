@@ -45,9 +45,14 @@ class UniprotAccessionHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         if not isinstance(obj.serializer, ProteinSerializer):
-            for p in obj["proteins"]:
-                if p["accession"] != level_name:
-                    obj["proteins"].remove(p)
+            arr = obj
+            if isinstance(obj, dict):
+                arr = [obj]
+            for o in arr:
+                if "proteins" in o:
+                    for p in o["proteins"]:
+                        if p["accession"] != level_name:
+                            o["proteins"].remove(p)
         return obj
 
 

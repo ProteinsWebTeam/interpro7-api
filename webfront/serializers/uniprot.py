@@ -59,9 +59,9 @@ class ProteinSerializer(ModelContentSerializer):
             "id": instance.identifier,
             "sourceOrganism": instance.organism,
             "name": {
-                "full": instance.name,
+                "name": instance.name,
                 "short": instance.short_name,
-                "other": instance.other_names
+                "other": instance.other_names,
             },
             "description": instance.description,
             "length": instance.length,
@@ -70,7 +70,7 @@ class ProteinSerializer(ModelContentSerializer):
             "gene": instance.gene,
             "go_terms": instance.go_terms,
             "proteinEvidence": 4,
-            "source_database": instance.source_database
+            "source_database": instance.source_database,
         }
 
     @staticmethod
@@ -79,8 +79,8 @@ class ProteinSerializer(ModelContentSerializer):
             "match_start": match.match_start,
             "match_end": match.match_end,
             "accession": match.entry_id,
-            # "length": match.protein.length,
-            # "source_database": match.protein.source_database
+            "source_database": match.entry.source_database,
+            "name": match.entry.name,
         }
         if full:
             output["entry"] = webfront.serializers.interpro.EntrySerializer.to_metadata_representation(match.entry)

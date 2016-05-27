@@ -190,7 +190,7 @@
         "biological_process": [
           {
             "id": "GO:0007186",
-            "termName": "G-protein coupled receptor signaling pathway"
+            "name": "G-protein coupled receptor signaling pathway"
           }
         ],
         "molecular_function": [

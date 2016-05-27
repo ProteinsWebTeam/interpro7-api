@@ -57,8 +57,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("accession", obj)
 
     def _check_match(self, obj):
-        self.assertIn("match_start", obj)
-        self.assertIn("match_end", obj)
+        self.assertIn("match", obj)
+        self.assertIsInstance(obj["match"], list)
         self.assertIn("accession", obj)
 
 

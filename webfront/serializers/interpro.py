@@ -42,21 +42,21 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_metadata_representation(instance):
         obj = {
-            'accession': instance.accession,
-            'entry_id': instance.entry_id,
-            'type': instance.type,
-            'go_terms': instance.go_terms,
-            'source_dataBase': instance.source_database,
-            'member_databases': instance.member_databases,
-            'integrated': instance.integrated,
-            'name': {
-                'name': instance.name,
-                'short': instance.short_name,
-                'other': instance.other_names
+            "accession": instance.accession,
+            "entry_id": instance.entry_id,
+            "type": instance.type,
+            "go_terms": instance.go_terms,
+            "source_database": instance.source_database,
+            "member_databases": instance.member_databases,
+            "integrated": instance.integrated,
+            "name": {
+                "name": instance.name,
+                "short": instance.short_name,
+                "other": instance.other_names,
             },
             "description": instance.description,
             "wikipedia": instance.wikipedia,
-            "literature": instance.literature
+            "literature": instance.literature,
         }
         # Just showing the accesion number instead of recursively show the entry to which has been integrated
         if instance.integrated:
@@ -81,7 +81,8 @@ class EntrySerializer(ModelContentSerializer):
             "match_start": match.match_start,
             "match_end": match.match_end,
             "length": match.protein.length,
-            "source_database": match.protein.source_database
+            "source_database": match.protein.source_database,
+            "name": match.protein.name,
         }
         if full:
             output["protein"] = ProteinSerializer.to_metadata_representation(match.protein)

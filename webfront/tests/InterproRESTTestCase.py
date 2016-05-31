@@ -4,8 +4,13 @@ from rest_framework import status
 
 
 class InterproRESTTestCase(APITransactionTestCase):
-    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
+    fixtures = [
+        'webfront/tests/fixtures.json',
+        'webfront/tests/protein_fixtures.json',
+        'webfront/tests/structure_fixtures.json'
+    ]
 
+    # methods to check entry related responses
     def _check_single_entry_response(self, response):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("entries", response.data)
@@ -41,6 +46,7 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertEqual(response.status_code, code, msg)
         settings.DEBUG = prev
 
+    # methods to check protein related responses
     def _check_protein_count_overview(self, obj):
         self.assertIn("uniprot", obj)
         if obj["uniprot"] > 0:
@@ -58,4 +64,13 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_match(self, obj):
         self.assertIn("match", obj)
         self.assertIsInstance(obj["match"], list)
+        self.assertIn("accession", obj)
+
+    # methods to check structure related responses
+    # TODO: Extend this tests
+    def _check_structure_count_overview(self, obj):
+        self.assertIn("pdb", obj)
+
+    def _check_structure_details(self, obj):
+        self.assertIn("chains", obj)
         self.assertIn("accession", obj)

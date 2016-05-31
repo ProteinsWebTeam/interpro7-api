@@ -1,0 +1,50 @@
+[
+  {
+    "model": "webfront.Structure",
+    "fields": {
+      "accession": "1JM7",
+      "name": "Solution structure of the BRCA1/BARD1 RING-domain heterodimer",
+      "experiment_type": "Solution NMR",
+      "release_date": "2009-02-24",
+      "authors": ["Brzovic, P.S.", "Rajagopal, P.", "Hoyt, D.W.", "King, M.-C.", "Klevit, R.E."],
+      "chains": ["A","B"],
+      "organism": {
+        "name": "Homo sapiens (Human)",
+        "taxid": 9606
+      },
+      "source_database": "pdb"
+    }
+  },
+  {
+    "model": "webfront.Structure",
+    "fields": {
+      "accession": "1T2V",
+      "name": "Structural basis of phospho-peptide recognition by the brct domain of brca1, structure with phosphopeptide",
+      "experiment_type": "X-ray diffraction, resolution 3.30Å",
+      "release_date": "2011-07-13",
+      "authors": ["Williams, R.S.", "Lee, M.S.", "Hau, D.D.", "Glover, J.N.M."],
+      "chains": ["A","B","C","D","E"],
+      "organism": {
+        "name": "Homo sapiens (Human)",
+        "taxid": 9606
+      },
+      "source_database": "pdb"
+    }
+  },
+  {
+    "model": "webfront.Structure",
+    "fields": {
+      "accession": "2BKM",
+      "name": "Crystal structure of the truncated hemoglobin from geobacillus stearothermophilus",
+      "experiment_type": "X-ray diffraction, resolution 1.50Å",
+      "release_date": "2009-02-24",
+      "authors": ["Ilari, A.", "Kjelgaard, P.", "Von Wachenfeldt, C.", "Boffi, A.", "Chiancone, E."],
+      "chains": ["A","B"],
+      "organism": {
+        "name": "Geobacillus kaustophilus (strain HTA426)",
+        "taxid": 235909
+      },
+      "source_database": "pdb"
+    }
+  }
+]

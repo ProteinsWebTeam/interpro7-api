@@ -44,3 +44,14 @@ class ProteinEntryFeature(models.Model):
     entry = models.ForeignKey("Entry", null=False)
     match_start = models.IntegerField(null=True)
     match_end = models.IntegerField(null=True)
+
+
+class Structure(models.Model):
+    accession = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=200)
+    experiment_type = models.CharField(max_length=30)
+    release_date = models.DateField()
+    authors = JSONField()
+    chains = JSONField()
+    organism = JSONField()
+    source_database = models.CharField(max_length=20, default="pdb")

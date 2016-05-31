@@ -4,6 +4,7 @@ from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
 from rest_framework import status
 from webfront.views.protein import ProteinHandler
+from webfront.views.structure import StructureHandler
 from rest_framework.response import Response
 
 
@@ -27,7 +28,7 @@ class GeneralHandler(CustomView):
     available_endpoint_handlers = [
         ('entry', EntryHandler),
         ('protein', ProteinHandler),
-        # 'structure': StructureHandler,
+        ('structure', StructureHandler),
     ]
     child_handlers = []
     queryset = Entry.objects

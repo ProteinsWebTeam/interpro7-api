@@ -24,6 +24,10 @@ class SerializerDetail(Enum):
     PROTEIN_DETAIL = 202
     PROTEIN_ENTRY_DETAIL = 203
 
+    STRUCTURE_HEADERS = 300
+    STRUCTURE_OVERVIEW = 301
+    STRUCTURE_DETAIL = 302
+    STRUCTURE_ENTRY_DETAIL = 303
 
 class CustomView(GenericAPIView):
     # description of the level of the endpoint, for debug purposes

@@ -68,15 +68,15 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "A0A0A2L2G2",
+      "protein": "M5ADK6",
       "structure": "2BKM",
       "chain": "B",
-      "length": 128,
+      "length": 117,
       "organism": {
-        "name": "Geobacillus kaustophilus (strain HTA426)",
-        "taxid": 235909
+        "name": "Homo sapiens (Human)",
+        "taxid": 9606
       },
-      "start_residue": 3,
+      "start_residue": 56,
       "stop_residue": 130
     }
   },
@@ -98,9 +98,69 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "A1CUJ5",
+      "protein": "P16582",
       "structure": "1T2V",
       "chain": "A",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "start_residue": 646,
+      "stop_residue": 859
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "B",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "start_residue": 646,
+      "stop_residue": 859
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "C",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "start_residue": 646,
+      "stop_residue": 859
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "D",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "start_residue": 646,
+      "stop_residue": 859
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "E",
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",

@@ -89,6 +89,7 @@ class UniprotHandler(CustomView):
             available_endpoint_handlers = {}
         ds = endpoint_levels[level - 1].lower()
         if ds != "uniprot":
+
             self.queryset = self.queryset.filter(source_database__iexact=ds)
         if self.queryset.count() == 0:
             raise Exception("The ID '{}' has not been found in {}".format(
@@ -102,11 +103,20 @@ class UniprotHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(UniprotHandler, "protein_db", level_name)
         if not isinstance(queryset, dict):
+            qs_type = get_queryset_type(queryset)
             if level_name != "uniprot":
-                queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
-            general_handler.set_in_store(UniprotHandler,
-                                         "protein_queryset",
-                                         queryset.values("proteins").exclude(proteins=None).distinct())
+                if qs_type == QuerysetType.PROTEIN:
+                    queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
+                elif qs_type == QuerysetType.STRUCTURE:
+                    queryset = queryset.filter(proteins__source_database__iexact=level_name).distinct()
+            if qs_type == QuerysetType.STRUCTURE_PROTEIN:
+                general_handler.set_in_store(UniprotHandler,
+                                             "protein_queryset",
+                                             queryset.values("protein").all())
+            else:
+                general_handler.set_in_store(UniprotHandler,
+                                             "protein_queryset",
+                                             queryset.values("proteins").exclude(proteins=None).distinct())
         else:
             qs = Entry.objects.all()
             if level_name != "uniprot":

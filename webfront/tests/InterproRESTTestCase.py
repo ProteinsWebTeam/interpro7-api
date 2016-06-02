@@ -74,3 +74,9 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_structure_details(self, obj):
         self.assertIn("chains", obj)
         self.assertIn("accession", obj)
+
+    def _check_structure_chain_details(self, obj):
+        self.assertIn("start_residue", obj)
+        self.assertIn("stop_residue", obj)
+        self.assertIn("length", obj)
+        self.assertIn("organism", obj)

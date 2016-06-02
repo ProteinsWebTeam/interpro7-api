@@ -1,6 +1,7 @@
 from django.db.models import Count
 from django.shortcuts import redirect
 
+from webfront.constants import get_queryset_type, QuerysetType
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from webfront.models import Protein, Entry
@@ -175,7 +176,13 @@ class ProteinHandler(CustomView):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
         qs = Protein.objects.all()
         if not isinstance(queryset, dict):
-            qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
+            qs_type = get_queryset_type(queryset)
+            if qs_type == QuerysetType.ENTRY:
+                qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
+            elif qs_type == QuerysetType.STRUCTURE:
+                qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
+            elif qs_type == QuerysetType.STRUCTURE_PROTEIN:
+                qs = Protein.objects.filter(accession__in=queryset.values('protein'))
         general_handler.set_in_store(ProteinHandler,
                                      "protein_count",
                                      ProteinHandler.get_database_contributions(qs))

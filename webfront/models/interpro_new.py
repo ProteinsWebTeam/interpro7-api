@@ -34,9 +34,10 @@ class Protein(models.Model):
     go_terms = JSONField()
     evidence_code = models.IntegerField()
     feature = JSONField() #signalpeptide, transmembrane, coiledCoil, lowComplexityDisorder, activeSites. PerResidue, diSulphideBridges
-    structure = JSONField()
+    # structure = JSONField()
     genomic_context = JSONField()
     source_database = models.CharField(max_length=20, default="uniprot")
+    structures = models.ManyToManyField('Structure', through='ProteinStructureFeature')
 
 
 class ProteinEntryFeature(models.Model):
@@ -53,5 +54,16 @@ class Structure(models.Model):
     release_date = models.DateField()
     authors = JSONField()
     chains = JSONField()
-    organism = JSONField()
     source_database = models.CharField(max_length=20, default="pdb")
+    proteins = models.ManyToManyField('Protein', through='ProteinStructureFeature')
+
+
+class ProteinStructureFeature(models.Model):
+    protein = models.ForeignKey("Protein", null=False)
+    structure = models.ForeignKey("Structure", null=False)
+    chain = models.CharField(max_length=1)
+    length = models.IntegerField(null=True)
+    organism = JSONField()
+    start_residue = models.IntegerField(null=True)
+    stop_residue = models.IntegerField(null=True)
+

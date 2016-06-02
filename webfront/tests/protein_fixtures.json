@@ -51,9 +51,6 @@
         "perResidueFeatures": [],
         "disulphideBridges": []
       },
-      "structure": {
-        "chains": []
-      },
       "genomic_context": {
         "DNA": ""
       },
@@ -98,9 +95,6 @@
         "activeSites": [],
         "perResidueFeatures": [],
         "disulphideBridges": []
-      },
-      "structure": {
-        "chains": []
       },
       "genomic_context": {
         "DNA": ""
@@ -159,9 +153,6 @@
         ],
         "perResidueFeatures": [],
         "disulphideBridges": []
-      },
-      "structure": {
-        "chains": []
       },
       "genomic_context": {
         "DNA": ""
@@ -223,9 +214,6 @@
         "activeSites": [],
         "perResidueFeatures": [],
         "disulphideBridges": []
-      },
-      "structure": {
-        "chains": []
       },
       "genomic_context": {
         "DNA": ""

@@ -26,6 +26,8 @@ class StructureRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self._check_structure_details(response.data["metadata"])
+        for chain in response.data["metadata"]["chains"].values():
+            self._check_structure_chain_details(chain)
 
 
     # TODO:

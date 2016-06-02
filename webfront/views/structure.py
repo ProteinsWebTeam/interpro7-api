@@ -1,6 +1,6 @@
 from django.db.models import Count
 # from django.shortcuts import redirect
-from webfront.models import Structure
+from webfront.models import Structure, ProteinStructureFeature
 from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 
@@ -10,6 +10,7 @@ class ChainPDBAccessionHandler(CustomView):
     serializer_class = StructureSerializer
     queryset = Structure.objects
     many = False
+    serializer_detail = SerializerDetail.STRUCTURE_CHAIN
     # serializer_detail_filter = SerializerDetail.STRUCTURE_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
@@ -18,7 +19,11 @@ class ChainPDBAccessionHandler(CustomView):
             available_endpoint_handlers = {}
         if parent_queryset is not None:
             self.queryset = parent_queryset
-        self.queryset = self.queryset.filter(chains__contains=endpoint_levels[level - 1])
+        # self.queryset = self.queryset.filter(chains__contains=endpoint_levels[level - 1])
+        self.queryset = ProteinStructureFeature.objects\
+            .filter(structure__in=self.queryset)\
+            .filter(chain=endpoint_levels[level - 1])
+            # self.queryset.filter(proteins__set__chain=endpoint_levels[level - 1])
         if self.queryset.count() == 0:
             raise Exception("The Chain '{}' has not been found in the structure {}".format(
                 endpoint_levels[level - 1], endpoint_levels[level - 2].upper()))
@@ -26,11 +31,6 @@ class ChainPDBAccessionHandler(CustomView):
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, *args, **kwargs
         )
-
-    @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None):
-        obj["metadata"]["chains"] = [level_name]
-        return obj
 
 
 class PDBAccessionHandler(CustomView):
@@ -40,7 +40,6 @@ class PDBAccessionHandler(CustomView):
     many = False
     child_handlers = [
         (r'[a-z]|[A-Z]', ChainPDBAccessionHandler),
-        # (r'.+', IDAccessionHandler),
     ]
     # serializer_detail_filter = SerializerDetail.STRUCTURE_DETAIL
 
@@ -69,7 +68,7 @@ class PDBHandler(CustomView):
     queryset = Structure.objects.all()
     serializer_class = StructureSerializer
     serializer_detail = SerializerDetail.STRUCTURE_HEADERS
-    # serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW
+    serializer_detail_filter = SerializerDetail.STRUCTURE_OVERVIEW
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):

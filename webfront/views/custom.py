@@ -1,33 +1,11 @@
-from enum import Enum
-
 import re
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
+from webfront.constants import SerializerDetail
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
 from webfront.serializers.ProteinEntryConsolidator import consolidate_protein_entry
-
-
-class SerializerDetail(Enum):
-    ALL = 1
-
-    ENTRY_HEADERS = 100
-    ENTRY_OVERVIEW = 101
-    ENTRY_DETAIL = 102
-    ENTRY_PROTEIN = 103
-    ENTRY_PROTEIN_DETAIL = 104
-    ENTRY_PROTEIN_HEADERS = 105
-
-    PROTEIN_HEADERS = 200
-    PROTEIN_OVERVIEW = 201
-    PROTEIN_DETAIL = 202
-    PROTEIN_ENTRY_DETAIL = 203
-
-    STRUCTURE_HEADERS = 300
-    STRUCTURE_OVERVIEW = 301
-    STRUCTURE_DETAIL = 302
-    STRUCTURE_ENTRY_DETAIL = 303
 
 class CustomView(GenericAPIView):
     # description of the level of the endpoint, for debug purposes

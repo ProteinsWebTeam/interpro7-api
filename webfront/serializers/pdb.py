@@ -1,3 +1,4 @@
+from webfront.constants import get_queryset_type, QuerysetType
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 
@@ -8,7 +9,7 @@ class StructureSerializer(ModelContentSerializer):
         representation = {}
 
         representation = self.endpoint_representation(representation, instance, self.detail)
-        # representation = self.filter_representation(representation, instance, self.detail_filter)
+        representation = self.filter_representation(representation, instance, self.detail_filter)
 
         return representation
 
@@ -18,6 +19,9 @@ class StructureSerializer(ModelContentSerializer):
             representation = StructureSerializer.to_full_representation(instance)
         elif detail == SerializerDetail.STRUCTURE_HEADERS:
             representation = StructureSerializer.to_headers_representation(instance)
+        elif detail == SerializerDetail.STRUCTURE_CHAIN:
+            representation = StructureSerializer.to_full_representation(instance.structure)
+            representation["metadata"]["chains"] = StructureSerializer.to_chain_representation(instance)
         return representation
 
     @staticmethod
@@ -32,6 +36,21 @@ class StructureSerializer(ModelContentSerializer):
         }
 
     @staticmethod
+    def filter_representation(representation, instance, detail_filter):
+        if detail_filter == SerializerDetail.PROTEIN_OVERVIEW:
+            representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance)
+        elif detail_filter == SerializerDetail.PROTEIN_DETAIL:
+            representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance)
+        elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
+                detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+            if get_queryset_type(instance) == QuerysetType.STRUCTURE_PROTEIN:
+                representation["proteins"] = 1
+            else:
+                representation["proteins"] = StructureSerializer.to_proteins_count_representation(instance)
+
+        return representation
+
+    @staticmethod
     def to_headers_representation(instance):
         return {"accession": instance.accession}
 
@@ -44,6 +63,18 @@ class StructureSerializer(ModelContentSerializer):
             "release_date": instance.release_date,
             "authors": instance.authors,
             "chains": instance.chains,
-            "organism": instance.organism,
             "source_database": instance.source_database,
         }
+    @staticmethod
+    def to_proteins_count_representation(instance):
+        return instance.proteins.distinct().count()
+
+    @staticmethod
+    def to_chain_representation(instance):
+        return {instance.chain: {
+            "protein": instance.protein.accession,
+            "length": instance.length,
+            "organism": instance.organism,
+            "start_residue": instance.start_residue,
+            "stop_residue": instance.stop_residue,
+        }}

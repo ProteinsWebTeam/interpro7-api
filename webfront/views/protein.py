@@ -4,7 +4,9 @@ from django.shortcuts import redirect
 from webfront.constants import get_queryset_type, QuerysetType
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.models import Protein, Entry
+from webfront.models import Protein, Entry, ProteinEntryFeature, ProteinStructureFeature
+from webfront.views.entry import EntryHandler
+from webfront.views.structure import StructureHandler
 
 db_members = r'(uniprot)|(trembl)|(swissprot)'
 
@@ -34,26 +36,49 @@ class UniprotAccessionHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         protein_db = general_handler.get_from_store(UniprotHandler, "protein_db")
-        if protein_db != "uniprot":
-            queryset = queryset.filter(proteinentryfeature__protein=level_name,
-                                       proteinentryfeature__protein__source_database__iexact=protein_db)
-        else:
-            queryset = queryset.filter(proteinentryfeature__protein=level_name)
-        if queryset.count() == 0:
-            raise ReferenceError("The protein {} doesn't exist in the database {}".format(level_name, protein_db))
+        qs_type = get_queryset_type(queryset)
+        if not isinstance(queryset, dict):
+            if protein_db != "uniprot":
+                if qs_type == QuerysetType.STRUCTURE_PROTEIN:
+                    queryset = queryset.filter(protein=level_name, protein__source_database__iexact=protein_db)
+                elif qs_type == QuerysetType.STRUCTURE:
+                    queryset = queryset.filter(proteins=level_name, proteins__source_database__iexact=protein_db)
+                else:
+                    queryset = queryset.filter(proteinentryfeature__protein=level_name,
+                                               proteinentryfeature__protein__source_database__iexact=protein_db)
+            else:
+                if qs_type == QuerysetType.STRUCTURE_PROTEIN:
+                    queryset = queryset.filter(protein=level_name)
+                elif qs_type == QuerysetType.STRUCTURE:
+                    queryset = queryset.filter(proteins=level_name)
+                else:
+                    queryset = queryset.filter(proteinentryfeature__protein=level_name)
+            if queryset.count() == 0:
+                raise ReferenceError("The protein {} doesn't exist in the database {}".format(level_name, protein_db))
+            return queryset
+        elif "interpro" in queryset:
+            matches = ProteinEntryFeature.objects.filter(protein=level_name)
+            return EntryHandler.get_database_contributions(matches, 'entry__')
+        elif "pdb" in queryset:
+            matches = ProteinStructureFeature.objects.filter(protein=level_name)
+            return StructureHandler.get_database_contributions(matches, 'structure__')
+
         return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
-        if not isinstance(obj.serializer, ProteinSerializer):
-            arr = obj
-            if isinstance(obj, dict):
-                arr = [obj]
-            for o in arr:
-                if "proteins" in o:
-                    for p in o["proteins"]:
-                        if p["accession"] != level_name:
-                            o["proteins"].remove(p)
+        if type(obj) != dict:
+            if not isinstance(obj.serializer, ProteinSerializer):
+                arr = obj
+                if isinstance(obj, dict):
+                    arr = [obj]
+                for o in arr:
+                    if "proteins" in o:
+                        for p in o["proteins"]:
+                            if "accession"in p and p["accession"] != level_name:
+                                o["proteins"].remove(p)
+                            elif "protein" in p and p["protein"]["accession"] != level_name:
+                                o["proteins"].remove(p)
         return obj
 
 

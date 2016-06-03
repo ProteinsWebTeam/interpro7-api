@@ -116,6 +116,16 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
 
 
 class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
+    def test_can_get_entry_overview_filtered_by_protein(self):
+        prot_s = "M5ADK6"
+        tests = [
+            "/api/entry/protein/uniprot/"+prot_s,
+            ]
+        for url in tests:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_entry_count_overview(response.data)
+
     def test_can_get_proteins_from_interpro_id_protein_id(self):
         acc = "IPR003165"
         pfam = "PF02171"
@@ -133,7 +143,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         for url in tests:
             response = self.client.get(url)
             self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-            self.assertEqual(len(response.data["proteins"]), len(tests[url]))
+            self.assertEqual(len(response.data["proteins"]), len(tests[url]), "failed at "+url)
             for match in response.data["proteins"]:
                 self._check_match(match)
                 self._check_protein_details(match["protein"])
@@ -169,7 +179,6 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         pfam_u = "PF17180"
         prot_u = "M5ADK6"
         tests = [
-            "/api/entry/protein/uniprot/"+prot,
             "/api/entry/interpro/protein/uniprot/"+prot_u,
             "/api/entry/interpro/"+acc+"/protein/trembl/"+prot,
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/trembl/"+prot,

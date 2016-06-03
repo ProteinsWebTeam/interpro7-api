@@ -91,69 +91,67 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
                 self._check_structure_chain_details(match)
                 self.assertIn(match["protein"], tests[url])
 
-#
-# class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
-#     def test_can_get_proteins_from_interpro_id_protein_id(self):
-#         acc = "IPR003165"
-#         pfam = "PF02171"
-#         pfam_u = "PF17180"
-#         prot = "A1CUJ5"
-#         prot_u = "M5ADK6"
-#
-#         tests = {
-#             "/api/entry/interpro/"+acc+"/protein/uniprot/"+prot: ["A1CUJ5"],
-#             "/api/entry/interpro/"+acc+"/protein/swissprot/"+prot: ["A1CUJ5"],
-#             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/uniprot/"+prot: ["A1CUJ5"],
-#             "/api/entry/pfam/"+pfam+"/protein/uniprot/"+prot: ["A1CUJ5"],
-#             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot/"+prot_u: ["M5ADK6"],
-#         }
-#         for url in tests:
-#             response = self.client.get(url)
-#             self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-#             self.assertEqual(len(response.data["proteins"]), len(tests[url]))
-#             for match in response.data["proteins"]:
-#                 self._check_match(match)
-#                 self._check_protein_details(match["protein"])
-#             ids = [x["accession"] for x in response.data["proteins"]]
-#             self.assertEqual(tests[url], ids)
-#
-#     def test_can_get_proteins_from_entr_db_protein_id(self):
-#         acc = "IPR003165"
-#         prot = "A1CUJ5"
-#         prot_u = "M5ADK6"
-#
-#         tests = {
-#             "/api/entry/interpro/protein/uniprot/"+prot: ["A1CUJ5"],
-#             "/api/entry/interpro/protein/swissprot/"+prot: ["A1CUJ5"],
-#             "/api/entry/interpro/"+acc+"/pfam//protein/uniprot/"+prot: ["A1CUJ5"],
-#             "/api/entry/pfam/protein/uniprot/"+prot: ["A1CUJ5"],
-#             "/api/entry/unintegrated/pfam/protein/uniprot/"+prot_u: ["M5ADK6"],
-#         }
-#         for url in tests:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK)
-#             self._check_is_list_of_objects_with_accession(response.data["results"])
-#             for entry in response.data["results"]:
-#                 self.assertIn("proteins", entry, "'proteins' should be one of the keys in the response")
-#                 for match in entry["proteins"]:
-#                     self._check_match(match)
-#                     self._check_protein_details(match["protein"])
-#
-#     def test_urls_that_should_fails(self):
-#         acc = "IPR003165"
-#         pfam = "PF02171"
-#         prot = "A1CUJ5"
-#         pfam_u = "PF17180"
-#         prot_u = "M5ADK6"
-#         tests = [
-#             "/api/entry/protein/uniprot/"+prot,
-#             "/api/entry/interpro/protein/uniprot/"+prot_u,
-#             "/api/entry/interpro/"+acc+"/protein/trembl/"+prot,
-#             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/trembl/"+prot,
-#             "/api/entry/interpro/"+acc+"/smart/"+pfam+"/protein/trembl/"+prot,
-#             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot/"+prot,
-#             "/api/entry/unintegrated/pfam/"+pfam+"/protein/trembl/"+prot,
-#             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/trembl/"+prot_u,
-#             ]
-#         for url in tests:
-#             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+
+class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
+    def test_can_get_proteins_from_pdb_id_protein_id(self):
+        pdb = "1JM7"
+        prot_a = "A1CUJ5"
+        prot_b = "M5ADK6"
+
+        tests = {
+            "/api/structure/pdb/"+pdb+"/protein/uniprot/"+prot_a: [prot_a],
+            "/api/structure/pdb/"+pdb+"/protein/uniprot/"+prot_b: [prot_b],
+            "/api/structure/pdb/"+pdb+"/A/protein/uniprot/"+prot_a: [prot_a],
+            "/api/structure/pdb/"+pdb+"/A/protein/swissprot/"+prot_a: [prot_a],
+            "/api/structure/pdb/"+pdb+"/B/protein/uniprot/"+prot_b: [prot_b],
+            "/api/structure/pdb/"+pdb+"/B/protein/swissprot/"+prot_b: [prot_b],
+        }
+        for url in tests:
+            response = self.client.get(url)
+            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+            self.assertEqual(len(response.data["proteins"]), len(tests[url]))
+            for match in response.data["proteins"]:
+                self._check_structure_chain_details(match)
+                self._check_protein_details(match["protein"])
+            ids = [x["protein"]["accession"] for x in response.data["proteins"]]
+            self.assertEqual(tests[url], ids)
+
+    def test_can_get_proteins_from_structure_db_protein_id(self):
+        prot_s = "M5ADK6"
+        prot_t = "P16582"
+
+        tests = {
+            "/api/structure/pdb/protein/uniprot/"+prot_s: ["2BKM", "1JM7"],
+            "/api/structure/pdb/protein/swissprot/"+prot_s: ["2BKM", "1JM7"],
+            "/api/structure/pdb/protein/trembl/"+prot_t: ["1T2V", "1T2V", "1T2V", "1T2V", "1T2V"],
+        }
+        for url in tests:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_accession(response.data["results"])
+            for structure in response.data["results"]:
+                self.assertIn("proteins", structure, "'proteins' should be one of the keys in the response")
+                for match in structure["proteins"]:
+                    self._check_structure_chain_details(match)
+                    self._check_protein_details(match["protein"])
+            ids = [x["accession"] for x in response.data["results"]]
+            self.assertEqual(tests[url].sort(), ids.sort())
+
+    def test_can_get_proteins_from_structure_protein_id(self):
+        prot_s = "M5ADK6"
+        response = self.client.get("/api/structure/protein/uniprot/"+prot_s)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_urls_that_should_fails(self):
+        pdb = "1JM7"
+        prot_s = "M5ADK6"
+        prot_t = "P16582"
+        tests = [
+            "/api/structure/pdb/"+pdb+"/protein/uniprot/bad_uniprot"
+            "/api/structure/pdb/"+pdb+"/protein/trembl/"+prot_s,
+            "/api/structure/pdb/BADP/protein/uniprot/"+prot_s,
+            "/api/structure/pdb/protein/trembl/"+prot_s,
+            "/api/structure/pdb/protein/swissprot/"+prot_t,
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")

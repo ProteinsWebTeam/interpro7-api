@@ -1,5 +1,6 @@
 from webfront.constants import get_queryset_type, QuerysetType
 from webfront.serializers.content_serializers import ModelContentSerializer
+from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import SerializerDetail
 
 
@@ -45,7 +46,10 @@ class StructureSerializer(ModelContentSerializer):
             else:
                 representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance)
         elif detail_filter == SerializerDetail.PROTEIN_DETAIL:
-            representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance)
+            if qs_type == QuerysetType.STRUCTURE:
+                representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance, True)
+            else:
+                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance)
         elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
                 detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
             if qs_type == QuerysetType.STRUCTURE_PROTEIN:
@@ -70,13 +74,14 @@ class StructureSerializer(ModelContentSerializer):
             "chains": instance.chains,
             "source_database": instance.source_database,
         }
+
     @staticmethod
     def to_proteins_count_representation(instance):
         return instance.proteins.distinct().count()
 
     @staticmethod
-    def to_chain_representation(instance):
-        return {
+    def to_chain_representation(instance, full=False):
+        chain = {
             "chain": instance.chain,
             "protein": instance.protein.accession,
             "source_database": instance.protein.source_database,
@@ -85,10 +90,16 @@ class StructureSerializer(ModelContentSerializer):
             "start_residue": instance.start_residue,
             "stop_residue": instance.stop_residue,
         }
+        if full:
+            chain["protein"] = ProteinSerializer.to_metadata_representation(instance.protein)
+        return chain
 
     @staticmethod
-    def to_proteins_overview_representation(instance):
+    def to_proteins_overview_representation(instance, is_full=False):
         return [
-                StructureSerializer.to_chain_representation(match)
+                StructureSerializer.to_chain_representation(match, is_full)
                 for match in instance.proteinstructurefeature_set.all()
                 ]
+    @staticmethod
+    def to_proteins_detail_representation(instance):
+        return [StructureSerializer.to_chain_representation(instance, True)]

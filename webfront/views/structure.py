@@ -96,11 +96,11 @@ class StructureHandler(CustomView):
     serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_HEADERS
 
     @staticmethod
-    def get_database_contributions(queryset):
-        protein_counter = queryset.values('source_database').annotate(total=Count('source_database'))
+    def get_database_contributions(queryset, prefix=""):
+        protein_counter = queryset.values(prefix+'source_database').annotate(total=Count(prefix+'source_database'))
         output = {}
         for row in protein_counter:
-            output[row["source_database"]] = row["total"]
+            output[row[prefix+"source_database"]] = row["total"]
         # output["uniprot"] = sum(output.values())
         return output
 

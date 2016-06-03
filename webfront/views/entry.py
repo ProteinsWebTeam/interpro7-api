@@ -234,22 +234,22 @@ class EntryHandler(CustomView):
     serializer_detail_filter = SerializerDetail.ENTRY_OVERVIEW
 
     @staticmethod
-    def get_database_contributions(queryset):
-        entry_counter = queryset.values('source_database').annotate(total=Count('source_database'))
+    def get_database_contributions(queryset, prefix=""):
+        entry_counter = queryset.values(prefix+'source_database').annotate(total=Count(prefix+'source_database'))
         output = {
             "interpro": 0,
             "unintegrated": 0,
             "member_databases": {}
         }
         for row in entry_counter:
-            if row["source_database"].lower() == "interpro":
+            if row[prefix+'source_database'].lower() == "interpro":
                 output["interpro"] += row["total"]
             else:
-                output["member_databases"][row["source_database"].lower()] = row["total"]
+                output["member_databases"][row[prefix+'source_database'].lower()] = row["total"]
 
         output["unintegrated"] = queryset\
-            .exclude(source_database__iexact="interpro")\
-            .filter(integrated__isnull=True).count()
+            .exclude(**{prefix+'source_database__iexact': "interpro"}) \
+            .filter(**{prefix+'integrated__isnull': True}).count()
         return output
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,

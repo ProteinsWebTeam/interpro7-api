@@ -141,6 +141,8 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_s = "M5ADK6"
         response = self.client.get("/api/structure/protein/uniprot/"+prot_s)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_structure_count_overview(response.data)
+        # TODO: improve this test
 
     def test_urls_that_should_fails(self):
         pdb = "1JM7"

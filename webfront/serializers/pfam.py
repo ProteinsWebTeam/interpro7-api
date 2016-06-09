@@ -12,7 +12,7 @@ class PfamaSerializer(ModelContentSerializer):
 
     class Meta:
         model = Pfama
-        fields = ('pfama_acc', 'pfama_id', 'num_full','link')
+        fields = ('pfama_acc', 'pfama_id', 'num_full', 'link')
 
 
 class Pfama2PfamaHhsearchSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,7 +22,7 @@ class Pfama2PfamaHhsearchSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Pfama2PfamaHhsearch
-        fields = ('pfama_acc_1','pfama_acc_2','evalue')
+        fields = ('pfama_acc_1', 'pfama_acc_2', 'evalue')
 
 
 class ClanSerializer(ModelContentSerializer):
@@ -31,7 +31,7 @@ class ClanSerializer(ModelContentSerializer):
     total_occurrences = serializers.SerializerMethodField()
 
     def get_total_occurrences(self,obj):
-        total =0;
+        total = 0;
         for member in obj.members.all():
             total += member.num_full
         return total

@@ -7,7 +7,7 @@
       "experiment_type": "Solution NMR",
       "release_date": "2009-02-24",
       "authors": ["Brzovic, P.S.", "Rajagopal, P.", "Hoyt, D.W.", "King, M.-C.", "Klevit, R.E."],
-      "chains": ["A","B"],
+      "chains": ["A", "B"],
       "source_database": "pdb"
     }
   },
@@ -19,7 +19,7 @@
       "experiment_type": "X-ray diffraction, resolution 3.30Å",
       "release_date": "2011-07-13",
       "authors": ["Williams, R.S.", "Lee, M.S.", "Hau, D.D.", "Glover, J.N.M."],
-      "chains": ["A","B","C","D","E"],
+      "chains": ["A", "B", "C", "D", "E"],
       "source_database": "pdb"
     }
   },
@@ -31,7 +31,7 @@
       "experiment_type": "X-ray diffraction, resolution 1.50Å",
       "release_date": "2009-02-24",
       "authors": ["Ilari, A.", "Kjelgaard, P.", "Von Wachenfeldt, C.", "Boffi, A.", "Chiancone, E."],
-      "chains": ["A","B"],
+      "chains": ["A", "B"],
       "source_database": "pdb"
     }
   },
@@ -170,5 +170,4 @@
       "stop_residue": 859
     }
   }
-
 ]

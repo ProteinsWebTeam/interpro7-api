@@ -38,18 +38,18 @@
       },
       "evidence_code": 3,
       "feature": {
-        "signalPeptide": [],
+        "signal_peptide": [],
         "transmembrane": [],
-        "coiledCoil": [],
-        "lowComplexity_disorder": [],
-        "activeSites": [
+        "coiled_coil": [],
+        "low_complexity_disorder": [],
+        "active_sites": [
           {
             "id": "IPR018202",
             "name": "Peptidase S10, serine carboxypeptidase, active site"
           }
         ],
-        "perResidueFeatures": [],
-        "disulphideBridges": []
+        "per_residue_features": [],
+        "disulphide_bridges": []
       },
       "genomic_context": {
         "DNA": ""
@@ -63,7 +63,7 @@
       "identifier": "M5ADK6_LACBR",
       "accession": "M5ADK6",
       "organism": {
-        "sourceOrganism": {
+        "source_organism": {
           "name": "Lactobacillus brevis KB290",
           "taxid": 1001583
         }
@@ -88,13 +88,13 @@
       },
       "evidence_code": 1,
       "feature": {
-        "signalPeptide": [],
+        "signal_peptide": [],
         "transmembrane": [],
-        "coiledCoil": [],
-        "lowComplexity_disorder": [],
-        "activeSites": [],
-        "perResidueFeatures": [],
-        "disulphideBridges": []
+        "coiled_coil": [],
+        "low_complexity_disorder": [],
+        "active_sites": [],
+        "per_residue_features": [],
+        "disulphide_bridges": []
       },
       "genomic_context": {
         "DNA": ""
@@ -141,18 +141,18 @@
       },
       "evidence_code": 1,
       "feature": {
-        "signalPeptide": [],
+        "signal_peptide": [],
         "transmembrane": [],
-        "coiledCoil": [],
-        "lowComplexity_disorder": [],
-        "activeSites": [
+        "coiled_coil": [],
+        "low_complexity_disorder": [],
+        "active_sites": [
           {
             "id": "IPR018202",
             "name": "Peptidase S10, serine carboxypeptidase, active site"
           }
         ],
-        "perResidueFeatures": [],
-        "disulphideBridges": []
+        "per_residue_features": [],
+        "disulphide_bridges": []
       },
       "genomic_context": {
         "DNA": ""
@@ -207,13 +207,13 @@
       },
       "evidence_code": 4,
       "feature": {
-        "signalPeptide": [],
+        "signal_peptide": [],
         "transmembrane": [],
-        "coiledCoil": [],
-        "lowComplexity_disorder": [],
-        "activeSites": [],
-        "perResidueFeatures": [],
-        "disulphideBridges": []
+        "coiled_coil": [],
+        "low_complexity_disorder": [],
+        "active_sites": [],
+        "per_residue_features": [],
+        "disulphide_bridges": []
       },
       "genomic_context": {
         "DNA": ""

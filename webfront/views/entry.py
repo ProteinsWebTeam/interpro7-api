@@ -1,9 +1,13 @@
+import ipdb
+import re
 from django.db.models import Count, QuerySet
 from webfront.models import Entry, ProteinEntryFeature
 from webfront.serializers.interpro import EntrySerializer
 from .custom import CustomView, SerializerDetail
+from django.conf import settings
 
-db_members = r'(pfam)|(smart)|(prosite_profiles)'
+members = settings.DB_MEMBERS
+db_members = '|'.join(members)
 
 
 class MemberAccesionHandler(CustomView):

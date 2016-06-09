@@ -75,7 +75,7 @@ class UniprotAccessionHandler(CustomView):
                 for o in arr:
                     if "proteins" in o:
                         for p in o["proteins"]:
-                            if "accession"in p and p["accession"] != level_name:
+                            if "accession" in p and p["accession"] != level_name:
                                 o["proteins"].remove(p)
                             elif "protein" in p and p["protein"]["accession"] != level_name:
                                 o["proteins"].remove(p)

@@ -1,4 +1,4 @@
-from unifam import settings
+from interpro import settings
 from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
@@ -56,8 +56,8 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_protein_details(self, obj):
         self.assertIn("description", obj)
         self.assertIn("name", obj)
-        self.assertIn("proteinEvidence", obj)
-        self.assertIn("sourceOrganism", obj)
+        self.assertIn("protein_evidence", obj)
+        self.assertIn("source_organism", obj)
         self.assertIn("length", obj)
         self.assertIn("accession", obj)
 

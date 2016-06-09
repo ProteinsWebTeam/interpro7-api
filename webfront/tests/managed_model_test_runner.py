@@ -1,7 +1,8 @@
-from django.test.runner import DiscoverRunner
-import sys
+import os
 import re
-from unifam.settings import *
+import sys
+from django.test.runner import DiscoverRunner
+from django.conf import settings
 
 
 class UnManagedModelTestRunner(DiscoverRunner):
@@ -28,9 +29,9 @@ class UnManagedModelTestRunner(DiscoverRunner):
             m._meta.managed = False
 
 if 'test' in sys.argv or 'test_coverage' in sys.argv:  # Covers regular testing and django-coverage
-    DATABASES['interpro_ro']['ENGINE'] = 'django.db.backends.sqlite3'
-    DATABASES['interpro_ro']['NAME'] = os.path.join(BASE_DIR, '../database/db3.sqlite3')
-    DATABASES['interpro_ro']['TEST'] = {'MIRROR': 'default'}
+    settings.DATABASES['interpro_ro']['ENGINE'] = 'django.db.backends.sqlite3'
+    settings.DATABASES['interpro_ro']['NAME'] = os.path.join(settings.BASE_DIR, '../database/db3.sqlite3')
+    settings.DATABASES['interpro_ro']['TEST'] = {'MIRROR': 'default'}
     # DATABASES['pfam_ro']['ENGINE'] = 'django.db.backends.sqlite3'
     # DATABASES['pfam_ro']['NAME'] = os.path.join(BASE_DIR, '../database/db2.sqlite3')
     # DATABASES['pfam_ro']['TEST'] = {'MIRROR': 'default'}

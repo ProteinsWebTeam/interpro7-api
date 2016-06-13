@@ -11,7 +11,7 @@ def log(kind, source="IPREL"):
             )
             print("STARTING{}".format(message))
             output = fn(n, *args, **kwargs)
-            if not hasattr(output, '__iter__'):
+            if not hasattr(output, "__iter__"):
                 output = [output]
             for [i, step] in enumerate(output, 1):
                 print("{:9d}: processed {}".format(i, step))
@@ -23,15 +23,15 @@ def log(kind, source="IPREL"):
 
 # TODO: put all these functions into their own file (could that be a view?)
 def extract_pubs(joins):
-    return [
-        dict(
+    return {
+        p.pub_id: dict(
             PMID=int(p.pubmed_id), type=p.pub_type, ISBN=p.isbn,
             volume=p.volume, issue=p.issue, year=int(p.year), title=p.title,
-            URL=p.url, rawPages=p.rawpages, medlineJournal=p.medline_journal,
-            ISOJournal=p.iso_journal, authors=p.authors, DOI_URL=p.doi_url, PUB_ID=p.pub_id
+            URL=p.url, raw_pages=p.rawpages, medline_journal=p.medline_journal,
+            ISO_journal=p.iso_journal, authors=p.authors, DOI_URL=p.doi_url
         )
         for p in [j.pub for j in joins]
-    ]
+    }
 
 def extract_member_db(acc):
     output = {}
@@ -49,13 +49,13 @@ def extract_member_db(acc):
 
 def extract_go(joins):
     output = {
-        "biologicalProcess": [],
-        "molecularFunction": [],
-        "cellularComponent": [],
+        "biological_process": [],
+        "molecular_function": [],
+        "cellular_component": [],
     }
     for join in joins:
         # TODO: check which kind of GO they are to assign to the right one
-        output['biologicalProcess'].append({
+        output['biological_process'].append({
             "id": join.go_id,
             "name": "",# TODO
         })
@@ -63,12 +63,12 @@ def extract_go(joins):
 
 def get_tax_name_from_id(id):
     try:
-        return iprel.TaxNameToId.objects.using('interpro_ro').get(pk=id).tax_name
+        return iprel.TaxNameToId.objects.using("interpro_ro").get(pk=id).tax_name
     except iprel.TaxNameToId.DoesNotExist:
         pass
 
 
-@log("interpro entry objects (and their contributing signatures)")
+@log("interpro entry (and their contributing signatures) object")
 def get_interpro_entries(n):
     for input in iprel.Entry.objects.using("interpro_ro").all()[:n]:
         acc = input.entry_ac
@@ -99,7 +99,7 @@ def get_interpro_entries(n):
             )
             yield "{}, entry from a member database".format(next(res))
 
-@log("unintegrated entry objects")
+@log("unintegrated entry object")
 def get_n_unintegrated_member_db_entries(n):
     for input in iprel.Method.objects.using("interpro_ro").filter(entry2method__isnull=True).all()[:n]:
         yield from set_member_db_entry(input)
@@ -123,6 +123,8 @@ def set_member_db_entry(input, integrated=None):
     output.save()
     already_added_proteins = dict()
     for match in input.match_set.all():
+        if len(already_added_proteins) > 0:
+            break
         protein_id = match.protein_ac_id
         protein = already_added_proteins.get(protein_id, None)
         if not protein:
@@ -191,5 +193,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         n = options["number"]
-        get_interpro_entries(n)
-        get_n_unintegrated_member_db_entries(n)
+        # get_interpro_entries(n)
+        # get_n_unintegrated_member_db_entries(n)

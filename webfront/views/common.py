@@ -1,4 +1,4 @@
-from unifam import settings
+from interpro import settings
 from webfront.models import Entry
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler

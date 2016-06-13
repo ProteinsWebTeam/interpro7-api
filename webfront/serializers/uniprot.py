@@ -53,7 +53,7 @@ class ProteinSerializer(ModelContentSerializer):
             "entries": ProteinSerializer.to_entries_count_representation(instance),
             "representation": instance.feature,
             # "structure": instance.structure,
-            "genomicContext": instance.genomic_context,
+            "genomic_context": instance.genomic_context,
             "source_database": instance.source_database
         }
 
@@ -66,7 +66,7 @@ class ProteinSerializer(ModelContentSerializer):
         return {
             "accession": instance.accession,
             "id": instance.identifier,
-            "sourceOrganism": instance.organism,
+            "source_organism": instance.organism,
             "name": {
                 "name": instance.name,
                 "short": instance.short_name,
@@ -78,7 +78,7 @@ class ProteinSerializer(ModelContentSerializer):
             "proteome": instance.proteome,
             "gene": instance.gene,
             "go_terms": instance.go_terms,
-            "proteinEvidence": 4,
+            "protein_evidence": 4,
             "source_database": instance.source_database,
         }
 

@@ -37,7 +37,7 @@
           "URL": null,
           "raw_pages": "1434-7",
           "medline_journal": "Science",
-          "ISOJournal": "Science",
+          "ISO_journal": "Science",
           "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
           "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
         },
@@ -50,9 +50,9 @@
           "year": 2000,
           "title": "Domains in gene silencing and cell differentiation proteins: the novel PAZ domain and redefinition of the Piwi domain.",
           "URL": null,
-          "rawPages": "481-2",
+          "raw_pages": "481-2",
           "medline_journal": "Trends Biochem Sci",
-          "ISOJournal": "Trends Biochem. Sci.",
+          "ISO_journal": "Trends Biochem. Sci.",
           "authors": "Cerutti L, Mian N, Bateman A.",
           "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
         },
@@ -154,9 +154,9 @@
           "year": 2004,
           "title": "Crystal structure of Argonaute and its implications for RISC slicer activity.",
           "URL": null,
-          "rawPages": "1434-7",
+          "raw_pages": "1434-7",
           "medline_journal": "Science",
-          "ISOJournal": "Science",
+          "ISO_journal": "Science",
           "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
           "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
         },
@@ -169,9 +169,9 @@
           "year": 2000,
           "title": "Domains in gene silencing and cell differentiation proteins: the novel PAZ domain and redefinition of the Piwi domain.",
           "URL": null,
-          "rawPages": "481-2",
+          "raw_pages": "481-2",
           "medline_journal": "Trends Biochem Sci",
-          "ISOJournal": "Trends Biochem. Sci.",
+          "ISO_journal": "Trends Biochem. Sci.",
           "authors": "Cerutti L, Mian N, Bateman A.",
           "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
         }

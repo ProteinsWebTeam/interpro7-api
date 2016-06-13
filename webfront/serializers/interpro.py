@@ -93,7 +93,7 @@ class EntrySerializer(ModelContentSerializer):
         return [
             EntrySerializer.to_match_representation(match, True)
             for match in instance.proteinentryfeature_set.all()
-            ]
+        ]
 
     @staticmethod
     def to_headers_representation(instance):

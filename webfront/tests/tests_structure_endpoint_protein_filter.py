@@ -6,9 +6,11 @@ data_in_fixtures = {
     "1T2V": ["P16582", "P16582", "P16582", "P16582", "P16582"],
     "1JM7": ["A1CUJ5", "M5ADK6"],
 }
+
+
 class StructureWithFilterProteinRESTTest(InterproRESTTestCase):
 
-    def test_can_get_protein_overview_from_entry(self):
+    def test_can_get_protein_overview_from_structure(self):
         response = self.client.get("/api/structure/protein/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_structure_count_overview(response.data)

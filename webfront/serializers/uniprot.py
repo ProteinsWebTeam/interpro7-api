@@ -1,3 +1,4 @@
+from webfront.constants import get_queryset_type, QuerysetType
 from webfront.models import Protein
 
 from webfront.serializers.content_serializers import ModelContentSerializer
@@ -29,12 +30,20 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def filter_representation(representation, instance, detail_filter):
+        qs_type = get_queryset_type(instance)
         if detail_filter == SerializerDetail.ENTRY_OVERVIEW:
             representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
         elif detail_filter == SerializerDetail.ENTRY_PROTEIN:
             representation = ProteinSerializer.to_match_representation(instance, False)
         elif detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
             representation = ProteinSerializer.to_match_representation(instance, True)
+        elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
+            representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
+        elif detail_filter == SerializerDetail.STRUCTURE_OVERVIEW:
+            representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance)
+        elif detail_filter == SerializerDetail.STRUCTURE_DETAIL:
+            if qs_type == QuerysetType.PROTEIN:
+                representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance, True)
         return representation
 
     @staticmethod
@@ -96,6 +105,34 @@ class ProteinSerializer(ModelContentSerializer):
     @staticmethod
     def to_entries_count_representation(instance):
         return instance.proteinentryfeature_set.count()
+
+    @staticmethod
+    def to_structures_count_representation(instance):
+        return instance.structures.distinct().count()
+
+    @staticmethod
+    def to_chain_representation(instance, full=False):
+        from webfront.serializers.pdb import StructureSerializer
+
+        chain = {
+            "chain": instance.chain,
+            "structure": instance.structure.accession,
+            "source_database": instance.structure.source_database,
+            "length": instance.length,
+            "organism": instance.organism,
+            "start_residue": instance.start_residue,
+            "stop_residue": instance.stop_residue,
+        }
+        if full:
+            chain["structure"] = StructureSerializer.to_metadata_representation(instance.structure)
+        return chain
+
+    @staticmethod
+    def to_structures_overview_representation(instance, is_full=False):
+        return [
+            ProteinSerializer.to_chain_representation(match, is_full)
+            for match in instance.proteinstructurefeature_set.all()
+            ]
 
     class Meta:
         model = Protein

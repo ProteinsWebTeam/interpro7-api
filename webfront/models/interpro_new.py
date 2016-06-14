@@ -43,13 +43,16 @@ class Protein(models.Model):
 class ProteinEntryFeature(models.Model):
     protein = models.ForeignKey("Protein", null=False)
     entry = models.ForeignKey("Entry", null=False)
-    match_start = models.IntegerField(null=True)
-    match_end = models.IntegerField(null=True)
+    coordinates = JSONField()
+    # match_start = models.IntegerField(null=True)
+    # match_end = models.IntegerField(null=True)
 
 
 class Structure(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=20)
+    short_name = models.CharField(max_length=20, null=True)
+    other_names = JSONField()
     experiment_type = models.CharField(max_length=30)
     release_date = models.DateField()
     authors = JSONField()
@@ -64,6 +67,7 @@ class ProteinStructureFeature(models.Model):
     chain = models.CharField(max_length=1)
     length = models.IntegerField(null=True)
     organism = JSONField()
-    start_residue = models.IntegerField(null=True)
-    stop_residue = models.IntegerField(null=True)
+    coordinates = JSONField()
+    # start_residue = models.IntegerField(null=True)
+    # stop_residue = models.IntegerField(null=True)
 

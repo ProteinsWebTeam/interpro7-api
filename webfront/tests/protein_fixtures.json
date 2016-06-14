@@ -226,8 +226,7 @@
     "fields": {
       "entry": "IPR003165",
       "protein": "A1CUJ5",
-      "match_start": 27,
-      "match_end": 80
+      "coordinates": [{"protein":[27,80]}]
     }
   },
   {
@@ -235,8 +234,7 @@
     "fields": {
       "entry": "PF02171",
       "protein": "A1CUJ5",
-      "match_start": 17,
-      "match_end": 70
+      "coordinates": [{"protein":[17,70]}]
     }
   },
   {
@@ -244,8 +242,7 @@
     "fields": {
       "entry": "SM00950",
       "protein": "A1CUJ5",
-      "match_start": 37,
-      "match_end": 90
+      "coordinates": [{"protein":[37,90]}]
     }
   },
   {
@@ -253,8 +250,7 @@
     "fields": {
       "entry": "IPR003165",
       "protein": "P16582",
-      "match_start": 48,
-      "match_end": 101
+      "coordinates": [{"protein":[48,101]}]
     }
   },
   {
@@ -262,8 +258,7 @@
     "fields": {
       "entry": "PS50822",
       "protein": "P16582",
-      "match_start": 48,
-      "match_end": 101
+      "coordinates": [{"protein":[48,101]}]
     }
   },
   {
@@ -271,8 +266,7 @@
     "fields": {
       "entry": "PF17180",
       "protein": "M5ADK6",
-      "match_start": 48,
-      "match_end": 101
+      "coordinates": [{"protein":[48,101]}]
     }
   },
   {
@@ -280,8 +274,7 @@
     "fields": {
       "entry": "IPR001165",
       "protein": "A1CUJ5",
-      "match_start": 148,
-      "match_end": 201
+      "coordinates": [{"protein":[148,201]}]
     }
   },
   {
@@ -289,8 +282,7 @@
     "fields": {
       "entry": "PF17176",
       "protein": "A1CUJ5",
-      "match_start": 48,
-      "match_end": 101
+      "coordinates": [{"protein":[48,101]}]
     }
   }
 ]

@@ -67,7 +67,11 @@ class StructureSerializer(ModelContentSerializer):
     def to_metadata_representation(instance):
         return {
             "accession": instance.accession,
-            "name": instance.name,
+            "name": {
+                "name": instance.name,
+                "short": instance.short_name,
+                "other": instance.other_names,
+            },
             "experiment_type": instance.experiment_type,
             "release_date": instance.release_date,
             "authors": instance.authors,
@@ -87,8 +91,7 @@ class StructureSerializer(ModelContentSerializer):
             "source_database": instance.protein.source_database,
             "length": instance.length,
             "organism": instance.organism,
-            "start_residue": instance.start_residue,
-            "stop_residue": instance.stop_residue,
+            "coordinates": instance.coordinates,
         }
         if full:
             chain["protein"] = ProteinSerializer.to_metadata_representation(instance.protein)

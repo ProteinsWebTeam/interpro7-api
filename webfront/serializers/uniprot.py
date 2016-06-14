@@ -85,7 +85,7 @@ class ProteinSerializer(ModelContentSerializer):
     @staticmethod
     def to_match_representation(match, full=False):
         output = {
-            "match": [match.match_start, match.match_end],
+            "match": match.coordinates,
             "accession": match.entry_id,
             "source_database": match.entry.source_database,
             "name": match.entry.name,
@@ -120,8 +120,7 @@ class ProteinSerializer(ModelContentSerializer):
             "source_database": instance.structure.source_database,
             "length": instance.length,
             "organism": instance.organism,
-            "start_residue": instance.start_residue,
-            "stop_residue": instance.stop_residue,
+            "coordinates": instance.coordinates,
         }
         if full:
             chain["structure"] = StructureSerializer.to_metadata_representation(instance.structure)

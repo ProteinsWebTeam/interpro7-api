@@ -4,6 +4,7 @@
     "fields": {
       "accession": "1JM7",
       "name": "Solution structure of the BRCA1/BARD1 RING-domain heterodimer",
+      "other_names": [],
       "experiment_type": "Solution NMR",
       "release_date": "2009-02-24",
       "authors": ["Brzovic, P.S.", "Rajagopal, P.", "Hoyt, D.W.", "King, M.-C.", "Klevit, R.E."],
@@ -16,6 +17,7 @@
     "fields": {
       "accession": "1T2V",
       "name": "Structural basis of phospho-peptide recognition by the brct domain of brca1, structure with phosphopeptide",
+      "other_names": [],
       "experiment_type": "X-ray diffraction, resolution 3.30Å",
       "release_date": "2011-07-13",
       "authors": ["Williams, R.S.", "Lee, M.S.", "Hau, D.D.", "Glover, J.N.M."],
@@ -28,6 +30,7 @@
     "fields": {
       "accession": "2BKM",
       "name": "Crystal structure of the truncated hemoglobin from geobacillus stearothermophilus",
+      "other_names": [],
       "experiment_type": "X-ray diffraction, resolution 1.50Å",
       "release_date": "2009-02-24",
       "authors": ["Ilari, A.", "Kjelgaard, P.", "Von Wachenfeldt, C.", "Boffi, A.", "Chiancone, E."],
@@ -46,8 +49,7 @@
         "name": "Homo sapiens (Human)",
         "taxid": 9606
       },
-      "start_residue": 26,
-      "stop_residue": 140
+      "coordinates": [{"protein":[27,80], "structure":[1,53]}]
     }
   },
   {
@@ -61,8 +63,7 @@
         "name": "Homo sapiens (Human)",
         "taxid": 9606
       },
-      "start_residue": 26,
-      "stop_residue": 140
+      "coordinates": [{"protein":[26,140], "structure":[1, 114]}]
     }
   },
   {
@@ -76,8 +77,7 @@
         "name": "Homo sapiens (Human)",
         "taxid": 9606
       },
-      "start_residue": 56,
-      "stop_residue": 130
+      "coordinates": [{"protein":[56,130], "structure":[1,74]}]
     }
   },
   {
@@ -91,8 +91,7 @@
         "name": "Geobacillus kaustophilus (strain HTA426)",
         "taxid": 235909
       },
-      "start_residue": 3,
-      "stop_residue": 130
+      "coordinates": [{"protein":[3,130], "structure":[10,137]}]
     }
   },
   {
@@ -106,8 +105,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "start_residue": 646,
-      "stop_residue": 859
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
     }
   },
   {
@@ -121,8 +119,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "start_residue": 646,
-      "stop_residue": 859
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
     }
   },
   {
@@ -136,8 +133,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "start_residue": 646,
-      "stop_residue": 859
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
     }
   },
   {
@@ -151,8 +147,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "start_residue": 646,
-      "stop_residue": 859
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
     }
   },
   {
@@ -166,8 +161,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "start_residue": 646,
-      "stop_residue": 859
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
     }
   }
 ]

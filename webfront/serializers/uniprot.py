@@ -52,9 +52,9 @@ class ProteinSerializer(ModelContentSerializer):
             "metadata": ProteinSerializer.to_metadata_representation(instance),
             "entries": ProteinSerializer.to_entries_count_representation(instance),
             "representation": instance.feature,
-            # "structure": instance.structure,
+            "structures": ProteinSerializer.to_structures_count_representation(instance),
             "genomic_context": instance.genomic_context,
-            "source_database": instance.source_database
+            # "source_database": instance.source_database
         }
 
     @staticmethod

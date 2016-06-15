@@ -36,7 +36,12 @@ class EntrySerializer(ModelContentSerializer):
         elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
                 detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
             representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
-
+        elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
+            representation["structures"] = EntrySerializer.to_structures_count_representation(instance)
+        elif detail_filter == SerializerDetail.STRUCTURE_OVERVIEW:
+            representation["structures"] = EntrySerializer.to_structures_overview_representation(instance)
+        elif detail_filter == SerializerDetail.STRUCTURE_DETAIL:
+            representation["structures"] = EntrySerializer.to_structures_overview_representation(instance, True)
         return representation
 
     @staticmethod
@@ -98,6 +103,30 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_headers_representation(instance):
         return {"accession": instance.accession}
+
+    @staticmethod
+    def to_structures_count_representation(instance):
+        return instance.structures.distinct().count()
+
+    @staticmethod
+    def to_structure_representation(instance, full=False):
+        from webfront.serializers.pdb import StructureSerializer
+
+        chain = {
+            "chain": instance.chain,
+            "structure": instance.structure.accession,
+            "coordinates": instance.coordinates,
+        }
+        if full:
+            chain["structure"] = StructureSerializer.to_metadata_representation(instance.structure)
+        return chain
+
+    @staticmethod
+    def to_structures_overview_representation(instance, is_full=False):
+        return [
+            EntrySerializer.to_structure_representation(match, is_full)
+            for match in instance.entrystructurefeature_set.all()
+            ]
 
     class Meta:
         model = Entry

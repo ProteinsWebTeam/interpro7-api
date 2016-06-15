@@ -17,6 +17,7 @@ class Entry(models.Model):
     wikipedia = models.TextField(null=True)
     literature = JSONField()
     proteins = models.ManyToManyField('Protein', through='ProteinEntryFeature')
+    structures = models.ManyToManyField('Structure', through='EntryStructureFeature')
 
 
 class Protein(models.Model):
@@ -59,6 +60,7 @@ class Structure(models.Model):
     chains = JSONField()
     source_database = models.CharField(max_length=20, default="pdb")
     proteins = models.ManyToManyField('Protein', through='ProteinStructureFeature')
+    entries = models.ManyToManyField('Entry', through='EntryStructureFeature')
 
 
 class ProteinStructureFeature(models.Model):
@@ -68,6 +70,10 @@ class ProteinStructureFeature(models.Model):
     length = models.IntegerField(null=True)
     organism = JSONField()
     coordinates = JSONField()
-    # start_residue = models.IntegerField(null=True)
-    # stop_residue = models.IntegerField(null=True)
 
+
+class EntryStructureFeature(models.Model):
+    entry = models.ForeignKey("Entry", null=False)
+    structure = models.ForeignKey("Structure", null=False)
+    chain = models.CharField(max_length=1)
+    coordinates = JSONField()

@@ -155,13 +155,168 @@
     "fields": {
       "protein": "P16582",
       "structure": "1T2V",
-      "chain": "E",
+      "chain": "A",
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
       "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+    }
+  },
+
+
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR001165",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[30,60], "structure":[1,53]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "A",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "B",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "C",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "D",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "E",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[20,50], "structure":[1,53]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "A",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "B",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "C",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "D",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "E",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PF02171",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[30,50], "structure":[20,40]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "SM00950",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[20,50], "structure":[20,50]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PF17180",
+      "structure": "2BKM",
+      "chain": "B",
+      "coordinates": [{"entry":[6,30], "structure":[46,70]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PF17180",
+      "structure": "1JM7",
+      "chain": "B",
+      "coordinates": [{"entry":[1,40], "structure":[21,60]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PF17176",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[2,32], "structure":[22,52]}]
     }
   }
 ]

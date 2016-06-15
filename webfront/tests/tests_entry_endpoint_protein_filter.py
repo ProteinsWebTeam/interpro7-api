@@ -36,6 +36,7 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
             "/api/entry/pfam/"+pfam+"/protein/",
             "/api/entry/pfam/"+pfam_un+"/protein/",
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/",
+            "/api/entry/interpro/pfam/"+pfam+"/protein/",
             "/api/entry/unintegrated/pfam/"+pfam_un+"/protein/",
             ]
         for url in urls:

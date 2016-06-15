@@ -79,3 +79,7 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("coordinates", obj)
         self.assertIn("length", obj)
         self.assertIn("organism", obj)
+
+    def _check_entry_structure_details(self, obj):
+        self.assertIn("coordinates", obj)
+        self.assertIn("chain", obj)

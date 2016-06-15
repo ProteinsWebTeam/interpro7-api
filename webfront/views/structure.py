@@ -1,6 +1,6 @@
 from django.db.models import Count
 from webfront.constants import get_queryset_type, QuerysetType
-from webfront.models import Structure, ProteinStructureFeature, Protein
+from webfront.models import Structure, ProteinStructureFeature, Protein, EntryStructureFeature
 from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 
@@ -101,7 +101,7 @@ class PDBAccessionHandler(CustomView):
         qs_type = get_queryset_type(queryset)
         general_handler.set_in_store(PDBAccessionHandler, "pdb_accession", level_name)
         if not isinstance(queryset, dict):
-            if qs_type == QuerysetType.PROTEIN:
+            if qs_type == QuerysetType.PROTEIN or qs_type == QuerysetType.ENTRY:
                 queryset = queryset.filter(structures=level_name).distinct()
             elif qs_type == QuerysetType.STRUCTURE:
                 queryset = queryset.filter(protein=level_name)
@@ -111,9 +111,10 @@ class PDBAccessionHandler(CustomView):
             if queryset.count() == 0:
                 raise ReferenceError("The chain {} doesn't exist in the structure {}".format(level_name, "pdb"))
             return queryset
-        # elif "interpro" in queryset:
-        #     matches = ProteinEntryFeature.objects.filter(protein=level_name)
-        #     return EntryHandler.get_database_contributions(matches, 'entry__')
+        elif "interpro" in queryset:
+            matches = EntryStructureFeature.objects.filter(structure=level_name)
+            from webfront.views.entry import EntryHandler
+            return EntryHandler.get_database_contributions(matches, 'entry__')
         elif "uniprot" in queryset:
             matches = ProteinStructureFeature.objects.filter(structure=level_name)
             from webfront.views.protein import ProteinHandler
@@ -240,8 +241,8 @@ class StructureHandler(CustomView):
             qs_type = get_queryset_type(queryset)
             if qs_type == QuerysetType.PROTEIN:
                 qs = Structure.objects.filter(accession__in=queryset.values('structures'))
-        #     elif qs_type == QuerysetType.STRUCTURE:
-        #         qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
+            elif qs_type == QuerysetType.ENTRY:
+                qs = Structure.objects.filter(accession__in=queryset.values('structures'))
         #     elif qs_type == QuerysetType.STRUCTURE_PROTEIN:
         #         qs = Protein.objects.filter(accession__in=queryset.values('protein'))
         general_handler.set_in_store(StructureHandler,

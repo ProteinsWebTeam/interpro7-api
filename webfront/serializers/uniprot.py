@@ -54,7 +54,7 @@ class ProteinSerializer(ModelContentSerializer):
             "representation": instance.feature,
             # "structure": instance.structure,
             "genomic_context": instance.genomic_context,
-            "source_database": instance.source_database
+            # "source_database": instance.source_database
         }
 
     @staticmethod

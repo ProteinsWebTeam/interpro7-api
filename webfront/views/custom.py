@@ -56,18 +56,26 @@ class CustomView(GenericAPIView):
                     serializer_detail=self.serializer_detail,
                     serializer_detail_filter=self.serializer_detail_filter,
                 )
-                data_tmp = self.post_serializer(serialized.data,
-                                                endpoint_levels[level - 1],
-                                                general_handler)
+                # data_tmp = general_handler.post_serializer(serialized.data,
+                #                                            general_handler.last_endpoint_level,
+                #                                 general_handler)
+                # data_tmp = self.post_serializer(serialized.data,
+                #                                            endpoint_levels[level - 1],
+                #                                            general_handler)
+                data_tmp = general_handler.execute_post_serializers(serialized.data)
 
                 if self.many:
                     return self.get_paginated_response(data_tmp)
                 else:
                     return Response(data_tmp)
 
-            data_tmp = self.post_serializer(self.queryset,
-                                            endpoint_levels[level - 1],
-                                            general_handler)
+            # data_tmp = general_handler.post_serializer(self.queryset,
+            #                                            general_handler.last_endpoint_level,
+            #                                 general_handler)
+            # data_tmp = self.post_serializer(self.queryset,
+            #                                 endpoint_levels[level - 1],
+            #                                 general_handler)
+            data_tmp = general_handler.execute_post_serializers(self.queryset)
             return Response(data_tmp)
 
         else:
@@ -110,6 +118,10 @@ class CustomView(GenericAPIView):
                         *args, **kwargs
                     )
 
+            # general_handler.post_serializer = handler_class.post_serializer
+            # general_handler.last_endpoint_level = level_name
+            general_handler.register_post_serializer(handler_class.post_serializer, level_name)
+
             # delegate to the lower level handler
             return handler_class.as_view()(
                 request, endpoint_levels, endpoints, level + 1,
@@ -122,6 +134,7 @@ class CustomView(GenericAPIView):
             self.serializer_detail_filter = handler_class.serializer_detail_filter
             self.queryset = handler_class.filter(self.queryset, endpoint_levels[level], general_handler)
             self.post_serializer = handler_class.post_serializer
+            general_handler.register_post_serializer(handler_class.post_serializer, endpoint_levels[level])
 
             # handlers = {**self.child_handlers, **endpoints}
             handlers = endpoints + handler_class.child_handlers

@@ -33,16 +33,17 @@ class GeneralHandler(CustomView):
     child_handlers = []
     queryset = Entry.objects
     store = {}
+    last_endpoint_level=None
 
     def get(self, request, url='', *args, **kwargs):
         self.store = {}
+        self.post_serializers = {}
         endpoint_levels = map_url_to_levels(url)
-        pagination = pagination_information(request)
 
+        self.set_in_store(GeneralHandler, "pagination", pagination_information(request))
         try:
             return super(GeneralHandler, self).get(
                 request, endpoint_levels,
-                pagination=pagination,
                 available_endpoint_handlers=self.available_endpoint_handlers,
                 level=0,
                 parent_queryset=self.queryset,
@@ -68,3 +69,24 @@ class GeneralHandler(CustomView):
             raise KeyError("The general handler store doesn't have the key {} registered under {}"
                            .format(key, handler_class))
         return self.store[handler_class][key]
+
+    post_serializers = {}
+    current_endpoint = None
+    main_endpoint = None
+
+    def register_post_serializer(self, post_serializer, value):
+        if value in [e[0] for e in self.available_endpoint_handlers]:
+            self.current_endpoint = value
+            if len(self.post_serializers) == 0:
+                self.main_endpoint = value
+        if self.current_endpoint is not None:
+            self.post_serializers[self.current_endpoint] = {
+                "post_serializer": post_serializer,
+                "value": value
+            }
+
+    def execute_post_serializers(self, data):
+        for key in self.post_serializers:
+            ps = self.post_serializers[key]
+            data = ps["post_serializer"](data, ps["value"], self)
+        return data

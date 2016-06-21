@@ -13,7 +13,7 @@ class StructureRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/structure/pdb")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_accession(response.data["results"])
-        self.assertEqual(len(response.data["results"]), 3)
+        self.assertEqual(len(response.data["results"]), 4)
 
     def test_can_read_structure_pdb_accession(self):
         response = self.client.get("/api/structure/pdb/2BKM")
@@ -28,6 +28,7 @@ class StructureRESTTest(InterproRESTTestCase):
         self._check_structure_details(response.data["metadata"])
         for chain in response.data["metadata"]["chains"].values():
             self._check_structure_chain_details(chain)
+            self.assertEqual(chain["chain"], "A")
 
 
     # TODO:

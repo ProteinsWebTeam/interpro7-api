@@ -5,6 +5,7 @@ data_in_fixtures = {
     "2BKM": ["A0A0A2L2G2", "M5ADK6"],
     "1T2V": ["P16582", "P16582", "P16582", "P16582", "P16582"],
     "1JM7": ["A1CUJ5", "M5ADK6"],
+    "1JZ8": ["A0A0A2L2G2", "A0A0A2L2G2"]
 }
 
 

@@ -33,7 +33,7 @@ class ProteinSerializer(ModelContentSerializer):
         qs_type = get_queryset_type(instance)
         if detail_filter == SerializerDetail.ENTRY_OVERVIEW:
             representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
-        elif detail_filter == SerializerDetail.ENTRY_PROTEIN:
+        elif detail_filter == SerializerDetail.ENTRY_MATCH:
             representation = ProteinSerializer.to_match_representation(instance, False)
         elif detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
             representation = ProteinSerializer.to_match_representation(instance, True)

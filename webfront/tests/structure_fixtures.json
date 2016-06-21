@@ -39,6 +39,19 @@
     }
   },
   {
+    "model": "webfront.Structure",
+    "fields": {
+      "accession": "1JZ8",
+      "name": "E. COLI (lacZ) BETA-GALACTOSIDASE (E537Q) IN COMPLEX WITH ALLOLACTOSE",
+      "other_names": [],
+      "experiment_type": "X-ray diffraction, resolution 1.50Å",
+      "release_date": "2009-02-24",
+      "authors": ["Juers, D.H.", "Matthews, B.W."],
+      "chains": ["A", "B","C", "D"],
+      "source_database": "pdb"
+    }
+  },
+  {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
       "protein": "A1CUJ5",
@@ -155,13 +168,41 @@
     "fields": {
       "protein": "P16582",
       "structure": "1T2V",
-      "chain": "A",
+      "chain": "E",
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
       "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "A0A0A2L2G2",
+      "structure": "1JZ8",
+      "chain": "A",
+      "length": 228,
+      "organism": {
+        "name": "Geobacillus kaustophilus (strain HTA426)",
+        "taxid": 235909
+      },
+      "coordinates": [{"protein":[50,130], "structure":[600,137]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "A0A0A2L2G2",
+      "structure": "1JZ8",
+      "chain": "B",
+      "length": 228,
+      "organism": {
+        "name": "Geobacillus kaustophilus (strain HTA426)",
+        "taxid": 235909
+      },
+      "coordinates": [{"protein":[50,130], "structure":[600,137]}]
     }
   },
 

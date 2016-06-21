@@ -2,7 +2,7 @@ from webfront.constants import get_queryset_type, QuerysetType
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import SerializerDetail
-
+from webfront.models import Structure
 
 class StructureSerializer(ModelContentSerializer):
 
@@ -16,14 +16,16 @@ class StructureSerializer(ModelContentSerializer):
 
     @staticmethod
     def endpoint_representation(representation, instance, detail):
+        qs_type = get_queryset_type(instance)
         if detail == SerializerDetail.ALL:
             representation = StructureSerializer.to_full_representation(instance)
         elif detail == SerializerDetail.STRUCTURE_HEADERS:
             representation = StructureSerializer.to_headers_representation(instance)
         elif detail == SerializerDetail.STRUCTURE_CHAIN:
-            representation = StructureSerializer.to_full_representation(instance.structure)
+            representation = StructureSerializer.to_full_representation(instance)
             representation["metadata"]["chains"] = {
-                instance.chain: StructureSerializer.to_chain_representation(instance)}
+                chain.chain: StructureSerializer.to_chain_representation(chain)
+                for chain in instance.proteinstructurefeature_set.all() }
         return representation
 
     @staticmethod
@@ -56,6 +58,10 @@ class StructureSerializer(ModelContentSerializer):
                 representation["proteins"] = 1
             else:
                 representation["proteins"] = StructureSerializer.to_proteins_count_representation(instance)
+        elif detail_filter == SerializerDetail.ENTRY_OVERVIEW:
+            representation["entries"] = StructureSerializer.to_entries_count_representation(instance)
+        elif detail_filter == SerializerDetail.ENTRY_MATCH:
+            representation["entries"] = StructureSerializer.to_entries_overview_representation(instance)
 
         return representation
 
@@ -106,3 +112,33 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def to_proteins_detail_representation(instance):
         return [StructureSerializer.to_chain_representation(instance, True)]
+
+    @staticmethod
+    def to_entries_count_representation(instance):
+        return instance.entrystructurefeature_set.count()
+
+    @staticmethod
+    def to_entry_representation(instance, full=False):
+        from webfront.serializers.interpro import EntrySerializer
+
+        chain = {
+            "chain": instance.chain,
+            "entry": instance.entry.accession,
+            "source_database": instance.entry.source_database,
+            "coordinates": instance.coordinates,
+        }
+        if instance.entry.integrated is not None:
+            chain["integrated"]= instance.entry.integrated.accession,
+        if full:
+            chain["structure"] = EntrySerializer.to_metadata_representation(instance.entry)
+        return chain
+
+    @staticmethod
+    def to_entries_overview_representation(instance, is_full=False):
+        return [
+            StructureSerializer.to_entry_representation(match, is_full)
+            for match in instance.entrystructurefeature_set.all()
+            ]
+
+    class Meta:
+        model = Structure

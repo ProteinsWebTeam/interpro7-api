@@ -1,8 +1,12 @@
 import ipdb
 import re
 from django.db.models import Count, QuerySet
-from webfront.models import Entry, ProteinEntryFeature
+
+from webfront.constants import QuerysetType
+from webfront.constants import get_queryset_type
+from webfront.models import Entry, ProteinEntryFeature, EntryStructureFeature, Structure
 from webfront.serializers.interpro import EntrySerializer
+from django.db.models import F
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
@@ -60,7 +64,7 @@ class MemberHandler(CustomView):
     ]
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
-    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN
+    serializer_detail_filter = SerializerDetail.ENTRY_MATCH
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
@@ -94,31 +98,77 @@ class MemberHandler(CustomView):
         except (IndexError, KeyError):
             interpro_acc = None
 
-        if isinstance(queryset, dict) and "uniprot" in queryset:
-            for prot_db in queryset:
-                matches = ProteinEntryFeature.objects.filter(entry__source_database__iexact=level_name)
-                if prot_db != "uniprot":
-                    matches = matches.filter(protein__source_database__iexact=prot_db)
+        if isinstance(queryset, dict):
+            if"uniprot" in queryset:
+                for prot_db in queryset:
+                    matches = ProteinEntryFeature.objects.filter(entry__source_database__iexact=level_name)
+                    if prot_db != "uniprot":
+                        matches = matches.filter(protein__source_database__iexact=prot_db)
 
+                    if is_unintegrated:
+                        matches = matches.filter(entry__integrated__isnull=True)
+                    elif interpro_acc is not None:
+                        matches = matches.filter(entry__integrated=interpro_acc)
+                    elif is_interpro:
+                        matches = matches.filter(entry__integrated__isnull=False)
+                    queryset[prot_db] = {
+                        "proteins": matches.values("protein").distinct().count(),
+                        "entries": matches.values("entry").distinct().count()
+                    }
+            elif "pdb" in queryset:
+                matches = EntryStructureFeature.objects.filter(entry__source_database__iexact=level_name)
                 if is_unintegrated:
                     matches = matches.filter(entry__integrated__isnull=True)
                 elif interpro_acc is not None:
                     matches = matches.filter(entry__integrated=interpro_acc)
                 elif is_interpro:
                     matches = matches.filter(entry__integrated__isnull=False)
-                queryset[prot_db] = {
-                    "proteins": matches.values("protein").distinct().count(),
+                queryset["pdb"] = {
+                    "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
-            return queryset
 
-        if hasattr(queryset, "model") and queryset.model is ProteinEntryFeature:
-            if is_unintegrated:
-                return queryset.filter(entry__source_database__iexact=level_name)
-            return ProteinEntryFeature.objects.filter(
-                entry__integrated__in=queryset.values("entry").distinct(),
-                entry__source_database__iexact=level_name)
+            return queryset
+        else:
+            qs_type = get_queryset_type(queryset)
+            if qs_type == QuerysetType.ENTRY_PROTEIN:
+                if is_unintegrated:
+                    return queryset.filter(entry__integrated__isnull=True,
+                                           entry__source_database__iexact=level_name)
+                return ProteinEntryFeature.objects.filter(
+                    entry__integrated__in=queryset.values("entry").distinct(),
+                    entry__source_database__iexact=level_name)
+            elif qs_type == QuerysetType.STRUCTURE:
+                qs = Entry.objects.all().filter(source_database__iexact=level_name)
+                if is_unintegrated:
+                    qs = qs.filter(integrated__isnull=True)
+                elif interpro_acc is not None:
+                    qs = qs.filter(integrated=interpro_acc)
+                elif is_interpro:
+                    qs = qs.filter(integrated__isnull=False)
+
+                general_handler.set_in_store(MemberHandler, "entries", [q["accession"] for q in qs.values("accession")])
+                queryset = queryset.filter(
+                    entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),
+                    entries__in=qs).distinct()
+                if queryset.count() == 0:
+                    raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+                return queryset
         return ProteinEntryFeature.objects.filter(protein__in=queryset, entry__source_database__iexact=level_name)
+
+    @staticmethod
+    def post_serializer(obj, level_name="", general_handler=None):
+        if hasattr(obj, 'serializer'):
+            try:
+                entries = general_handler.get_from_store(MemberHandler, "entries")
+            except IndexError:
+                entries = Entry.objects.all()
+            arr = [obj] if isinstance(obj, dict) else obj
+            for o in arr:
+                if "entries" in o:
+                    o["entries"] = [e for e in o["entries"]
+                                    if e["source_database"] == level_name and e["entry"] in entries]
+        return obj
 
 
 class AccesionHandler(CustomView):
@@ -149,13 +199,20 @@ class AccesionHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(AccesionHandler, "accession", level_name)
-        if isinstance(queryset, dict) and "uniprot" in queryset:
-            for prot_db in queryset:
-                matches = ProteinEntryFeature.objects.filter(entry=level_name)
-                if prot_db != "uniprot":
-                    matches = matches.filter(protein__source_database__iexact=prot_db)
-                queryset[prot_db] = {
-                    "proteins": matches.values("protein").distinct().count(),
+        if isinstance(queryset, dict):
+            if "uniprot" in queryset:
+                for prot_db in queryset:
+                    matches = ProteinEntryFeature.objects.filter(entry=level_name)
+                    if prot_db != "uniprot":
+                        matches = matches.filter(protein__source_database__iexact=prot_db)
+                    queryset[prot_db] = {
+                        "proteins": matches.values("protein").distinct().count(),
+                        "entries": matches.values("entry").distinct().count()
+                    }
+            elif "pdb" in queryset:
+                matches = EntryStructureFeature.objects.filter(entry=level_name)
+                queryset["pdb"] = {
+                    "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
             return queryset
@@ -170,7 +227,7 @@ class UnintegratedHandler(CustomView):
         .filter(integrated__isnull=True)
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
-    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN
+    serializer_detail_filter = SerializerDetail.ENTRY_MATCH
     child_handlers = [
         (db_members, MemberHandler)
     ]
@@ -178,24 +235,58 @@ class UnintegratedHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
-        if isinstance(queryset, dict) and "uniprot" in queryset:
-            for prot_db in queryset:
-                matches = ProteinEntryFeature.objects\
-                    .filter(entry__integrated__isnull=True)\
+        if isinstance(queryset, dict):
+            if "uniprot" in queryset:
+                for prot_db in queryset:
+                    matches = ProteinEntryFeature.objects\
+                        .filter(entry__integrated__isnull=True)\
+                        .exclude(entry__source_database__iexact="interpro")
+                    if prot_db != "uniprot":
+                        matches = matches.filter(protein__source_database__iexact=prot_db)
+                    queryset[prot_db] = {
+                        "proteins": matches.values("protein").distinct().count(),
+                        "entries": matches.values("entry").distinct().count()
+                    }
+            elif "pdb" in queryset:
+                matches = EntryStructureFeature.objects \
+                    .filter(entry__integrated__isnull=True) \
                     .exclude(entry__source_database__iexact="interpro")
-                if prot_db != "uniprot":
-                    matches = matches.filter(protein__source_database__iexact=prot_db)
-                queryset[prot_db] = {
-                    "proteins": matches.values("protein").distinct().count(),
+                queryset["pdb"] = {
+                    "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
             return queryset
-        qs = ProteinEntryFeature.objects \
-            .filter(protein__in=queryset, entry__integrated__isnull=True) \
-            .exclude(entry__source_database__iexact="interpro")
-        if qs.count() == 0:
-            raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
-        return qs
+        else:
+            qs_type = get_queryset_type(queryset)
+            qs = queryset
+            if qs_type == QuerysetType.PROTEIN:
+                qs = ProteinEntryFeature.objects \
+                    .filter(protein__in=queryset, entry__integrated__isnull=True) \
+                    .exclude(entry__source_database__iexact="interpro")
+            elif qs_type == QuerysetType.STRUCTURE:
+                # qs = EntryStructureFeature.objects \
+                #     .filter(structure__in=queryset, entry__integrated__isnull=True) \
+                #     .exclude(entry__source_database__iexact="interpro")
+                # if qs.count() == 0:
+                #     raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+                qs = queryset \
+                    .filter(entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),
+                            entries__integrated__isnull=True,
+                            entries__source_database__iregex=db_members).distinct()
+            if qs.count() == 0:
+                raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+            return qs
+
+    @staticmethod
+    def post_serializer(obj, level_name="", general_handler=None):
+        if hasattr(obj, 'serializer'):
+            arr = [obj] if isinstance(obj, dict) else obj
+            for o in arr:
+                if "entries" in o:
+                    o["entries"] = [e for e in o["entries"]
+                                    if re.match(db_members, e["source_database"]) and
+                                    "integrated" not in e]
+        return obj
 
 
 class InterproHandler(CustomView):
@@ -207,24 +298,52 @@ class InterproHandler(CustomView):
     ]
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
-    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN
+    serializer_detail_filter = SerializerDetail.ENTRY_MATCH
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(InterproHandler, "interpro", True)
-        if isinstance(queryset, dict) and "uniprot" in queryset:
-            for prot_db in queryset:
-                matches = ProteinEntryFeature.objects.filter(entry__source_database__iexact="interpro")
-                if prot_db != "uniprot":
-                    matches = matches.filter(protein__source_database__iexact=prot_db)
-                queryset[prot_db] = {
-                    "proteins": matches.values("protein").distinct().count(),
+        if isinstance(queryset, dict):
+            if "uniprot" in queryset:
+                for prot_db in queryset:
+                    matches = ProteinEntryFeature.objects.filter(entry__source_database__iexact="interpro")
+                    if prot_db != "uniprot":
+                        matches = matches.filter(protein__source_database__iexact=prot_db)
+                    queryset[prot_db] = {
+                        "proteins": matches.values("protein").distinct().count(),
+                        "entries": matches.values("entry").distinct().count()
+                    }
+            elif "pdb" in queryset:
+                matches = EntryStructureFeature.objects.filter(entry__source_database__iexact="interpro")
+                queryset["pdb"] = {
+                    "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
             return queryset
-        return ProteinEntryFeature.objects.filter(protein__in=queryset, entry__source_database__iexact="interpro")
+        else:
+            qs_type = get_queryset_type(queryset)
+            if qs_type == QuerysetType.PROTEIN:
+                return ProteinEntryFeature.objects.filter(protein__in=queryset, entry__source_database__iexact="interpro")
+                # return queryset.filter(entries__source_database__iexact="interpro")
+            elif qs_type == QuerysetType.STRUCTURE:
+                qs = queryset.filter(
+                    entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),
+                    entries__source_database__iexact="interpro").distinct()
+                if qs.count() == 0:
+                    raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+                return qs
+            # return EntryStructureFeature.objects.filter(structure__in=queryset, entry__source_database__iexact="interpro")
 #        return queryset.filter(entry__source_database__iexact="interpro")
     # TODO: Check this filter
+
+    @staticmethod
+    def post_serializer(obj, level_name="", general_handler=None):
+        if hasattr(obj, 'serializer'):
+            arr = [obj] if isinstance(obj, dict) else obj
+            for o in arr:
+                if "entries" in o:
+                    o["entries"] = [e for e in o["entries"] if e["source_database"]=="interpro"]
+        return obj
 
 
 class EntryHandler(CustomView):
@@ -272,7 +391,12 @@ class EntryHandler(CustomView):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
         qs = Entry.objects.all()
         if not isinstance(queryset, dict):
-            qs = Entry.objects.filter(accession__in=queryset.values('proteinentryfeature__entry'))
+            qs_type = get_queryset_type(queryset)
+            if qs_type == QuerysetType.STRUCTURE:
+                # TODO: Check on how to filter the chains.
+                qs = Entry.objects.filter(accession__in=queryset.values('entrystructurefeature__entry'))
+            elif qs_type == QuerysetType.PROTEIN:
+                qs = Entry.objects.filter(accession__in=queryset.values('proteinentryfeature__entry'))
         general_handler.set_in_store(EntryHandler,
                                      "entry_count",
                                      EntryHandler.get_database_contributions(qs))

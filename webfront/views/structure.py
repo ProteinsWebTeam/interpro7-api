@@ -20,9 +20,12 @@ class ChainPDBAccessionHandler(CustomView):
         if parent_queryset is not None:
             self.queryset = parent_queryset
         # self.queryset = self.queryset.filter(chains__contains=endpoint_levels[level - 1])
-        self.queryset = ProteinStructureFeature.objects\
-            .filter(structure__in=self.queryset)\
-            .filter(chain=endpoint_levels[level - 1])
+        self.queryset = self.queryset\
+            .filter(proteinstructurefeature__chain=endpoint_levels[level - 1])
+
+        # ProteinStructureFeature.objects\
+        #     .filter(structure__in=self.queryset)\
+        #     .filter(chain=endpoint_levels[level - 1])
         # self.queryset.filter(proteins__set__chain=endpoint_levels[level - 1])
         if self.queryset.count() == 0:
             raise Exception("The Chain '{}' has not been found in the structure {}".format(
@@ -51,7 +54,6 @@ class ChainPDBAccessionHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         if type(obj) != dict:
-            if not isinstance(obj.serializer, StructureSerializer):
                 pdb = general_handler.get_from_store(PDBAccessionHandler, "pdb_accession")
                 arr = obj
                 if isinstance(obj, dict):
@@ -68,6 +70,20 @@ class ChainPDBAccessionHandler(CustomView):
                               p["structure"]["chain"] == level_name and
                               p["structure"]["accession"] == pdb)
                              ]
+                    if "entries" in o and isinstance(o["entries"], list):
+                        o["entries"] = \
+                            [p for p in o["entries"] if
+                             ("chain" in p and
+                              p["chain"] == level_name) or
+                             ("structure" in p and
+                              "chain" in p["structure"] and
+                              p["entry"]["chain"] == level_name)
+                             ]
+                    if "metadata"in o and "chains" in o["metadata"] and isinstance(o["metadata"]["chains"], dict):
+                        o["metadata"]["chains"] = \
+                            {p:o["metadata"]["chains"][p] for p in o["metadata"]["chains"] if
+                             (level_name in p)
+                             }
         return obj
 
 
@@ -82,18 +98,19 @@ class PDBAccessionHandler(CustomView):
     serializer_detail_filter = SerializerDetail.STRUCTURE_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
         if parent_queryset is not None:
             self.queryset = parent_queryset
         self.queryset = self.queryset.filter(accession__iexact=endpoint_levels[level - 1])
+        general_handler.set_in_store(PDBAccessionHandler, "pdb_accession", endpoint_levels[level - 1])
         if self.queryset.count() == 0:
             raise Exception("The ID '{}' has not been found in {}".format(
                 endpoint_levels[level - 1], endpoint_levels[level - 2]))
         return super(PDBAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, *args, **kwargs
+            self.queryset, handler, general_handler, *args, **kwargs
         )
 
     @staticmethod

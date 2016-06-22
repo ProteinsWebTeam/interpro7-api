@@ -52,12 +52,14 @@ class StructureSerializer(ModelContentSerializer):
                 representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance, True)
             else:
                 representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance)
-        elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
-                detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+        elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS:
             if qs_type == QuerysetType.STRUCTURE_PROTEIN:
                 representation["proteins"] = 1
             else:
                 representation["proteins"] = StructureSerializer.to_proteins_count_representation(instance)
+        elif detail_filter == SerializerDetail.ENTRY_DETAIL:
+            if qs_type == QuerysetType.STRUCTURE:
+                representation["entries"] = StructureSerializer.to_entries_overview_representation(instance, True)
         elif detail_filter == SerializerDetail.ENTRY_OVERVIEW:
             representation["entries"] = StructureSerializer.to_entries_count_representation(instance)
         elif detail_filter == SerializerDetail.ENTRY_MATCH:
@@ -130,7 +132,7 @@ class StructureSerializer(ModelContentSerializer):
         if instance.entry.integrated is not None:
             chain["integrated"]= instance.entry.integrated.accession,
         if full:
-            chain["structure"] = EntrySerializer.to_metadata_representation(instance.entry)
+            chain["entry"] = EntrySerializer.to_metadata_representation(instance.entry)
         return chain
 
     @staticmethod

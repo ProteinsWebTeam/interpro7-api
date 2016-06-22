@@ -18,7 +18,7 @@ class MemberAccesionHandler(CustomView):
     level_description = 'DB member accession level'
     serializer_class = EntrySerializer
     many = False
-    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_DETAIL
+    serializer_detail_filter = SerializerDetail.ENTRY_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):
@@ -40,20 +40,62 @@ class MemberAccesionHandler(CustomView):
             is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
         except (IndexError, KeyError):
             is_unintegrated = False
-        if isinstance(queryset, dict) and "uniprot" in queryset:
-            for prot_db in queryset:
-                matches = ProteinEntryFeature.objects.filter(entry=level_name)
-                # Under the assumption that a pfam family cannot be part of more than one Interpro domain.
-                if prot_db != "uniprot":
-                    matches = matches.filter(protein__source_database__iexact=prot_db)
+        try:
+            is_interpro = general_handler.get_from_store(InterproHandler, "interpro")
+        except (IndexError, KeyError):
+            is_interpro = False
+        try:
+            interpro_acc = general_handler.get_from_store(AccesionHandler, "accession")
+        except (IndexError, KeyError):
+            interpro_acc = None
+        if isinstance(queryset, dict):
+            if"uniprot" in queryset:
+                for prot_db in queryset:
+                    matches = ProteinEntryFeature.objects.filter(entry=level_name)
+                    # Under the assumption that a pfam family cannot be part of more than one Interpro domain.
+                    if prot_db != "uniprot":
+                        matches = matches.filter(protein__source_database__iexact=prot_db)
+                    if is_unintegrated:
+                        matches = matches.filter(entry__integrated__isnull=True)
+                    queryset[prot_db] = {
+                        "proteins": matches.values("protein").distinct().count(),
+                        "entries": matches.values("entry").distinct().count()
+                    }
+            elif "pdb" in queryset:
+                matches = EntryStructureFeature.objects.filter(entry__accession__iexact=level_name)
                 if is_unintegrated:
                     matches = matches.filter(entry__integrated__isnull=True)
-                queryset[prot_db] = {
-                    "proteins": matches.values("protein").distinct().count(),
+                elif interpro_acc is not None:
+                    matches = matches.filter(entry__integrated=interpro_acc)
+                elif is_interpro:
+                    matches = matches.filter(entry__integrated__isnull=False)
+                queryset["pdb"] = {
+                    "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
             return queryset
-        return queryset.filter(entry=level_name)
+        qs_type = get_queryset_type(queryset)
+        if qs_type == QuerysetType.STRUCTURE:
+            if is_unintegrated:
+                queryset = queryset.filter(entry=level_name, entry__integrated__isnull=True)
+            elif interpro_acc is not None:
+                queryset = queryset.filter(entry=level_name, entry__integrated=interpro_acc)
+            else:
+                queryset = queryset.filter(entry=level_name, entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),)
+        if queryset.count() == 0:
+            raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+        return queryset
+
+    @staticmethod
+    def post_serializer(obj, level_name="", general_handler=None):
+        if hasattr(obj, 'serializer'):
+            arr = [obj] if isinstance(obj, dict) else obj
+            for o in arr:
+                if "entries" in o:
+                    o["entries"] = [e for e in o["entries"]
+                                    if e["entry"] == level_name or
+                                    (isinstance(e["entry"], dict) and e["entry"]["accession"] == level_name)]
+        return obj
 
 
 class MemberHandler(CustomView):
@@ -178,7 +220,7 @@ class AccesionHandler(CustomView):
     ]
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_DETAIL
-    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_DETAIL
+    serializer_detail_filter = SerializerDetail.ENTRY_DETAIL
     queryset = Entry.objects
     many = False
 
@@ -218,6 +260,17 @@ class AccesionHandler(CustomView):
             return queryset
         return queryset.filter(entry=level_name)
         # TODO: Check this filter
+
+    @staticmethod
+    def post_serializer(obj, level_name="", general_handler=None):
+        if hasattr(obj, 'serializer'):
+            arr = [obj] if isinstance(obj, dict) else obj
+            for o in arr:
+                if "entries" in o:
+                    o["entries"] = [e for e in o["entries"]
+                                    if e["entry"] == level_name or
+                                    (isinstance(e["entry"], dict) and e["entry"]["accession"] == level_name)]
+        return obj
 
 
 class UnintegratedHandler(CustomView):

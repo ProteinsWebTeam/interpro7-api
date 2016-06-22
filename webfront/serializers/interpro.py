@@ -34,7 +34,7 @@ class EntrySerializer(ModelContentSerializer):
         elif detail_filter == SerializerDetail.PROTEIN_DETAIL:
             representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance)
         elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
-                detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL:
+                detail_filter == SerializerDetail.ENTRY_DETAIL:
             representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
         elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
             representation["structures"] = EntrySerializer.to_structures_count_representation(instance)

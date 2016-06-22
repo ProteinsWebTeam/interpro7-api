@@ -170,104 +170,110 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
-#
-# class structureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
-#
-#     def test_urls_that_return_object_of_structure_and_entry_counts(self):
-#         acc = "IPR003165"
-#         pfam = "PF02171"
-#         pfam_u = "PF17180"
-#         urls = [
-#             "/api/structure/entry/unintegrated/pfam/"+pfam_u,
-#             "/api/structure/entry/interpro/pfam/"+pfam,
-#             "/api/structure/entry/pfam/"+pfam,
-#             "/api/structure/entry/interpro/"+acc+"/pfam/"+pfam,
-#             "/api/structure/entry/interpro/"+acc,
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK)
-#             self.assertIsInstance(response.data, dict)
-#             for prot_db in response.data:
-#                 self.assertIn(prot_db, ["pdb", "pdb", "pdb"])
-#                 self.assertIn("structures", response.data[prot_db])
-#                 self.assertIn("entries", response.data[prot_db])
-#
-#     def test_can_get_entries_from_structure_id_interpro_ids(self):
-#         acc = "A1CUJ5"
-#         ips = ["IPR001165", "IPR003165"]
-#         for ip in ips:
-#             response = self.client.get("/api/structure/pdb/"+acc+"/entry/interpro/"+ip)
-#             self._check_single_entry_response(response)
-#
-#     def test_urls_that_return_list_of_structure_accessions_with_matches_and_detailed_entries(self):
-#         acc = "IPR003165"
-#         pfam = "PF02171"
-#         smart = "SM00950"
-#         urls = [
-#             "/api/structure/pdb/entry/interpro/"+acc,
-#             "/api/structure/pdb/entry/interpro/"+acc,
-#             "/api/structure/pdb/entry/interpro/"+acc,
-#             "/api/structure/pdb/entry/pfam/"+pfam,
-#             "/api/structure/pdb/entry/unintegrated/pfam/"+pfam,
-#             "/api/structure/pdb/entry/unintegrated/smart/"+smart,
-#             "/api/structure/pdb/entry/interpro/pfam/"+pfam,
-#             "/api/structure/pdb/entry/interpro/"+acc+"/pfam/"+pfam,
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK)
-#             self._check_is_list_of_objects_with_accession(response.data["results"])
-#             self._check_is_list_of_objects_with_key(response.data["results"], "entries",
-#                                                     "It should have the key 'entries' for the URL ["+url+"]")
-#             for structure in response.data["results"]:
-#                 for match in structure["entries"]:
-#                     self._check_match(match)
-#                     self._check_entry_details(match["entry"])
-#
-#     def test_urls_that_return_a_structure_details_with_matches(self):
-#         sp_1 = "M5ADK6"
-#         sp_2 = "A1CUJ5"
-#         acc = "IPR003165"
-#         pfam = "PF02171"
-#         pfam_u = "PF17180"
-#         smart = "SM00950"
-#         urls = [
-#             "/api/structure/pdb/"+sp_2+"/entry/interpro/"+acc,
-#             "/api/structure/pdb/"+sp_2+"/entry/pfam/"+pfam,
-#             "/api/structure/pdb/"+sp_2+"/entry/interpro/pfam/"+pfam,
-#             "/api/structure/pdb/"+sp_2+"/entry/interpro/smart/"+smart,
-#             "/api/structure/pdb/"+sp_2+"/entry/interpro/"+acc+"/smart/"+smart,
-#             "/api/structure/pdb/"+sp_2+"/entry/interpro/"+acc+"/pfam/"+pfam,
-#             "/api/structure/pdb/"+sp_1+"/entry/unintegrated/pfam/"+pfam_u,
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self._check_structure_details(response.data["metadata"])
-#             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-#             self.assertEqual(len(response.data["entries"]), 1,
-#                              "The number of entries should be 1. URL: [{}]".format(url))
-#             self._check_match(response.data["entries"][0])
-#             self._check_entry_details(response.data["entries"][0]["entry"])
-#
-#     def test_can_get_entries_from_structure_id_pfam_id(self):
-#         acc = "A1CUJ5"
-#         pfam = "PF02171"
-#         response = self.client.get("/api/structure/pdb/"+acc+"/entry/pfam/"+pfam)
-#         self._check_single_entry_response(response)
-#
-#     def test_urls_that_should_fails(self):
-#         tr_1 = "P16582"
-#         sp_1 = "M5ADK6"
-#         acc = "IPR003165"
-#         pfam = "PF02171"
-#         pfam_u = "PF17180"
-#         tests = [
-#             "/api/structure/pdb/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
-#             "/api/structure/pdb/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
-#             "/api/structure/pdb/"+sp_1+"/entry/unintegrated/pfam/"+pfam_u,
-#             "/api/structure/pdb/"+sp_1+"/entry/interpro/"+acc,
-#             "/api/structure/pdb/"+sp_1+"/entry/interpro/"+acc+"/pfam/"+pfam,
-#             ]
-#         for url in tests:
-#             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+
+class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
+
+    def test_urls_that_return_object_of_structure_and_entry_counts(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_u = "PF17180"
+        urls = [
+            "/api/structure/entry/unintegrated/pfam/"+pfam_u,
+            "/api/structure/entry/interpro/pfam/"+pfam,
+            "/api/structure/entry/pfam/"+pfam,
+            "/api/structure/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/structure/entry/interpro/"+acc,
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIsInstance(response.data, dict)
+            for prot_db in response.data:
+                self.assertIn(prot_db, ["pdb"])
+                self.assertIn("structures", response.data[prot_db])
+                self.assertIn("entries", response.data[prot_db])
+
+    def test_urls_that_return_list_of_structure_accessions_with_matches_and_detailed_entries(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_u = "PF17180"
+        smart = "SM00950"
+        urls = {
+            "/api/structure/pdb/entry/interpro/"+acc: [acc],
+            "/api/structure/pdb/entry/pfam/"+pfam: [pfam],
+            "/api/structure/pdb/entry/unintegrated/pfam/"+pfam_u: [pfam_u],
+            "/api/structure/pdb/entry/interpro/smart/"+smart: [smart],
+            "/api/structure/pdb/entry/interpro/"+acc+"/pfam/"+pfam: [pfam],
+        }
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "entries",
+                                                    "It should have the key 'entries' for the URL ["+url+"]")
+            for structure in response.data["results"]:
+                for match in structure["entries"]:
+                    self._check_entry_structure_details(match)
+                    self._check_entry_details(match["entry"])
+                    self.assertIn(match["entry"]["accession"], urls[url])
+
+    def test_can_get_entries_from_structure_id_interpro_ids(self):
+        pdb_1 = "1JM7"
+        ips = ["IPR001165", "IPR003165"]
+        for ip in ips:
+            response = self.client.get("/api/structure/pdb/"+pdb_1+"/entry/interpro/"+ip)
+            self._check_single_entry_response(response)
+
+    def test_urls_that_return_a_structure_details_with_matches(self):
+        pdb_1 = "1JM7"
+        pdb_2 = "2BKM"
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_u = "PF17180"
+        smart = "SM00950"
+        urls = [
+            "/api/structure/pdb/"+pdb_1+"/entry/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_1+"/entry/interpro/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_1+"/entry/interpro/smart/"+smart,
+            "/api/structure/pdb/"+pdb_1+"/entry/interpro/"+acc+"/smart/"+smart,
+            "/api/structure/pdb/"+pdb_1+"/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_2+"/entry/unintegrated/pfam/"+pfam_u,
+            "/api/structure/pdb/"+pdb_1+"/A/entry/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_1+"/A/entry/interpro/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_1+"/A/entry/interpro/smart/"+smart,
+            "/api/structure/pdb/"+pdb_1+"/A/entry/interpro/"+acc+"/smart/"+smart,
+            "/api/structure/pdb/"+pdb_1+"/A/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_2+"/B/entry/unintegrated/pfam/"+pfam_u,
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self._check_structure_details(response.data["metadata"])
+            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self.assertEqual(len(response.data["entries"]), 1,
+                             "The number of entries should be 1. URL: [{}]".format(url))
+            self._check_entry_structure_details(response.data["entries"][0])
+            self._check_entry_details(response.data["entries"][0]["entry"])
+
+    def test_urls_that_should_fails(self):
+        pdb_1 = "1JM7"
+        pdb_2 = "2BKM"
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_u = "PF17180"
+        smart = "SM00950"
+        tests = [
+            "/api/structure/pdb/"+pdb_2+"/entry/interpro/"+acc,
+            "/api/structure/pdb/"+pdb_2+"/entry/unintegrated/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_2+"/entry/interpro/"+acc,
+            "/api/structure/pdb/"+pdb_2+"/entry/interpro/"+acc+"/smart/"+smart,
+            "/api/structure/pdb/entry/unintegrated/smart/"+smart,
+            "/api/structure/pdb/"+pdb_1+"/B/entry/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_1+"/B/entry/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_1+"/B/entry/interpro/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_1+"/B/entry/interpro/smart/"+smart,
+            "/api/structure/pdb/"+pdb_1+"/B/entry/interpro/"+acc+"/smart/"+smart,
+            "/api/structure/pdb/"+pdb_1+"/B/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/structure/pdb/"+pdb_2+"/A/entry/unintegrated/pfam/"+pfam_u,
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")

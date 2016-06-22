@@ -63,10 +63,8 @@
       "identifier": "M5ADK6_LACBR",
       "accession": "M5ADK6",
       "organism": {
-        "source_organism": {
-          "name": "Lactobacillus brevis KB290",
-          "taxid": 1001583
-        }
+        "name": "Lactobacillus brevis KB290",
+        "taxid": 1001583
       },
       "name": "Band 7 protein",
       "short_name": null,

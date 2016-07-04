@@ -25,7 +25,7 @@ class StructureWithFilterProteinRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
 
     def test_urls_that_return_structure_with_protein_count(self):
@@ -62,16 +62,16 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/structure/pdb/protein/uniprot")
         self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
         for result in response.data["results"]:
-            self.assertEqual(len(result["proteins"]), len(data_in_fixtures[result["accession"]]))
+            self.assertEqual(len(result["proteins"]), len(data_in_fixtures[result["metadata"]["accession"]]))
             for match in result["proteins"]:
-                self.assertIn(match["protein"], data_in_fixtures[result["accession"]])
+                self.assertIn(match["protein"], data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_swissprot_from_pdb_structures(self):
         response = self.client.get("/api/structure/pdb/protein/swissprot")
         for result in response.data["results"]:
             for match in result["proteins"]:
-                self.assertIn(match["protein"], data_in_fixtures[result["accession"]])
+                self.assertIn(match["protein"], data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_uniprot_matches_from_structures(self):
@@ -131,13 +131,13 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         for url in tests:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             for structure in response.data["results"]:
                 self.assertIn("proteins", structure, "'proteins' should be one of the keys in the response")
                 for match in structure["proteins"]:
                     self._check_structure_chain_details(match)
                     self._check_protein_details(match["protein"])
-            ids = [x["accession"] for x in response.data["results"]]
+            ids = [x["metadata"]["accession"] for x in response.data["results"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_can_get_proteins_from_structure_protein_id(self):

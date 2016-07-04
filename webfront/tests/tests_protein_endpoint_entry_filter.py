@@ -19,7 +19,7 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
 
     def test_can_get_entries_from_protein_id(self):
@@ -98,7 +98,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             self._check_is_list_of_objects_with_key(response.data["results"], "entries",
                                                     "It should have the key 'entries' for the URL ["+url+"]")
             for protein in response.data["results"]:
@@ -185,7 +185,7 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             self._check_is_list_of_objects_with_key(response.data["results"], "entries",
                                                     "It should have the key 'entries' for the URL ["+url+"]")
             for protein in response.data["results"]:

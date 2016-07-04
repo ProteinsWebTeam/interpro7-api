@@ -24,7 +24,7 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
 
     def test_urls_that_return_entry_with_protein_count(self):
@@ -166,7 +166,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         for url in tests:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             for entry in response.data["results"]:
                 self.assertIn("proteins", entry, "'proteins' should be one of the keys in the response")
                 for match in entry["proteins"]:

@@ -29,13 +29,13 @@ class EntryRESTTest(InterproRESTTestCase):
     def test_can_read_entry_interpro(self):
         response = self.client.get("/api/entry/interpro")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self._check_is_list_of_objects_with_accession(response.data["results"])
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_can_read_entry_unintegrated(self):
         response = self.client.get("/api/entry/unintegrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self._check_is_list_of_objects_with_accession(response.data["results"])
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
         self.assertEqual(len(response.data["results"]), 4)
 
     def test_can_read_entry_interpro_id(self):
@@ -55,7 +55,7 @@ class EntryRESTTest(InterproRESTTestCase):
             response = self.client.get("/api/entry/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), self.db_members[member])
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
 
     def test_can_read_entry_interpro_member(self):
         for member in self.db_members:
@@ -63,7 +63,7 @@ class EntryRESTTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), 1,
                              "The testdataset only has one interpro entry with 1 member entry")
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             # self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
 
     def test_can_read_entry_unintegrated_member(self):
@@ -71,7 +71,7 @@ class EntryRESTTest(InterproRESTTestCase):
             response = self.client.get("/api/entry/unintegrated/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), self.db_members[member]-1)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
 
     def test_can_read_entry_interpro_id_member(self):
         acc = "IPR003165"
@@ -79,7 +79,7 @@ class EntryRESTTest(InterproRESTTestCase):
             response = self.client.get("/api/entry/interpro/"+acc+"/"+member)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), 1)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
 
     def test_can_read_entry_interpro_id_pfam_id(self):
         acc = "IPR003165"

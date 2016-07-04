@@ -102,7 +102,14 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_headers_representation(instance):
-        return {"accession": instance.accession}
+        return {
+            "metadata": {
+                "accession": instance.accession,
+                "name": instance.name,
+                "source_database": instance.source_database,
+                "type": instance.type
+            }
+        }
 
     @staticmethod
     def to_structures_count_representation(instance):

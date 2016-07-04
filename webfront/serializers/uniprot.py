@@ -59,7 +59,14 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_headers_representation(instance):
-        return {"accession": instance.accession}
+        return {
+            "metadata": {
+                "accession": instance.accession,
+                "name": instance.name,
+                "source_database": instance.source_database,
+                "length": instance.length
+            }
+        }
 
     @staticmethod
     def to_metadata_representation(instance):

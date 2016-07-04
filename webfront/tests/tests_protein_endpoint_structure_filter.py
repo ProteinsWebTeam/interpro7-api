@@ -28,7 +28,7 @@ class ProteinWithFilterStructureRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             self._check_is_list_of_objects_with_key(response.data["results"], "structures")
 
     def test_urls_that_return_protein_with_structure_count(self):
@@ -60,10 +60,10 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
         for result in response.data["results"]:
             self.assertEqual(len(result["structures"]),
-                             len(data_in_fixtures[result["accession"]]),
-                             "failing for "+result["accession"])
+                             len(data_in_fixtures[result["metadata"]["accession"]]),
+                             "failing for "+result["metadata"]["accession"])
             for match in result["structures"]:
-                self.assertIn(match["structure"], data_in_fixtures[result["accession"]])
+                self.assertIn(match["structure"], data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_swissprot_from_pdb_structures(self):
@@ -71,11 +71,11 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         self.assertEqual(len(response.data["results"]), len(data_swissprot))
         for result in response.data["results"]:
             self.assertEqual(len(result["structures"]),
-                             len(data_in_fixtures[result["accession"]]),
-                             "failing for "+result["accession"])
-            self.assertIn(result["accession"], data_swissprot)
+                             len(data_in_fixtures[result["metadata"]["accession"]]),
+                             "failing for "+result["metadata"]["accession"])
+            self.assertIn(result["metadata"]["accession"], data_swissprot)
             for match in result["structures"]:
-                self.assertIn(match["structure"], data_in_fixtures[result["accession"]])
+                self.assertIn(match["structure"], data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_uniprot_matches_from_structures(self):
@@ -138,13 +138,13 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
         for url in tests:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_accession(response.data["results"])
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
             for protein in response.data["results"]:
                 self.assertIn("structures", protein, "'structures' should be one of the keys in the response")
                 for match in protein["structures"]:
                     self._check_structure_chain_details(match)
                     self._check_structure_details(match["structure"])
-            ids = [x["accession"] for x in response.data["results"]]
+            ids = [x["metadata"]["accession"] for x in response.data["results"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_can_get_proteins_from_structure_protein_id(self):

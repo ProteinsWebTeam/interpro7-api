@@ -29,7 +29,7 @@ class RESTRequestsTest(FunctionalTest):
         self.assertEqual(len(jsonp["results"]), num_interpro,
                          "The response should have as many entries as reported in /entry ")
 
-        acc = jsonp["results"][0]["accession"]
+        acc = jsonp["results"][0]["metadata"]["accession"]
         self.browser.get(self.server_url + "/api/entry/interpro/"+acc+"?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
@@ -62,7 +62,7 @@ class RESTRequestsTest(FunctionalTest):
 
         self.assertEqual(len(jsonp["results"]), num_uniprot,
                          "The response should have as many entries as reported in /entry ")
-        acc = jsonp["results"][0]["accession"]
+        acc = jsonp["results"][0]["metadata"]["accession"]
 
         self.browser.get(self.server_url + "/api/protein/uniprot/"+acc+"?format=json")
         content = self.browser.find_element_by_tag_name('body').text

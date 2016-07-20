@@ -95,7 +95,7 @@ class ProteinSerializer(ModelContentSerializer):
     @staticmethod
     def to_match_representation(match, full=False):
         output = {
-            "match": match.coordinates,
+            "coordinates": match.coordinates,
             "accession": match.entry_id,
             "source_database": match.entry.source_database,
             "name": match.entry.name,

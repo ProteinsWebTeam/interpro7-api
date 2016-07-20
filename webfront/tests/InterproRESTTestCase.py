@@ -62,8 +62,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("accession", obj)
 
     def _check_match(self, obj):
-        self.assertIn("match", obj)
-        self.assertIsInstance(obj["match"], list)
+        self.assertIn("coordinates", obj)
+        self.assertIsInstance(obj["coordinates"], list)
         self.assertIn("accession", obj)
 
     # methods to check structure related responses

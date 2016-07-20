@@ -25,7 +25,6 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
 
     def test_urls_that_return_entry_with_protein_count(self):
         acc = "IPR003165"

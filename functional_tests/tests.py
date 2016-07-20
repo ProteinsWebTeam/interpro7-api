@@ -40,7 +40,7 @@ class RESTRequestsTest(FunctionalTest):
         self.assertIn("molecular_function", jsonp["metadata"]["go_terms"],
                       "the key is part of the go_terms and has been parsed OK")
 
-        self.assertEqual(jsonp["proteins"], 2)
+        self.assertEqual(jsonp["metadata"]["counters"]["proteins"], 2)
 
     def test_request_protein_endpoint(self):
         self.browser.get(self.server_url + "/api/protein/?format=json")

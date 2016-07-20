@@ -31,14 +31,15 @@ class ProteinSerializer(ModelContentSerializer):
     @staticmethod
     def filter_representation(representation, instance, detail_filter):
         qs_type = get_queryset_type(instance)
-        if detail_filter == SerializerDetail.ENTRY_OVERVIEW:
-            representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
-        elif detail_filter == SerializerDetail.ENTRY_MATCH:
+        # if detail_filter == SerializerDetail.ENTRY_OVERVIEW:
+        #     representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
+        # el
+        if detail_filter == SerializerDetail.ENTRY_MATCH:
             representation = ProteinSerializer.to_match_representation(instance, False)
         elif detail_filter == SerializerDetail.ENTRY_DETAIL:
             representation = ProteinSerializer.to_match_representation(instance, True)
-        elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
-            representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
+        # elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
+        #     representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
         elif detail_filter == SerializerDetail.STRUCTURE_OVERVIEW:
             representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance)
         elif detail_filter == SerializerDetail.STRUCTURE_DETAIL:
@@ -50,9 +51,7 @@ class ProteinSerializer(ModelContentSerializer):
     def to_full_representation(instance):
         return {
             "metadata": ProteinSerializer.to_metadata_representation(instance),
-            "entries": ProteinSerializer.to_entries_count_representation(instance),
             "representation": instance.feature,
-            "structures": ProteinSerializer.to_structures_count_representation(instance),
             "genomic_context": instance.genomic_context,
             # "source_database": instance.source_database
         }
@@ -87,6 +86,10 @@ class ProteinSerializer(ModelContentSerializer):
             "go_terms": instance.go_terms,
             "protein_evidence": 4,
             "source_database": instance.source_database,
+            "counters": {
+                "entries": instance.proteinentryfeature_set.count(),
+                "structures": instance.structures.distinct().count(),
+            }
         }
 
     @staticmethod
@@ -109,13 +112,13 @@ class ProteinSerializer(ModelContentSerializer):
     #         for match in instance.proteinentryfeature_set.all()
     #     ]
 
-    @staticmethod
-    def to_entries_count_representation(instance):
-        return instance.proteinentryfeature_set.count()
-
-    @staticmethod
-    def to_structures_count_representation(instance):
-        return instance.structures.distinct().count()
+    # @staticmethod
+    # def to_entries_count_representation(instance):
+    #     return instance.proteinentryfeature_set.count()
+    #
+    # @staticmethod
+    # def to_structures_count_representation(instance):
+    #     return instance.structures.distinct().count()
 
     @staticmethod
     def to_chain_representation(instance, full=False):

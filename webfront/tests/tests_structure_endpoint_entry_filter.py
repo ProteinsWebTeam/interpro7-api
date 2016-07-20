@@ -18,7 +18,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "entries")
+            # self._check_is_list_of_objects_with_key(response.data["results"], "entries")
 
     def test_can_get_entries_from_structure_id(self):
         urls = ["/api/structure/pdb/"+pdb+"/entry/" for pdb in ["1JM7", "2BKM", "1T2V"]]

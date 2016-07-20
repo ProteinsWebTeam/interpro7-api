@@ -99,7 +99,8 @@ class EntryRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data.keys())
-        self.assertIn("proteins", response.data.keys())
+        self.assertIn("counters", response.data["metadata"].keys())
+        self.assertIn("proteins", response.data["metadata"]["counters"].keys())
         self._check_entry_details(response.data["metadata"])
 
     def test_can_read_entry_unintegrated_pfam_id(self):
@@ -107,7 +108,8 @@ class EntryRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/unintegrated/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data.keys())
-        self.assertIn("proteins", response.data.keys())
+        self.assertIn("counters", response.data["metadata"].keys())
+        self.assertIn("proteins", response.data["metadata"]["counters"].keys())
         self._check_entry_details(response.data["metadata"])
 
     def test_cant_read_entry_unintegrated_pfam_id_integrated(self):
@@ -117,12 +119,12 @@ class EntryRESTTest(InterproRESTTestCase):
     def test_can_get_protein_amount_from_interpro_id(self):
         acc = "IPR003165"
         response = self.client.get("/api/entry/interpro/"+acc)
-        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-        self.assertEqual(response.data["proteins"], 2)
+        self.assertIn("counters", response.data["metadata"], "'proteins' should be one of the keys in the response")
+        self.assertEqual(response.data["metadata"]["counters"]["proteins"], 2)
 
     def test_can_get_protein_amount_from_interpro_id_pfam_id(self):
         acc = "IPR003165"
         pf = "PF02171"
         response = self.client.get("/api/entry/interpro/"+acc+"/pfam/"+pf)
-        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-        self.assertEqual(response.data["proteins"], 1)
+        self.assertIn("counters", response.data["metadata"], "'proteins' should be one of the keys in the response")
+        self.assertEqual(response.data["metadata"]["counters"]["proteins"], 1)

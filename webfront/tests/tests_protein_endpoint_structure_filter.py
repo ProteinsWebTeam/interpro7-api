@@ -29,7 +29,7 @@ class ProteinWithFilterStructureRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            # self._check_is_list_of_objects_with_key(response.data["results"], "structures")
 
     def test_urls_that_return_protein_with_structure_count(self):
         for prot in data_in_fixtures:
@@ -42,9 +42,8 @@ class ProteinWithFilterStructureRESTTest(InterproRESTTestCase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 self._check_protein_details(response.data["metadata"])
-                self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
-                self._check_structure_count_overview(response.data["structures"])
-                self.assertEqual(response.data["structures"]["pdb"], len(list(set(data_in_fixtures[prot]))))
+                self.assertIn("structures", response.data["metadata"]["counters"], "'structures' should be one of the keys in the response")
+                self.assertEqual(response.data["metadata"]["counters"]["structures"], len(list(set(data_in_fixtures[prot]))))
 
 
 class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):

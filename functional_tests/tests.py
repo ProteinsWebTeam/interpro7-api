@@ -12,13 +12,13 @@ class RESTRequestsTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp), 3, "the output has exactly 3 keys")
+        self.assertEqual(len(jsonp["entries"]), 3, "the output has exactly 3 keys")
 
         self.assertIn('"member_databases"', content)
         self.assertIn('"interpro"', content)
         self.assertIn('"unintegrated"', content)
 
-        num_interpro = jsonp["interpro"]
+        num_interpro = jsonp["entries"]["interpro"]
         self.assertEqual(num_interpro, 2, "the fixtures dataset only includes two interpro entry")
 
         self.browser.get(self.server_url + "/api/entry/interpro?format=json")
@@ -48,11 +48,11 @@ class RESTRequestsTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp), 3, "the output has exactly 1 keys")
+        self.assertEqual(len(jsonp["proteins"]), 3, "the output has exactly 1 keys")
 
         self.assertIn('"uniprot"', content)
 
-        num_uniprot = jsonp["uniprot"]
+        num_uniprot = jsonp["proteins"]["uniprot"]
         self.assertEqual(num_uniprot, 4, "the TEST dataset only includes 4 uniprot entries")
 
         self.browser.get(self.server_url + "/api/protein/uniprot?format=json")

@@ -9,7 +9,7 @@ class EntryWithFilterStructureRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_entry_count_overview(response.data)
         self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
-        self._check_structure_count_overview(response.data["structures"])
+        self._check_structure_count_overview(response.data)
 
     def test_urls_that_return_list_of_accessions_and_structure(self):
         acc = "IPR003165"
@@ -43,7 +43,7 @@ class EntryWithFilterStructureRESTTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_entry_details(response.data["metadata"])
             self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
-            self._check_structure_count_overview(response.data["structures"])
+            self._check_structure_count_overview(response.data)
 
 
 class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):

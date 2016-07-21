@@ -31,10 +31,9 @@ class ProteinSerializer(ModelContentSerializer):
     @staticmethod
     def filter_representation(representation, instance, detail_filter):
         qs_type = get_queryset_type(instance)
-        # if detail_filter == SerializerDetail.ENTRY_OVERVIEW:
-        #     representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
-        # el
-        if detail_filter == SerializerDetail.ENTRY_MATCH:
+        if detail_filter == SerializerDetail.ENTRY_OVERVIEW:
+            representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
+        elif detail_filter == SerializerDetail.ENTRY_MATCH:
             representation = ProteinSerializer.to_match_representation(instance, False)
         elif detail_filter == SerializerDetail.ENTRY_DETAIL:
             representation = ProteinSerializer.to_match_representation(instance, True)
@@ -112,9 +111,9 @@ class ProteinSerializer(ModelContentSerializer):
     #         for match in instance.proteinentryfeature_set.all()
     #     ]
 
-    # @staticmethod
-    # def to_entries_count_representation(instance):
-    #     return instance.proteinentryfeature_set.count()
+    @staticmethod
+    def to_entries_count_representation(instance):
+        return instance.proteinentryfeature_set.count()
     #
     # @staticmethod
     # def to_structures_count_representation(instance):

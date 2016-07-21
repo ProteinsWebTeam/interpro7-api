@@ -17,7 +17,7 @@ class ProteinWithFilterStructureRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_protein_count_overview(response.data)
         self.assertIn("structures", response.data, "'proteins' should be one of the keys in the response")
-        self._check_structure_count_overview(response.data["structures"])
+        self._check_structure_count_overview(response.data)
 
     def test_urls_that_return_list_of_accessions_and_structures(self):
         urls = [

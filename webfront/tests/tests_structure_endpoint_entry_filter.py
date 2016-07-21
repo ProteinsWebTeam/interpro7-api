@@ -8,7 +8,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/structure/entry")
         self._check_structure_count_overview(response.data)
         self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self._check_entry_count_overview(response.data["entries"])
+        self._check_entry_count_overview(response.data)
 
     def test_urls_that_return_list_of_accessions_and_entries(self):
         urls = [
@@ -26,7 +26,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
             self._check_structure_details(response.data["metadata"])
-            self._check_entry_count_overview(response.data["entries"])
+            self._check_entry_count_overview(response.data)
 
     def test_can_get_entries_from_structure_id_chain(self):
         urls = ["/api/structure/pdb/"+pdb+"/A/entry/" for pdb in ["1JM7", "2BKM", "1T2V"]]
@@ -34,7 +34,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
             self._check_structure_details(response.data["metadata"])
-            self._check_entry_count_overview(response.data["entries"])
+            self._check_entry_count_overview(response.data)
             for chain in response.data["metadata"]["chains"].values():
                 self._check_structure_chain_details(chain)
                 self.assertEqual(chain["chain"], "A")
@@ -44,7 +44,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/structure/pdb/"+acc+"/entry/")
         self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
         self._check_structure_details(response.data["metadata"])
-        self._check_entry_count_overview(response.data["entries"])
+        self._check_entry_count_overview(response.data)
         self.assertDictEqual(response.data["entries"]["member_databases"], {},
                              "there should not be reports of member db")
         self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
@@ -75,10 +75,10 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIsInstance(response.data, dict, url+" should have returned a dict")
-            for prot_db in response.data:
+            for prot_db in response.data["structures"]:
                 self.assertEqual(prot_db, "pdb")
-                self.assertIn("structures", response.data[prot_db])
-                self.assertIn("entries", response.data[prot_db])
+                self.assertIn("structures", response.data["structures"][prot_db])
+                self.assertIn("entries", response.data["structures"][prot_db])
 
     def test_urls_that_return_list_of_structure_accessions_with_matches(self):
         acc = "IPR003165"
@@ -188,10 +188,10 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIsInstance(response.data, dict)
-            for prot_db in response.data:
+            for prot_db in response.data["structures"]:
                 self.assertIn(prot_db, ["pdb"])
-                self.assertIn("structures", response.data[prot_db])
-                self.assertIn("entries", response.data[prot_db])
+                self.assertIn("structures", response.data["structures"][prot_db])
+                self.assertIn("entries", response.data["structures"][prot_db])
 
     def test_urls_that_return_list_of_structure_accessions_with_matches_and_detailed_entries(self):
         acc = "IPR003165"

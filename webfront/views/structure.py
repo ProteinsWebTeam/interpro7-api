@@ -243,7 +243,7 @@ class StructureHandler(CustomView):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
 
-        self.queryset = StructureHandler.get_database_contributions(Structure.objects.all())
+        self.queryset = {"structures": StructureHandler.get_database_contributions(Structure.objects.all())}
 
         return super(StructureHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

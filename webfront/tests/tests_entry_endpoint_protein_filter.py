@@ -9,7 +9,7 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_entry_count_overview(response.data)
         self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-        self._check_protein_count_overview(response.data["proteins"])
+        self._check_protein_count_overview(response.data)
 
     def test_urls_that_return_list_of_accessions_and_proteins(self):
         acc = "IPR003165"
@@ -43,7 +43,7 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_entry_details(response.data["metadata"])
             self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-            self._check_protein_count_overview(response.data["proteins"])
+            self._check_protein_count_overview(response.data)
 
 
 class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):

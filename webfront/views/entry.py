@@ -49,19 +49,19 @@ class MemberAccesionHandler(CustomView):
         except (IndexError, KeyError):
             interpro_acc = None
         if isinstance(queryset, dict):
-            if"uniprot" in queryset:
-                for prot_db in queryset:
+            if "proteins" in queryset:
+                for prot_db in queryset["proteins"]:
                     matches = ProteinEntryFeature.objects.filter(entry=level_name)
                     # Under the assumption that a pfam family cannot be part of more than one Interpro domain.
                     if prot_db != "uniprot":
                         matches = matches.filter(protein__source_database__iexact=prot_db)
                     if is_unintegrated:
                         matches = matches.filter(entry__integrated__isnull=True)
-                    queryset[prot_db] = {
+                    queryset["proteins"][prot_db] = {
                         "proteins": matches.values("protein").distinct().count(),
                         "entries": matches.values("entry").distinct().count()
                     }
-            elif "pdb" in queryset:
+            elif "structures" in queryset:
                 matches = EntryStructureFeature.objects.filter(entry__accession__iexact=level_name)
                 if is_unintegrated:
                     matches = matches.filter(entry__integrated__isnull=True)
@@ -69,7 +69,7 @@ class MemberAccesionHandler(CustomView):
                     matches = matches.filter(entry__integrated=interpro_acc)
                 elif is_interpro:
                     matches = matches.filter(entry__integrated__isnull=False)
-                queryset["pdb"] = {
+                queryset["structures"]["pdb"] = {
                     "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
@@ -141,8 +141,8 @@ class MemberHandler(CustomView):
             interpro_acc = None
 
         if isinstance(queryset, dict):
-            if"uniprot" in queryset:
-                for prot_db in queryset:
+            if"proteins" in queryset:
+                for prot_db in queryset["proteins"]:
                     matches = ProteinEntryFeature.objects.filter(entry__source_database__iexact=level_name)
                     if prot_db != "uniprot":
                         matches = matches.filter(protein__source_database__iexact=prot_db)
@@ -153,11 +153,11 @@ class MemberHandler(CustomView):
                         matches = matches.filter(entry__integrated=interpro_acc)
                     elif is_interpro:
                         matches = matches.filter(entry__integrated__isnull=False)
-                    queryset[prot_db] = {
+                    queryset["proteins"][prot_db] = {
                         "proteins": matches.values("protein").distinct().count(),
                         "entries": matches.values("entry").distinct().count()
                     }
-            elif "pdb" in queryset:
+            elif "structures" in queryset:
                 matches = EntryStructureFeature.objects.filter(entry__source_database__iexact=level_name)
                 if is_unintegrated:
                     matches = matches.filter(entry__integrated__isnull=True)
@@ -165,7 +165,7 @@ class MemberHandler(CustomView):
                     matches = matches.filter(entry__integrated=interpro_acc)
                 elif is_interpro:
                     matches = matches.filter(entry__integrated__isnull=False)
-                queryset["pdb"] = {
+                queryset["structures"]["pdb"] = {
                     "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
@@ -242,18 +242,18 @@ class AccesionHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(AccesionHandler, "accession", level_name)
         if isinstance(queryset, dict):
-            if "uniprot" in queryset:
-                for prot_db in queryset:
+            if "proteins" in queryset:
+                for prot_db in queryset["proteins"]:
                     matches = ProteinEntryFeature.objects.filter(entry=level_name)
                     if prot_db != "uniprot":
                         matches = matches.filter(protein__source_database__iexact=prot_db)
-                    queryset[prot_db] = {
+                    queryset["proteins"][prot_db] = {
                         "proteins": matches.values("protein").distinct().count(),
                         "entries": matches.values("entry").distinct().count()
                     }
-            elif "pdb" in queryset:
+            elif "structures" in queryset:
                 matches = EntryStructureFeature.objects.filter(entry=level_name)
-                queryset["pdb"] = {
+                queryset["structures"]["pdb"] = {
                     "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
@@ -289,22 +289,22 @@ class UnintegratedHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
         if isinstance(queryset, dict):
-            if "uniprot" in queryset:
-                for prot_db in queryset:
+            if "proteins" in queryset:
+                for prot_db in queryset["proteins"]:
                     matches = ProteinEntryFeature.objects\
                         .filter(entry__integrated__isnull=True)\
                         .exclude(entry__source_database__iexact="interpro")
                     if prot_db != "uniprot":
                         matches = matches.filter(protein__source_database__iexact=prot_db)
-                    queryset[prot_db] = {
+                    queryset["proteins"][prot_db] = {
                         "proteins": matches.values("protein").distinct().count(),
                         "entries": matches.values("entry").distinct().count()
                     }
-            elif "pdb" in queryset:
+            elif "structures" in queryset:
                 matches = EntryStructureFeature.objects \
                     .filter(entry__integrated__isnull=True) \
                     .exclude(entry__source_database__iexact="interpro")
-                queryset["pdb"] = {
+                queryset["structures"]["pdb"] = {
                     "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
@@ -357,18 +357,18 @@ class InterproHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(InterproHandler, "interpro", True)
         if isinstance(queryset, dict):
-            if "uniprot" in queryset:
-                for prot_db in queryset:
+            if "proteins" in queryset:
+                for prot_db in queryset["proteins"]:
                     matches = ProteinEntryFeature.objects.filter(entry__source_database__iexact="interpro")
                     if prot_db != "uniprot":
                         matches = matches.filter(protein__source_database__iexact=prot_db)
-                    queryset[prot_db] = {
+                    queryset["proteins"][prot_db] = {
                         "proteins": matches.values("protein").distinct().count(),
                         "entries": matches.values("entry").distinct().count()
                     }
-            elif "pdb" in queryset:
+            elif "structures" in queryset:
                 matches = EntryStructureFeature.objects.filter(entry__source_database__iexact="interpro")
-                queryset["pdb"] = {
+                queryset["structures"]["pdb"] = {
                     "structures": matches.values("structure").distinct().count(),
                     "entries": matches.values("entry").distinct().count()
                 }
@@ -432,7 +432,7 @@ class EntryHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
-        self.queryset = EntryHandler.get_database_contributions(Entry.objects.all())
+        self.queryset = {"entries": EntryHandler.get_database_contributions(Entry.objects.all())}
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs

@@ -199,7 +199,7 @@ class ProteinHandler(CustomView):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
 
-        self.queryset = ProteinHandler.get_database_contributions(Protein.objects.all())
+        self.queryset = {"proteins": ProteinHandler.get_database_contributions(Protein.objects.all())}
 
         return super(ProteinHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

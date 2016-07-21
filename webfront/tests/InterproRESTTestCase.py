@@ -27,7 +27,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("member_databases", obj)
         self.assertIn("accession", obj)
 
-    def _check_entry_count_overview(self, obj):
+    def _check_entry_count_overview(self, main_obj):
+        obj = main_obj["entries"]
         self.assertIn("member_databases", obj)
         self.assertIn("interpro", obj)
         self.assertIn("unintegrated", obj)
@@ -47,7 +48,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         settings.DEBUG = prev
 
     # methods to check protein related responses
-    def _check_protein_count_overview(self, obj):
+    def _check_protein_count_overview(self, main_obj):
+        obj = main_obj["proteins"]
         self.assertIn("uniprot", obj)
         if obj["uniprot"] > 0:
             self.assertTrue("trembl" in obj or "swissprot" in obj,
@@ -68,7 +70,8 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     # methods to check structure related responses
     # TODO: Extend this tests
-    def _check_structure_count_overview(self, obj):
+    def _check_structure_count_overview(self, main_obj):
+        obj = main_obj["structures"]
         self.assertIn("pdb", obj)
 
     def _check_structure_details(self, obj):

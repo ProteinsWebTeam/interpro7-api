@@ -52,7 +52,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/protein/structure/pdb")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_protein_count_overview(response.data)
-        self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
+        self.assertIn("structures", response.data["proteins"]["uniprot"], "'structures' should be one of the keys in the response")
 
     def test_can_get_proteins_from_pdb_structures(self):
         response = self.client.get("/api/protein/uniprot/structure/pdb")

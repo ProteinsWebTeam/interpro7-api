@@ -48,15 +48,15 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
     def test_can_get_protein_match_from_structure(self):
         response = self.client.get("/api/structure/protein/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-        uniprots = response.data["proteins"]
-        response = self.client.get("/api/structure/protein/swissprot")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        swissprots = response.data["proteins"]
-        response = self.client.get("/api/structure/protein/trembl")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        trembls = response.data["proteins"]
-        self.assertEqual(uniprots, swissprots+trembls, "uniprot proteins should be equal to swissprot + trembl")
+        self.assertIn("proteins", response.data["structures"]["pdb"], "'proteins' should be one of the keys in the response")
+        # uniprots = response.data["proteins"]
+        # response = self.client.get("/api/structure/protein/swissprot")
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # swissprots = response.data["proteins"]
+        # response = self.client.get("/api/structure/protein/trembl")
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # trembls = response.data["proteins"]
+        # self.assertEqual(uniprots, swissprots+trembls, "uniprot proteins should be equal to swissprot + trembl")
 
     def test_can_get_proteins_from_pdb_structures(self):
         response = self.client.get("/api/structure/pdb/protein/uniprot")

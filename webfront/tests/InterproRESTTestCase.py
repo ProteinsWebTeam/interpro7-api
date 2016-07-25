@@ -33,6 +33,14 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("interpro", obj)
         self.assertIn("unintegrated", obj)
 
+    def _check_is_list_of_metadata_objects(self, _list, msg=""):
+        for obj in _list:
+            self.assertIn("metadata", obj, msg)
+            self.assertTrue(isinstance(obj, dict))
+            self.assertIn("source_database", obj["metadata"], msg)
+            self.assertIn("accession", obj["metadata"], msg)
+            self.assertIn("name", obj["metadata"], msg)
+
     def _check_is_list_of_objects_with_key(self, _list, key, msg=""):
         for obj in _list:
             self.assertIn(key, obj, msg)
@@ -51,9 +59,7 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_protein_count_overview(self, main_obj):
         obj = main_obj["proteins"]
         self.assertIn("uniprot", obj)
-        if obj["uniprot"] > 0:
-            self.assertTrue("trembl" in obj or "swissprot" in obj,
-                            "If there is a uniprot protein then it should either be reported in swissprot or trembl")
+        self.assertTrue("trembl" in obj or "swissprot" in obj)
 
     def _check_protein_details(self, obj):
         self.assertIn("description", obj)
@@ -86,3 +92,18 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_entry_structure_details(self, obj):
         self.assertIn("coordinates", obj)
         self.assertIn("chain", obj)
+
+    def _check_counter_by_endpoint(self, endpoint, obj):
+        if "entry" == endpoint:
+            self._check_entry_count_overview(obj)
+        elif "protein" == endpoint:
+            self._check_protein_count_overview(obj)
+        elif "structure" == endpoint:
+            self._check_structure_count_overview(obj)
+
+    def _check_object_by_accesssion(self, obj):
+        self.assertIn("metadata", obj)
+        self.assertIn("source_database", obj["metadata"])
+        self.assertIn("accession", obj["metadata"])
+        self.assertIn("counters", obj["metadata"])
+        self.assertIn("name", obj["metadata"])

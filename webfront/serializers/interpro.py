@@ -33,11 +33,11 @@ class EntrySerializer(ModelContentSerializer):
             representation["proteins"] = EntrySerializer.to_proteins_overview_representation(instance)
         elif detail_filter == SerializerDetail.PROTEIN_DETAIL:
             representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance)
-        # # elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS or \
+        elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS:
         # #         detail_filter == SerializerDetail.ENTRY_DETAIL:
-        # #     representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
-        # elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
-        #     representation["structures"] = EntrySerializer.to_structures_count_representation(instance)
+            representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
+        elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
+            representation["structures"] = EntrySerializer.to_structures_count_representation(instance)
         elif detail_filter == SerializerDetail.STRUCTURE_OVERVIEW:
             representation["structures"] = EntrySerializer.to_structures_overview_representation(instance)
         elif detail_filter == SerializerDetail.STRUCTURE_DETAIL:
@@ -72,9 +72,9 @@ class EntrySerializer(ModelContentSerializer):
             obj["integrated"] = instance.integrated.accession
         return obj
 
-    # @staticmethod
-    # def to_proteins_count_representation(instance):
-    #     return instance.proteinentryfeature_set.count()
+    @staticmethod
+    def to_proteins_count_representation(instance):
+        return instance.proteinentryfeature_set.count()
 
     @staticmethod
     def to_proteins_overview_representation(instance):
@@ -115,9 +115,9 @@ class EntrySerializer(ModelContentSerializer):
             }
         }
 
-    # @staticmethod
-    # def to_structures_count_representation(instance):
-    #     return instance.structures.distinct().count()
+    @staticmethod
+    def to_structures_count_representation(instance):
+        return instance.structures.distinct().count()
 
     @staticmethod
     def to_structure_representation(instance, full=False):

@@ -7,6 +7,142 @@ structure_urls = [
     "structure/pdb/1JM7",
 ]
 
+api_test_map = {
+    "entry": {
+        "interpro": [
+            "IPR003165",
+            "IPR001165"
+        ],
+        "pfam": [
+            "PF02171",
+            "PF17180",
+            "PF17176",
+        ],
+        "smart": [
+            "SM00950",
+            "SM00002",
+        ],
+        "prosite_profiles": [
+            "PS50822",
+            "PS01031",
+        ],
+        "interpro/pfam": [
+            "PF02171",
+        ],
+        "interpro/smart": [
+            "SM00950",
+        ],
+        "interpro/prosite_profiles": [
+            "PS50822",
+        ],
+        "unintegrated/pfam": [
+            "PF17180",
+            "PF17176",
+        ],
+        "unintegrated/smart": [
+            "SM00002",
+        ],
+        "unintegrated/prosite_profiles": [
+            "PS01031",
+        ],
+    },
+    "protein": {
+        "uniprot": [
+            "A1CUJ5",
+            "M5ADK6",
+            "A0A0A2L2G2",
+            "P16582",
+        ],
+        "swissprot": [
+            "A1CUJ5",
+            "M5ADK6",
+        ],
+        "trembl": [
+            "A0A0A2L2G2",
+            "P16582",
+        ],
+    },
+    "structure": {
+        "pdb": [
+            "1JM7",
+            "1T2V",
+            "2BKM",
+            "1JZ8",
+        ]
+    },
+}
+endpoint_plurals = {
+    "entry": "entries",
+    "protein": "proteins",
+    "structure": "structures",
+}
+
+
+class ObjectStructureTest(InterproRESTTestCase):
+
+    def test_endpoints_independently(self):
+        for endpoint in api_test_map:
+            response = self.client.get("/api/"+endpoint)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_counter_by_endpoint(endpoint,response.data)
+
+            for db in api_test_map[endpoint]:
+                response_db = self.client.get("/api/"+endpoint+"/"+db)
+                self.assertEqual(response_db.status_code, status.HTTP_200_OK)
+                self.assertEqual(len(response_db.data["results"]), len(api_test_map[endpoint][db]))
+                self._check_is_list_of_metadata_objects(response_db.data["results"], "metadata")
+
+                for acc in api_test_map[endpoint][db]:
+                    response_acc = self.client.get("/api/"+endpoint+"/"+db+"/"+acc)
+                    self.assertEqual(response_acc.status_code, status.HTTP_200_OK)
+                    self._check_object_by_accesssion(response_acc.data)
+
+    def test_combining_two_endpoints(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+
+                # [endpoint]/[endpoint]
+                response = self.client.get("/api/"+endpoint1+"/"+endpoint2)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self._check_counter_by_endpoint(endpoint1, response.data)
+                self._check_counter_by_endpoint(endpoint2, response.data)
+
+                for db in api_test_map[endpoint1]:
+                    # [endpoint]/[db]/[endpoint]
+                    current = "/api/"+endpoint1+"/"+db+"/"+endpoint2
+                    response_db = self.client.get(current)
+                    self.assertEqual(response_db.status_code, status.HTTP_200_OK)
+                    self._check_is_list_of_metadata_objects(response_db.data["results"], "metadata")
+
+                    self._check_is_list_of_objects_with_key(response_db.data["results"],
+                                                            endpoint_plurals[endpoint2],
+                                                            "URL : [{}]".format(current))
+
+                    # [endpoint]/[endpoint]/[db]
+                    current = "/api/"+endpoint2+"/"+endpoint1+"/"+db+"/"
+                    response_db = self.client.get(current)
+                    self.assertEqual(response_db.status_code, status.HTTP_200_OK)
+                    self._check_counter_by_endpoint(endpoint2, response_db.data)
+                    for inner_obj in response_db.data[endpoint_plurals[endpoint2]]:
+                        if inner_obj in ["interpro", "unintegrated", "uniprot", "swissprot", "trembl", "pdb"]:
+                            self.assertIn(endpoint_plurals[endpoint1],
+                                          response_db.data[endpoint_plurals[endpoint2]][inner_obj],
+                                          response_db.data[endpoint_plurals[endpoint2]])
+                            self.assertIn(endpoint_plurals[endpoint2],
+                                          response_db.data[endpoint_plurals[endpoint2]][inner_obj],
+                                          response_db.data[endpoint_plurals[endpoint2]])
+
+                    for acc in api_test_map[endpoint1][db]:
+                        # [endpoint]/[db]/[acc]/[endpoint]
+                        current = "/api/"+endpoint1+"/"+db+"/"+acc+"/"+endpoint2
+                        response_acc = self.client.get(current)
+                        self.assertEqual(response_acc.status_code, status.HTTP_200_OK)
+                        self._check_object_by_accesssion(response_acc.data)
+                        self._check_counter_by_endpoint(endpoint2, response.data)
+
+
 
 class EntryWithFilterProteinStructureRESTTest(InterproRESTTestCase):
 

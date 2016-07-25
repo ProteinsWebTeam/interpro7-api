@@ -51,9 +51,9 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
     def test_can_get_structure_match_from_entry(self):
         response = self.client.get("/api/entry/structure/pdb")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
+        self.assertIn("structures", response.data["entries"]["interpro"], "'structures' should be one of the keys in the response")
         self._check_entry_count_overview(response.data)
-        self.assertIsInstance(response.data["structures"], int)
+        self.assertIsInstance(response.data["entries"]["interpro"]["structures"], int)
 
     def test_can_get_structures_from_interpro_structure(self):
         response = self.client.get("/api/entry/interpro/structure/pdb")

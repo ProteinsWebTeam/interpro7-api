@@ -37,8 +37,8 @@ class ProteinSerializer(ModelContentSerializer):
             representation = ProteinSerializer.to_match_representation(instance, False)
         elif detail_filter == SerializerDetail.ENTRY_DETAIL:
             representation = ProteinSerializer.to_match_representation(instance, True)
-        # elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
-        #     representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
+        elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
+            representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
         elif detail_filter == SerializerDetail.STRUCTURE_OVERVIEW:
             representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance)
         elif detail_filter == SerializerDetail.STRUCTURE_DETAIL:
@@ -115,9 +115,9 @@ class ProteinSerializer(ModelContentSerializer):
     def to_entries_count_representation(instance):
         return instance.proteinentryfeature_set.count()
     #
-    # @staticmethod
-    # def to_structures_count_representation(instance):
-    #     return instance.structures.distinct().count()
+    @staticmethod
+    def to_structures_count_representation(instance):
+        return instance.structures.distinct().count()
 
     @staticmethod
     def to_chain_representation(instance, full=False):

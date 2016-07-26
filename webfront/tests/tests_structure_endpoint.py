@@ -33,7 +33,7 @@ class StructureRESTTest(InterproRESTTestCase):
 
     # TODO:
     def test_cant_read_structure_bad_db(self):
-        self._check_HTTP_response_code("/api/structure/bad_db")
+        self._check_HTTP_response_code("/api/structure/bad_db", code=status.HTTP_404_NOT_FOUND)
 
     def test_cant_read_structure_pdb_bad_chain(self):
-        self._check_HTTP_response_code("/api/structure/pdb/2bkm/C")
+        self._check_HTTP_response_code("/api/structure/pdb/2bkm/C", code=status.HTTP_404_NOT_FOUND)

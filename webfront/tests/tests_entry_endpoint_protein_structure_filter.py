@@ -143,7 +143,6 @@ class ObjectStructureTest(InterproRESTTestCase):
                         # [endpoint]/[endpoint]/[db]/[acc]
                         current = "/api/"+endpoint2+"/"+endpoint1+"/"+db+"/"+acc+"/"
                         response_acc = self.client.get(current)
-                        print(current)
                         self.assertEqual(response_acc.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                         self._check_counter_by_endpoint(endpoint2, response_acc.data, "URL : [{}]".format(current))
                         self._check_count_overview_per_endpoints(response_acc.data,

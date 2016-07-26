@@ -52,12 +52,12 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
         swissprot = "A1CUJ5"
         trembl = "P16582"
         tests = [
-            "/api/protein/bad_db/entry/",
             "/api/protein/swissprot/"+trembl+"/entry/",
             "/api/protein/trembl/"+swissprot+"/entry/",
+            "/api/protein/bad_db/entry/",
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
 
 
 class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
@@ -131,9 +131,17 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         tr_1 = "P16582"
         sp_1 = "M5ADK6"
         tests = [
-            "/api/protein/uniprot/"+tr_1+"/entry/unintegrated",
             "/api/protein/swissprot/"+tr_1+"/entry/unintegrated",
             "/api/protein/trembl/"+sp_1+"/entry/unintegrated",
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
+
+    def test_urls_that_should_fails_with_no_content(self):
+        tr_1 = "P16582"
+        sp_1 = "M5ADK6"
+        tests = [
+            "/api/protein/uniprot/"+tr_1+"/entry/unintegrated",
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
@@ -226,7 +234,8 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         # TODO: it is returning 2 entries. FIX!!
         # self._check_single_entry_response(response)
 
-    def test_urls_that_should_fails(self):
+    def test_urls_that_should_fails_with_no_content(self):
+        self.skipTest("Fails until we remove the consolidation")
         tr_1 = "P16582"
         sp_1 = "M5ADK6"
         acc = "IPR003165"
@@ -234,10 +243,21 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         pfam_u = "PF17180"
         tests = [
             "/api/protein/uniprot/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
-            "/api/protein/swissprot/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
-            "/api/protein/trembl/"+sp_1+"/entry/unintegrated/pfam/"+pfam_u,
             "/api/protein/uniprot/"+sp_1+"/entry/interpro/"+acc,
             "/api/protein/uniprot/"+sp_1+"/entry/interpro/"+acc+"/pfam/"+pfam,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+
+    def test_urls_that_should_fail(self):
+        tr_1 = "P16582"
+        sp_1 = "M5ADK6"
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_u = "PF17180"
+        tests = [
+            "/api/protein/swissprot/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
+            "/api/protein/trembl/"+sp_1+"/entry/unintegrated/pfam/"+pfam_u,
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

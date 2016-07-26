@@ -55,7 +55,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             "/api/structure/bad_db/entry/",
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
 
 
 class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
@@ -123,7 +123,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
                              "The nember of entries dhould be the sem URL: [{}]".format(url))
             for entry in response.data["entries"]:
-                self.assertIn(entry["entry"], urls[url])
+                self.assertIn(entry["accession"], urls[url])
 
     def test_urls_that_return_a_structure_details_with_matches_from_chain(self):
         pdb_1 = "1JM7"
@@ -149,7 +149,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
                              "The number of entries should be the same. URL: [{}]".format(url))
             for entry in response.data["entries"]:
-                self.assertIn(entry["entry"], urls[url])
+                self.assertIn(entry["accession"], urls[url])
 
     def test_urls_that_should_return_empty_entries(self):
         pdb_1 = "1JM7"

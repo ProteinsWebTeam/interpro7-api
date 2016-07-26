@@ -48,7 +48,7 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_is_list_of_objects_with_accession(self, _list, msg=""):
         self._check_is_list_of_objects_with_key(_list, "accession", msg)
 
-    def _check_HTTP_response_code(self, url, code=status.HTTP_404_NOT_FOUND, msg=""):
+    def _check_HTTP_response_code(self, url, code=status.HTTP_204_NO_CONTENT, msg=""):
         prev = settings.DEBUG
         settings.DEBUG = False
         response = self.client.get(url)

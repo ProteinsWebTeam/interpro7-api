@@ -62,7 +62,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
                              len(data_in_fixtures[result["metadata"]["accession"]]),
                              "failing for "+result["metadata"]["accession"])
             for match in result["structures"]:
-                self.assertIn(match["structure"], data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"], data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_swissprot_from_pdb_structures(self):
@@ -74,7 +74,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
                              "failing for "+result["metadata"]["accession"])
             self.assertIn(result["metadata"]["accession"], data_swissprot)
             for match in result["structures"]:
-                self.assertIn(match["structure"], data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"], data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_uniprot_matches_from_structures(self):
@@ -85,7 +85,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["structures"]), len(tests[url]))
             for match in response.data["structures"]:
                 self._check_structure_chain_details(match)
-            ids = [x["structure"] for x in response.data["structures"]]
+            ids = [x["accession"] for x in response.data["structures"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_urls_that_should_fails(self):
@@ -97,7 +97,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
             "/api/protein/trembl/BADP/structure/pdb",
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
 
 
 class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
@@ -153,7 +153,7 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
         self._check_protein_count_overview(response.data)
         # TODO: improve this test
 
-    def test_urls_that_should_fails(self):
+    def test_urls_that_should_fails_with_no_content(self):
         pdb_1 = "1JM7"
         # pdb_2 = "2BKM"
         # TODO: the one with pdb_2 has been commented, as it doesn't give error but rather an empty array
@@ -163,11 +163,23 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
         tests = [
             "/api/protein/uniprot/"+prot_s1+"/structure/pdb/"+pdb_1+"/B",
             "/api/protein/uniprot/"+prot_s2+"/structure/pdb/"+pdb_1+"/A",
-            "/api/protein/trembl/"+prot_s2+"/structure/pdb/"+pdb_1,
-            "/api/protein/trembl/BAD_PROTEIN/structure/pdb/"+pdb_1,
             "/api/protein/trembl/structure/pdb/"+pdb_1,
             # "/api/protein/trembl/structure/pdb/"+pdb_2+"/B",
-            "/api/protein/structure/pdb/BAD_PDB"
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+
+    def test_urls_that_should_fail(self):
+        pdb_1 = "1JM7"
+        # pdb_2 = "2BKM"
+        # TODO: the one with pdb_2 has been commented, as it doesn't give error but rather an empty array
+        # So evalluate what is the best approach
+        prot_s1 = "A1CUJ5"
+        prot_s2 = "M5ADK6"
+        tests = [
+            "/api/protein/trembl/BAD_PROTEIN/structure/pdb/"+pdb_1,
+            "/api/protein/structure/pdb/BAD_PDB"
+            "/api/protein/trembl/"+prot_s2+"/structure/pdb/"+pdb_1,
+        ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

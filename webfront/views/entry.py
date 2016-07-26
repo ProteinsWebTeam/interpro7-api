@@ -4,9 +4,8 @@ from django.db.models import Count, QuerySet
 
 from webfront.constants import QuerysetType
 from webfront.constants import get_queryset_type
-from webfront.models import Entry, ProteinEntryFeature, EntryStructureFeature, Structure
+from webfront.models import Entry, ProteinEntryFeature, EntryStructureFeature
 from webfront.serializers.interpro import EntrySerializer
-from django.db.models import F
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 

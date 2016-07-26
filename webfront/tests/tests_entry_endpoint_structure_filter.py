@@ -63,7 +63,7 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
                 # self.assertIn(match["structure"], data_in_fixtures[result["accession"]])
                 self._check_entry_structure_details(match)
 
-    def test_can_get_matches_from_entries(self):
+    def test_urls_that_should_fails_with_no_content(self):
         acc = "IPR003165"
         pfam = "PF02171"
         pfam_u = "PF17180"
@@ -81,7 +81,7 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["structures"]), len(tests[url]), "on url: "+url)
             for match in response.data["structures"]:
                 self._check_entry_structure_details(match)
-            ids = [x["structure"] for x in response.data["structures"]]
+            ids = [x["accession"] for x in response.data["structures"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
 
@@ -140,17 +140,24 @@ class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
                     self._check_entry_structure_details(match)
                     self._check_structure_details(match["structure"])
 
-    def test_urls_that_should_fails(self):
+    def test_urls_that_should_fails_with_no_content(self):
         acc = "IPR003165"
         pdb_1 = "1T2V"
         pdb_2 = "2BKM"
-        pfam = "PF02171"
         pfam_u = "PF17180"
         tests = [
             "/api/entry/interpro/structure/pdb/"+pdb_2,
             "/api/entry/interpro/"+acc+"/structure/pdb/"+pdb_2,
             "/api/entry/unintegrated/pfam/"+pfam_u+"/structure/pdb/"+pdb_1,
-            "/api/entry/unintegrated/pfam/"+pfam+"/structure/pdb/"+pdb_2,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+
+    def test_urls_that_should_fail(self):
+        pdb_2 = "2BKM"
+        pfam = "PF02171"
+        tests = [
+            "/api/entry/unintegrated/pfam/"+pfam+"/structure/pdb/"+pdb_2,
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

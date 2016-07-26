@@ -64,14 +64,14 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         for result in response.data["results"]:
             self.assertEqual(len(result["proteins"]), len(data_in_fixtures[result["metadata"]["accession"]]))
             for match in result["proteins"]:
-                self.assertIn(match["protein"], data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"], data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_swissprot_from_pdb_structures(self):
         response = self.client.get("/api/structure/pdb/protein/swissprot")
         for result in response.data["results"]:
             for match in result["proteins"]:
-                self.assertIn(match["protein"], data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"], data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_uniprot_matches_from_structures(self):
@@ -82,7 +82,7 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["proteins"]), len(tests[url]))
             for match in response.data["proteins"]:
                 self._check_structure_chain_details(match)
-            ids = [x["protein"] for x in response.data["proteins"]]
+            ids = [x["accession"] for x in response.data["proteins"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_can_get_uniprot_matches_from_structures_chain(self):
@@ -92,7 +92,7 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
             for match in response.data["proteins"]:
                 self._check_structure_chain_details(match)
-                self.assertIn(match["protein"], tests[url])
+                self.assertIn(match["accession"], tests[url])
 
 
 class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
@@ -147,16 +147,25 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         self._check_structure_count_overview(response.data)
         # TODO: improve this test
 
-    def test_urls_that_should_fails(self):
+    def test_urls_that_should_fail_with_no_content(self):
         pdb = "1JM7"
         prot_s = "M5ADK6"
         prot_t = "P16582"
         tests = [
             "/api/structure/pdb/"+pdb+"/protein/uniprot/bad_uniprot"
             "/api/structure/pdb/"+pdb+"/protein/trembl/"+prot_s,
-            "/api/structure/pdb/BADP/protein/uniprot/"+prot_s,
             "/api/structure/pdb/protein/trembl/"+prot_s,
             "/api/structure/pdb/protein/swissprot/"+prot_t,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+
+    def test_urls_that_should_fails(self):
+        pdb = "1JM7"
+        prot_s = "M5ADK6"
+        prot_t = "P16582"
+        tests = [
+            "/api/structure/pdb/BADP/protein/uniprot/"+prot_s,
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

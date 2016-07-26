@@ -173,7 +173,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
                     self._check_match(match)
                     self._check_protein_details(match["protein"])
 
-    def test_urls_that_should_fails(self):
+    def test_urls_that_should_fails_with_no_content(self):
         acc = "IPR003165"
         pfam = "PF02171"
         prot = "A1CUJ5"
@@ -183,10 +183,19 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
             "/api/entry/interpro/protein/uniprot/"+prot_u,
             "/api/entry/interpro/"+acc+"/protein/trembl/"+prot,
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/trembl/"+prot,
-            "/api/entry/interpro/"+acc+"/smart/"+pfam+"/protein/trembl/"+prot,
             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot/"+prot,
-            "/api/entry/unintegrated/pfam/"+pfam+"/protein/trembl/"+prot,
             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/trembl/"+prot_u,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+
+    def test_urls_that_should_fail(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        prot = "A1CUJ5"
+        tests = [
+            "/api/entry/interpro/"+acc+"/smart/"+pfam+"/protein/trembl/"+prot,
+            "/api/entry/unintegrated/pfam/"+pfam+"/protein/trembl/"+prot,
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

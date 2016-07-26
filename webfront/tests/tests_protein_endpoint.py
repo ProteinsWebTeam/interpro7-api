@@ -40,7 +40,7 @@ class ProteinRESTTest(InterproRESTTestCase):
         self._check_protein_details(response.data["metadata"])
 
     def test_cant_read_protein_bad_db(self):
-        self._check_HTTP_response_code("/api/protein/bad_db")
+        self._check_HTTP_response_code("/api/protein/bad_db", code=status.HTTP_404_NOT_FOUND)
 
     def test_cant_read_protein_uniprot_bad_id(self):
-        self._check_HTTP_response_code("/api/protein/uniprot/bad_id")
+        self._check_HTTP_response_code("/api/protein/uniprot/bad_id", code=status.HTTP_404_NOT_FOUND)

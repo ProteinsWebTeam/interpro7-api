@@ -45,10 +45,10 @@ class EntryRESTTest(InterproRESTTestCase):
         self._check_entry_details(response.data["metadata"])
 
     def test_fail_entry_interpro_unknown_id(self):
-        self._check_HTTP_response_code("/api/entry/interpro/IPR999999")
+        self._check_HTTP_response_code("/api/entry/interpro/IPR999999", code=status.HTTP_404_NOT_FOUND)
 
     def test_bad_entry_point(self):
-        self._check_HTTP_response_code("/api/bad_entry_point")
+        self._check_HTTP_response_code("/api/bad_entry_point", code=status.HTTP_404_NOT_FOUND)
 
     def test_can_read_entry_member(self):
         for member in self.db_members:
@@ -92,7 +92,7 @@ class EntryRESTTest(InterproRESTTestCase):
     def test_cant_read_entry_interpro_id_pfam_id_not_in_entry(self):
         acc = "IPR003165"
         pfam = "PF17180"
-        self._check_HTTP_response_code("/api/entry/interpro/"+acc+"/pfam/"+pfam)
+        self._check_HTTP_response_code("/api/entry/interpro/"+acc+"/pfam/"+pfam, code=status.HTTP_404_NOT_FOUND)
 
     def test_can_read_entry_pfam_id(self):
         pfam = "PF17180"
@@ -114,7 +114,7 @@ class EntryRESTTest(InterproRESTTestCase):
 
     def test_cant_read_entry_unintegrated_pfam_id_integrated(self):
         pfam = "PF02171"
-        self._check_HTTP_response_code("/api/entry/unintegrated/pfam/"+pfam)
+        self._check_HTTP_response_code("/api/entry/unintegrated/pfam/"+pfam, code=status.HTTP_404_NOT_FOUND)
 
     def test_can_get_protein_amount_from_interpro_id(self):
         acc = "IPR003165"

@@ -209,7 +209,7 @@ class MemberHandler(CustomView):
             for o in arr:
                 if "entries" in o:
                     o["entries"] = [e for e in o["entries"]
-                                    if e["source_database"] == level_name and e["entry"] in entries]
+                                    if e["source_database"] == level_name and e["accession"] in entries]
         return obj
 
 

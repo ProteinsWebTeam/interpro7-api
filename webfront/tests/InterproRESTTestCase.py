@@ -27,11 +27,11 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("member_databases", obj)
         self.assertIn("accession", obj)
 
-    def _check_entry_count_overview(self, main_obj):
+    def _check_entry_count_overview(self, main_obj, msg=""):
         obj = main_obj["entries"]
-        self.assertIn("member_databases", obj)
-        self.assertIn("interpro", obj)
-        self.assertIn("unintegrated", obj)
+        self.assertIn("member_databases", obj, msg)
+        self.assertIn("interpro", obj, msg)
+        self.assertIn("unintegrated", obj, msg)
 
     def _check_is_list_of_metadata_objects(self, _list, msg=""):
         for obj in _list:
@@ -55,11 +55,18 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertEqual(response.status_code, code, msg)
         settings.DEBUG = prev
 
+    def _get_in_debug_mode(self, url):
+        prev = settings.DEBUG
+        settings.DEBUG = False
+        response = self.client.get(url)
+        settings.DEBUG = prev
+        return response
+
     # methods to check protein related responses
-    def _check_protein_count_overview(self, main_obj):
+    def _check_protein_count_overview(self, main_obj, msg=""):
         obj = main_obj["proteins"]
-        self.assertIn("uniprot", obj)
-        self.assertTrue("trembl" in obj or "swissprot" in obj)
+        self.assertIn("uniprot", obj, msg)
+        self.assertTrue("trembl" in obj or "swissprot" in obj, msg)
 
     def _check_protein_details(self, obj):
         self.assertIn("description", obj)
@@ -76,9 +83,9 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     # methods to check structure related responses
     # TODO: Extend this tests
-    def _check_structure_count_overview(self, main_obj):
+    def _check_structure_count_overview(self, main_obj, msg=""):
         obj = main_obj["structures"]
-        self.assertIn("pdb", obj)
+        self.assertIn("pdb", obj, msg)
 
     def _check_structure_details(self, obj):
         self.assertIn("chains", obj)
@@ -93,17 +100,27 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("coordinates", obj)
         self.assertIn("chain", obj)
 
-    def _check_counter_by_endpoint(self, endpoint, obj):
+    def _check_counter_by_endpoint(self, endpoint, obj, msg=""):
         if "entry" == endpoint:
-            self._check_entry_count_overview(obj)
+            self._check_entry_count_overview(obj, msg)
         elif "protein" == endpoint:
-            self._check_protein_count_overview(obj)
+            self._check_protein_count_overview(obj, msg)
         elif "structure" == endpoint:
-            self._check_structure_count_overview(obj)
+            self._check_structure_count_overview(obj, msg)
 
-    def _check_object_by_accesssion(self, obj):
-        self.assertIn("metadata", obj)
-        self.assertIn("source_database", obj["metadata"])
-        self.assertIn("accession", obj["metadata"])
-        self.assertIn("counters", obj["metadata"])
-        self.assertIn("name", obj["metadata"])
+    def _check_object_by_accesssion(self, obj, msg=""):
+        self.assertIn("metadata", obj, msg)
+        self.assertIn("source_database", obj["metadata"], msg)
+        self.assertIn("accession", obj["metadata"], msg)
+        self.assertIn("counters", obj["metadata"], msg)
+        self.assertIn("name", obj["metadata"], msg)
+
+    def _check_count_overview_per_endpoints(self, obj, endpoints1, endpoints2, msg=""):
+        for inner_obj in obj[endpoints2]:
+            if inner_obj in ["interpro", "unintegrated", "uniprot", "swissprot", "trembl", "pdb"]:
+                self.assertIn(endpoints1,
+                              obj[endpoints2][inner_obj],
+                              msg)
+                self.assertIn(endpoints2,
+                              obj[endpoints2][inner_obj],
+                              msg)

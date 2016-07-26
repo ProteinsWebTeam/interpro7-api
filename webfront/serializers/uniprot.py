@@ -125,7 +125,7 @@ class ProteinSerializer(ModelContentSerializer):
 
         chain = {
             "chain": instance.chain,
-            "structure": instance.structure.accession,
+            "accession": instance.structure.accession,
             "source_database": instance.structure.source_database,
             "length": instance.length,
             "organism": instance.organism,

@@ -1,5 +1,6 @@
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
+import logging
 
 structure_urls = [
     "structure/",
@@ -76,7 +77,8 @@ endpoint_plurals = {
     "protein": "proteins",
     "structure": "structures",
 }
-
+# TODO: Create tests for Chains in structure
+# TODO: Crete tests for entry/unintegrated
 
 class ObjectStructureTest(InterproRESTTestCase):
 
@@ -104,18 +106,18 @@ class ObjectStructureTest(InterproRESTTestCase):
                     continue
 
                 # [endpoint]/[endpoint]
-                response = self.client.get("/api/"+endpoint1+"/"+endpoint2)
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self._check_counter_by_endpoint(endpoint1, response.data)
-                self._check_counter_by_endpoint(endpoint2, response.data)
+                current = "/api/"+endpoint1+"/"+endpoint2
+                response = self.client.get(current)
+                self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                self._check_counter_by_endpoint(endpoint1, response.data, "URL : [{}]".format(current))
+                self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
 
                 for db in api_test_map[endpoint1]:
                     # [endpoint]/[db]/[endpoint]
                     current = "/api/"+endpoint1+"/"+db+"/"+endpoint2
                     response_db = self.client.get(current)
-                    self.assertEqual(response_db.status_code, status.HTTP_200_OK)
-                    self._check_is_list_of_metadata_objects(response_db.data["results"], "metadata")
-
+                    self.assertEqual(response_db.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                    self._check_is_list_of_metadata_objects(response_db.data["results"], "URL : [{}]".format(current))
                     self._check_is_list_of_objects_with_key(response_db.data["results"],
                                                             endpoint_plurals[endpoint2],
                                                             "URL : [{}]".format(current))
@@ -123,25 +125,55 @@ class ObjectStructureTest(InterproRESTTestCase):
                     # [endpoint]/[endpoint]/[db]
                     current = "/api/"+endpoint2+"/"+endpoint1+"/"+db+"/"
                     response_db = self.client.get(current)
-                    self.assertEqual(response_db.status_code, status.HTTP_200_OK)
-                    self._check_counter_by_endpoint(endpoint2, response_db.data)
-                    for inner_obj in response_db.data[endpoint_plurals[endpoint2]]:
-                        if inner_obj in ["interpro", "unintegrated", "uniprot", "swissprot", "trembl", "pdb"]:
-                            self.assertIn(endpoint_plurals[endpoint1],
-                                          response_db.data[endpoint_plurals[endpoint2]][inner_obj],
-                                          response_db.data[endpoint_plurals[endpoint2]])
-                            self.assertIn(endpoint_plurals[endpoint2],
-                                          response_db.data[endpoint_plurals[endpoint2]][inner_obj],
-                                          response_db.data[endpoint_plurals[endpoint2]])
+                    self.assertEqual(response_db.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                    self._check_counter_by_endpoint(endpoint2, response_db.data, "URL : [{}]".format(current))
+                    self._check_count_overview_per_endpoints(response_db.data,
+                                                             endpoint_plurals[endpoint1],
+                                                             endpoint_plurals[endpoint2],
+                                                             "URL : [{}]".format(current))
 
                     for acc in api_test_map[endpoint1][db]:
                         # [endpoint]/[db]/[acc]/[endpoint]
                         current = "/api/"+endpoint1+"/"+db+"/"+acc+"/"+endpoint2
                         response_acc = self.client.get(current)
-                        self.assertEqual(response_acc.status_code, status.HTTP_200_OK)
-                        self._check_object_by_accesssion(response_acc.data)
-                        self._check_counter_by_endpoint(endpoint2, response.data)
+                        self.assertEqual(response_acc.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                        self._check_object_by_accesssion(response_acc.data, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
 
+                        # [endpoint]/[endpoint]/[db]/[acc]
+                        current = "/api/"+endpoint2+"/"+endpoint1+"/"+db+"/"+acc+"/"
+                        response_acc = self.client.get(current)
+                        print(current)
+                        self.assertEqual(response_acc.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint2, response_acc.data, "URL : [{}]".format(current))
+                        self._check_count_overview_per_endpoints(response_acc.data,
+                                                                 endpoint_plurals[endpoint1],
+                                                                 endpoint_plurals[endpoint2],
+                                                                 "URL : [{}]".format(current))
+
+                    # [endpoint]/[db]/[endpoint]/[db]
+                    for db2 in api_test_map[endpoint2]:
+                        current = "/api/"+endpoint1+"/"+db+"/"+endpoint2+"/"+db2
+                        response_db = self._get_in_debug_mode(current)
+                        if response_db.status_code == status.HTTP_200_OK:
+                            self._check_is_list_of_metadata_objects(response_db.data["results"], "URL : [{}]".format(current))
+                            self._check_is_list_of_objects_with_key(response_db.data["results"],
+                                                                    endpoint_plurals[endpoint2],
+                                                                    "URL : [{}]".format(current))
+                            for result in [x[endpoint_plurals[endpoint2]] for x in response_db.data["results"]]:
+                                for match in result:
+                                    self.assertIn("coordinates", match, "URL : [{}]".format(current))
+                                    self.assertIn("source_database", match, "URL : [{}]".format(current))
+                                    self.assertIn("accession", match, "URL : [{}]".format(current))
+                        elif response_db.status_code != status.HTTP_204_NO_CONTENT:
+                            logging.info("({}) - [{}]".format(response_db.status_code, current))
+                            self.client.get(current)
+
+
+                        # [endpoint]/[db]/[acc]/[endpoint]/[db]
+                        # [endpoint]/[db]/[endpoint]/[db]/[acc]
+
+                        # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
 
 
 class EntryWithFilterProteinStructureRESTTest(InterproRESTTestCase):

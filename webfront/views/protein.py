@@ -57,6 +57,7 @@ class UniprotAccessionHandler(CustomView):
                 raise ReferenceError("The protein {} doesn't exist in the database {}".format(level_name, protein_db))
             return queryset
         elif "interpro" in queryset:
+            # TODO: Not filtering properly!
             matches = ProteinEntryFeature.objects.filter(protein=level_name)
             return EntryHandler.get_database_contributions(matches, 'entry__')
         elif "pdb" in queryset:

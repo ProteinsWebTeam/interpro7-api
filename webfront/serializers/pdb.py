@@ -105,7 +105,7 @@ class StructureSerializer(ModelContentSerializer):
     def to_chain_representation(instance, full=False):
         chain = {
             "chain": instance.chain,
-            "protein": instance.protein.accession,
+            "accession": instance.protein.accession,
             "source_database": instance.protein.source_database,
             "length": instance.length,
             "organism": instance.organism,
@@ -135,7 +135,7 @@ class StructureSerializer(ModelContentSerializer):
 
         chain = {
             "chain": instance.chain,
-            "entry": instance.entry.accession,
+            "accession": instance.entry.accession,
             "source_database": instance.entry.source_database,
             "coordinates": instance.coordinates,
         }

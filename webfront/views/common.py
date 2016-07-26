@@ -50,6 +50,11 @@ class GeneralHandler(CustomView):
                 general_handler=self,
                 *args, **kwargs
             )
+        except ReferenceError as e:
+            if settings.DEBUG:
+                raise
+            content = {'Error': e.args[0]}
+            return Response(content, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             if settings.DEBUG:
                 raise

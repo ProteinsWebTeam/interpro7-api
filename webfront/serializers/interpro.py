@@ -125,8 +125,9 @@ class EntrySerializer(ModelContentSerializer):
 
         chain = {
             "chain": instance.chain,
-            "structure": instance.structure.accession,
+            "accession": instance.structure.accession,
             "coordinates": instance.coordinates,
+            "source_database": instance.structure.source_database,
         }
         if full:
             chain["structure"] = StructureSerializer.to_metadata_representation(instance.structure)

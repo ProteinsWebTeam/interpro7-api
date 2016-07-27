@@ -264,7 +264,7 @@ class StructureHandler(CustomView):
         for row in protein_counter:
             output[row[prefix+"source_database"]] = row["total"]
         # output["uniprot"] = sum(output.values())
-        return output
+        return output if output != {} else {"pdb": 0}
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, *args, **kwargs):

@@ -80,13 +80,14 @@ endpoint_plurals = {
 # TODO: Create tests for Chains in structure
 # TODO: Crete tests for entry/unintegrated
 
+
 class ObjectStructureTest(InterproRESTTestCase):
 
     def test_endpoints_independently(self):
         for endpoint in api_test_map:
             response = self.client.get("/api/"+endpoint)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_counter_by_endpoint(endpoint,response.data)
+            self._check_counter_by_endpoint(endpoint, response.data)
 
             for db in api_test_map[endpoint]:
                 response_db = self.client.get("/api/"+endpoint+"/"+db)
@@ -138,7 +139,7 @@ class ObjectStructureTest(InterproRESTTestCase):
                         response_acc = self.client.get(current)
                         self.assertEqual(response_acc.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                         self._check_object_by_accesssion(response_acc.data, "URL : [{}]".format(current))
-                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint2, response_acc.data, "URL : [{}]".format(current))
 
                         # [endpoint]/[endpoint]/[db]/[acc]
                         current = "/api/"+endpoint2+"/"+endpoint1+"/"+db+"/"+acc+"/"
@@ -155,7 +156,8 @@ class ObjectStructureTest(InterproRESTTestCase):
                         current = "/api/"+endpoint1+"/"+db+"/"+endpoint2+"/"+db2
                         response_db = self._get_in_debug_mode(current)
                         if response_db.status_code == status.HTTP_200_OK:
-                            self._check_is_list_of_metadata_objects(response_db.data["results"], "URL : [{}]".format(current))
+                            self._check_is_list_of_metadata_objects(response_db.data["results"],
+                                                                    "URL : [{}]".format(current))
                             self._check_is_list_of_objects_with_key(response_db.data["results"],
                                                                     endpoint_plurals[endpoint2],
                                                                     "URL : [{}]".format(current))
@@ -168,9 +170,26 @@ class ObjectStructureTest(InterproRESTTestCase):
                             logging.info("({}) - [{}]".format(response_db.status_code, current))
                             self.client.get(current)
 
+                        for acc in api_test_map[endpoint1][db]:
+                            # [endpoint]/[db]/[acc]/[endpoint]/[db]
+                            current = "/api/"+endpoint1+"/"+db+"/"+acc+"/"+endpoint2+"/"+db2
+                            print("URL: [{}]".format(current))
+                            response = self._get_in_debug_mode(current)
+                            if response.status_code == status.HTTP_200_OK:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                            elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                logging.info("({}) - [{}]".format(response_db.status_code, current))
+                                self.client.get(current)
 
-                        # [endpoint]/[db]/[acc]/[endpoint]/[db]
-                        # [endpoint]/[db]/[endpoint]/[db]/[acc]
+                            # [endpoint]/[db]/[endpoint]/[db]/[acc]
+                            current = "/api/"+endpoint2+"/"+db2+"/"+endpoint1+"/"+db+"/"+acc
+                            print("URL: [{}]".format(current))
+                            response = self._get_in_debug_mode(current)
+                            if response.status_code == status.HTTP_200_OK:
+                                self.assertEqual(response_acc.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                            elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                logging.info("({}) - [{}]".format(response_db.status_code, current))
+                                self.client.get(current)
 
                         # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
 

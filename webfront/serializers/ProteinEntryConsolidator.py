@@ -34,5 +34,8 @@ def consolidate_protein_entry(view):
             if view.many:
                 return view.get_paginated_response(list(proteins.values()))
             else:
-                return Response(list(proteins.values())[0])
+                if proteins:
+                    return Response(list(proteins.values())[0])
+                else:
+                    raise ReferenceError("Empty result for API request.")
     return None

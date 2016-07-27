@@ -66,7 +66,8 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_protein_count_overview(self, main_obj, msg=""):
         obj = main_obj["proteins"]
         self.assertIn("uniprot", obj, msg)
-        self.assertTrue("trembl" in obj or "swissprot" in obj, msg)
+        if (isinstance(obj["uniprot"], int) and obj["uniprot"] > 0) or (isinstance(obj["uniprot"], dict) and isinstance(obj["uniprot"]["proteins"], int) and obj["uniprot"]["proteins"] > 0):
+            self.assertTrue("trembl" in obj or "swissprot" in obj, msg)
 
     def _check_protein_details(self, obj):
         self.assertIn("description", obj)

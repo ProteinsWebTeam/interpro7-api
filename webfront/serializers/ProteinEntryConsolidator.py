@@ -30,7 +30,7 @@ def consolidate_protein_entry(view):
                 #     row,
                 #     serializer_detail_filter == SerializerDetail.ENTRY_PROTEIN_DETAIL))
                 proteins[row.protein]["entries"].append(
-                    ProteinSerializer.filter_representation({}, row, serializer_detail_filter))
+                    ProteinSerializer.filter_representation({}, row, [serializer_detail_filter]))
             if view.many:
                 return view.get_paginated_response(list(proteins.values()))
             else:

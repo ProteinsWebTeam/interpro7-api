@@ -115,7 +115,6 @@ class UniprotHandler(CustomView):
             available_endpoint_handlers = {}
         ds = endpoint_levels[level - 1].lower()
         if ds != "uniprot":
-
             self.queryset = self.queryset.filter(source_database__iexact=ds)
         if self.queryset.count() == 0:
             raise Exception("The ID '{}' has not been found in {}".format(
@@ -135,6 +134,9 @@ class UniprotHandler(CustomView):
                     queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
                 elif qs_type == QuerysetType.STRUCTURE:
                     queryset = queryset.filter(proteins__source_database__iexact=level_name).distinct()
+            if queryset.count() == 0:
+                raise ReferenceError("There isn't any data for {}".format(level_name))
+
             if qs_type == QuerysetType.STRUCTURE_PROTEIN:
                 general_handler.set_in_store(UniprotHandler,
                                              "protein_queryset",

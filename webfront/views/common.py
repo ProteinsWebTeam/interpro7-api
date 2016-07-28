@@ -33,11 +33,12 @@ class GeneralHandler(CustomView):
     child_handlers = []
     queryset = Entry.objects
     store = {}
-    last_endpoint_level=None
+    last_endpoint_level = None
 
     def get(self, request, url='', *args, **kwargs):
         self.store = {}
         self.post_serializers = {}
+        self.filter_serializers = {}
         endpoint_levels = map_url_to_levels(url)
 
         self.set_in_store(GeneralHandler, "pagination", pagination_information(request))
@@ -95,3 +96,15 @@ class GeneralHandler(CustomView):
             ps = self.post_serializers[key]
             data = ps["post_serializer"](data, ps["value"], self)
         return data
+
+    filter_serializers = {}
+    current_filter_endpoint = None
+
+    def register_filter_serializer(self, filter_serializer, value):
+        if value in [e[0] for e in self.available_endpoint_handlers]:
+            self.current_filter_endpoint = value
+        if self.current_filter_endpoint is not None:
+            self.filter_serializers[self.current_filter_endpoint] = {
+                "filter_serializer": filter_serializer,
+                "value": value
+            }

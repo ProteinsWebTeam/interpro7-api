@@ -12,7 +12,7 @@ class ProteinSerializer(ModelContentSerializer):
         representation = {}
 
         representation = self.endpoint_representation(representation, instance, self.detail)
-        representation = self.filter_representation(representation, instance, self.detail_filter)
+        representation = self.filter_representation(representation, instance, self.detail_filters)
 
         return representation
 
@@ -29,19 +29,19 @@ class ProteinSerializer(ModelContentSerializer):
         return representation
 
     @staticmethod
-    def filter_representation(representation, instance, detail_filter):
+    def filter_representation(representation, instance, detail_filters):
         qs_type = get_queryset_type(instance)
-        if detail_filter == SerializerDetail.ENTRY_OVERVIEW:
+        if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
             representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
-        elif detail_filter == SerializerDetail.ENTRY_MATCH:
-            representation = ProteinSerializer.to_match_representation(instance, False)
-        elif detail_filter == SerializerDetail.ENTRY_DETAIL:
-            representation = ProteinSerializer.to_match_representation(instance, True)
-        elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
+        if SerializerDetail.ENTRY_MATCH in detail_filters:
+            representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, False)
+        if SerializerDetail.ENTRY_DETAIL in detail_filters:
+            representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, True)
+        if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
             representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
-        elif detail_filter == SerializerDetail.STRUCTURE_OVERVIEW:
+        if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance)
-        elif detail_filter == SerializerDetail.STRUCTURE_DETAIL:
+        if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
             if qs_type == QuerysetType.PROTEIN:
                 representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance, True)
         return representation
@@ -99,6 +99,9 @@ class ProteinSerializer(ModelContentSerializer):
             "source_database": match.entry.source_database,
             "name": match.entry.name,
         }
+        if match.entry.integrated:
+            output["integrated"]= match.entry.integrated.accession
+
         if full:
             output["entry"] = webfront.serializers.interpro.EntrySerializer.to_metadata_representation(match.entry)
 
@@ -140,6 +143,13 @@ class ProteinSerializer(ModelContentSerializer):
         return [
             ProteinSerializer.to_chain_representation(match, is_full)
             for match in instance.proteinstructurefeature_set.all()
+            ]
+
+    @staticmethod
+    def to_entries_overview_representation(instance, is_full=False):
+        return [
+            ProteinSerializer.to_match_representation(match, is_full)
+            for match in instance.proteinentryfeature_set.all()
             ]
 
     class Meta:

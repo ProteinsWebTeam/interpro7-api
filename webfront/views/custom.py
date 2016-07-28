@@ -37,9 +37,9 @@ class CustomView(GenericAPIView):
         if len(endpoint_levels) == level:
             if self.from_model:
 
-                consolidation = consolidate_protein_entry(self)
-                if consolidation is not None:
-                    return consolidation
+                # consolidation = consolidate_protein_entry(self)
+                # if consolidation is not None:
+                #     return consolidation
 
                 if self.many:
                     self.queryset = self.paginate_queryset(self.get_queryset())
@@ -54,7 +54,7 @@ class CustomView(GenericAPIView):
                     content=request.GET.getlist('content'),
                     context={"request": request},
                     serializer_detail=self.serializer_detail,
-                    serializer_detail_filter=self.serializer_detail_filter,
+                    serializer_detail_filters=general_handler.filter_serializers,
                 )
                 # data_tmp = general_handler.post_serializer(serialized.data,
                 #                                            general_handler.last_endpoint_level,
@@ -131,9 +131,8 @@ class CustomView(GenericAPIView):
 
     def filter_entrypoint(self, handler_name, handler_class, endpoint_levels, endpoints, general_handler):
         for level in range(len(endpoint_levels)):
-            self.serializer_detail_filter = handler_class.serializer_detail_filter
             self.queryset = handler_class.filter(self.queryset, endpoint_levels[level], general_handler)
-            self.post_serializer = handler_class.post_serializer
+            general_handler.register_filter_serializer(handler_class.serializer_detail_filter, endpoint_levels[level])
             general_handler.register_post_serializer(handler_class.post_serializer, endpoint_levels[level])
 
             # handlers = {**self.child_handlers, **endpoints}

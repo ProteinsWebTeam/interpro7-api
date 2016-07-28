@@ -215,7 +215,6 @@ class ObjectStructureTest(InterproRESTTestCase):
 
                     # [endpoint]/[endpoint]
                     current = "/api/"+endpoint1+"/"+endpoint2+"/"+endpoint3
-                    print(current)
                     response = self.client.get(current)
                     self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                     self._check_counter_by_endpoint(endpoint1, response.data, "URL : [{}]".format(current))
@@ -223,15 +222,106 @@ class ObjectStructureTest(InterproRESTTestCase):
                     self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
 
                     for db1 in api_test_map[endpoint1]:
-                        # [endpoint]/[db]/[endpoint]
+                        # [endpoint]/[db]/[endpoint]/[endpoint]
                         current = "/api/"+endpoint1+"/"+db1+"/"+endpoint2+"/"+endpoint3
-                        print(current)
                         response = self.client.get(current)
                         self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                         self._check_is_list_of_metadata_objects(response.data["results"], "URL : [{}]".format(current))
                         self._check_is_list_of_objects_with_key(response.data["results"],
                                                                 endpoint_plurals[endpoint2],
                                                                 "URL : [{}]".format(current))
+                        # [endpoint]/[endpoint]/[db]/[endpoint]
+                        current = "/api/"+endpoint2+"/"+endpoint1+"/"+db1+"/"+endpoint3
+                        response = self.client.get(current)
+                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                        self._check_count_overview_per_endpoints(response.data,
+                                                                 endpoint_plurals[endpoint1],
+                                                                 endpoint_plurals[endpoint2],
+                                                                 "URL : [{}]".format(current))
+
+                        # [endpoint]/[endpoint]/[endpoint]/[db]
+                        current = "/api/"+endpoint2+"/"+endpoint3+"/"+endpoint1+"/"+db1
+                        response = self.client.get(current)
+                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                        self._check_count_overview_per_endpoints(response.data,
+                                                                 endpoint_plurals[endpoint1],
+                                                                 endpoint_plurals[endpoint2],
+                                                                 "URL : [{}]".format(current))
+
+                    # [endpoint]/[db]/[endpoint]/[db]/[endpoint]
+                    for db2 in api_test_map[endpoint2]:
+                        current = "/api/"+endpoint1+"/"+db1+"/"+endpoint2+"/"+db2+"/"+endpoint3
+                        response = self._get_in_debug_mode(current)
+                        if response.status_code == status.HTTP_200_OK:
+                            self._check_is_list_of_metadata_objects(response.data["results"],
+                                                                    "URL : [{}]".format(current))
+                            self._check_is_list_of_objects_with_key(response.data["results"],
+                                                                    endpoint_plurals[endpoint2],
+                                                                    "URL : [{}]".format(current))
+                            for result in [x[endpoint_plurals[endpoint2]] for x in response.data["results"]]:
+                                self._check_list_of_matches(result, "URL : [{}]".format(current))
+                            self._check_is_list_of_objects_with_key(response.data["results"],
+                                                                    endpoint_plurals[endpoint3],
+                                                                    "URL : [{}]".format(current))
+                        elif response.status_code != status.HTTP_204_NO_CONTENT:
+                            logging.info("({}) - [{}]".format(response.status_code, current))
+                            self.client.get(current)
+
+                        # [endpoint]/[db]/[endpoint]/[endpoint]/[db]
+                        current = "/api/"+endpoint1+"/"+db1+"/"+endpoint3+"/"+endpoint2+"/"+db2
+                        response = self._get_in_debug_mode(current)
+                        if response.status_code == status.HTTP_200_OK:
+                            self._check_is_list_of_metadata_objects(response.data["results"],
+                                                                    "URL : [{}]".format(current))
+                            self._check_is_list_of_objects_with_key(response.data["results"],
+                                                                    endpoint_plurals[endpoint2],
+                                                                    "URL : [{}]".format(current))
+                            for result in [x[endpoint_plurals[endpoint2]] for x in response.data["results"]]:
+                                self._check_list_of_matches(result, "URL : [{}]".format(current))
+                            self._check_is_list_of_objects_with_key(response.data["results"],
+                                                                    endpoint_plurals[endpoint3],
+                                                                    "URL : [{}]".format(current))
+                        elif response.status_code != status.HTTP_204_NO_CONTENT:
+                            logging.info("({}) - [{}]".format(response.status_code, current))
+                            self.client.get(current)
+
+                        # [endpoint]/[endpoint]/[db]/[endpoint]/[db]
+                        current = "/api/"+endpoint3+"/"+endpoint2+"/"+db2+"/"+endpoint1+"/"+db1
+                        response = self.client.get(current)
+                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                        self._check_count_overview_per_endpoints(response.data,
+                                                                 endpoint_plurals[endpoint2],
+                                                                 endpoint_plurals[endpoint3],
+                                                                 "URL : [{}]".format(current))
+                        self._check_count_overview_per_endpoints(response.data,
+                                                                 endpoint_plurals[endpoint1],
+                                                                 endpoint_plurals[endpoint3],
+                                                                 "URL : [{}]".format(current))
+                        # [endpoint]/[db]/[endpoint]/[db]/[endpoint]/[db]
+                        for db3 in api_test_map[endpoint3]:
+                            current = "/api/"+endpoint1+"/"+db1+"/"+endpoint2+"/"+db2+"/"+endpoint3+"/"+db3
+                            response = self._get_in_debug_mode(current)
+                            if response.status_code == status.HTTP_200_OK:
+                                self._check_is_list_of_metadata_objects(response.data["results"],
+                                                                        "URL : [{}]".format(current))
+                                self._check_is_list_of_objects_with_key(response.data["results"],
+                                                                        endpoint_plurals[endpoint2],
+                                                                        "URL : [{}]".format(current))
+                                for result in [x[endpoint_plurals[endpoint2]] for x in response.data["results"]]:
+                                    self._check_list_of_matches(result, "URL : [{}]".format(current))
+                                self._check_is_list_of_objects_with_key(response.data["results"],
+                                                                        endpoint_plurals[endpoint3],
+                                                                        "URL : [{}]".format(current))
+                                for result in [x[endpoint_plurals[endpoint3]] for x in response.data["results"]]:
+                                    self._check_list_of_matches(result, "URL : [{}]".format(current))
+                            elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                logging.info("({}) - [{}]".format(response.status_code, current))
+                                self.client.get(current)
 
 
 class EntryWithFilterProteinStructureRESTTest(InterproRESTTestCase):

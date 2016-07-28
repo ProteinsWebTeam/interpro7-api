@@ -5,7 +5,6 @@ from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 
 
-
 def filter_protein_overview(obj, accession=None):
     for prot_db in obj:
         matches = ProteinStructureFeature.objects.all()
@@ -13,10 +12,11 @@ def filter_protein_overview(obj, accession=None):
             matches = matches.filter(structure=accession)
         if prot_db != "uniprot":
             matches = matches.filter(protein__source_database__iexact=prot_db)
-        obj[prot_db] = {
-            "proteins": matches.values("protein").distinct().count(),
-            "structures": matches.values("structure").distinct().count()
-        }
+        CustomView.set_counter_attributte(obj, prot_db, "proteins",
+                                          matches.values("protein").distinct().count())
+        CustomView.set_counter_attributte(obj, prot_db, "structures",
+                                          matches.values("structure").distinct().count())
+
 
 def filter_entry_overview(obj, accession=None):
     for entry_db in obj:
@@ -26,10 +26,10 @@ def filter_entry_overview(obj, accession=None):
         if entry_db == "member_databases":
             for member_db in obj[entry_db]:
                 matches2 = matches.filter(entry__source_database__iexact=member_db)
-                obj[entry_db][member_db] = {
-                    "structures": matches2.values("structure").distinct().count(),
-                    "entries": matches2.values("entry").distinct().count()
-                }
+                CustomView.set_counter_attributte(obj[entry_db], member_db, "entries",
+                                                  matches2.values("entry").distinct().count())
+                CustomView.set_counter_attributte(obj[entry_db], member_db, "structures",
+                                                  matches2.values("structure").distinct().count())
         else:
             if entry_db == "interpro":
                 matches = matches.filter(entry__source_database__iexact=entry_db)
@@ -37,10 +37,14 @@ def filter_entry_overview(obj, accession=None):
                 matches = matches \
                     .filter(entry__integrated__isnull=True) \
                     .exclude(entry__source_database__iexact="interpro")
-            obj[entry_db] = {
-                "structures": matches.values("structure").distinct().count(),
-                "entries": matches.values("entry").distinct().count()
-            }
+            CustomView.set_counter_attributte(obj, entry_db, "entries",
+                                              matches.values("entry").distinct().count())
+            CustomView.set_counter_attributte(obj, entry_db, "structures",
+                                              matches.values("structure").distinct().count())
+            # obj[entry_db] = {
+            #     "structures": matches.values("structure").distinct().count(),
+            #     "entries": matches.values("entry").distinct().count()
+            # }
 
 
 class ChainPDBAccessionHandler(CustomView):

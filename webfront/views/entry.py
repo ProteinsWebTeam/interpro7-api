@@ -1,4 +1,3 @@
-import ipdb
 import re
 from django.db.models import Count, QuerySet
 

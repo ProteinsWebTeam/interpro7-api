@@ -154,10 +154,10 @@ class UniprotHandler(CustomView):
                     if entry_db == "member_databases":
                         for member_db in queryset["entries"][entry_db]:
                             matches2 = matches.filter(entry__source_database__iexact=member_db)
-                            queryset["entries"][entry_db][member_db] = {
-                                "proteins": matches2.values("protein").distinct().count(),
-                                "entries": matches2.values("entry").distinct().count()
-                            }
+                            CustomView.set_counter_attributte(queryset["entries"][entry_db], member_db, "proteins",
+                                                              matches2.values("protein").distinct().count())
+                            CustomView.set_counter_attributte(queryset["entries"][entry_db], member_db, "entries",
+                                                              matches2.values("entry").distinct().count())
                     else:
                         if entry_db == "interpro":
                             matches = matches.filter(entry__source_database__iexact=entry_db)
@@ -165,18 +165,26 @@ class UniprotHandler(CustomView):
                             matches = matches \
                                 .filter(entry__integrated__isnull=True) \
                                 .exclude(entry__source_database__iexact="interpro")
-                        queryset["entries"][entry_db] = {
-                            "proteins": matches.values("protein").distinct().count(),
-                            "entries": matches.values("entry").distinct().count()
-                        }
+                        CustomView.set_counter_attributte(queryset["entries"], entry_db, "proteins",
+                                                          matches.values("protein").distinct().count())
+                        CustomView.set_counter_attributte(queryset["entries"], entry_db, "entries",
+                                                          matches.values("entry").distinct().count())
+                        # queryset["entries"][entry_db] = {
+                        #     "proteins": matches.values("protein").distinct().count(),
+                        #     "entries": matches.values("entry").distinct().count()
+                        # }
             elif "structures" in queryset:
                 matches = ProteinStructureFeature.objects.all()
                 if level_name != "uniprot":
                     matches = matches.filter(protein__source_database__iexact=level_name)
-                queryset["structures"]["pdb"] = {
-                    "structures": matches.values("structure").distinct().count(),
-                    "proteins": matches.values("protein").distinct().count()
-                }
+                CustomView.set_counter_attributte(queryset["structures"], "pdb", "proteins",
+                                                  matches.values("protein").distinct().count())
+                CustomView.set_counter_attributte(queryset["structures"], "pdb", "structures",
+                                                  matches.values("structure").distinct().count())
+                # queryset["structures"]["pdb"] = {
+                #     "structures": matches.values("structure").distinct().count(),
+                #     "proteins": matches.values("protein").distinct().count()
+                # }
         return queryset
 
     @staticmethod

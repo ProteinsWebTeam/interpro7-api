@@ -167,3 +167,10 @@ class CustomView(GenericAPIView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         return obj
+
+    @staticmethod
+    def set_counter_attributte(obj, dict_key, key, value):
+        if dict_key not in obj or not isinstance(obj[dict_key], dict):
+            obj[dict_key]={}
+        obj[dict_key][key]=value
+

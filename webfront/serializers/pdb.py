@@ -10,7 +10,7 @@ class StructureSerializer(ModelContentSerializer):
         representation = {}
 
         representation = self.endpoint_representation(representation, instance, self.detail)
-        representation = self.filter_representation(representation, instance, self.detail_filter)
+        representation = self.filter_representation(representation, instance, self.detail_filters)
 
         return representation
 
@@ -40,29 +40,29 @@ class StructureSerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def filter_representation(representation, instance, detail_filter):
+    def filter_representation(representation, instance, detail_filters):
         qs_type = get_queryset_type(instance)
-        if detail_filter == SerializerDetail.PROTEIN_OVERVIEW:
+        if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
             if qs_type == QuerysetType.STRUCTURE_PROTEIN:
                 representation["proteins"] = [StructureSerializer.to_chain_representation(instance)]
             else:
                 representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance)
-        elif detail_filter == SerializerDetail.PROTEIN_DETAIL:
+        if SerializerDetail.PROTEIN_DETAIL in detail_filters:
             if qs_type == QuerysetType.STRUCTURE:
                 representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance, True)
             else:
                 representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance)
-        elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS:
+        if SerializerDetail.ENTRY_PROTEIN_HEADERS in detail_filters:
         #     if qs_type == QuerysetType.STRUCTURE_PROTEIN:
         #         representation["proteins"] = 1
         #     else:
             representation["proteins"] = StructureSerializer.to_proteins_count_representation(instance)
-        elif detail_filter == SerializerDetail.ENTRY_DETAIL:
+        if SerializerDetail.ENTRY_DETAIL in detail_filters:
             if qs_type == QuerysetType.STRUCTURE:
                 representation["entries"] = StructureSerializer.to_entries_overview_representation(instance, True)
-        elif detail_filter == SerializerDetail.ENTRY_OVERVIEW:
+        if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
             representation["entries"] = StructureSerializer.to_entries_count_representation(instance)
-        elif detail_filter == SerializerDetail.ENTRY_MATCH:
+        if SerializerDetail.ENTRY_MATCH in detail_filters:
             representation["entries"] = StructureSerializer.to_entries_overview_representation(instance)
 
         return representation

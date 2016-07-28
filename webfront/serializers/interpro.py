@@ -9,7 +9,7 @@ class EntrySerializer(ModelContentSerializer):
         representation = {}
 
         representation = self.endpoint_representation(representation, instance, self.detail)
-        representation = self.filter_representation(representation, instance, self.detail_filter)
+        representation = self.filter_representation(representation, instance, self.detail_filters)
 
         return representation
 
@@ -28,19 +28,19 @@ class EntrySerializer(ModelContentSerializer):
         return representation
 
     @staticmethod
-    def filter_representation(representation, instance, detail_filter):
-        if detail_filter == SerializerDetail.PROTEIN_OVERVIEW:
+    def filter_representation(representation, instance, detail_filters):
+        if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
             representation["proteins"] = EntrySerializer.to_proteins_overview_representation(instance)
-        elif detail_filter == SerializerDetail.PROTEIN_DETAIL:
+        if SerializerDetail.PROTEIN_DETAIL in detail_filters:
             representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance)
-        elif detail_filter == SerializerDetail.ENTRY_PROTEIN_HEADERS:
+        if SerializerDetail.ENTRY_PROTEIN_HEADERS in detail_filters:
         # #         detail_filter == SerializerDetail.ENTRY_DETAIL:
             representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
-        elif detail_filter == SerializerDetail.STRUCTURE_HEADERS:
+        if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
             representation["structures"] = EntrySerializer.to_structures_count_representation(instance)
-        elif detail_filter == SerializerDetail.STRUCTURE_OVERVIEW:
+        if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = EntrySerializer.to_structures_overview_representation(instance)
-        elif detail_filter == SerializerDetail.STRUCTURE_DETAIL:
+        if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
             representation["structures"] = EntrySerializer.to_structures_overview_representation(instance, True)
         return representation
 

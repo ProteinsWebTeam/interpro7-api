@@ -91,11 +91,11 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/protein/uniprot/entry/pfam",
             "/api/protein/uniprot/entry/unintegrated",
             "/api/protein/uniprot/entry/unintegrated/pfam",
-            "/api/protein/uniprot/entry/unintegrated/smart",
             "/api/protein/uniprot/entry/interpro/pfam",
             "/api/protein/uniprot/entry/interpro/"+acc+"/pfam",
         ]
         for url in urls:
+            print(url)
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
@@ -110,14 +110,14 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         sp_2 = "A1CUJ5"
         acc = "IPR003165"
         urls = {
-            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated": ["PF17180"],
             "/api/protein/uniprot/"+sp_2+"/entry/interpro": ["IPR003165", "IPR001165"],
+            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated": ["PF17180"],
             "/api/protein/uniprot/"+sp_2+"/entry/pfam": ["PF17176", "PF02171"],
             "/api/protein/uniprot/"+sp_2+"/entry/interpro/pfam": ["PF02171"],
             "/api/protein/uniprot/"+sp_2+"/entry/interpro/smart": ["SM00950"],
+            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated/pfam": ["PF17180"],
             "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/smart": ["SM00950"],
             "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/pfam": ["PF02171"],
-            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated/pfam": ["PF17180"],
         }
         for url in urls:
             response = self.client.get(url)
@@ -141,6 +141,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         tr_1 = "P16582"
         sp_1 = "M5ADK6"
         tests = [
+            "/api/protein/uniprot/entry/unintegrated/smart",
             "/api/protein/uniprot/"+tr_1+"/entry/unintegrated",
             ]
         for url in tests:
@@ -173,8 +174,9 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         acc = "A1CUJ5"
         ips = ["IPR001165", "IPR003165"]
         for ip in ips:
-            response = self.client.get("/api/protein/uniprot/"+acc+"/entry/interpro/"+ip)
-            self._check_single_entry_response(response)
+            url = "/api/protein/uniprot/"+acc+"/entry/interpro/"+ip
+            response = self.client.get(url)
+            self._check_single_entry_response(response, "URL: [{}]".format(url))
 
     def test_urls_that_return_list_of_protein_accessions_with_matches_and_detailed_entries(self):
         acc = "IPR003165"
@@ -235,7 +237,6 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         # self._check_single_entry_response(response)
 
     def test_urls_that_should_fails_with_no_content(self):
-        self.skipTest("Fails until we remove the consolidation")
         tr_1 = "P16582"
         sp_1 = "M5ADK6"
         acc = "IPR003165"

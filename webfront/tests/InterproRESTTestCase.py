@@ -11,21 +11,21 @@ class InterproRESTTestCase(APITransactionTestCase):
     ]
 
     # methods to check entry related responses
-    def _check_single_entry_response(self, response):
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("entries", response.data)
+    def _check_single_entry_response(self, response, msg=""):
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg)
+        self.assertIn("entries", response.data, msg)
         self.assertEqual(len(response.data["entries"]), 1,
-                         "only one entry should be included when the ID is specified")
-        self.assertIn("entry", response.data["entries"][0])
-        self._check_entry_details(response.data["entries"][0]["entry"])
+                         "only one entry should be included when the ID is specified" + msg)
+        self.assertIn("entry", response.data["entries"][0], msg)
+        self._check_entry_details(response.data["entries"][0]["entry"], msg)
 
-    def _check_entry_details(self, obj):
-        self.assertIn("entry_id", obj)
-        self.assertIn("type", obj)
-        self.assertIn("literature", obj)
-        self.assertIn("integrated", obj)
-        self.assertIn("member_databases", obj)
-        self.assertIn("accession", obj)
+    def _check_entry_details(self, obj, msg=""):
+        self.assertIn("entry_id", obj, msg)
+        self.assertIn("type", obj, msg)
+        self.assertIn("literature", obj, msg)
+        self.assertIn("integrated", obj, msg)
+        self.assertIn("member_databases", obj, msg)
+        self.assertIn("accession", obj, msg)
 
     def _check_entry_count_overview(self, main_obj, msg=""):
         obj = main_obj["entries"]
@@ -77,10 +77,15 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("length", obj)
         self.assertIn("accession", obj)
 
-    def _check_match(self, obj):
-        self.assertIn("coordinates", obj)
-        self.assertIsInstance(obj["coordinates"], list)
-        self.assertIn("accession", obj)
+    def _check_match(self, obj, msg=""):
+        self.assertIn("coordinates", obj, msg)
+        self.assertIsInstance(obj["coordinates"], list, msg)
+        self.assertIn("accession", obj, msg)
+        self.assertIn("source_database", obj, msg)
+
+    def _check_list_of_matches(self, obj, msg=""):
+        for match in obj:
+            self._check_match(match, msg)
 
     # methods to check structure related responses
     # TODO: Extend this tests

@@ -10,6 +10,9 @@ from django.conf import settings
 
 members = settings.DB_MEMBERS
 db_members = '|'.join(members)
+db_members_accessions = (
+    r'^({})$'.format('|'.join((db['accession'] for (_, db) in members.items())))
+)
 
 
 class MemberAccesionHandler(CustomView):
@@ -99,7 +102,7 @@ class MemberAccesionHandler(CustomView):
 class MemberHandler(CustomView):
     level_description = 'DB member level'
     child_handlers = [
-        (r'PF\d{5}|SM\d{5}|PS\d{5}', MemberAccesionHandler),
+        (db_members_accessions, MemberAccesionHandler),
         # 'clan':     ClanHandler,
     ]
     serializer_class = EntrySerializer

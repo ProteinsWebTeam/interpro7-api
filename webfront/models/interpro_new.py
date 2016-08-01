@@ -4,10 +4,10 @@ from jsonfield import JSONField
 
 class Entry(models.Model):
     entry_id = models.CharField(max_length=10, null=True)
-    accession = models.CharField(primary_key=True, max_length=10)
-    type = models.CharField(max_length=10)
+    accession = models.CharField(primary_key=True, max_length=19)
+    type = models.CharField(max_length=14)
     name = models.TextField()
-    short_name = models.CharField(max_length=12)
+    short_name = models.CharField(max_length=30)
     other_names = JSONField()
     source_database = models.CharField(max_length=20)
     member_databases = JSONField()

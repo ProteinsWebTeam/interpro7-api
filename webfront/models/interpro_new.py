@@ -51,7 +51,7 @@ class ProteinEntryFeature(models.Model):
 
 class Structure(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=512)
     short_name = models.CharField(max_length=20, null=True)
     other_names = JSONField()
     experiment_type = models.CharField(max_length=30)

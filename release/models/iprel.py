@@ -20,13 +20,13 @@ class Citation(models.Model):
     volume = models.CharField(max_length=55, blank=True, null=True)
     issue = models.CharField(max_length=55, blank=True, null=True)
     year = models.IntegerField(blank=True, null=True)
-    title = models.CharField(max_length=740, blank=True, null=True)
-    url = models.CharField(max_length=740, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    url = models.CharField(max_length=255, blank=True, null=True)
     rawpages = models.CharField(max_length=100, blank=True, null=True)
     medline_journal = models.CharField(max_length=255, blank=True, null=True)
     iso_journal = models.CharField(max_length=255, blank=True, null=True)
-    authors = models.CharField(max_length=4000, blank=True, null=True)
-    doi_url = models.CharField(max_length=1500, blank=True, null=True)
+    authors = models.CharField(max_length=255, blank=True, null=True)
+    doi_url = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -36,7 +36,7 @@ class Citation(models.Model):
 class CommonAnnotation(models.Model):
     ann_id = models.CharField(primary_key=True, max_length=7)
     name = models.CharField(max_length=50, blank=True, null=True)
-    text = models.CharField(unique=True, max_length=4000)
+    text = models.CharField(unique=True, max_length=255)
     comments = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
@@ -58,7 +58,7 @@ class CvDatabase(models.Model):
 class CvEntryType(models.Model):
     code = models.CharField(primary_key=True, max_length=1)
     abbrev = models.CharField(unique=True, max_length=20)
-    description = models.CharField(max_length=2000, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -68,7 +68,7 @@ class CvEntryType(models.Model):
 class CvEvidence(models.Model):
     code = models.CharField(primary_key=True, max_length=3)
     abbrev = models.CharField(unique=True, max_length=10)
-    description = models.CharField(max_length=2000, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -78,7 +78,7 @@ class CvEvidence(models.Model):
 class CvRelation(models.Model):
     code = models.CharField(primary_key=True, max_length=2)
     abbrev = models.CharField(unique=True, max_length=10)
-    description = models.CharField(max_length=2000, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
     forward = models.CharField(max_length=30)
     reverse = models.CharField(max_length=30)
 
@@ -247,7 +247,7 @@ class Etaxi(models.Model):
     left_number = models.FloatField(blank=True, null=True)
     right_number = models.FloatField(blank=True, null=True)
     annotation_source = models.CharField(max_length=1, blank=True, null=True)
-    full_name = models.CharField(max_length=513, blank=True, null=True)
+    full_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -509,9 +509,9 @@ class TaxNameToId(models.Model):
 
 
 class UniprotPdbe(models.Model):
-    entry_id = models.CharField(max_length=4)
-    chain = models.CharField(max_length=4)
-    sptr_ac = models.CharField(max_length=15)
+    entry_id = models.CharField(max_length=4, primary_key=True)
+    chain = models.CharField(max_length=4, primary_key=True)
+    sptr_ac = models.ForeignKey(Protein, db_column='sptr_ac', primary_key=True)
     sptr_id = models.CharField(max_length=16)
     beg_seq = models.BigIntegerField(blank=True, null=True)
     end_seq = models.BigIntegerField(blank=True, null=True)
@@ -525,6 +525,7 @@ class UniprotPdbe(models.Model):
     class Meta:
         managed = False
         db_table = '"INTERPRO"."uniprot_pdbe"'
+        unique_together = (("entry_id", "chain", "sptr_ac"), )
 
 
 class UniprotTaxonomy(models.Model):

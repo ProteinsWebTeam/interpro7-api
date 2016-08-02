@@ -3,6 +3,20 @@ from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
 
+chains = {
+    "1JM7": ["A", "B"],
+    "1T2V": ["A", "B", "C", "D", "E"],
+    "2BKM": ["A", "B"],
+    "1JZ8": ["A", "B"],
+}
+#
+# chains = {
+#     "1JM7": [{"A": "A1CUJ5"}, {"B": "M5ADK6"}],
+#     "1T2V": [{"A": "P16582"}, {"B": "P16582"}, {"C": "P16582"}, {"D": "P16582"}, {"E": "P16582"}],
+#     "2BKM": [{"A": "A0A0A2L2G2"}, {"B": "M5ADK6"}],
+#     "1JZ8": [{"A": "A0A0A2L2G2"}, {"B": "A0A0A2L2G2"}],
+# }
+
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [
         'webfront/tests/fixtures.json',
@@ -130,3 +144,59 @@ class InterproRESTTestCase(APITransactionTestCase):
                 self.assertIn(endpoints2,
                               obj[endpoints2][inner_obj],
                               msg)
+
+    def _check_structure_and_chains(self, response, endpoint, db, acc, postfix="", key=None):
+        urls = []
+        if "structure" == endpoint:
+            # _chains = [list(ch.keys())[0] for ch in chains[acc]]
+            self.assertEqual(chains[acc], response.data["metadata"]["chains"])
+            for chain in chains[acc]:
+                current = "/api/"+endpoint+"/"+db+"/"+acc+"/"+chain+postfix
+                urls.append(current)
+                response_acc = self._get_in_debug_mode(current)
+                if response_acc.status_code == status.HTTP_200_OK:
+                    self.assertEqual(response_acc.status_code, status.HTTP_200_OK)
+                    self._check_object_by_accesssion(response_acc.data)
+                    self.assertEqual(len(response_acc.data["metadata"]["chains"]), 1)
+                    if key is not None:
+                        for ch2 in response_acc.data[key]:
+                            self.assertEqual(ch2["chain"], chain)
+                    self.assertIn(chain, response_acc.data["metadata"]["chains"])
+                    self._check_match(response_acc.data["metadata"]["chains"][chain])
+                elif response_acc.status_code != status.HTTP_204_NO_CONTENT:
+                    self.client.get(current)
+        return urls
+
+    def _check_structure_chains_as_counter_filter(self, endpoint, db, acc, prefix="", postfix="", key1=None, key2=None):
+        urls = []
+        if "structure" == endpoint:
+            for chain in chains[acc]:
+                current = "/api/"+prefix+"/"+endpoint+"/"+db+"/"+acc+"/"+chain+postfix
+                urls.append(current)
+                response = self._get_in_debug_mode(current)
+                if response.status_code == status.HTTP_200_OK:
+                    self._check_counter_by_endpoint(prefix, response.data, "URL : [{}]".format(current))
+                    self._check_count_overview_per_endpoints(response.data, key1, key2,
+                                                             "URL : [{}]".format(current))
+                elif response.status_code != status.HTTP_204_NO_CONTENT:
+                    self.client.get(current)
+        return urls
+
+    def _check_structure_chains_as_filter(self, endpoint, db, acc, prefix="", postfix="", key1=None, key2=None):
+        urls = []
+        if "structure" == endpoint:
+            for chain in chains[acc]:
+                current = "/api/"+prefix+"/"+endpoint+"/"+db+"/"+acc+"/"+chain+postfix
+                urls.append(current)
+                response = self._get_in_debug_mode(current)
+                if response.status_code == status.HTTP_200_OK:
+                    self._check_is_list_of_metadata_objects(response.data["results"])
+                    for result in [x[key1] for x in response.data["results"]]:
+                        self._check_list_of_matches(result, "URL : [{}]".format(current))
+                        self.assertGreaterEqual(len(result), 1)
+                        for r in result:
+                            self.assertEqual(r["chain"], chain)
+
+                elif response.status_code != status.HTTP_204_NO_CONTENT:
+                    self.client.get(current)
+        return urls

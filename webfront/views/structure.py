@@ -5,11 +5,13 @@ from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 
 
-def filter_protein_overview(obj, accession=None):
+def filter_protein_overview(obj, accession=None, chain=None):
     for prot_db in obj:
         matches = ProteinStructureFeature.objects.all()
         if accession is not None:
             matches = matches.filter(structure=accession)
+        if chain is not None:
+            matches = matches.filter(chain=chain)
         if prot_db != "uniprot":
             matches = matches.filter(protein__source_database__iexact=prot_db)
         CustomView.set_counter_attributte(obj, prot_db, "proteins",
@@ -18,11 +20,13 @@ def filter_protein_overview(obj, accession=None):
                                           matches.values("structure").distinct().count())
 
 
-def filter_entry_overview(obj, accession=None):
+def filter_entry_overview(obj, accession=None, chain=None):
     for entry_db in obj:
         matches = EntryStructureFeature.objects.all()
         if accession is not None:
             matches = matches.filter(structure=accession)
+        if chain is not None:
+            matches = matches.filter(chain=chain)
         if entry_db == "member_databases":
             for member_db in obj[entry_db]:
                 matches2 = matches.filter(entry__source_database__iexact=member_db)
@@ -87,6 +91,12 @@ class ChainPDBAccessionHandler(CustomView):
             if queryset.count() == 0:
                 raise ReferenceError("The protein {} doesn't exist in the database {}".format(level_name, "pdb"))
             return queryset
+        if "entries" in queryset:
+            filter_entry_overview(queryset["entries"], chain=level_name)
+        if "proteins" in queryset:
+            filter_protein_overview(queryset["proteins"], chain=level_name)
+
+        return queryset
         # if "interpro" in queryset:
         #     matches = EntryStructureFeature.objects.filter(structure=level_name)
         #     from webfront.views.entry import EntryHandler
@@ -101,6 +111,7 @@ class ChainPDBAccessionHandler(CustomView):
         if type(obj) != dict:
                 pdb = general_handler.get_from_store(PDBAccessionHandler, "pdb_accession")
                 arr = obj
+                remove_empty_structures = False
                 if isinstance(obj, dict):
                     arr = [obj]
                 for o in arr:
@@ -115,7 +126,11 @@ class ChainPDBAccessionHandler(CustomView):
                               p["structure"]["chain"] == level_name and
                               p["structure"]["accession"] == pdb)
                              ]
-                    if "entries" in o and isinstance(o["entries"], list):
+                        if len(o["structures"]) == 0:
+                            remove_empty_structures = True
+                        #     raise ReferenceError("The chain {} doesn't exist in the selected structure".format(level_name))
+
+                    if "entries" in o and isinstance(o["entries"], list) and len(o["entries"]) > 0 and "chain" in o["entries"][0]:
                         o["entries"] = \
                             [p for p in o["entries"] if
                              ("chain" in p and
@@ -124,11 +139,29 @@ class ChainPDBAccessionHandler(CustomView):
                               "chain" in p["structure"] and
                               p["entry"]["chain"] == level_name)
                              ]
+                        if len(o["entries"]) == 0:
+                            raise ReferenceError("The chain {} doesn't exist in the selected structure".format(level_name))
+                    if "proteins" in o and isinstance(o["proteins"], list) and len(o["proteins"]) > 0 and "chain" in o["proteins"][0]:
+                        o["proteins"] = \
+                            [p for p in o["proteins"] if
+                             ("chain" in p and
+                              p["chain"] == level_name) or
+                             ("structure" in p and
+                              "chain" in p["structure"] and
+                              p["entry"]["chain"] == level_name)
+                             ]
+                        if len(o["proteins"]) == 0:
+                            raise ReferenceError("The chain {} doesn't exist in the selected structure".format(level_name))
                     if "metadata"in o and "chains" in o["metadata"] and isinstance(o["metadata"]["chains"], dict):
                         o["metadata"]["chains"] = \
                             {p:o["metadata"]["chains"][p] for p in o["metadata"]["chains"] if
                              (level_name in p)
                              }
+                if remove_empty_structures:
+                    arr = [a for a in arr if len(a["structures"]) > 0]
+                    if len(arr) == 0:
+                        raise ReferenceError("The chain {} doesn't exist in the selected structure".format(level_name))
+                    return arr
         return obj
 
 

@@ -190,8 +190,9 @@ class InterproRESTTestCase(APITransactionTestCase):
                 urls.append(current)
                 response = self._get_in_debug_mode(current)
                 if response.status_code == status.HTTP_200_OK:
-                    self._check_is_list_of_metadata_objects(response.data["results"])
-                    for result in [x[key1] for x in response.data["results"]]:
+                    obj = [response.data] if "structures" in response.data else response.data["results"]
+                    self._check_is_list_of_metadata_objects(obj)
+                    for result in [x[key1] for x in obj]:
                         self._check_list_of_matches(result, "URL : [{}]".format(current))
                         self.assertGreaterEqual(len(result), 1)
                         for r in result:

@@ -72,7 +72,6 @@ plurals = {
     "structure": "structures",
 }
 
-# TODO: Create tests for Chains in structure
 # TODO: Crete tests for entry/unintegrated
 
 
@@ -158,7 +157,7 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                  "URL : [{}]".format(current))
 
                         tested += self._check_structure_chains_as_counter_filter(endpoint1, db, acc, endpoint2, "",
-                                                                       plurals[endpoint1], plurals[endpoint2])
+                                                                                 plurals[endpoint1], plurals[endpoint2])
 
                     # [endpoint]/[db]/[endpoint]/[db]
                     for db2 in api_test_map[endpoint2]:
@@ -226,6 +225,9 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     self._check_list_of_matches(response.data[plurals[endpoint2]],
                                                                 "URL : [{}]".format(current))
                                     tested += self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2+"/"+db2+"/"+acc2, plurals[endpoint2])
+                                    tested += self._check_structure_chains_as_filter(endpoint2, db2, acc2,
+                                                                                     endpoint1+"/"+db+"/"+acc, "",
+                                                                                     plurals[endpoint2])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
@@ -397,6 +399,8 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                 "URL : [{}]".format(current))
                                     self._check_counter_by_endpoint(endpoint3, response.data,
                                                                     "URL : [{}]".format(current))
+                                    tested += self._check_structure_and_chains(response, endpoint1, db1, acc1,
+                                                                               "/"+endpoint2+"/"+db2+"/"+endpoint3)
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
@@ -413,6 +417,8 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                 "URL : [{}]".format(current))
                                     self._check_counter_by_endpoint(endpoint3, response.data,
                                                                     "URL : [{}]".format(current))
+                                    tested += self._check_structure_and_chains(response, endpoint1, db1, acc1,
+                                                                               "/"+endpoint3+"/"+endpoint2+"/"+db2)
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
@@ -430,6 +436,10 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     self._check_is_list_of_objects_with_key(response.data["results"],
                                                                             plurals[endpoint3],
                                                                             "URL : [{}]".format(current))
+                                    tested += self._check_structure_chains_as_filter(endpoint1, db1, acc1,
+                                                                                     endpoint2+"/"+db2, "/"+endpoint3,
+                                                                                     plurals[endpoint1],
+                                                                                     plurals[endpoint3])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
@@ -447,6 +457,10 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     self._check_is_list_of_objects_with_key(response.data["results"],
                                                                             plurals[endpoint3],
                                                                             "URL : [{}]".format(current))
+                                    tested += self._check_structure_chains_as_filter(endpoint1, db1, acc1,
+                                                                                     endpoint2+"/"+db2+"/"+endpoint3,
+                                                                                     "", plurals[endpoint1],
+                                                                                     plurals[endpoint3])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
@@ -466,6 +480,12 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                          plurals[endpoint3],
                                                                          "URL : [{}]".format(current))
 
+                                tested += self._check_structure_chains_as_counter_filter(
+                                    endpoint1, db1, acc1,
+                                    endpoint3+"/"+endpoint2+"/"+db2+"/", "",
+                                    plurals[endpoint1],
+                                    plurals[endpoint3])
+
                                 # /[endpoint]/[endpoint]/[db]/[acc]/[endpoint]/[db]
                                 current = "/api/"+endpoint3+"/"+endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2
                                 tested.append(current)
@@ -481,6 +501,12 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                          plurals[endpoint3],
                                                                          "URL : [{}]".format(current))
 
+                                tested += self._check_structure_chains_as_counter_filter(
+                                    endpoint1, db1, acc1,
+                                    endpoint3, "/"+endpoint2+"/"+db2,
+                                    plurals[endpoint1],
+                                    plurals[endpoint3])
+
                                 for acc2 in api_test_map[endpoint2][db2]:
                                     # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]
                                     current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"\
@@ -495,6 +521,15 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                     "URL : [{}]".format(current))
                                         self._check_counter_by_endpoint(endpoint3, response.data,
                                                                         "URL : [{}]".format(current))
+
+                                        tested += self._check_structure_and_chains(
+                                            response, endpoint1, db1, acc1,
+                                            "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3)
+
+                                        tested += self._check_structure_chains_as_filter(
+                                            endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1, "/"+endpoint3,
+                                            plurals[endpoint2])
+
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
@@ -512,6 +547,14 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                     "URL : [{}]".format(current))
                                         self._check_counter_by_endpoint(endpoint3, response.data,
                                                                         "URL : [{}]".format(current))
+
+                                        tested += self._check_structure_and_chains(
+                                            response, endpoint1, db1, acc1,
+                                            "/"+endpoint3+"/"+endpoint2+"/"+db2+"/"+acc2)
+
+                                        tested += self._check_structure_chains_as_filter(
+                                            endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3, "",
+                                            plurals[endpoint2])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
@@ -533,6 +576,16 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                              plurals[endpoint1],
                                                                              plurals[endpoint3],
                                                                              "URL : [{}]".format(current))
+                                    tested += self._check_structure_chains_as_counter_filter(
+                                        endpoint1, db1, acc1,
+                                        endpoint3, "/"+endpoint2+"/"+db2+"/"+acc2,
+                                        plurals[endpoint1],
+                                        plurals[endpoint3])
+                                    tested += self._check_structure_chains_as_counter_filter(
+                                        endpoint2, db2, acc2,
+                                        endpoint3+"/"+endpoint1+"/"+db1+"/"+acc1, "",
+                                        plurals[endpoint2],
+                                        plurals[endpoint3])
 
                                 # [endpoint]/[db]/[endpoint]/[db]/[endpoint]/[db]
                             for db3 in api_test_map[endpoint3]:
@@ -572,6 +625,9 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                     "URL : [{}]".format(current))
                                         self._check_list_of_matches(response.data[plurals[endpoint3]],
                                                                     "URL : [{}]".format(current))
+                                        tested += self._check_structure_and_chains(
+                                            response, endpoint1, db1, acc1,
+                                            "/"+endpoint2+"/"+db2+"/"+endpoint3+"/"+db3)
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
@@ -590,6 +646,9 @@ class ObjectStructureTest(InterproRESTTestCase):
                                         for result in [x[plurals[endpoint3]] for x in response.data["results"]]:
                                             self._check_list_of_matches(result, "URL : [{}]".format(current))
 
+                                        tested += self._check_structure_chains_as_filter(
+                                            endpoint1, db1, acc1, endpoint2+"/"+db2, "/"+endpoint3+"/"+db3,
+                                            plurals[endpoint1])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
@@ -609,6 +668,9 @@ class ObjectStructureTest(InterproRESTTestCase):
                                         for result in [x[plurals[endpoint3]] for x in response.data["results"]]:
                                             self._check_list_of_matches(result,
                                                                         "URL : [{}]".format(current))
+                                        tested += self._check_structure_chains_as_filter(
+                                            endpoint1, db1, acc1, endpoint2+"/"+db2+"/"+endpoint3+"/"+db3, "",
+                                            plurals[endpoint1])
 
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
@@ -628,6 +690,12 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                     "URL : [{}]".format(current))
                                         self._check_list_of_matches(response.data[plurals[endpoint3]],
                                                                     "URL : [{}]".format(current))
+                                        tested += self._check_structure_and_chains(
+                                            response, endpoint1, db1, acc1,
+                                            "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3)
+                                        tested += self._check_structure_chains_as_filter(
+                                            endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1, "/"+endpoint3+"/"+db3,
+                                            plurals[endpoint2])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
@@ -645,6 +713,12 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                     "URL : [{}]".format(current))
                                         self._check_list_of_matches(response.data[plurals[endpoint3]],
                                                                     "URL : [{}]".format(current))
+                                        tested += self._check_structure_and_chains(
+                                            response, endpoint1, db1, acc1,
+                                            "/"+endpoint3+"/"+db3+"/"+endpoint2+"/"+db2+"/"+acc2)
+                                        tested += self._check_structure_chains_as_filter(
+                                            endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3+"/"+db3, "",
+                                            plurals[endpoint2])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
@@ -662,6 +736,12 @@ class ObjectStructureTest(InterproRESTTestCase):
                                             self._check_list_of_matches(result, "URL : [{}]".format(current))
                                         for result in [x[plurals[endpoint2]] for x in response.data["results"]]:
                                             self._check_list_of_matches(result, "URL : [{}]".format(current))
+                                        tested += self._check_structure_chains_as_filter(
+                                            endpoint1, db1, acc1, endpoint3+"/"+db3, "/"+endpoint2+"/"+db2+"/"+acc2,
+                                            plurals[endpoint2])
+                                        tested += self._check_structure_chains_as_filter(
+                                            endpoint2, db2, acc2, endpoint3+"/"+db3+"/"+endpoint1+"/"+db1+"/"+acc1, "",
+                                            plurals[endpoint2])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
@@ -680,6 +760,15 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                         "URL : [{}]".format(current))
                                             self._check_list_of_matches(response.data[plurals[endpoint3]],
                                                                         "URL : [{}]".format(current))
+                                            tested += self._check_structure_and_chains(
+                                                response, endpoint1, db1, acc1,
+                                                "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3+"/"+acc3)
+                                            tested += self._check_structure_chains_as_filter(
+                                                endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1, "/"+endpoint3+"/"+db3+"/"+acc3,
+                                                plurals[endpoint2])
+                                            tested += self._check_structure_chains_as_filter(
+                                                endpoint3, db3, acc3, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2+"/"+acc2, "",
+                                                plurals[endpoint3])
                                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                                             logging.info("({}) - [{}]".format(response.status_code, current))
                                             self.client.get(current)

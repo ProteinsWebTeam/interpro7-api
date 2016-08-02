@@ -95,7 +95,6 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/protein/uniprot/entry/interpro/"+acc+"/pfam",
         ]
         for url in urls:
-            print(url)
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")

@@ -47,7 +47,7 @@
       "experiment_type": "X-ray diffraction, resolution 1.50Å",
       "release_date": "2009-02-24",
       "authors": ["Juers, D.H.", "Matthews, B.W."],
-      "chains": ["A", "B","C", "D"],
+      "chains": ["A", "B"],
       "source_database": "pdb"
     }
   },

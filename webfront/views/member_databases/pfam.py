@@ -2,8 +2,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from rest_framework import viewsets
-from unifam.settings import DB_MEMBERS
-from webfront.models.pfam import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership,PfamaRegFullSignificant, PfamseqMarkup
+from interpro.settings import DB_MEMBERS
+from webfront.models.pfam import Clan, Pfama, Pfama2PfamaHhsearch, ClanMembership, PfamaRegFullSignificant, PfamseqMarkup
 from webfront.serializers.pfam import ClanSerializer, PfamaSerializer, Pfama2PfamaHhsearchSerializer, MembershipSerializer
 from webfront.active_sites import ActiveSites
 
@@ -33,7 +33,7 @@ def get_filtered_information(i_filter="integrated", member=None):
     else:
         list_of_families = i_filter# query to get the specific family
 
-    if member != None:
+    if member is not None:
         list_of_families += " - "+member
     return list_of_families
 
@@ -55,7 +55,7 @@ def interpro_member_page(request, i_filter, member):
         "member": member,
         "families": families,
         "data_types": db_members[member.lower()]['options'],
-        "list_of_families": get_filtered_information(i_filter,member),
+        "list_of_families": get_filtered_information(i_filter, member),
         "db_members": db_members
     })
 
@@ -76,14 +76,13 @@ def interpro_member_filter_page(request, i_filter, member, m_filter):
             except ObjectDoesNotExist:
                 return HttpResponseNotFound("Family accession "+m_filter+" not found")
 
-
         return render(request, 'pfam_family.html', {
             "filter": i_filter,
             "member": member,
             "m_filter": m_filter,
-            "family":family,
+            "family": family,
             "data_types": db_members[member.lower()]['options_per_family'],
-            "list_of_families": get_filtered_information(i_filter,member),
+            "list_of_families": get_filtered_information(i_filter, member),
             "db_members": db_members
         })
 
@@ -106,19 +105,15 @@ def interpro_member_filter_acc_page(request, i_filter, member, m_filter, option)
                 active_sites.load_from_db()
                 active_sites.load_alignment()
 
-
                 return render(request, 'pfam_active_sites.html', {
                     "filter": i_filter,
                     "member": member,
-                    "family":family,
+                    "family": family,
                     "active_sites": active_sites,
                     "data_types": db_members[member.lower()]['options_per_family'],
-                    "list_of_families": get_filtered_information(i_filter,member),
+                    "list_of_families": get_filtered_information(i_filter, member),
                     "db_members": db_members
                 })
-
-
-
 
 
 class ClanViewSet(viewsets.ModelViewSet):

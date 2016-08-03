@@ -1,0 +1,102 @@
+{
+  "entries":{
+    "IPR003165":{
+      "proteins": {
+        "swissprot": ["A1CUJ5"],
+        "trembl":["P16582"]
+      },
+      "structures":["1T2V","1JM7"],
+      "member_databases" : {
+        "smart": ["SM00950"],
+        "prosite_profiles": ["PS50822"],
+        "pfam": ["PF02171"]
+      },
+      "source_database" : "interpro"
+    },
+    "IPR001165":{
+      "proteins": {
+        "swissprot": ["A1CUJ5"],
+        "trembl":[]
+      },
+      "structures":["1JM7"],
+      "source_database" : "interpro"
+    },
+    "PF02171":{
+      "proteins": {
+        "swissprot": ["A1CUJ5"]
+      },
+      "structures":["1JM7"],
+      "integrated" : "IPR003165",
+      "source_database" : "pfam"
+    },
+    "SM00950":{
+      "proteins": {
+        "swissprot": ["A1CUJ5"]
+      },
+      "structures":["1JM7"],
+      "integrated" : "IPR003165",
+      "source_database" : "smart"
+    },
+    "PS50822":{
+      "proteins": {
+        "trembl":["P16582"]
+      },
+      "structures":["1T2V"],
+      "integrated" : "IPR003165",
+      "source_database" : "prosites_profiles"
+    },
+    "PF17180":{
+      "proteins": {
+        "swissprot": ["M5ADK6"],
+        "trembl":["P16582"]
+      },
+      "structures":["2BKM","1JM7"],
+      "source_database" : "pfam"
+    },
+    "PF17176":{
+      "proteins": {
+        "swissprot": ["A1CUJ5"]
+      },
+      "structures":["1JM7"],
+      "source_database" : "pfam"
+    },
+    "SM00002":{
+      "proteins":[],
+      "structures":[],
+      "source_database" : "smart"
+    },
+    "PS01031":{
+      "proteins":[],
+      "structures":[],
+      "source_database" : "prosites_profiles"
+    }
+  },
+  "proteins":{
+    "A1CUJ5":{
+      "structures":["1JM7"]
+    },
+    "M5ADK6":{
+      "structures":["1JM7","2BKM"]
+    },
+    "A0A0A2L2G2":{
+      "structures":["2BKM","1JZ8"]
+    },
+    "P16582":{
+      "structures":["1T2V"]
+    }
+  },
+  "structures":{
+    "1JM7": {
+      "proteins":["A1CUJ5", "M5ADK6"]
+    },
+    "2BKM": {
+      "proteins":["A0A0A2L2G2", "M5ADK6"]
+    },
+    "1T2V": {
+      "proteins":["P16582","P16582","P16582","P16582","P16582"]
+    },
+    "1JZ8": {
+      "proteins":["A0A0A2L2G2","A0A0A2L2G2"]
+    }
+  }
+}

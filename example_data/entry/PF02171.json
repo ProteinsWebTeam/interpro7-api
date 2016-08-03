@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "accession": "PF02171",
+    "id": "",
+    "type": "domain",
+    "GO": {
+      "biologicalProcess": [],
+      "molecularFunction": [
+        {
+          "id": "GO:0003676",
+          "name": "nucleic acid binding"
+        }
+      ],
+      "cellularComponent": []
+    },
+    "sourceDataBase": "Pfam",
+    "memberDataBases": {},
+    "integrated": "IPR003165",
+    "name": {
+      "name": "Piwi domain",
+      "short": "Piwi",
+      "other": []
+    },
+    "description": "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA.",
+    "wikipedia": "Piwi",
+    "literature": {
+      "PUB00020128": {
+        "PMID": 15284453,
+        "type": "J",
+        "ISBN": null,
+        "volume": "305",
+        "issue": "5689",
+        "year": 2004,
+        "title": "Crystal structure of Argonaute and its implications for RISC slicer activity.",
+        "URL": null,
+        "rawPages": "1434-7",
+        "medlineJournal": "Science",
+        "ISOJournal": "Science",
+        "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
+        "DOI_URL": "http://dx.doi.org/10.1126/science.1102514",
+      },
+      "PUB00018283": {
+        "PMID": 11050429,
+        "type": "J",
+        "ISBN": null,
+        "volume": "25",
+        "issue": "10",
+        "year": 2000,
+        "title": "Domains in gene silencing and cell differentiation proteins: the novel PAZ domain and redefinition of the Piwi domain.",
+        "URL": null,
+        "rawPages": "481-2",
+        "medlineJournal": "Trends Biochem Sci",
+        "ISOJournal": "Trends Biochem. Sci.",
+        "authors": "Cerutti L, Mian N, Bateman A.",
+        "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8",
+      }
+    }
+  }
+}

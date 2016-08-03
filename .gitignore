@@ -7,5 +7,6 @@ unifam/mysql.conf
 unifam/settings-private.py
 .coverage
 config/oracle.yml
+config/oracle_dw.yml
 config/mysql.yml
 *.db

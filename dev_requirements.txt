@@ -1,0 +1,4 @@
+selenium~=2.48.0
+django-debug-toolbar~=1.4
+ipdb~=0.8.1
+coveralls~=1.1

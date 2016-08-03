@@ -2,44 +2,52 @@ hmmer_path: "/Users/gsalazar/Downloads/hmmer-3.1b2-macosx-intel/binaries/"
 tmp_path: "/tmp/"
 
 members:
-  cath-gene3d:
-    filter: "cath-gene3d"
-    label: "CATH-Gene3D"
+  gene3d:
+    filter: "gene3d"
+    label: "Gene3D"
+    accession: ".*"
     options: []
     options_per_family: []
   hamap:
     filter: "hamap"
     label: "HAMAP"
+    accession: ".*"
     options: []
     options_per_family: []
   panther:
     filter: "panther"
     label: "PANTHER"
+    accession: ".*"
     options: []
     options_per_family: []
   pirsf:
     filter: "pirsf"
     label: "PIRSF"
+    accession: ".*"
     options: []
     options_per_family: []
   prints:
     filter: "prints"
     label: "PRINTS"
+    accession: ".*"
     options: []
     options_per_family: []
-  prosite_patterns:
-    filter: "prosite_patterns"
+  prosite:
+    filter: "prosite"
     label: "PROSITE patterns"
+    accession: PS\\d\{5\}
     options: []
     options_per_family: []
   prosite_profiles:
     filter: "prosite_profiles"
     label: "PROSITE profiles"
+    accession: PS\\d\{5\}
     options: []
     options_per_family: []
   pfam:
     filter: "pfam"
     label: "Pfam"
+    accession: PF\\d\{5\}
     options:
       -
         label: "Clans"
@@ -51,20 +59,24 @@ members:
   prodom:
     filter: "prodom"
     label: "ProDom"
+    accession: ".*"
     options: []
     options_per_family: []
   smart:
     filter: "smart"
     label: "SMART"
+    accession: SM\\d\{5\}
     options: []
     options_per_family: []
-  superfamily:
-    filter: "superfamily"
+  ssf:
+    filter: "ssf"
     label: "SUPERFAMILY"
+    accession: ".*"
     options: []
     options_per_family: []
   tigrfams:
     filter: "tigrfams"
     label: "TIGRFAMs"
+    accession: ".*"
     options: []
     options_per_family: []

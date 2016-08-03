@@ -1,0 +1,316 @@
+[
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id" : "id1",
+      "accession" : "IPR003165",
+      "type" : "domain",
+      "name" : "Piwi domain",
+      "short_name" : "Piwi",
+      "other_names" : [],
+      "source_database" : "interpro",
+      "member_databases" : {
+        "smart": ["SM00950"],
+        "prosite_profiles": ["PS50822"],
+        "pfam": ["PF02171"]
+      },
+      "integrated" : null,
+      "go_terms" : {
+        "biological_process": [],
+        "molecular_function": [{
+          "id": "GO:0003676",
+          "name": "nucleic acid binding"
+        }],
+        "cellular_component": []
+      },
+      "description" : ["The piwi domain [PUB00020128] is a protein domain found in piwi proteins and a large number of related nucleic acid-binding proteins, especially those that bind and cleave RNA. The function of the domain is double stranded-RNA-guided hydrolysis of single stranded-RNA, as has been determined in the argonaute family of related proteins [PUB00018283]."],
+      "wikipedia" : "",
+      "literature": {
+        "PUB00020128": {
+          "PMID": 15284453,
+          "type": "J",
+          "ISBN": null,
+          "volume": "305",
+          "issue": "5689",
+          "year": 2004,
+          "title": "Crystal structure of Argonaute and its implications for RISC slicer activity.",
+          "URL": null,
+          "raw_pages": "1434-7",
+          "medline_journal": "Science",
+          "ISO_journal": "Science",
+          "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
+          "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
+        },
+        "PUB00018283": {
+          "PMID": 11050429,
+          "type": "J",
+          "ISBN": null,
+          "volume": "25",
+          "issue": "10",
+          "year": 2000,
+          "title": "Domains in gene silencing and cell differentiation proteins: the novel PAZ domain and redefinition of the Piwi domain.",
+          "URL": null,
+          "raw_pages": "481-2",
+          "medline_journal": "Trends Biochem Sci",
+          "ISO_journal": "Trends Biochem. Sci.",
+          "authors": "Cerutti L, Mian N, Bateman A.",
+          "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
+        },
+        "PUB00050034": {
+          "PMID": 19187762
+        },
+        "PUB00033445": {
+          "PMID": 14749716
+        },
+        "PUB00033483": {
+          "PMID": 12526743
+        },
+        "PUB00053929": {
+          "PMID": 20211138
+        },
+        "PUB00006604": {
+          "PMID": 9851978
+        },
+        "PUB00018289": {
+          "PMID": 9927466
+        },
+        "PUB00036180": {
+          "PMID": 16815998
+        },
+        "PUB00018290": {
+          "PMID": 10631171
+        },
+        "PUB00040580": {
+          "PMID": 17027504
+        },
+        "PUB00042042": {
+          "PMID": 17130125
+        },
+        "PUB00032750": {
+          "PMID": 15800628
+        },
+        "PUB00038628": {
+          "PMID": 15800629
+        }
+      }
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id" : "id10",
+      "accession" : "IPR001165",
+      "type" : "domain",
+      "name" : "Qiwi domain",
+      "short_name" : "Qiwi",
+      "other_names" : [],
+      "source_database" : "interpro",
+      "member_databases" : {},
+      "integrated" : null,
+      "go_terms" : {
+        "biological_process": [],
+        "molecular_function": [{
+          "id": "GO:0003676",
+          "name": "nucleic acid binding"
+        }],
+        "cellular_component": []
+      },
+      "description" : ["The qiwi domain "],
+      "wikipedia" : "",
+      "literature": {}
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "entry_id": "id2",
+      "accession": "PF02171",
+      "type": "domain",
+      "name": "Piwi domain",
+      "short_name": "Piwi",
+      "other_names": [],
+      "go_terms": {
+        "biological_process": [],
+        "molecular_function": [
+          {
+            "id": "GO:0003676",
+            "name": "nucleic acid binding"
+          }
+        ],
+        "cellular_component": []
+      },
+      "source_database": "pfam",
+      "member_databases": null,
+      "integrated": "IPR003165",
+      "description": ["This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."],
+      "wikipedia": "Piwi",
+      "literature": {
+        "PUB00020128": {
+          "PMID": 15284453,
+          "type": "J",
+          "ISBN": null,
+          "volume": "305",
+          "issue": "5689",
+          "year": 2004,
+          "title": "Crystal structure of Argonaute and its implications for RISC slicer activity.",
+          "URL": null,
+          "raw_pages": "1434-7",
+          "medline_journal": "Science",
+          "ISO_journal": "Science",
+          "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
+          "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
+        },
+        "PUB00018283": {
+          "PMID": 11050429,
+          "type": "J",
+          "ISBN": null,
+          "volume": "25",
+          "issue": "10",
+          "year": 2000,
+          "title": "Domains in gene silencing and cell differentiation proteins: the novel PAZ domain and redefinition of the Piwi domain.",
+          "URL": null,
+          "raw_pages": "481-2",
+          "medline_journal": "Trends Biochem Sci",
+          "ISO_journal": "Trends Biochem. Sci.",
+          "authors": "Cerutti L, Mian N, Bateman A.",
+          "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
+        }
+      }
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "entry_id": "SM00950",
+      "accession": "SM00950",
+      "type": "domain",
+      "name": "Piwi domain",
+      "short_name": "Piwi",
+      "other_names": [],
+      "go_terms": {
+        "biological_process": [],
+        "molecular_function": [
+          {
+            "id": "GO:0003676",
+            "name": "nucleic acid binding"
+          }
+        ],
+        "cellular_component": []
+      },
+      "source_database": "smart",
+      "member_databases": null,
+      "integrated": "IPR003165",
+      "description": ["This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."],
+      "wikipedia": "Piwi",
+      "literature": {}
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "entry_id": "PS50822",
+      "accession": "PS50822",
+      "type": "MATRIX",
+      "name": "PIWI",
+      "short_name": "Piwi",
+      "other_names": [],
+      "go_terms": {},
+      "source_database": "prosite_profiles",
+      "member_databases": null,
+      "integrated": "IPR003165",
+      "description": ["The Piwi box (or Sting domain) is an about 40 to 80 amino-acid conserved region, which was first identified in the C-terminal part of Drosophila Piwi and Sting proteins, and of related proteins from human, Caenorhabditis elegans, Arabidopsis thaliana, fission yeast and Dictyostelium discoideum."],
+      "wikipedia": "Piwi",
+      "literature": {}
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "accession": "PF17180",
+      "entry_id": "id3",
+      "type": "domain",
+      "go_terms": {
+        "biological_process": [],
+        "molecular_function": [],
+        "cellular_component": []
+      },
+      "source_database": "pfam",
+      "member_databases": {},
+      "integrated": null,
+      "name": "Zinc-binding domain",
+      "short_name": "zf-3CxxC_2",
+      "other_names": [],
+      "description": [],
+      "wikipedia": "",
+      "literature": {}
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "accession": "PF17176",
+      "entry_id": "id4",
+      "type": "domain",
+      "go_terms": {
+        "biological_process": [],
+        "molecular_function": [],
+        "cellular_component": []
+      },
+      "source_database": "pfam",
+      "member_databases": {},
+      "integrated": null,
+      "name": "tRNA-binding domain",
+      "short_name": "tRNA_bind_3",
+      "other_names": [],
+      "description": [],
+      "wikipedia": "",
+      "literature": {}
+    }
+
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "entry_id": "SM00002",
+      "accession": "SM00002",
+      "type": "family",
+      "name": "Myelin family",
+      "short_name": "Myelin",
+      "other_names": [],
+      "go_terms": {
+        "biological_process": [],
+        "molecular_function": [
+          {
+            "id": "GO:0016021",
+            "name": "integral component of membrane"
+          }
+        ],
+        "cellular_component": []
+      },
+      "source_database": "smart",
+      "member_databases": null,
+      "integrated": null,
+      "description": ["The myelin sheath is a multi-layered membrane, unique to the nervous system, that functions as an insulator to greatly increase the velocity of axonal impulse conduction."],
+      "wikipedia": null,
+      "literature": {}
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "entry_id": null,
+      "accession": "PS01031",
+      "type": "MATRIX",
+      "name": "HSP20",
+      "short_name": "HSP20",
+      "other_names": [],
+      "go_terms": {},
+      "source_database": "prosite_profiles",
+      "member_databases": null,
+      "integrated": null,
+      "description": ["Heat shock hsp20 proteins family profile."],
+      "wikipedia": null,
+      "literature": {}
+    }
+  }
+]

@@ -3,6 +3,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 import sys
 import time
+import os
 from selenium.common.exceptions import StaleElementReferenceException
 
 class FunctionalTest(StaticLiveServerTestCase):  #1
@@ -21,7 +22,13 @@ class FunctionalTest(StaticLiveServerTestCase):  #1
             super().tearDownClass()
 
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        try:
+            if os.environ['BROWSER_TEST'] == "chrome":
+                self.browser = webdriver.Chrome()
+            else:
+                raise KeyError
+        except KeyError:
+            self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
 
     def tearDown(self):

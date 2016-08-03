@@ -1,0 +1,77 @@
+{
+  "metadata" : {
+    "accession": "V5XAD2",
+    "id": "V5XAD2_MYCNE",
+    "sourceOrganism": {
+      "name": "Mycobacterium neoaurum VKM Ac-1815D",
+      "taxid": 700508
+    },
+    "name": {
+      "name": "NADH-quinone oxidoreductase subunit I",
+      "short": null,
+      "other": ["NADH dehydrogenase I subunit I", "NDH-1 subunit I"]
+    },
+    "description": "NDH-1 shuttles electrons from NADH, via FMN and iron-sulfur (Fe-S) centers, to quinones in the respiratory chain. The immediate electron acceptor for the enzyme in this species is believed to be menaquinone. Couples the redox reaction to proton translocation (for every two electrons transferred, four hydrogen ions are translocated across the cytoplasmic membrane), and thus conserves the redox energy in a proton gradient.",
+    "length": 179,
+    "sequence": "MSKVGDALAGFGVTFKAMLHKPITEQYPEKPGPVAPRYHGRHQLNRYADGLEKCIGCELCAWACPADAIFVEGADNTAEQRFSPGERYGRVYQINYLRCIGCGLCIEACPTRALTMTNDYEMADDNRADLIYGKDKLLAPLTADMTAPPHAMAEGSTDEDYYRGNIRADGLARPSEATR",
+    "proteome": "UP000018763",
+    "gene": "nuoI",
+    "GO": {
+      "biologicalProcess": [
+        {
+          "id": "GO:0055114",
+          "name": "oxidation-reduction process"
+        }
+      ],
+      "molecularFunction": [
+        {
+          "id": "GO:0016651",
+          "name": "oxidoreductase activity, acting on NAD(P)H"
+        },
+        {
+          "id": "GO:0051539",
+          "name": "4 iron, 4 sulfur cluster binding"
+        }
+      ],
+      "cellularComponent": [
+        {
+          "id": "GO:0016020",
+          "name": "membrane"
+        }
+      ]
+    },
+    "proteinEvidence": 3
+  },
+  "representation": {
+    "entries": [
+      {
+        "id": "IPR010226",
+        "name": "NADH-quinone oxidoreductase, chain I",
+        "type": "family"
+      },
+      {
+        "id": "IPR017896",
+        "name": "4Fe-4S ferredoxin-type, iron-sulphur binding domain",
+        "type": "domain"
+      },
+      {
+        "id": "IPR017900",
+        "name": "4Fe-4S ferredoxin, iron-sulphur binding, conserved site",
+        "type": "conservedSite"
+      }
+    ],
+    "signalPeptide": [],
+    "transmembrane": [],
+    "coiledCoil": [],
+    "lowComplexity_disorder": [],
+    "activeSites": [],
+    "perResidueFeatures": [],
+    "disulphideBridges": []
+  },
+  "structure": {
+    "chains": []
+  },
+  "genomicContext": {
+    "DNA": ""
+  }
+}

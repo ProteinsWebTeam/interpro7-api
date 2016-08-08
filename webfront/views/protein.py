@@ -4,11 +4,95 @@ from django.shortcuts import redirect
 from webfront.constants import get_queryset_type, QuerysetType
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.models import Protein, Entry, ProteinEntryFeature, ProteinStructureFeature
+from webfront.models import Protein, Entry, ProteinEntryFeature, ProteinStructureFeature, Structure
 from webfront.views.entry import EntryHandler
 from webfront.views.structure import StructureHandler
 
 db_members = r'(uniprot)|(trembl)|(swissprot)'
+
+
+def filter_entry_overview(obj, general_handler, database, accession=None):
+    try:
+        prev_queryset = general_handler.get_from_store(CustomView, "queryset_for_previous_count")
+        qs_type = get_queryset_type(prev_queryset)
+    except (IndexError, KeyError):
+        qs_type = prev_queryset = None
+
+    matches = ProteinEntryFeature.objects.all()
+    if database != "uniprot":
+        matches = matches.filter(protein__source_database__iexact=database)
+    general_handler.set_in_store(CustomView, "queryset_for_previous_count", matches)
+
+    # flattening the object
+    obj = {**obj, **obj["member_databases"]}
+    del obj["member_databases"]
+
+    for entry_db in obj:
+        if entry_db == "unintegrated":
+            matches2 = matches \
+                .filter(entry__integrated__isnull=True) \
+                .exclude(entry__source_database__iexact="interpro")
+        else:
+            matches2 = matches.filter(entry__source_database__iexact=entry_db)
+
+        entries = matches2.values("entry")
+        prots = matches2.values("protein")
+
+        if prev_queryset is not None:
+            if qs_type == QuerysetType.ENTRY_STRUCTURE:
+                matches2 = matches2.filter(entry__entrystructurefeature__in=prev_queryset)
+                entries = matches2.values("entry")
+                prots = Protein.objects \
+                    .filter(accession__in=matches2.values("protein")) \
+                    .filter(accession__in=prev_queryset.values("entry__protein"))
+                structs = Structure.objects.filter(entries__in=entries, proteins__in=prots)
+                CustomView.set_counter_attributte(
+                    obj, entry_db, "structures", structs.distinct().count())
+
+        CustomView.set_counter_attributte(obj, entry_db, "proteins",
+                                          prots.distinct().count())
+        CustomView.set_counter_attributte(obj, entry_db, "entries",
+                                          entries.distinct().count())
+
+    new_obj = {"member_databases": {}}
+    for key, value in obj.items():
+        if key == "interpro" or key == "unintegrated":
+            new_obj[key] = value
+        else:
+            new_obj["member_databases"][key] = value
+    return new_obj
+
+
+def filter_structure_overview(obj, general_handler, database, accession=None):
+    try:
+        prev_queryset = general_handler.get_from_store(CustomView, "queryset_for_previous_count")
+        qs_type = get_queryset_type(prev_queryset)
+    except (IndexError, KeyError):
+        qs_type = prev_queryset = None
+    matches = ProteinStructureFeature.objects.all()
+    if database != "uniprot":
+        matches = matches.filter(protein__source_database__iexact=database)
+    prots = matches.values("protein")
+    structs = matches.values("structure")
+    general_handler.set_in_store(CustomView, "queryset_for_previous_count", matches)
+    if prev_queryset is not None:
+        if qs_type == QuerysetType.ENTRY_STRUCTURE:
+            matches = matches.filter(structure__accession__in=prev_queryset.values("structure"))\
+                .filter(protein__in=prev_queryset.values("entry__protein"))
+            prev_queryset = prev_queryset.filter(structure__proteinstructurefeature__in=matches)\
+                .filter(entry__accession__in=matches.values("protein__entry"))
+
+            structs = matches.values("structure")
+            entries = prev_queryset.values("entry")
+            prots = matches.values("protein")
+
+            CustomView.set_counter_attributte(obj, "pdb", "entries",
+                                              entries.distinct().count())
+    CustomView.set_counter_attributte(obj, "pdb", "proteins",
+                                      prots.distinct().count())
+    CustomView.set_counter_attributte(obj, "pdb", "structures",
+                                      structs.distinct().count())
+    return obj
 
 
 class UniprotAccessionHandler(CustomView):
@@ -56,13 +140,42 @@ class UniprotAccessionHandler(CustomView):
             if queryset.count() == 0:
                 raise ReferenceError("The protein {} doesn't exist in the database {}".format(level_name, protein_db))
             return queryset
-        elif "interpro" in queryset:
-            # TODO: Not filtering properly!
-            matches = ProteinEntryFeature.objects.filter(protein=level_name)
-            return EntryHandler.get_database_contributions(matches, 'entry__')
-        elif "pdb" in queryset:
-            matches = ProteinStructureFeature.objects.filter(protein=level_name)
-            return StructureHandler.get_database_contributions(matches, 'structure__')
+        else:
+            if "entries" in queryset:
+                for entry_db in queryset["entries"]:
+                    matches = ProteinEntryFeature.objects.filter(protein=level_name)
+                    if entry_db == "member_databases":
+                        for member_db in queryset["entries"][entry_db]:
+                            matches2 = matches.filter(entry__source_database__iexact=member_db)
+                            CustomView.set_counter_attributte(queryset["entries"][entry_db], member_db, "proteins",
+                                                              matches2.values("protein").distinct().count())
+                            CustomView.set_counter_attributte(queryset["entries"][entry_db], member_db, "entries",
+                                                              matches2.values("entry").distinct().count())
+                    else:
+                        if entry_db == "interpro":
+                            matches = matches.filter(entry__source_database__iexact=entry_db)
+                        elif entry_db == "unintegrated":
+                            matches = matches \
+                                .filter(entry__integrated__isnull=True) \
+                                .exclude(entry__source_database__iexact="interpro")
+                        CustomView.set_counter_attributte(queryset["entries"], entry_db, "proteins",
+                                                          matches.values("protein").distinct().count())
+                        CustomView.set_counter_attributte(queryset["entries"], entry_db, "entries",
+                                                          matches.values("entry").distinct().count())
+            if "structures" in queryset:
+                matches = ProteinStructureFeature.objects.filter(protein=level_name)
+                CustomView.set_counter_attributte(queryset["structures"], "pdb", "proteins",
+                                                  matches.values("protein").distinct().count())
+                CustomView.set_counter_attributte(queryset["structures"], "pdb", "structures",
+                                                  matches.values("structure").distinct().count())
+
+            #     if "entries" in queryset:
+            # # TODO: Not filtering properly!
+            #     matches = ProteinEntryFeature.objects.filter(protein=level_name)
+            #     return EntryHandler.get_database_contributions(matches, 'entry__')
+            # if "structures" in queryset:
+            #     matches = ProteinStructureFeature.objects.filter(protein=level_name)
+            #     return StructureHandler.get_database_contributions(matches, 'structure__')
 
         return queryset
 
@@ -146,45 +259,11 @@ class UniprotHandler(CustomView):
                                              "protein_queryset",
                                              queryset.values("proteins").exclude(proteins=None).distinct())
         else:
+            del queryset["proteins"]
             if "entries" in queryset:
-                for entry_db in queryset["entries"]:
-                    matches = ProteinEntryFeature.objects.all()
-                    if level_name != "uniprot":
-                        matches = matches.filter(protein__source_database__iexact=level_name)
-                    if entry_db == "member_databases":
-                        for member_db in queryset["entries"][entry_db]:
-                            matches2 = matches.filter(entry__source_database__iexact=member_db)
-                            CustomView.set_counter_attributte(queryset["entries"][entry_db], member_db, "proteins",
-                                                              matches2.values("protein").distinct().count())
-                            CustomView.set_counter_attributte(queryset["entries"][entry_db], member_db, "entries",
-                                                              matches2.values("entry").distinct().count())
-                    else:
-                        if entry_db == "interpro":
-                            matches = matches.filter(entry__source_database__iexact=entry_db)
-                        elif entry_db == "unintegrated":
-                            matches = matches \
-                                .filter(entry__integrated__isnull=True) \
-                                .exclude(entry__source_database__iexact="interpro")
-                        CustomView.set_counter_attributte(queryset["entries"], entry_db, "proteins",
-                                                          matches.values("protein").distinct().count())
-                        CustomView.set_counter_attributte(queryset["entries"], entry_db, "entries",
-                                                          matches.values("entry").distinct().count())
-                        # queryset["entries"][entry_db] = {
-                        #     "proteins": matches.values("protein").distinct().count(),
-                        #     "entries": matches.values("entry").distinct().count()
-                        # }
-            elif "structures" in queryset:
-                matches = ProteinStructureFeature.objects.all()
-                if level_name != "uniprot":
-                    matches = matches.filter(protein__source_database__iexact=level_name)
-                CustomView.set_counter_attributte(queryset["structures"], "pdb", "proteins",
-                                                  matches.values("protein").distinct().count())
-                CustomView.set_counter_attributte(queryset["structures"], "pdb", "structures",
-                                                  matches.values("structure").distinct().count())
-                # queryset["structures"]["pdb"] = {
-                #     "structures": matches.values("structure").distinct().count(),
-                #     "proteins": matches.values("protein").distinct().count()
-                # }
+                queryset["entries"] = filter_entry_overview(queryset["entries"], general_handler, level_name)
+            if "structures" in queryset:
+                queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler, level_name)
         return queryset
 
     @staticmethod
@@ -246,7 +325,9 @@ class ProteinHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
         qs = Protein.objects.all()
-        if not isinstance(queryset, dict):
+        if isinstance(queryset, dict):
+            queryset["proteins"] = ProteinHandler.get_database_contributions(qs)
+        else:
             qs_type = get_queryset_type(queryset)
             if qs_type == QuerysetType.ENTRY:
                 qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
@@ -254,9 +335,9 @@ class ProteinHandler(CustomView):
                 qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
             elif qs_type == QuerysetType.STRUCTURE_PROTEIN:
                 qs = Protein.objects.filter(accession__in=queryset.values('protein'))
-        general_handler.set_in_store(ProteinHandler,
-                                     "protein_count",
-                                     ProteinHandler.get_database_contributions(qs))
+            general_handler.set_in_store(ProteinHandler,
+                                         "protein_count",
+                                         ProteinHandler.get_database_contributions(qs))
         return queryset
 
     @staticmethod

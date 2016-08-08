@@ -6,6 +6,7 @@ from webfront.constants import SerializerDetail
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
 
+
 class CustomView(GenericAPIView):
     # description of the level of the endpoint, for debug purposes
     level_description = 'level'
@@ -170,6 +171,5 @@ class CustomView(GenericAPIView):
     @staticmethod
     def set_counter_attributte(obj, dict_key, key, value):
         if dict_key not in obj or not isinstance(obj[dict_key], dict):
-            obj[dict_key]={}
-        obj[dict_key][key]=value
-
+            obj[dict_key] = {}
+        obj[dict_key][key] = value

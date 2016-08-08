@@ -1,6 +1,7 @@
 from webfront.models import Entry
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from rest_framework import status
+from webfront.views.common import map_url_to_levels
 
 
 class ModelTest(InterproRESTTestCase):
@@ -12,6 +13,18 @@ class ModelTest(InterproRESTTestCase):
     def test_content_of_a_json_attribute(self):
         entry = Entry.objects.get(accession="IPR003165")
         self.assertEqual(entry.member_databases["pfam"][0], "PF02171")
+
+    def test_url_mapper(self):
+        urls = {
+            "entry/protein/structure": "entry/structure/protein",
+            "/entry/protein/structure": "entry/structure/protein",
+            "entry/protein/uniprot/M5ADK6/structure": "entry/structure/protein/uniprot/M5ADK6",
+            "entry/protein/structure/pdb": "entry/protein/structure/pdb",
+            "entry/interpro/protein/structure": "entry/interpro/structure/protein",
+            "entry/interpro/protein/uniprot/structure": "entry/interpro/structure/protein/uniprot",
+        }
+        for url in urls:
+            self.assertEqual(urls[url].split("/"), map_url_to_levels(url))
 
 
 class EntryRESTTest(InterproRESTTestCase):

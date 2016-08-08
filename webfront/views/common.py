@@ -6,12 +6,20 @@ from rest_framework import status
 from webfront.views.protein import ProteinHandler
 from webfront.views.structure import StructureHandler
 from rest_framework.response import Response
+import re
 
 
 def map_url_to_levels(url):
-    return list(
-        filter(lambda a: len(a) != 0, url.split('/'))
-    )
+    parts = [x.strip("/") for x in re.compile("(entry|protein|structure)").split(url)]
+
+    new_url = parts[:3]
+    for i in range(4, len(parts), 2):
+        if parts[i] == "":
+            new_url = new_url[:3] + parts[i-1:i+1] + new_url[3:]
+        else:
+            new_url += parts[i-1:i+1]
+
+    return "/".join(filter(lambda a: len(a) != 0, new_url)).split("/")
 
 
 def pagination_information(request):

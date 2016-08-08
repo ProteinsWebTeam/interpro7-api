@@ -24,6 +24,10 @@ try:
     ORACLE_CONFIG = yaml.safe_load(open('{}/config/oracle.yml'.format(BASE_DIR)))
 except FileNotFoundError:
     ORACLE_CONFIG = {}
+try:
+    MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
+except FileNotFoundError:
+    MYSQL_CONFIG = {}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -51,12 +55,10 @@ INSTALLED_APPS = (
     'release',
     # added
     'rest_framework',
-    'corsheaders',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',# added
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -91,15 +93,30 @@ WSGI_APPLICATION = 'interpro.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': ,
+    #     'TEST': {
+    #         'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
+    #     },
+    # },
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, '../database/db.sqlite3'),
+        'ENGINE': MYSQL_CONFIG.get('engine', 'django.db.backends.sqlite3'),
+        'NAME': MYSQL_CONFIG.get(
+            'sid',
+            os.path.join(BASE_DIR, '../database/db.sqlite3')
+        ),
+        'USER': MYSQL_CONFIG.get('user'),
+        'PASSWORD': MYSQL_CONFIG.get('password'),
+        'HOST': MYSQL_CONFIG.get('host'),
+        'PORT': MYSQL_CONFIG.get('port'),
         'TEST': {
+            'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
         },
     },
     'interpro_ro': {
-        'ENGINE': 'django.db.backends.oracle',
+        'ENGINE': ORACLE_CONFIG.get('engine', 'django.db.backends.oracle'),
         'NAME': ORACLE_CONFIG.get('sid', 'INTERPRO_DB'),
         'USER': ORACLE_CONFIG.get('user', 'USER'),
         'PASSWORD': ORACLE_CONFIG.get('password'),

@@ -1,28 +1,57 @@
-from django.core.management.base import BaseCommand
+import logging
 from datetime import date
+from itertools import chain, islice
+
+from tqdm import tqdm
+
+from django.core.management.base import BaseCommand
+from django.db.utils import IntegrityError
 
 from release.models import iprel
 from webfront.models import Entry, Protein, Structure, ProteinEntryFeature, ProteinStructureFeature, EntryStructureFeature
 
+# global array
 errors = []
 
-def log(kind, source="IPREL"):
-    def wrapper1(fn):
-        def wrapper2(n, *args, **kwargs):
-            message = " -> Put {n} {kind}{plural} from {source}".format(
-                n=n, kind=kind, plural=("s" if n <= 1 else ""), source=source
-            )
-            print("STARTING{}".format(message))
-            output = fn(n, *args, **kwargs)
-            if not hasattr(output, "__iter__"):
-                output = [output]
-            for [i, step] in enumerate(output, 1):
-                print("{:9d}: processed {}".format(i, step))
+# helpers
+def chunks(iterable, max=1000):
+    iterator = iter(iterable)
+    for first in iterator:
+        yield chain([first], islice(iterator, max - 1))
 
-            print("ENDED{}".format(message))
-            return output
-        return wrapper2
-    return wrapper1
+def queryset_from_model(m, db_name='interpro_ro'):
+    return m.objects.using(db_name).all()
+
+def subset_iterator_from_queryset(qs, n, n_skip = 0):
+    return tqdm(
+        qs[n_skip:n].iterator(),
+        initial=n_skip,
+        total=n,
+        mininterval=1
+    )
+
+def bulk_insert(chunk, model):
+    try:
+        model.objects.bulk_create((e for e in chunk), batch_size=1000)
+    except IntegrityError as err:
+        # Might just be duplicate, so already there
+        if 'Duplicate' not in str(err):
+            # It is not a duplicate, so real problem, so re-raise
+            raise
+
+def create_multiple_x(qs, instantiator, type_info):
+    for input in qs:
+        try:
+            output = instantiator(input)
+            yield output
+        except Exception as err:
+            errors.append((type_info, input.pk, err))
+
+def n_or_all(n, qs):
+    count = qs.count()
+    if n and n < count:
+        return n
+    return count
 
 # TODO: put all these functions into their own file (could that be a view?)
 def _extract_pubs(joins):
@@ -38,17 +67,24 @@ def _extract_pubs(joins):
 
 def _extract_member_db(acc):
     output = {}
-    ids = []
+    # ids = []
     methods = iprel.Entry2Method.objects.using("interpro_ro").filter(entry_ac=acc).all()
     for method in methods:
         db = method.method_ac.dbcode.dbshort
         id = method.method_ac_id
-        ids.append(id)
+        # ids.append(id)
         if db in output:
             output[db].append(id)
         else:
             output[db] = [id]
-    return [output, ids]
+    # return [output, ids]
+    return output
+
+def _extract_integration(member_db_entry):
+    try:
+        return Entry.objects.get(pk=member_db_entry.entry2method.entry_ac_id)
+    except iprel.Entry2Method.DoesNotExist as err:
+        pass
 
 def _extract_go(joins):
     output = {
@@ -70,78 +106,195 @@ def _get_tax_name_from_id(id):
     except iprel.TaxNameToId.DoesNotExist:
         pass
 
-@log("protein object")
+# entries
+def get_n_member_db_entries(n):
+    qs = iprel.Method.objects.using("interpro_ro").all()
+    n = n_or_all(n, qs)
+    set_member_db_entries(subset_iterator_from_queryset(qs, n))
+
+def set_member_db_entries(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_entry_from_member_db,
+        'memberDB entry'
+    )):
+        bulk_insert(chunk, Entry)
+
+def get_n_interpro_entries(n):
+    qs = queryset_from_model(iprel.Entry)
+    n = n_or_all(n, qs)
+    set_interpro_entries(subset_iterator_from_queryset(qs, n))
+
+def set_interpro_entries(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_entry_from_interpro,
+        'interpro entry'
+    )):
+        bulk_insert(chunk, Entry)
+
+def create_entry_from_member_db(input):
+    return Entry(
+        accession=input.method_ac,
+        entry_id="",# TODO
+        type=input.sig_type.abbrev,
+        go_terms={},# TODO
+        source_database=input.dbcode.dbshort,
+        member_databases={},
+        integrated=_extract_integration(input),
+        name=input.description,
+        short_name=input.name,
+        other_names=[],# TODO
+        description=[input.abstract] if input.abstract else [],
+        literature=_extract_pubs(input.method2pub_set.all())
+    )
+
+def create_entry_from_interpro(input):
+    # [members_dbs, member_db_accs] = _extract_member_db(input.entry_ac)
+    return Entry(
+        accession=input.entry_ac,
+        entry_id="",# TODO
+        type=input.entry_type.abbrev,
+        go_terms=_extract_go(input.interpro2go_set.all()),# TODO
+        source_database="InterPro",
+        member_databases=_extract_member_db(input.entry_ac),
+        integrated=None,
+        name=input.name,
+        short_name=input.short_name,
+        other_names=[],# TODO
+        description=[join.ann.text for join in input.entry2common_set.all()],
+        literature=_extract_pubs(input.entry2pub_set.all())
+    )
+
+# proteins
 def get_n_proteins(n):
-    for input in iprel.Protein.objects.using("interpro_ro").all()[:n]:
-        acc = input.protein_ac
-        try:
-            set_protein(input)
-        except Exception as err:
-            errors.append(('protein', acc, err))
-        yield "{}, protein".format(acc)
+    qs = queryset_from_model(iprel.Protein)
+    n = n_or_all(n, qs)
+    # This will be likely to break before completion, so enable resumable
+    # Count n existing, skip n, then starts filling
+    n_skip = Protein.objects.count()
+    set_proteins(subset_iterator_from_queryset(qs, n, n_skip))
 
+def set_proteins(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_protein_from_protein,
+        'protein'
+    )):
+        bulk_insert(chunk, Protein)
 
-@log("interpro entry (and their contributing signatures) object")
-def get_interpro_entries(n):
-    for input in iprel.Entry.objects.using("interpro_ro").all()[:n]:
-        acc = input.entry_ac
-        try:
-            [members_dbs, member_db_accs] = _extract_member_db(input.entry_ac)
-            output = Entry(
-                accession=acc,
-                entry_id="",# TODO
-                type=input.entry_type.abbrev,
-                go_terms=_extract_go(input.interpro2go_set.all()),# TODO
-                source_database="InterPro",
-                member_databases=members_dbs,
-                integrated=None,
-                name=input.name,
-                short_name=input.short_name,
-                other_names=[],# TODO
-                description=[join.ann.text for join in input.entry2common_set.all()],
-                literature=_extract_pubs(input.entry2pub_set.all())
-            )
-            output.save()
-        except Exception as err:
-            errors.append(('entry', acc, err))
-        yield "{}, entry from InterPro".format(acc)
-        # for prot in (_.protein_ac for _ in input.mventry2proteintrue_set.all()):
-        #     set_protein(prot)
-        #     yield "{}, protein".format(prot.protein_ac)
-        # for acc in member_db_accs:
-        #     res = set_member_db_entry(
-        #         iprel.Method.objects.using("interpro_ro").get(pk=acc),
-        #         output
-        #     )
-        #     yield "{}, entry from a member database".format(next(res))
+def create_protein_from_protein(input):
+    tax_name = _get_tax_name_from_id(input.tax_id)
+    tax = {"taxid": input.tax_id}
+    if tax_name:
+        tax["name"] = tax_name
+    return Protein(
+        accession=input.protein_ac,
+        identifier=input.name,
+        organism=tax,
+        name="",# TODO
+        short_name="",# TODO
+        other_names=[],# TODO
+        description=[],# TODO
+        sequence="",# TODO
+        length=input.len,
+        proteome="",# TODO
+        gene="",# TODO
+        go_terms={},# TODO
+        evidence_code=0,# TODO
+        feature={},# TODO
+        # structure={},# TODO
+        genomic_context={},# TODO
+        source_database=input.dbcode.dbshort
+    )
 
-@log("unintegrated entry object")
-def get_n_unintegrated_member_db_entries(n):
-    for input in iprel.Method.objects.using("interpro_ro").filter(entry2method__isnull=True).all()[:n]:
-        yield from set_member_db_entry(input)
-
-@log("structure object")
+# structures
 def get_n_structures(n):
-    for input in iprel.UniprotPdbe.objects.using("interpro_ro").all()[:n]:
-        acc = input.entry_id
-        try:
-            output = Structure(
-                accession=acc,
-                name=input.title,
-                short_name=input.sptr_id,
-                other_names=[input.sptr_ac],
-                experiment_type=input.method,
-                release_date=date.today(),
-                authors=[],
-                chains=[input.chain],
-                source_database='pdb'
-            )
-            output.save()
-        except Exception as err:
-            errors.append(('structure', acc, err))
-        yield "{}, structure".format(acc)
+    qs = queryset_from_model(iprel.UniprotPdbe).values_list(
+        "entry_id", flat=True
+    ).distinct()
+    n = n_or_all(n, qs)
+    set_structures(subset_iterator_from_queryset(qs, n))
 
-@log("protein <-> entry")
+def set_structures(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_structure_from_uniprot_pdbe,
+        'structure'
+    )):
+        bulk_insert(chunk, Structure)
+
+def create_structure_from_uniprot_pdbe(id):
+    qsi = queryset_from_model(iprel.UniprotPdbe).filter(entry_id=id).iterator()
+    input = next(qsi)
+    output = Structure(
+        accession=input.entry_id,
+        name=input.title,
+        short_name="",
+        other_names=[],
+        experiment_type=input.method,
+        release_date=date.today(),
+        authors=[],
+        chains=[input.chain],
+        source_database='pdb'
+    )
+    for input in qsi:
+        output.chains.append(input.chain)
+    return output
+
+
+
+
+
+
+
+
+
+
+
+def get_n_entry_structure_features(n):
+    qs = queryset_from_model(iprel.Match)
+    n = n_or_all(n, qs)
+    set_entry_structure_features(subset_iterator_from_queryset(qs, n))
+
+def set_entry_structure_features(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_entry_structure_features_from_match,
+        'entry-structure feature'
+    )):
+        bulk_insert(chunk, ProteinEntryFeature)
+
+def create_entry_structure_features_from_match(input):
+    pass
+
+
+
+
+
+
+
+def get_n_protein_entry_features(n):
+    qs = queryset_from_model(iprel.Match)
+    n = n_or_all(n, qs)
+    set_protein_entry_features(subset_iterator_from_queryset(qs, n))
+
+def set_protein_entry_features(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_protein_entry_features_from_match,
+        'protein-netry feature'
+    )):
+        bulk_insert(chunk, ProteinEntryFeature)
+
+def create_protein_entry_features_from_match(input):
+    protein = Protein.objects.get(pk=input.protein_ac_id)
+    entry = Entry.objects.get(pk=input.method_ac_id)
+
+
+
+
+
 def get_n_protein_entry_features(n):
     for pef in iprel.Match.objects.using("interpro_ro").all()[:n]:
         try:
@@ -190,7 +343,6 @@ def get_n_protein_entry_features(n):
                 err
             ))
 
-@log("protein <-> structure")
 def get_all_protein_structure_features(n):
     s_qs = Structure.objects.all()
     for p in Protein.objects.all():
@@ -296,7 +448,6 @@ def set_protein(input):
         genomic_context={},# TODO
         source_database=input.dbcode.dbshort
     )
-    output.save()
     return output
 
 def set_protein_entry_feature(protein, entry, feat = None):
@@ -309,31 +460,50 @@ def set_protein_entry_feature(protein, entry, feat = None):
     pef.save()
     return pef
 
+
+
+
+
+
 def _fillEntries(n):
-    get_n_unintegrated_member_db_entries(n)
-    get_interpro_entries(n)
+    print('Step 1 of 2 running')
+    # This needs to be done first
+    get_n_interpro_entries(n)
+    print('Step 2 of 2 running')
+    # Because we reference InterPro entries inside member DB entries
+    get_n_member_db_entries(n)
 
 def _fillProteins(n):
+    print('Step 1 of 1 running')
     get_n_proteins(n)
 
 def _fillStructures(n):
+    print('Step 1 of 1 running')
     get_n_structures(n)
 
 def _fillProteinEntryFeatures(n):
+    print('Step 1 of 1 running')
     get_n_protein_entry_features(n)
 
 def _fillProteinStructureFeatures(n):
-    get_all_protein_structure_features(n)
+    print('Step 1 of 1 running')
+    get_n_protein_structure_features(n)
+
+def _fillEntryStructureFeatures(n):
+    print('Step 1 of 1 running')
+    get_n_entry_structure_features(n)
 
 _modelFillers = {
     'Entry': _fillEntries,
     'Protein': _fillProteins,
     'Structure': _fillStructures,
     'ProteinEntry': _fillProteinEntryFeatures,
-    'ProteinStructure': _fillProteinStructureFeatures
+    'ProteinStructure': _fillProteinStructureFeatures,
+    'EntryStructure': _fillEntryStructureFeatures,
 }
 
 def fillModelWith(model, n):
+    print('Filling table for {}'.format(model))
     _modelFillers[model](n)
 
 class Command(BaseCommand):
@@ -343,22 +513,35 @@ class Command(BaseCommand):
         parser.add_argument(
             "--number", "-n",
             type=int,
-            default=10,
-            help="Number of elements of each kind to add to the DW"
+            help=(
+                "Number of elements of each kind to add to the DW. " +
+                "If none specified, will add EVERYTHING to the model"
+            )
         )
         parser.add_argument(
             "--model", "-m",
             type=str,
             required=True,
+            choices=_modelFillers.keys(),
             help="Name of the model to add to"
+        )
+        parser.add_argument(
+            "--logs", "-l",
+            type=bool,
+            help="Activates Django logs"
         )
 
     def handle(self, *args, **options):
         n = options["number"]
         m = options["model"]
+        if not n:
+            print('Warning: adding everything in {}'.format(m))
+        if not options["logs"]:
+            logging.disable(logging.CRITICAL)
         fillModelWith(model=m, n=n)
-        print('There has been {} error(s):'.format(len(errors)))
+        if len(errors) <= 1:
+            print('There has been {} error:'.format(len(errors)))
+        else:
+            print('There have been {} errors:'.format(len(errors)))
         for (type, accession, error) in errors:
             print(' - Error while adding the {} {} ({})'.format(type, accession, error))
-        # get_interpro_entries(n)
-        # get_n_unintegrated_member_db_entries(n)

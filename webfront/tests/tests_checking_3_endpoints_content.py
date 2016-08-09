@@ -125,14 +125,14 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         continue
                     for db3 in api_test_map[endpoint3]:
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
-                        print(url)
+                        # print(url)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         expected = self.get_expected_payload(endpoint1, endpoint2, endpoint3, db3)
                         self.assertEqual(response.data, expected)
 
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, endpoint2)
-                        print(url)
+                        # print(url)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         self.assertEqual(response.data, expected)
@@ -170,15 +170,42 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             continue
                         for db3 in api_test_map[endpoint3]:
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2, endpoint3, db3)
+                            # print(url)
                             response = self.client.get(url)
                             self.assertEqual(response.status_code, status.HTTP_200_OK)
                             expected = self.get_expected_payload(endpoint1, endpoint2, endpoint3, db3, db2=db2)
                             self.assertEqual(response.data, expected)
 
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, endpoint2, db2)
+                            # print(url)
                             response = self.client.get(url)
                             self.assertEqual(response.status_code, status.HTTP_200_OK)
                             self.assertEqual(response.data, expected)
+
+    def test_endpoint_db_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for db2 in api_test_map[endpoint2]:
+                    for endpoint3 in api_test_map:
+                        if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                            continue
+                        for db3 in api_test_map[endpoint3]:
+                            if db3 == "unintegrated":
+                                continue
+                            #     TODO: Make a plan to test unintegrated IDs
+                            for acc3 in api_test_map[endpoint3][db3]:
+                                url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2, endpoint3, db3, acc3)
+                                response = self.client.get(url)
+                                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                expected = self.get_expected_payload(endpoint1, endpoint2, endpoint3, db3, db2=db2, acc3=acc3)
+                                self.assertEqual(response.data, expected)
+
+                                url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, acc3, endpoint2, db2)
+                                response = self.client.get(url)
+                                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                self.assertEqual(response.data, expected)
 
     def get_expected_payload(self, endpoint1, endpoint2, endpoint3, db3, db2=None, acc3=None):
         payload = {}

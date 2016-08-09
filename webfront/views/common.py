@@ -1,4 +1,5 @@
 from interpro import settings
+from webfront.constants import get_queryset_type
 from webfront.models import Entry
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
@@ -116,3 +117,11 @@ class GeneralHandler(CustomView):
                 "filter_serializer": filter_serializer,
                 "value": value
             }
+
+    def get_previous_queryset(self):
+        try:
+            prev_queryset = self.get_from_store(CustomView, "queryset_for_previous_count")
+            qs_type = get_queryset_type(prev_queryset)
+        except (IndexError, KeyError):
+            qs_type = prev_queryset = None
+        return prev_queryset, qs_type

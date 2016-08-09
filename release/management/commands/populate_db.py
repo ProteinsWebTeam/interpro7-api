@@ -1,6 +1,7 @@
 import logging
 from datetime import date
 from itertools import chain, islice
+from random import randint
 
 from tqdm import tqdm
 
@@ -242,7 +243,34 @@ def create_structure_from_uniprot_pdbe(id):
         output.chains.append(input.chain)
     return output
 
+# protein <-> structure
+def get_n_protein_structure_features(n):
+    qs = queryset_from_model(iprel.UniprotPdbe)
+    n = n_or_all(n, qs)
+    set_protein_structure_features(subset_iterator_from_queryset(qs, n))
 
+def set_protein_structure_features(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_protein_structure_feature_from_uniprot_pdbe,
+        'protein <-> structure'
+    )):
+        bulk_insert(chunk, ProteinStructureFeature)
+
+def create_protein_structure_feature_from_uniprot_pdbe(input):
+    protein = Protein.objects.get(pk=input.sptr_ac_id)
+    structure = Structure.objects.get(pk=input.entry_id)
+    return ProteinStructureFeature(
+        protein=protein,
+        structure=structure,
+        chain=input.chain,
+        length=(input.end_seq + randint(0, 10)),# TODO: change this to correct value
+        organism=protein.organism,
+        coordinates=[{
+            'protein': [1, protein.length],
+            'structure': [input.beg_seq, input.end_seq],
+        }]
+    )
 
 
 
@@ -423,32 +451,6 @@ def set_member_db_entry(input, integrated=None):
     #             pef.protein.identifier, pef.entry.accession
     #         )
     yield acc
-
-def set_protein(input):
-    tax_name = _get_tax_name_from_id(input.tax_id)
-    tax = {"taxid": input.tax_id}
-    if tax_name:
-        tax["name"] = tax_name
-    output = Protein(
-        accession=input.protein_ac,
-        identifier=input.name,
-        organism=tax,
-        name="",# TODO
-        short_name="",# TODO
-        other_names=[],# TODO
-        description=[],# TODO
-        sequence="",# TODO
-        length=input.len,
-        proteome="",# TODO
-        gene="",# TODO
-        go_terms={},# TODO
-        evidence_code=0,# TODO
-        feature={},# TODO
-        # structure={},# TODO
-        genomic_context={},# TODO
-        source_database=input.dbcode.dbshort
-    )
-    return output
 
 def set_protein_entry_feature(protein, entry, feat = None):
     pef = ProteinEntryFeature(

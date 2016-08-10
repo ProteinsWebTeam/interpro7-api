@@ -2,6 +2,7 @@ import logging
 from datetime import date
 from itertools import chain, islice
 from random import randint
+from threading import Thread
 
 from tqdm import tqdm
 
@@ -23,12 +24,14 @@ def chunks(iterable, max=1000):
 def queryset_from_model(m, db_name='interpro_ro'):
     return m.objects.using(db_name).all()
 
-def subset_iterator_from_queryset(qs, n, n_skip = 0):
+def subset_iterator_from_queryset(qs, n, n_skip=0, position=0):
     return tqdm(
         qs[n_skip:n].iterator(),
         initial=n_skip,
         total=n,
-        mininterval=1
+        mininterval=1,
+        dynamic_ncols=True,
+        position=position
     )
 
 def bulk_insert(chunk, model):
@@ -46,7 +49,11 @@ def create_multiple_x(qs, instantiator, type_info):
             output = instantiator(input)
             yield output
         except Exception as err:
-            errors.append((type_info, input.pk, err))
+            errors.append((
+                type_info,
+                '-'.join(input) if type(input) is tuple else input.pk,
+                err,
+            ))
 
 def n_or_all(n, qs):
     count = qs.count()
@@ -68,17 +75,16 @@ def _extract_pubs(joins):
 
 def _extract_member_db(acc):
     output = {}
-    # ids = []
-    methods = iprel.Entry2Method.objects.using("interpro_ro").filter(entry_ac=acc).all()
+    methods = iprel.Entry2Method.objects.using("interpro_ro").filter(
+        entry_ac=acc
+    ).all()
     for method in methods:
         db = method.method_ac.dbcode.dbshort
         id = method.method_ac_id
-        # ids.append(id)
         if db in output:
             output[db].append(id)
         else:
             output[db] = [id]
-    # return [output, ids]
     return output
 
 def _extract_integration(member_db_entry):
@@ -243,9 +249,94 @@ def create_structure_from_uniprot_pdbe(id):
         output.chains.append(input.chain)
     return output
 
+# protein <-> entry
+def get_n_protein_interpro_entry_features(n):
+    qs = queryset_from_model(iprel.Supermatch).values_list(
+        "protein_ac", "entry_ac"
+    ).distinct()
+    n = n_or_all(n, qs)
+    set_protein_interpro_entry_feature_from_supermatch(
+        subset_iterator_from_queryset(qs, n)
+    )
+
+def set_protein_interpro_entry_feature_from_supermatch(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_protein_interpro_entry_feature_from_supermatch,
+        'protein <-> interpro entry'
+    )):
+        bulk_insert(chunk, ProteinEntryFeature)
+
+def create_protein_interpro_entry_feature_from_supermatch(composite):
+    protein_id, entry_id = composite
+    qsi = queryset_from_model(iprel.Supermatch).filter(
+        protein_ac=protein_id,
+        entry_ac=entry_id
+    ).values("pos_from", "pos_to").iterator()
+    protein = Protein.objects.get(pk=protein_id)
+    entry = Entry.objects.get(pk=entry_id)
+    input = next(qsi)
+    output = ProteinEntryFeature(
+        protein=protein,
+        entry=entry,
+        coordinates=[{
+            'protein': [input["pos_from"], input["pos_to"]],
+            'entry': [1, input["pos_to"] - input["pos_from"]]
+        }]
+    )
+    for input in qsi:
+        output.coordinates.append({
+            'protein': [input["pos_from"], input["pos_to"]],
+            'entry': [1, input["pos_to"] - input["pos_from"]]
+        })
+    return output
+
+def get_n_protein_member_db_entry_features(n):
+    qs = queryset_from_model(iprel.Match).values_list(
+        "protein_ac", "method_ac"
+    ).distinct()
+    n = n_or_all(n, qs)
+    set_protein_member_db_entry_feature_from_match(
+        subset_iterator_from_queryset(qs, n)
+    )
+
+def set_protein_member_db_entry_feature_from_match(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_protein_member_db_entry_feature_from_match,
+        'protein <-> member db entry'
+    )):
+        bulk_insert(chunk, ProteinEntryFeature)
+
+def create_protein_member_db_entry_feature_from_match(composite):
+    protein_id, entry_id = composite
+    qsi = queryset_from_model(iprel.Match).filter(
+        protein_ac=protein_id,
+        method_ac=entry_id
+    ).values("pos_from", "pos_to").iterator()
+    protein = Protein.objects.get(pk=protein_id)
+    entry = Entry.objects.get(pk=entry_id)
+    input = next(qsi)
+    output = ProteinEntryFeature(
+        protein=protein,
+        entry=entry,
+        coordinates=[{
+            'protein': [input["pos_from"], input["pos_to"]],
+            'entry': [1, input["pos_to"] - input["pos_from"]]
+        }]
+    )
+    for input in qsi:
+        output.coordinates.append({
+            'protein': [input["pos_from"], input["pos_to"]],
+            'entry': [1, input["pos_to"] - input["pos_from"]]
+        })
+    return output
+
 # protein <-> structure
 def get_n_protein_structure_features(n):
-    qs = queryset_from_model(iprel.UniprotPdbe)
+    qs = queryset_from_model(iprel.UniprotPdbe).values_list(
+        "entry_id", "sptr_ac", "chain"
+    ).distinct()
     n = n_or_all(n, qs)
     set_protein_structure_features(subset_iterator_from_queryset(qs, n))
 
@@ -257,20 +348,35 @@ def set_protein_structure_features(qs):
     )):
         bulk_insert(chunk, ProteinStructureFeature)
 
-def create_protein_structure_feature_from_uniprot_pdbe(input):
-    protein = Protein.objects.get(pk=input.sptr_ac_id)
-    structure = Structure.objects.get(pk=input.entry_id)
-    return ProteinStructureFeature(
+def create_protein_structure_feature_from_uniprot_pdbe(composite):
+    structure_id, protein_id, chain = composite
+    qsi = queryset_from_model(iprel.UniprotPdbe).filter(
+        entry_id=structure_id,
+        sptr_ac=protein_id,
+        chain=chain
+    ).iterator()
+    protein = Protein.objects.get(pk=protein_id)
+    structure = Structure.objects.get(pk=structure_id)
+    input = next(qsi)
+    output = ProteinStructureFeature(
         protein=protein,
         structure=structure,
         chain=input.chain,
-        length=(input.end_seq + randint(0, 10)),# TODO: change this to correct value
+        length=input.end_seq,# TODO: change this to correct value
         organism=protein.organism,
         coordinates=[{
             'protein': [1, protein.length],
             'structure': [input.beg_seq, input.end_seq],
         }]
     )
+    for input in qsi:
+        output.coordinates.append({
+            'protein': [1, protein.length],
+            'structure': [input.beg_seq, input.end_seq],
+        })
+        # TODO: *also* change this to correct value
+        output.length = max(output.length, input.end_seq)
+    return output
 
 
 
@@ -279,188 +385,188 @@ def create_protein_structure_feature_from_uniprot_pdbe(input):
 
 
 
+
+# def get_n_entry_structure_features(n):
+#     qs = queryset_from_model(iprel.Match)
+#     n = n_or_all(n, qs)
+#     set_entry_structure_features(subset_iterator_from_queryset(qs, n))
+
+# def set_entry_structure_features(qs):
+#     for chunk in chunks(create_multiple_x(
+#         qs,
+#         create_entry_structure_features_from_match,
+#         'entry-structure feature'
+#     )):
+#         bulk_insert(chunk, ProteinEntryFeature)
+
+# def create_entry_structure_features_from_match(input):
+#     pass
+
+
+
+
+
+
+
+# def get_n_protein_entry_features(n):
+#     qs = queryset_from_model(iprel.Match)
+#     n = n_or_all(n, qs)
+#     set_protein_entry_features(subset_iterator_from_queryset(qs, n))
+
+# def set_protein_entry_features(qs):
+#     for chunk in chunks(create_multiple_x(
+#         qs,
+#         create_protein_entry_features_from_match,
+#         'protein-netry feature'
+#     )):
+#         bulk_insert(chunk, ProteinEntryFeature)
+
+# def create_protein_entry_features_from_match(input):
+#     protein = Protein.objects.get(pk=input.protein_ac_id)
+#     entry = Entry.objects.get(pk=input.method_ac_id)
+
+
+
+
+
+# def get_n_protein_entry_features(n):
+#     for pef in iprel.Match.objects.using("interpro_ro").all()[:n]:
+#         try:
+#             coordinates = [{"protein": [pef.pos_from, pef.pos_to]}]
+#             protein = Protein.objects.get(pk=pef.protein_ac_id)
+#             entry = Entry.objects.get(pk=pef.method_ac_id)
+#             output = ProteinEntryFeature(
+#                 protein=protein,
+#                 entry=entry,
+#                 coordinates=coordinates
+#             )
+#             output.save()
+#         except Entry.DoesNotExist:
+#             pass
+#         except Protein.DoesNotExist:
+#             pass
+#         except Exception as err:
+#             errors.append((
+#                 'protein <-> entry',
+#                 '{} <-> {}'.format(pef.protein_ac_id, pef.method_ac_id),
+#                 err
+#             ))
+#         yield "{} <-> {}, protein <-> entry".format(
+#             pef.protein_ac_id, pef.method_ac_id
+#         )
+#         try:
+#             interpro_entry = pef.method_ac.entry2method.entry_ac
+#             entry = Entry.objects.get(pk=interpro_entry.entry_ac)
+#             output = ProteinEntryFeature(
+#                 protein=protein,
+#                 entry=entry,
+#                 coordinates=coordinates,
+#             )
+#             output.save()
+#             yield "{} <-> {}, protein <-> entry".format(
+#                 pef.protein_ac_id, interpro_entry.entry_ac
+#             )
+#         except iprel.Entry2Method.DoesNotExist:
+#             pass
+#         except Entry.DoesNotExist:
+#             pass
+#         except Exception as err:
+#             errors.append((
+#                 'protein <-> entry',
+#                 '{} <-> {}'.format(pef.protein_ac_id, interpro_entry.entry_ac),
+#                 err
+#             ))
+
+# def get_all_protein_structure_features(n):
+#     s_qs = Structure.objects.all()
+#     for p in Protein.objects.all():
+#         for s in s_qs:
+#             for psf in iprel.UniprotPdbe.objects.using(
+#                 "interpro_ro"
+#             ).filter(entry_id=s.pk, sptr_ac=p.pk).all():
+#                 try:
+#                     protein = Protein.objects.get(pk=psf.sptr_ac)
+#                     structure = Structure.objects.get(pk=psf.entry_id)
+#                     output = ProteinStructureFeature(
+#                         protein=protein,
+#                         structure=structure,
+#                         chain=psf.chain,
+#                         length=(psf.end_seq - psf.beg_seq),
+#                         organism={},
+#                         coordinates=[{
+#                             'protein': [psf.beg_seq, psf.end_seq],
+#                             'structure': [1, psf.end_seq - psf.beg_seq],
+#                         }]
+#                     )
+#                     output.save()
+#                     yield "{} <-> {}, protein <-> structure".format(
+#                         psf.sptr_ac_id, psf.entry_id
+#                     )
+#                 except Protein.DoesNotExist:
+#                     pass
+#                 except Structure.DoesNotExist:
+#                     pass
+#                 except Exception as err:
+#                     errors.append((
+#                         'protein <-> structure',
+#                         '{} <-> {}'.format(psf.sptr_ac_id, psf.entry_id),
+#                         err
+#                     ))
 
 def get_n_entry_structure_features(n):
-    qs = queryset_from_model(iprel.Match)
-    n = n_or_all(n, qs)
-    set_entry_structure_features(subset_iterator_from_queryset(qs, n))
-
-def set_entry_structure_features(qs):
-    for chunk in chunks(create_multiple_x(
-        qs,
-        create_entry_structure_features_from_match,
-        'entry-structure feature'
-    )):
-        bulk_insert(chunk, ProteinEntryFeature)
-
-def create_entry_structure_features_from_match(input):
     pass
 
+# def set_member_db_entry(input, integrated=None):
+#     acc = input.method_ac
+#     try:
+#         output = Entry(
+#             accession=acc,
+#             entry_id="",# TODO
+#             type=input.sig_type.abbrev,
+#             go_terms={},# TODO
+#             source_database=input.dbcode.dbshort,
+#             member_databases={},
+#             integrated=integrated,
+#             name=input.description,
+#             short_name=input.name,
+#             other_names=[],# TODO
+#             description=[input.abstract] if input.abstract else [],
+#             literature=_extract_pubs(input.method2pub_set.all())
+#         )
+#         output.save()
+#     except Exception as err:
+#         errors.append(('entry', acc, err))
+#     # already_added_proteins = dict()
+#     # for match in input.match_set.all():
+#     #     if len(already_added_proteins) > 0:
+#     #         break
+#     #     protein_id = match.protein_ac_id
+#     #     protein = already_added_proteins.get(protein_id, None)
+#     #     if not protein:
+#     #         protein = set_protein(match.protein_ac)
+#     #         yield "{}, protein".format(protein_id)
+#     #         already_added_proteins[protein_id] = protein
+#     #     pef = set_protein_entry_feature(protein, output, match)
+#     #     yield "{}<->{}, protein/entry feature".format(
+#     #         pef.protein.identifier, pef.entry.accession
+#     #     )
+#     # if integrated:
+#     #     for protein in already_added_proteins.values():
+#     #         pef = set_protein_entry_feature(protein, integrated)
+#     #         yield "{}<->{}, protein/entry feature".format(
+#     #             pef.protein.identifier, pef.entry.accession
+#     #         )
+#     yield acc
 
-
-
-
-
-
-def get_n_protein_entry_features(n):
-    qs = queryset_from_model(iprel.Match)
-    n = n_or_all(n, qs)
-    set_protein_entry_features(subset_iterator_from_queryset(qs, n))
-
-def set_protein_entry_features(qs):
-    for chunk in chunks(create_multiple_x(
-        qs,
-        create_protein_entry_features_from_match,
-        'protein-netry feature'
-    )):
-        bulk_insert(chunk, ProteinEntryFeature)
-
-def create_protein_entry_features_from_match(input):
-    protein = Protein.objects.get(pk=input.protein_ac_id)
-    entry = Entry.objects.get(pk=input.method_ac_id)
-
-
-
-
-
-def get_n_protein_entry_features(n):
-    for pef in iprel.Match.objects.using("interpro_ro").all()[:n]:
-        try:
-            coordinates = [{"protein": [pef.pos_from, pef.pos_to]}]
-            protein = Protein.objects.get(pk=pef.protein_ac_id)
-            entry = Entry.objects.get(pk=pef.method_ac_id)
-            output = ProteinEntryFeature(
-                protein=protein,
-                entry=entry,
-                coordinates=coordinates
-            )
-            output.save()
-        except Entry.DoesNotExist:
-            pass
-        except Protein.DoesNotExist:
-            pass
-        except Exception as err:
-            errors.append((
-                'protein <-> entry',
-                '{} <-> {}'.format(pef.protein_ac_id, pef.method_ac_id),
-                err
-            ))
-        yield "{} <-> {}, protein <-> entry".format(
-            pef.protein_ac_id, pef.method_ac_id
-        )
-        try:
-            interpro_entry = pef.method_ac.entry2method.entry_ac
-            entry = Entry.objects.get(pk=interpro_entry.entry_ac)
-            output = ProteinEntryFeature(
-                protein=protein,
-                entry=entry,
-                coordinates=coordinates,
-            )
-            output.save()
-            yield "{} <-> {}, protein <-> entry".format(
-                pef.protein_ac_id, interpro_entry.entry_ac
-            )
-        except iprel.Entry2Method.DoesNotExist:
-            pass
-        except Entry.DoesNotExist:
-            pass
-        except Exception as err:
-            errors.append((
-                'protein <-> entry',
-                '{} <-> {}'.format(pef.protein_ac_id, interpro_entry.entry_ac),
-                err
-            ))
-
-def get_all_protein_structure_features(n):
-    s_qs = Structure.objects.all()
-    for p in Protein.objects.all():
-        for s in s_qs:
-            for psf in iprel.UniprotPdbe.objects.using(
-                "interpro_ro"
-            ).filter(entry_id=s.pk, sptr_ac=p.pk).all():
-                try:
-                    protein = Protein.objects.get(pk=psf.sptr_ac)
-                    structure = Structure.objects.get(pk=psf.entry_id)
-                    output = ProteinStructureFeature(
-                        protein=protein,
-                        structure=structure,
-                        chain=psf.chain,
-                        length=(psf.end_seq - psf.beg_seq),
-                        organism={},
-                        coordinates=[{
-                            'protein': [psf.beg_seq, psf.end_seq],
-                            'structure': [1, psf.end_seq - psf.beg_seq],
-                        }]
-                    )
-                    output.save()
-                    yield "{} <-> {}, protein <-> structure".format(
-                        psf.sptr_ac_id, psf.entry_id
-                    )
-                except Protein.DoesNotExist:
-                    pass
-                except Structure.DoesNotExist:
-                    pass
-                except Exception as err:
-                    errors.append((
-                        'protein <-> structure',
-                        '{} <-> {}'.format(psf.sptr_ac_id, psf.entry_id),
-                        err
-                    ))
-
-def get_n_entry_structure_features(n):
-    pass
-
-def set_member_db_entry(input, integrated=None):
-    acc = input.method_ac
-    try:
-        output = Entry(
-            accession=acc,
-            entry_id="",# TODO
-            type=input.sig_type.abbrev,
-            go_terms={},# TODO
-            source_database=input.dbcode.dbshort,
-            member_databases={},
-            integrated=integrated,
-            name=input.description,
-            short_name=input.name,
-            other_names=[],# TODO
-            description=[input.abstract] if input.abstract else [],
-            literature=_extract_pubs(input.method2pub_set.all())
-        )
-        output.save()
-    except Exception as err:
-        errors.append(('entry', acc, err))
-    # already_added_proteins = dict()
-    # for match in input.match_set.all():
-    #     if len(already_added_proteins) > 0:
-    #         break
-    #     protein_id = match.protein_ac_id
-    #     protein = already_added_proteins.get(protein_id, None)
-    #     if not protein:
-    #         protein = set_protein(match.protein_ac)
-    #         yield "{}, protein".format(protein_id)
-    #         already_added_proteins[protein_id] = protein
-    #     pef = set_protein_entry_feature(protein, output, match)
-    #     yield "{}<->{}, protein/entry feature".format(
-    #         pef.protein.identifier, pef.entry.accession
-    #     )
-    # if integrated:
-    #     for protein in already_added_proteins.values():
-    #         pef = set_protein_entry_feature(protein, integrated)
-    #         yield "{}<->{}, protein/entry feature".format(
-    #             pef.protein.identifier, pef.entry.accession
-    #         )
-    yield acc
-
-def set_protein_entry_feature(protein, entry, feat = None):
-    pef = ProteinEntryFeature(
-        protein=protein,
-        entry=entry,
-        match_start=feat.pos_from if feat else None,
-        match_end=feat.pos_to if feat else None
-    )
-    pef.save()
-    return pef
+# def set_protein_entry_feature(protein, entry, feat = None):
+#     pef = ProteinEntryFeature(
+#         protein=protein,
+#         entry=entry,
+#         match_start=feat.pos_from if feat else None,
+#         match_end=feat.pos_to if feat else None
+#     )
+#     pef.save()
+#     return pef
 
 
 
@@ -484,8 +590,21 @@ def _fillStructures(n):
     get_n_structures(n)
 
 def _fillProteinEntryFeatures(n):
+    print('Step 1 and 2 of 2 running')
+    # t1 = Thread(target=get_n_protein_interpro_entry_features, args=(n, 0))
+    # t1.start()
+    # t2 = Thread(target=get_n_protein_member_db_entry_features, args=(n, 1))
+    # t2.start()
+    # t1.join()
+    # t2.join()
+
+def _fillProteinInterproEntryFeatures(n):
     print('Step 1 of 1 running')
-    get_n_protein_entry_features(n)
+    get_n_protein_interpro_entry_features(n)
+
+def _fillProteinMemberDBEntryFeatures(n):
+    print('Step 1 of 1 running')
+    get_n_protein_member_db_entry_features(n)
 
 def _fillProteinStructureFeatures(n):
     print('Step 1 of 1 running')
@@ -500,6 +619,8 @@ _modelFillers = {
     'Protein': _fillProteins,
     'Structure': _fillStructures,
     'ProteinEntry': _fillProteinEntryFeatures,
+    'ProteinInterproEntry': _fillProteinInterproEntryFeatures,
+    'ProteinMemberDBEntry': _fillProteinMemberDBEntryFeatures,
     'ProteinStructure': _fillProteinStructureFeatures,
     'EntryStructure': _fillEntryStructureFeatures,
 }
@@ -529,7 +650,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--logs", "-l",
-            type=bool,
+            action='store_true',
             help="Activates Django logs"
         )
 

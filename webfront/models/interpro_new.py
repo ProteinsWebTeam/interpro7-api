@@ -48,6 +48,9 @@ class ProteinEntryFeature(models.Model):
     # match_start = models.IntegerField(null=True)
     # match_end = models.IntegerField(null=True)
 
+    class Meta:
+        unique_together = (('protein', 'entry'), )
+
 
 class Structure(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
@@ -66,10 +69,13 @@ class Structure(models.Model):
 class ProteinStructureFeature(models.Model):
     protein = models.ForeignKey("Protein", null=False)
     structure = models.ForeignKey("Structure", null=False)
-    chain = models.CharField(max_length=1)
+    chain = models.CharField(max_length=4, null=False)
     length = models.IntegerField(null=True)
     organism = JSONField()
     coordinates = JSONField()
+
+    class Meta:
+        unique_together = (('protein', 'structure', 'chain'), )
 
 
 class EntryStructureFeature(models.Model):
@@ -77,3 +83,6 @@ class EntryStructureFeature(models.Model):
     structure = models.ForeignKey("Structure", null=False)
     chain = models.CharField(max_length=1)
     coordinates = JSONField()
+
+    class Meta:
+        unique_together = (('entry', 'structure', 'chain'), )

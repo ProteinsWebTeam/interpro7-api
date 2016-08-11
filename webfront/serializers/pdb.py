@@ -127,7 +127,7 @@ class StructureSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_entries_count_representation(instance):
-        return instance.entrystructurefeature_set.count()
+        return instance.entrystructurefeature_set.values("entry").distinct().count()
 
     @staticmethod
     def to_entry_representation(instance, full=False):

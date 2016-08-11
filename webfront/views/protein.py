@@ -219,10 +219,12 @@ class UniprotHandler(CustomView):
         if not isinstance(queryset, dict):
             qs_type = get_queryset_type(queryset)
             if level_name != "uniprot":
-                if qs_type == QuerysetType.PROTEIN:
+                if qs_type == QuerysetType.ENTRY:
                     queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
                 elif qs_type == QuerysetType.STRUCTURE:
                     queryset = queryset.filter(proteins__source_database__iexact=level_name).distinct()
+            else:
+                queryset = queryset.filter(proteins__source_database__isnull=False).distinct()
             if queryset.count() == 0:
                 raise ReferenceError("There isn't any data for {}".format(level_name))
 

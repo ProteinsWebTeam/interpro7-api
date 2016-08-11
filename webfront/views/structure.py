@@ -297,6 +297,9 @@ class PDBHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         if not isinstance(queryset, dict):
             qs_type = get_queryset_type(queryset)
+            queryset = queryset.filter(structures__source_database__iexact=level_name).distinct()
+            if queryset.count() == 0:
+                raise ReferenceError("There isn't any data for {}".format(level_name))
             if qs_type == QuerysetType.PROTEIN:
                 general_handler.set_in_store(PDBHandler, "structure_queryset",
                                              queryset.values("structures").exclude(structures=None).distinct())

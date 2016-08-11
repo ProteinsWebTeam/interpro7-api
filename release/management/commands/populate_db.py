@@ -273,12 +273,10 @@ def create_protein_interpro_entry_feature_from_supermatch(composite):
         protein_ac=protein_id,
         entry_ac=entry_id
     ).values("pos_from", "pos_to").iterator()
-    protein = Protein.objects.get(pk=protein_id)
-    entry = Entry.objects.get(pk=entry_id)
     input = next(qsi)
     output = ProteinEntryFeature(
-        protein=protein,
-        entry=entry,
+        protein_id=protein_id,
+        entry_id=entry_id,
         coordinates=[{
             'protein': [input["pos_from"], input["pos_to"]],
             'entry': [1, input["pos_to"] - input["pos_from"]]
@@ -314,12 +312,10 @@ def create_protein_member_db_entry_feature_from_match(composite):
         protein_ac=protein_id,
         method_ac=entry_id
     ).values("pos_from", "pos_to").iterator()
-    protein = Protein.objects.get(pk=protein_id)
-    entry = Entry.objects.get(pk=entry_id)
     input = next(qsi)
     output = ProteinEntryFeature(
-        protein=protein,
-        entry=entry,
+        protein_id=protein_id,
+        entry_id=entry_id,
         coordinates=[{
             'protein': [input["pos_from"], input["pos_to"]],
             'entry': [1, input["pos_to"] - input["pos_from"]]
@@ -356,11 +352,10 @@ def create_protein_structure_feature_from_uniprot_pdbe(composite):
         chain=chain
     ).iterator()
     protein = Protein.objects.get(pk=protein_id)
-    structure = Structure.objects.get(pk=structure_id)
     input = next(qsi)
     output = ProteinStructureFeature(
         protein=protein,
-        structure=structure,
+        structure_id=structure_id,
         chain=input.chain,
         length=input.end_seq,# TODO: change this to correct value
         organism=protein.organism,

@@ -219,23 +219,21 @@ class UniprotHandler(CustomView):
         if not isinstance(queryset, dict):
             qs_type = get_queryset_type(queryset)
             if level_name != "uniprot":
-                if qs_type == QuerysetType.ENTRY:
-                    queryset = queryset.filter(proteinentryfeature__protein__source_database__iexact=level_name)
-                elif qs_type == QuerysetType.STRUCTURE:
-                    queryset = queryset.filter(proteins__source_database__iexact=level_name).distinct()
+                queryset = queryset.filter(proteins__source_database__iexact=level_name).distinct()
             else:
                 queryset = queryset.filter(proteins__source_database__isnull=False).distinct()
             if queryset.count() == 0:
                 raise ReferenceError("There isn't any data for {}".format(level_name))
 
-            if qs_type == QuerysetType.STRUCTURE_PROTEIN:
-                general_handler.set_in_store(UniprotHandler,
-                                             "protein_queryset",
-                                             queryset.values("protein").all())
-            else:
-                general_handler.set_in_store(UniprotHandler,
-                                             "protein_queryset",
-                                             queryset.values("proteins").exclude(proteins=None).distinct())
+            if qs_type == QuerysetType.ENTRY:
+                general_handler.set_in_store(UniprotHandler, "structures",
+                                             queryset.values_list("proteins__structure").distinct())
+            elif qs_type == QuerysetType.STRUCTURE:
+                general_handler.set_in_store(UniprotHandler, "proteins",
+                                             queryset.values_list("proteins").distinct())
+            general_handler.set_in_store(UniprotHandler,
+                                         "protein_queryset",
+                                         queryset.values("proteins").exclude(proteins=None).distinct())
         else:
             del queryset["proteins"]
             if "entries" in queryset:
@@ -245,25 +243,32 @@ class UniprotHandler(CustomView):
         return queryset
 
     @staticmethod
-    def remove_proteins(obj, protein_source):
+    def remove_proteins(obj, protein_source, white_list=None):
+        if white_list is not None:
+            white_list = [p["proteins"] for p in white_list]
         if "proteins" in obj:
-            for p in obj["proteins"]:
-                if "source_database"in p and p["source_database"] != protein_source:
-                    obj["proteins"].remove(p)
+            obj["proteins"] = [p
+                               for p in obj["proteins"]
+                               if "source_database"in p and p["source_database"] == protein_source and
+                               (white_list is None or p["accession"] in white_list)]
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        try:
+            prots = general_handler.get_from_store(UniprotHandler, "protein_queryset")
+        except (KeyError, IndexError):
+            prots = None
+
         if hasattr(obj, 'serializer') and not isinstance(obj.serializer, ProteinSerializer):
             if level_name != "uniprot":
                 if isinstance(obj, list):
                     for o in obj:
-                        UniprotHandler.remove_proteins(o, level_name)
+                        UniprotHandler.remove_proteins(o, level_name, prots)
                 else:
-                    UniprotHandler.remove_proteins(obj, level_name)
+                    UniprotHandler.remove_proteins(obj, level_name, prots)
         try:
-            if "proteins" not in obj:
-                obj["proteins"] = general_handler.get_from_store(UniprotHandler,
-                                                                 "protein_queryset").count()
+            if "proteins" not in obj and prots is not None:
+                obj["proteins"] = prots.count()
         finally:
             return obj
 

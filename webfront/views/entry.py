@@ -5,6 +5,7 @@ from webfront.constants import QuerysetType
 from webfront.constants import get_queryset_type
 from webfront.models import Entry, ProteinEntryFeature, EntryStructureFeature
 from webfront.serializers.interpro import EntrySerializer
+from webfront.views.protein import UniprotHandler
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
@@ -272,14 +273,20 @@ class MemberHandler(CustomView):
     def post_serializer(obj, level_name="", general_handler=None):
         if hasattr(obj, 'serializer'):
             try:
+                entries_from_prot = [x[0] for x in general_handler.get_from_store(UniprotHandler, "entries")]
+            except (IndexError, KeyError):
+                entries_from_prot = None
+            try:
                 entries = general_handler.get_from_store(MemberHandler, "entries")
-            except IndexError:
-                entries = Entry.objects.all()
+            except (IndexError, KeyError):
+                entries = None
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
                     o["entries"] = [e for e in o["entries"]
-                                    if e["source_database"] == level_name and e["accession"] in entries]
+                                    if e["source_database"] == level_name and
+                                    (entries is None or e["accession"] in entries) and
+                                    (entries_from_prot is None or e["accession"] in entries_from_prot)]
         return obj
 
 

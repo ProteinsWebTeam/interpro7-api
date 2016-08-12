@@ -3,6 +3,7 @@ from webfront.constants import get_queryset_type, QuerysetType
 from webfront.models import Structure, ProteinStructureFeature, EntryStructureFeature
 from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
+from webfront.views.protein import UniprotHandler
 
 
 def filter_protein_overview(obj, general_handler, accession=None, chain=None):
@@ -314,13 +315,17 @@ class PDBHandler(CustomView):
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
-
         try:
-            if "structures" not in obj:
-                obj["structures"] = general_handler.get_from_store(PDBHandler,
-                                                                   "structure_queryset").count()
+            structures = [x[0] for x in general_handler.get_from_store(UniprotHandler, "structures")]
+            for result in obj:
+                result["structures"] = [x for x in result["structures"] if x["accession"] in structures]
         finally:
-            return obj
+            try:
+                if "structures" not in obj:
+                    obj["structures"] = general_handler.get_from_store(PDBHandler,
+                                                                       "structure_queryset").count()
+            finally:
+                return obj
 
 
 class StructureHandler(CustomView):

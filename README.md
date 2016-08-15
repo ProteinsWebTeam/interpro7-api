@@ -4,7 +4,7 @@
 
 ## Interpro 7
 
-This is the firs prototype to create an API for the new version of Interpro.
+This is the first prototype to create an API for the new version of Interpro.
 
 The architecture of the URL it is defined as a set of endpoints that can be freely combined to describe filters for each of them. The initial set of point is:
 

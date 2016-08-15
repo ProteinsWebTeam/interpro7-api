@@ -9,7 +9,7 @@ class Entry(models.Model):
     name = models.TextField()
     short_name = models.CharField(max_length=30)
     other_names = JSONField()
-    source_database = models.CharField(max_length=20)
+    source_database = models.CharField(max_length=20, db_index=True)
     member_databases = JSONField()
     integrated = models.ForeignKey("Entry", null=True, blank=True)
     go_terms = JSONField()
@@ -37,7 +37,7 @@ class Protein(models.Model):
     feature = JSONField() #signalpeptide, transmembrane, coiledCoil, lowComplexityDisorder, activeSites. PerResidue, diSulphideBridges
     # structure = JSONField()
     genomic_context = JSONField()
-    source_database = models.CharField(max_length=20, default="uniprot")
+    source_database = models.CharField(max_length=20, default="uniprot", db_index=True)
     structures = models.ManyToManyField('Structure', through='ProteinStructureFeature')
 
 
@@ -61,7 +61,7 @@ class Structure(models.Model):
     release_date = models.DateField()
     authors = JSONField()
     chains = JSONField()
-    source_database = models.CharField(max_length=20, default="pdb")
+    source_database = models.CharField(max_length=20, default="pdb", db_index=True)
     proteins = models.ManyToManyField('Protein', through='ProteinStructureFeature')
     entries = models.ManyToManyField('Entry', through='EntryStructureFeature')
 

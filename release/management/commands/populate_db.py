@@ -272,20 +272,20 @@ def create_protein_interpro_entry_feature_from_supermatch(composite):
     qsi = queryset_from_model(iprel.Supermatch).filter(
         protein_ac=protein_id,
         entry_ac=entry_id
-    ).values("pos_from", "pos_to").iterator()
-    input = next(qsi)
+    ).values_list("pos_from", "pos_to").iterator()
+    pos_from, pos_to = next(qsi)
     output = ProteinEntryFeature(
         protein_id=protein_id,
         entry_id=entry_id,
         coordinates=[{
-            'protein': [input["pos_from"], input["pos_to"]],
-            'entry': [1, input["pos_to"] - input["pos_from"]]
+            'protein': [pos_from, pos_to],
+            'entry': [1, pos_to - pos_from]
         }]
     )
-    for input in qsi:
+    for (pos_from, pos_to) in qsi:
         output.coordinates.append({
-            'protein': [input["pos_from"], input["pos_to"]],
-            'entry': [1, input["pos_to"] - input["pos_from"]]
+            'protein': [pos_from, pos_to],
+            'entry': [1, pos_to - pos_from]
         })
     return output
 
@@ -311,20 +311,20 @@ def create_protein_member_db_entry_feature_from_match(composite):
     qsi = queryset_from_model(iprel.Match).filter(
         protein_ac=protein_id,
         method_ac=entry_id
-    ).values("pos_from", "pos_to").iterator()
-    input = next(qsi)
+    ).values_list("pos_from", "pos_to").iterator()
+    pos_from, pos_to = next(qsi)
     output = ProteinEntryFeature(
         protein_id=protein_id,
         entry_id=entry_id,
         coordinates=[{
-            'protein': [input["pos_from"], input["pos_to"]],
-            'entry': [1, input["pos_to"] - input["pos_from"]]
+            'protein': [pos_from, pos_to],
+            'entry': [1, pos_to - pos_from]
         }]
     )
-    for input in qsi:
+    for (pos_from, pos_to) in qsi:
         output.coordinates.append({
-            'protein': [input["pos_from"], input["pos_to"]],
-            'entry': [1, input["pos_to"] - input["pos_from"]]
+            'protein': [pos_from, pos_to],
+            'entry': [1, pos_to - pos_from]
         })
     return output
 

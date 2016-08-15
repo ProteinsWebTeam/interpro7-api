@@ -5,6 +5,7 @@ from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
 from rest_framework import status
 from webfront.views.protein import ProteinHandler
+from webfront.views.queryset_manager import QuerysetManager
 from webfront.views.structure import StructureHandler
 from rest_framework.response import Response
 import re
@@ -43,6 +44,7 @@ class GeneralHandler(CustomView):
     queryset = Entry.objects
     store = {}
     last_endpoint_level = None
+    queryset_manager = QuerysetManager()
 
     def get(self, request, url='', *args, **kwargs):
         self.store = {}

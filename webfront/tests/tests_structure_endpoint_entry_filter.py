@@ -168,7 +168,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/structure/pdb/entry/unintegrated/smart",
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed.")
 
 
 class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
@@ -254,7 +254,7 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             self._check_entry_structure_details(response.data["entries"][0])
             self._check_entry_details(response.data["entries"][0]["entry"])
 
-    def test_urls_that_should_fails(self):
+    def test_urls_that_should_fail(self):
         pdb_1 = "1JM7"
         pdb_2 = "2BKM"
         acc = "IPR003165"
@@ -267,6 +267,18 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/structure/pdb/"+pdb_2+"/entry/interpro/"+acc,
             "/api/structure/pdb/"+pdb_2+"/entry/interpro/"+acc+"/smart/"+smart,
             "/api/structure/pdb/entry/unintegrated/smart/"+smart,
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+
+    def test_urls_that_should_fails(self):
+        pdb_1 = "1JM7"
+        pdb_2 = "2BKM"
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_u = "PF17180"
+        smart = "SM00950"
+        tests = [
             "/api/structure/pdb/"+pdb_1+"/B/entry/pfam/"+pfam,
             "/api/structure/pdb/"+pdb_1+"/B/entry/pfam/"+pfam,
             "/api/structure/pdb/"+pdb_1+"/B/entry/interpro/pfam/"+pfam,
@@ -276,4 +288,4 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/structure/pdb/"+pdb_2+"/A/entry/unintegrated/pfam/"+pfam_u,
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed.")

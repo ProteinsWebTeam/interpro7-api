@@ -104,32 +104,23 @@ class ChainPDBAccessionHandler(CustomView):
     serializer_detail_filter = SerializerDetail.STRUCTURE_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
         if parent_queryset is not None:
             self.queryset = parent_queryset
 
-        self.queryset = self.queryset\
-            .filter(proteinstructurefeature__chain=endpoint_levels[level - 1])
-
-        if self.queryset.count() == 0:
-            raise Exception("The Chain '{}' has not been found in the structure {}".format(
-                endpoint_levels[level - 1], endpoint_levels[level - 2].upper()))
+        general_handler.queryset_manager.add_filter("structure",
+                                                    proteinstructurefeature__chain=endpoint_levels[level - 1])
         return super(ChainPDBAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, *args, **kwargs
+            self.queryset, handler, general_handler, *args, **kwargs
         )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        qs_type = get_queryset_type(queryset)
         if not isinstance(queryset, dict):
-            if qs_type == QuerysetType.PROTEIN:
-                queryset = queryset.filter(proteinstructurefeature__protein__in=queryset,
-                                           proteinstructurefeature__chain=level_name)
-            if queryset.count() == 0:
-                raise ReferenceError("The protein {} doesn't exist in the database {}".format(level_name, "pdb"))
+            general_handler.queryset_manager.add_filter("structure", proteinstructurefeature__chain=level_name)
             return queryset
         if "entries" in queryset:
             queryset["entries"] = filter_entry_overview(queryset["entries"], general_handler, chain=level_name)
@@ -214,13 +205,8 @@ class PDBAccessionHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
-        if parent_queryset is not None:
-            self.queryset = parent_queryset
-        self.queryset = self.queryset.filter(accession__iexact=endpoint_levels[level - 1])
+        general_handler.queryset_manager.add_filter("structure", accession__iexact=endpoint_levels[level - 1])
         general_handler.set_in_store(PDBAccessionHandler, "pdb_accession", endpoint_levels[level - 1])
-        if self.queryset.count() == 0:
-            raise Exception("The ID '{}' has not been found in {}".format(
-                endpoint_levels[level - 1], endpoint_levels[level - 2]))
         return super(PDBAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -228,18 +214,9 @@ class PDBAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        qs_type = get_queryset_type(queryset)
         general_handler.set_in_store(PDBAccessionHandler, "pdb_accession", level_name)
         if not isinstance(queryset, dict):
-            if qs_type == QuerysetType.PROTEIN or qs_type == QuerysetType.ENTRY:
-                queryset = queryset.filter(structures=level_name).distinct()
-            elif qs_type == QuerysetType.STRUCTURE:
-                queryset = queryset.filter(protein=level_name)
-            else:
-                queryset = queryset.filter(proteinentryfeature__protein=level_name)
-
-            if queryset.count() == 0:
-                raise ReferenceError("The chain {} doesn't exist in the structure {}".format(level_name, "pdb"))
+            general_handler.queryset_manager.add_filter("structure", accession__iexact=level_name)
             return queryset
         if "entries" in queryset:
             queryset["entries"] = filter_entry_overview(queryset["entries"], general_handler, level_name)
@@ -280,30 +257,20 @@ class PDBHandler(CustomView):
     serializer_detail_filter = SerializerDetail.STRUCTURE_OVERVIEW
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
         ds = endpoint_levels[level - 1].lower()
-        self.queryset = self.queryset.filter(source_database__iexact=ds)
-
-        if self.queryset.count() == 0:
-            raise Exception("The ID '{}' has not been found in {}".format(
-                endpoint_levels[level - 1], endpoint_levels[level - 2]))
+        general_handler.queryset_manager.add_filter("structure", source_database__iexact=ds)
         return super(PDBHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, *args, **kwargs
+            self.queryset, handler, general_handler, *args, **kwargs
         )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         if not isinstance(queryset, dict):
-            qs_type = get_queryset_type(queryset)
-            queryset = queryset.filter(structures__source_database__iexact=level_name).distinct()
-            if queryset.count() == 0:
-                raise ReferenceError("There isn't any data for {}".format(level_name))
-            if qs_type == QuerysetType.PROTEIN:
-                general_handler.set_in_store(PDBHandler, "structure_queryset",
-                                             queryset.values("structures").exclude(structures=None).distinct())
+            general_handler.queryset_manager.add_filter("structure", source_database__iexact=level_name)
         else:
             del queryset["structures"]
             if "entries" in queryset:
@@ -343,19 +310,19 @@ class StructureHandler(CustomView):
         output = {}
         for row in protein_counter:
             output[row[prefix+"source_database"]] = row["total"]
-        # output["uniprot"] = sum(output.values())
         return output if output != {} else {"pdb": 0}
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
 
+        general_handler.queryset_manager.reset_filters("structure")
         self.queryset = {"structures": StructureHandler.get_database_contributions(Structure.objects.all())}
 
         return super(StructureHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, *args, **kwargs
+            self.queryset, handler, general_handler, *args, **kwargs
         )
 
     @staticmethod

@@ -123,7 +123,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_protein_details(response.data["metadata"])
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
-                             "The nember of entries dhould be the sem URL: [{}]".format(url))
+                             "The nember of entries should be the same URL: [{}]".format(url))
             self.assertIn(response.data["entries"][0]["accession"], urls[url])
 
     def test_urls_that_should_fails(self):
@@ -186,7 +186,6 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/protein/swissprot/entry/interpro/"+acc,
             "/api/protein/trembl/entry/interpro/"+acc,
             "/api/protein/uniprot/entry/pfam/"+pfam,
-            "/api/protein/uniprot/entry/unintegrated/pfam/"+pfam,
             "/api/protein/uniprot/entry/interpro/smart/"+smart,
             "/api/protein/uniprot/entry/interpro/pfam/"+pfam,
             "/api/protein/uniprot/entry/interpro/"+acc+"/pfam/"+pfam,
@@ -245,6 +244,7 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/protein/uniprot/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
             "/api/protein/uniprot/"+sp_1+"/entry/interpro/"+acc,
             "/api/protein/uniprot/"+sp_1+"/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/protein/uniprot/entry/unintegrated/pfam/"+pfam,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")

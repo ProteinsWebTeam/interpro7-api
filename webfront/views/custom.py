@@ -40,7 +40,14 @@ class CustomView(GenericAPIView):
                 # consolidation = consolidate_protein_entry(self)
                 # if consolidation is not None:
                 #     return consolidation
+                self.queryset = general_handler.queryset_manager.get_queryset().distinct()
+                if self.queryset.count() == 0:
+                    if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct().count():
+                        raise Exception("The URL requested didn't have any data related.\nList of endpoints: {}"
+                                        .format(endpoint_levels))
 
+                    raise ReferenceError("The URL requested didn't have any data related.\nList of endpoints: {}"
+                                    .format(endpoint_levels))
                 if self.many:
                     self.queryset = self.paginate_queryset(self.get_queryset())
                 else:

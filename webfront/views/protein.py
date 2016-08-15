@@ -108,42 +108,26 @@ class UniprotAccessionHandler(CustomView):
     serializer_detail_filter = SerializerDetail.PROTEIN_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
         if parent_queryset is not None:
             self.queryset = parent_queryset
-        self.queryset = self.queryset.filter(accession=endpoint_levels[level - 1])
+        general_handler.queryset_manager.add_filter("protein", accession=endpoint_levels[level - 1])
+
         if self.queryset.count() == 0:
             raise Exception("The ID '{}' has not been found in {}".format(
                 endpoint_levels[level - 1], endpoint_levels[level - 2]))
         return super(UniprotAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, *args, **kwargs
+            self.queryset, handler, general_handler, *args, **kwargs
         )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         protein_db = general_handler.get_from_store(UniprotHandler, "protein_db")
-        qs_type = get_queryset_type(queryset)
         if not isinstance(queryset, dict):
-            if protein_db != "uniprot":
-                if qs_type == QuerysetType.STRUCTURE_PROTEIN:
-                    queryset = queryset.filter(protein=level_name, protein__source_database__iexact=protein_db)
-                elif qs_type == QuerysetType.STRUCTURE:
-                    queryset = queryset.filter(proteins=level_name, proteins__source_database__iexact=protein_db)
-                else:
-                    queryset = queryset.filter(proteinentryfeature__protein=level_name,
-                                               proteinentryfeature__protein__source_database__iexact=protein_db)
-            else:
-                if qs_type == QuerysetType.STRUCTURE_PROTEIN:
-                    queryset = queryset.filter(protein=level_name)
-                elif qs_type == QuerysetType.STRUCTURE:
-                    queryset = queryset.filter(proteins=level_name)
-                else:
-                    queryset = queryset.filter(proteinentryfeature__protein=level_name)
-            if queryset.count() == 0:
-                raise ReferenceError("The protein {} doesn't exist in the database {}".format(level_name, protein_db))
+            general_handler.queryset_manager.add_filter("protein", accession=level_name)
             return queryset
         else:
             if "entries" in queryset:
@@ -159,9 +143,7 @@ class UniprotAccessionHandler(CustomView):
     def post_serializer(obj, level_name="", general_handler=None):
         if type(obj) != dict:
             if not isinstance(obj.serializer, ProteinSerializer):
-                arr = obj
-                if isinstance(obj, dict):
-                    arr = [obj]
+                arr = [obj] if isinstance(obj, dict) else obj
                 for o in arr:
                     if "proteins" in o:
                         for p in o["proteins"]:
@@ -199,41 +181,25 @@ class UniprotHandler(CustomView):
     serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
         ds = endpoint_levels[level - 1].lower()
         if ds != "uniprot":
-            self.queryset = self.queryset.filter(source_database__iexact=ds)
-        if self.queryset.count() == 0:
-            raise Exception("The ID '{}' has not been found in {}".format(
-                endpoint_levels[level - 1], endpoint_levels[level - 2]))
+            general_handler.queryset_manager.add_filter("protein", source_database__iexact=ds)
         return super(UniprotHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, *args, **kwargs
+            self.queryset, handler, general_handler, *args, **kwargs
         )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(UniprotHandler, "protein_db", level_name)
         if not isinstance(queryset, dict):
-            qs_type = get_queryset_type(queryset)
             if level_name != "uniprot":
-                queryset = queryset.filter(proteins__source_database__iexact=level_name).distinct()
+                general_handler.queryset_manager.add_filter("protein", source_database__iexact=level_name)
             else:
-                queryset = queryset.filter(proteins__source_database__isnull=False).distinct()
-            if queryset.count() == 0:
-                raise ReferenceError("There isn't any data for {}".format(level_name))
-
-            if qs_type == QuerysetType.ENTRY:
-                general_handler.set_in_store(UniprotHandler, "structures",
-                                             queryset.values_list("proteins__structure").distinct())
-            elif qs_type == QuerysetType.STRUCTURE:
-                general_handler.set_in_store(UniprotHandler, "proteins",
-                                             queryset.values_list("proteins").distinct())
-            general_handler.set_in_store(UniprotHandler,
-                                         "protein_queryset",
-                                         queryset.values("proteins").exclude(proteins=None).distinct())
+                general_handler.queryset_manager.add_filter("protein", source_database__isnull=False)
         else:
             del queryset["proteins"]
             if "entries" in queryset:
@@ -293,15 +259,16 @@ class ProteinHandler(CustomView):
         return output
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
 
+        general_handler.queryset_manager.reset_filters("protein")
         self.queryset = {"proteins": ProteinHandler.get_database_contributions(Protein.objects.all())}
 
         return super(ProteinHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, *args, **kwargs
+            self.queryset, handler, general_handler, *args, **kwargs
         )
 
     @staticmethod

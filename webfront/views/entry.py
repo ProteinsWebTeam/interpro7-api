@@ -1,11 +1,10 @@
 import re
-from django.db.models import Count, QuerySet
+from django.db.models import Count
 
 from webfront.constants import QuerysetType
 from webfront.constants import get_queryset_type
 from webfront.models import Entry, ProteinEntryFeature, EntryStructureFeature
 from webfront.serializers.interpro import EntrySerializer
-from webfront.views.protein import UniprotHandler
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
@@ -47,7 +46,7 @@ def filter_structure_overview(obj, general_handler, database=None, is_unintegrat
         structs = matches.values("structure")
         entries = matches.values("entry")
         if include_prots:
-            prots = set(matches.values_list("entry__protein__accession"))\
+            prots = set(matches.values_list("entry__protein__accession")) \
                 .intersection(matches.values_list("structure__protein__accession"))
             CustomView.set_counter_attributte(obj, "pdb", "proteins", len(prots))
 
@@ -65,8 +64,8 @@ def filter_protein_overview(obj, general_handler, database=None, is_unintegrated
     prev_queryset, qs_type = general_handler.get_previous_queryset()
     matches = ProteinEntryFeature.objects.all()
     if is_unintegrated:
-        matches = matches\
-            .filter(entry__integrated__isnull=True)\
+        matches = matches \
+            .filter(entry__integrated__isnull=True) \
             .exclude(entry__source_database__iexact="interpro")
     if database is not None:
         matches = matches.filter(entry__source_database__iexact=database)
@@ -79,7 +78,7 @@ def filter_protein_overview(obj, general_handler, database=None, is_unintegrated
 
     if prev_queryset is not None:
         if qs_type == QuerysetType.STRUCTURE_PROTEIN:
-            matches = matches.filter(protein__proteinstructurefeature__in=prev_queryset)\
+            matches = matches.filter(protein__proteinstructurefeature__in=prev_queryset) \
                 .filter(entry__accession__in=prev_queryset.values("structure__entry"))
         elif qs_type == QuerysetType.ENTRY_PROTEIN:
             matches = matches.all() & prev_queryset.all()
@@ -111,17 +110,15 @@ class MemberAccesionHandler(CustomView):
     serializer_detail_filter = SerializerDetail.ENTRY_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
         if parent_queryset is not None:
             self.queryset = parent_queryset
-        self.queryset = self.queryset.filter(accession__iexact=endpoint_levels[level-1])
-        if self.queryset.count() == 0:
-            raise Exception("The ID '{}' has not been found in {}"
-                            .format(endpoint_levels[level-1], "/".join(endpoint_levels[:level-1])))
+        general_handler.queryset_manager.add_filter("entry", accession__iexact=endpoint_levels[level - 1])
         return super(MemberAccesionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, self.queryset, handler, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, self.queryset,
+            handler, general_handler, *args, **kwargs
         )
 
     @staticmethod
@@ -160,22 +157,12 @@ class MemberAccesionHandler(CustomView):
                     interpro_acc=interpro_acc,
                     is_interpro=is_interpro)
             return queryset
-        qs_type = get_queryset_type(queryset)
-        if qs_type == QuerysetType.STRUCTURE:
-            if is_unintegrated:
-                queryset = queryset.filter(entry=level_name, entry__integrated__isnull=True)
-            elif interpro_acc is not None:
-                queryset = queryset.filter(entry=level_name, entry__integrated=interpro_acc)
-            else:
-                queryset = queryset.filter(
-                    entry=level_name,
-                    entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),)
-        if queryset.count() == 0:
-            raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+        general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
         return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        remove_empty_structures = False
         if hasattr(obj, 'serializer'):
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
@@ -183,6 +170,12 @@ class MemberAccesionHandler(CustomView):
                     o["entries"] = [e for e in o["entries"]
                                     if e["entry"] == level_name or
                                     (isinstance(e["entry"], dict) and e["entry"]["accession"] == level_name)]
+                    if len(o["entries"]) == 0:
+                        remove_empty_structures = True
+            if remove_empty_structures:
+                arr = [a for a in arr if len(a["entries"]) > 0]
+                if len(arr) == 0:
+                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
         return obj
 
 
@@ -190,27 +183,30 @@ class MemberHandler(CustomView):
     level_description = 'DB member level'
     child_handlers = [
         (db_members_accessions, MemberAccesionHandler),
-        # 'clan':     ClanHandler,
     ]
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
     serializer_detail_filter = SerializerDetail.ENTRY_MATCH
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
 
-        if parent_queryset is not None and isinstance(parent_queryset, QuerySet):
-            if endpoint_levels[level-2] == "unintegrated":
-                self.queryset = parent_queryset.filter(integrated__isnull=True)
-            else:
-                self.queryset = Entry.objects.filter(integrated__in=parent_queryset)
+        general_handler.queryset_manager.add_filter("entry", source_database__iexact=endpoint_levels[level - 1])
 
-        self.queryset = self.queryset.filter(source_database__iexact=endpoint_levels[level-1])
+        # if parent_queryset is not None and isinstance(parent_queryset, QuerySet):
+        if endpoint_levels[level - 2] == "unintegrated":
+            general_handler.queryset_manager.add_filter("entry", integrated__isnull=True)
+        if endpoint_levels[level - 2] == "interpro":
+            general_handler.queryset_manager.add_filter("entry", integrated__isnull=False)
+        if level - 3 >= 0 and endpoint_levels[level - 3] == "interpro":
+            general_handler.queryset_manager.add_filter("entry", integrated=endpoint_levels[level - 2])
+            general_handler.queryset_manager.remove_filter("entry", "accession__iexact")
 
         return super(MemberHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler,
+            general_handler, *args, **kwargs
         )
 
     @staticmethod
@@ -247,37 +243,24 @@ class MemberHandler(CustomView):
                                                                    is_interpro=is_interpro)
             return queryset
         else:
-            qs_type = get_queryset_type(queryset)
-            qs = Entry.objects.all().filter(source_database__iexact=level_name)
             if is_unintegrated:
-                qs = qs.filter(integrated__isnull=True)
+                general_handler.queryset_manager.add_filter("entry", integrated__isnull=True)
             elif interpro_acc is not None:
-                qs = qs.filter(integrated=interpro_acc)
+                general_handler.queryset_manager.add_filter("entry", integrated=interpro_acc)
+                general_handler.queryset_manager.remove_filter("entry", "accession__iexact")
             elif is_interpro:
-                qs = qs.filter(integrated__isnull=False)
-
-            general_handler.set_in_store(MemberHandler, "entries", [q["accession"] for q in qs.values("accession")])
-            if qs_type == QuerysetType.PROTEIN:
-                queryset = queryset.filter(entry__source_database__iexact=level_name,
-                                           entry__in=qs).distinct()
-            elif qs_type == QuerysetType.STRUCTURE:
-                queryset = queryset.filter(
-                    entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),
-                    entries__in=qs).distinct()
-
-            if queryset.count() == 0:
-                raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
+                general_handler.queryset_manager.add_filter("entry", integrated__isnull=False)
+            general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
             return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        remove_empty_structures = False
         if hasattr(obj, 'serializer'):
             try:
-                entries_from_prot = [x[0] for x in general_handler.get_from_store(UniprotHandler, "entries")]
-            except (IndexError, KeyError):
-                entries_from_prot = None
-            try:
-                entries = general_handler.get_from_store(MemberHandler, "entries")
+                entries = [x[0]
+                           for x in general_handler.queryset_manager.get_queryset("entry")
+                           .values_list("accession").distinct()]
             except (IndexError, KeyError):
                 entries = None
             arr = [obj] if isinstance(obj, dict) else obj
@@ -285,8 +268,14 @@ class MemberHandler(CustomView):
                 if "entries" in o:
                     o["entries"] = [e for e in o["entries"]
                                     if e["source_database"] == level_name and
-                                    (entries is None or e["accession"] in entries) and
-                                    (entries_from_prot is None or e["accession"] in entries_from_prot)]
+                                    (entries is None or e["accession"] in entries)
+                                    ]
+                    if len(o["entries"]) == 0:
+                        remove_empty_structures = True
+            if remove_empty_structures:
+                arr = [a for a in arr if len(a["entries"]) > 0]
+                if len(arr) == 0:
+                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
         return obj
 
 
@@ -302,17 +291,12 @@ class AccesionHandler(CustomView):
     many = False
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
-        if parent_queryset is not None:
-            self.queryset = parent_queryset
-        self.queryset = self.queryset.filter(accession__iexact=endpoint_levels[level-1])
-        if self.queryset.count() == 0:
-            raise Exception("The ID '{}' has not been found in {}"
-                            .format(endpoint_levels[level-1], endpoint_levels[level-2]))
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+
+        general_handler.queryset_manager.add_filter("entry", accession__iexact=endpoint_levels[level - 1])
         return super(AccesionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler, *args, **kwargs
+            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset,
+            handler, general_handler, *args, **kwargs
         )
 
     @staticmethod
@@ -328,14 +312,11 @@ class AccesionHandler(CustomView):
                                                                    database="interpro",
                                                                    accession=level_name)
             return queryset
-        queryset = queryset.filter(entry=level_name)
-        if queryset.count() == 0:
-            raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
-        return queryset
-    # TODO: Check this filter
+        general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        remove_empty_structures = False
         if hasattr(obj, 'serializer'):
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
@@ -343,13 +324,19 @@ class AccesionHandler(CustomView):
                     o["entries"] = [e for e in o["entries"]
                                     if e["entry"] == level_name or
                                     (isinstance(e["entry"], dict) and e["entry"]["accession"] == level_name)]
+                    if len(o["entries"]) == 0:
+                        remove_empty_structures = True
+            if remove_empty_structures:
+                arr = [a for a in arr if len(a["entries"]) > 0]
+                if len(arr) == 0:
+                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
         return obj
 
 
 class UnintegratedHandler(CustomView):
     level_description = 'interpro accession level'
-    queryset = Entry.objects.all()\
-        .exclude(source_database__iexact="interpro")\
+    queryset = Entry.objects.all() \
+        .exclude(source_database__iexact="interpro") \
         .filter(integrated__isnull=True)
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
@@ -357,6 +344,18 @@ class UnintegratedHandler(CustomView):
     child_handlers = [
         (db_members, MemberHandler)
     ]
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+        if available_endpoint_handlers is None:
+            available_endpoint_handlers = {}
+        general_handler.queryset_manager.add_filter("entry",
+                                                    integrated__isnull=True,
+                                                    source_database__iregex=db_members)
+        return super(UnintegratedHandler, self).get(
+            request, endpoint_levels, available_endpoint_handlers, level,
+            self.queryset, handler, general_handler, *args, **kwargs
+        )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
@@ -371,23 +370,14 @@ class UnintegratedHandler(CustomView):
                                                                    is_unintegrated=True)
             return queryset
         else:
-            qs_type = get_queryset_type(queryset)
-            qs = queryset
-            if qs_type == QuerysetType.PROTEIN:
-                qs = queryset\
-                    .filter(entry__integrated__isnull=True,
-                            entry__source_database__iregex=db_members).distinct()
-            elif qs_type == QuerysetType.STRUCTURE:
-                qs = queryset \
-                    .filter(entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),
-                            entries__integrated__isnull=True,
-                            entries__source_database__iregex=db_members).distinct()
-            if qs.count() == 0:
-                raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
-            return qs
+            general_handler.queryset_manager.add_filter(
+                "entry",
+                integrated__isnull=True,
+                source_database__iregex=db_members)
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        remove_empty_structures = False
         if hasattr(obj, 'serializer'):
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
@@ -395,6 +385,12 @@ class UnintegratedHandler(CustomView):
                     o["entries"] = [e for e in o["entries"]
                                     if re.match(db_members, e["source_database"]) and
                                     "integrated" not in e]
+                    if len(o["entries"]) == 0:
+                        remove_empty_structures = True
+            if remove_empty_structures:
+                arr = [a for a in arr if len(a["entries"]) > 0]
+                if len(arr) == 0:
+                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
         return obj
 
 
@@ -408,6 +404,17 @@ class InterproHandler(CustomView):
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
     serializer_detail_filter = SerializerDetail.ENTRY_MATCH
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+        if available_endpoint_handlers is None:
+            available_endpoint_handlers = {}
+        general_handler.queryset_manager.add_filter("entry",
+                                                    source_database__iexact=endpoint_levels[level - 1])
+        return super(InterproHandler, self).get(
+            request, endpoint_levels, available_endpoint_handlers, level,
+            self.queryset, handler, general_handler, *args, **kwargs
+        )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
@@ -423,26 +430,24 @@ class InterproHandler(CustomView):
                                                                    "interpro")
             return queryset
         else:
-            qs_type = get_queryset_type(queryset)
-            qs = None
-            if qs_type == QuerysetType.PROTEIN:
-                qs = queryset.filter(
-                    entry__source_database__iexact="interpro").distinct()
-            elif qs_type == QuerysetType.STRUCTURE:
-                qs = queryset.filter(
-                    entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),
-                    entries__source_database__iexact="interpro").distinct()
-            if qs is not None and qs.count() == 0:
-                raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
-            return qs
+            general_handler.queryset_manager.add_filter("entry",
+                                                        source_database__iexact=level_name)
+            return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        remove_empty_structures = False
         if hasattr(obj, 'serializer'):
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
                     o["entries"] = [e for e in o["entries"] if e["source_database"] == "interpro"]
+                    if len(o["entries"]) == 0:
+                        remove_empty_structures = True
+            if remove_empty_structures:
+                arr = [a for a in arr if len(a["entries"]) > 0]
+                if len(arr) == 0:
+                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
         return obj
 
 
@@ -458,47 +463,50 @@ class EntryHandler(CustomView):
 
     @staticmethod
     def get_database_contributions(queryset, prefix=""):
-        entry_counter = queryset.values(prefix+'source_database').annotate(total=Count(prefix+'source_database'))
+        entry_counter = queryset.values(prefix + 'source_database').annotate(total=Count(prefix + 'source_database'))
         output = {
             "interpro": 0,
             "unintegrated": 0,
             "member_databases": {}
         }
         for row in entry_counter:
-            if row[prefix+'source_database'].lower() == "interpro":
+            if row[prefix + 'source_database'].lower() == "interpro":
                 output["interpro"] += row["total"]
             else:
-                output["member_databases"][row[prefix+'source_database'].lower()] = row["total"]
+                output["member_databases"][row[prefix + 'source_database'].lower()] = row["total"]
 
-        output["unintegrated"] = queryset\
-            .exclude(**{prefix+'source_database__iexact': "interpro"}) \
-            .filter(**{prefix+'integrated__isnull': True}).count()
+        output["unintegrated"] = queryset \
+            .exclude(**{prefix + 'source_database__iexact': "interpro"}) \
+            .filter(**{prefix + 'integrated__isnull': True}).count()
         return output
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         if available_endpoint_handlers is None:
             available_endpoint_handlers = {}
+        general_handler.queryset_manager.reset_filters("entry")
         self.queryset = {"entries": EntryHandler.get_database_contributions(Entry.objects.all())}
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
         )
+
     # TODO: Check the filter option for endpoints combinations
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
+        queryset_tmp = general_handler.queryset_manager.get_queryset()
         qs = Entry.objects.all()
         if isinstance(queryset, dict):
             queryset["entries"] = EntryHandler.get_database_contributions(qs)
         else:
-            qs_type = get_queryset_type(queryset)
+            qs_type = get_queryset_type(queryset_tmp)
             if qs_type == QuerysetType.STRUCTURE:
                 # TODO: Check on how to filter the chains.
-                qs = Entry.objects.filter(accession__in=queryset.values('entrystructurefeature__entry'))
+                qs = Entry.objects.filter(accession__in=queryset_tmp.values('entrystructurefeature__entry'))
             elif qs_type == QuerysetType.PROTEIN:
-                qs = Entry.objects.filter(accession__in=queryset.values('proteinentryfeature__entry'))
+                qs = Entry.objects.filter(accession__in=queryset_tmp.values('proteinentryfeature__entry'))
 
             general_handler.set_in_store(EntryHandler,
                                          "entry_count",

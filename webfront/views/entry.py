@@ -111,10 +111,6 @@ class MemberAccesionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
-        if parent_queryset is not None:
-            self.queryset = parent_queryset
         general_handler.queryset_manager.add_filter("entry", accession__iexact=endpoint_levels[level - 1])
         return super(MemberAccesionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset,
@@ -190,8 +186,6 @@ class MemberHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
 
         general_handler.queryset_manager.add_filter("entry", source_database__iexact=endpoint_levels[level - 1])
 
@@ -344,8 +338,6 @@ class UnintegratedHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
         general_handler.queryset_manager.add_filter("entry",
                                                     integrated__isnull=True,
                                                     source_database__iregex=db_members)
@@ -409,8 +401,6 @@ class InterproHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
         general_handler.queryset_manager.add_filter("entry",
                                                     source_database__iexact=endpoint_levels[level - 1])
         return super(InterproHandler, self).get(
@@ -484,8 +474,6 @@ class EntryHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
         general_handler.queryset_manager.reset_filters("entry")
         self.queryset = {"entries": EntryHandler.get_database_contributions(Entry.objects.all())}
         return super(EntryHandler, self).get(

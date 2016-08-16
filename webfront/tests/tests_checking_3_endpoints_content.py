@@ -139,16 +139,12 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     for db3 in api_test_map[endpoint3]:
                         #     TODO: Make a plan to test unintegrated IDs
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
-                        print(url)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3)
-                        print(response.data)
-                        print(expected)
                         self.assertEqual(response.data, expected)
 
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, endpoint2)
-                        print(url)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         self.assertEqual(response.data, expected)
@@ -393,14 +389,45 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def get_expected_list_payload(self, endpoint1, db1, endpoint2, endpoint3, db2=None, db3=None, acc3=None):
+    def test_db_acc_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for db3 in api_test_map[endpoint3]:
+                                for acc3 in api_test_map[endpoint3][db3]:
+                                    for acc2 in api_test_map[endpoint2][db2]:
+                                        un2 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc2[:2]] \
+                                            if db2 == "unintegrated" else ""
+                                        un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
+                                            if db3 == "unintegrated" else ""
+                                        expected = self.get_expected_list_payload(endpoint1, db1, endpoint2, endpoint3,
+                                                                                  db2=db2, db3=db3, acc2=acc2, acc3=acc3)
+                                        url = "/api/{}/{}/{}/{}/{}/{}/{}/{}" \
+                                            .format(endpoint1, db1, endpoint2, db2+un2, acc2, endpoint3, db3+un3, acc3)
+                                        response = self._get_in_debug_mode(url)
+                                        if response.status_code == status.HTTP_200_OK:
+                                            self.compare_db_db_endpoint_expected_vs_response(
+                                                expected, response, endpoint1, endpoint2, endpoint3)
+                                        else:
+                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def get_expected_list_payload(self, endpoint1, db1, endpoint2, endpoint3, db2=None, db3=None, acc2=None, acc3=None):
         accs1 = api_test_map[endpoint1][db1]
         accs2 = []
-        if db2 is None:
-            for db in api_test_map[endpoint2]:
-                accs2 += api_test_map[endpoint2][db]
+        if acc2 is None:
+            if db2 is None:
+                for db in api_test_map[endpoint2]:
+                    accs2 += api_test_map[endpoint2][db]
+            else:
+                accs2 = api_test_map[endpoint2][db2]
         else:
-            accs2 = api_test_map[endpoint2][db2]
+            accs2 = [acc2]
         if acc3 is None:
             accs3 = []
             if db3 is None:

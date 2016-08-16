@@ -105,11 +105,6 @@ class ChainPDBAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
-        if parent_queryset is not None:
-            self.queryset = parent_queryset
-
         general_handler.queryset_manager.add_filter("structure",
                                                     proteinstructurefeature__chain=endpoint_levels[level - 1])
         return super(ChainPDBAccessionHandler, self).get(
@@ -203,8 +198,6 @@ class PDBAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
         general_handler.queryset_manager.add_filter("structure", accession__iexact=endpoint_levels[level - 1])
         general_handler.set_in_store(PDBAccessionHandler, "pdb_accession", endpoint_levels[level - 1])
         return super(PDBAccessionHandler, self).get(
@@ -258,8 +251,6 @@ class PDBHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
         ds = endpoint_levels[level - 1].lower()
         general_handler.queryset_manager.add_filter("structure", source_database__iexact=ds)
         return super(PDBHandler, self).get(
@@ -318,9 +309,6 @@ class StructureHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
-
         general_handler.queryset_manager.reset_filters("structure")
         self.queryset = {"structures": StructureHandler.get_database_contributions(Structure.objects.all())}
 

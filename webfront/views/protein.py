@@ -209,34 +209,32 @@ class UniprotHandler(CustomView):
         return queryset
 
     @staticmethod
-    def remove_proteins(obj, protein_source, white_list=None):
-        if white_list is not None:
-            white_list = [p["proteins"] for p in white_list]
-        if "proteins" in obj:
-            obj["proteins"] = [p
-                               for p in obj["proteins"]
-                               if "source_database"in p and p["source_database"] == protein_source and
-                               (white_list is None or p["accession"] in white_list)]
-
-    @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         try:
-            prots = general_handler.get_from_store(UniprotHandler, "protein_queryset")
+            prots = [x[0]
+                     for x in general_handler.queryset_manager.get_queryset("protein")
+                     .values_list("accession").distinct()]
         except (KeyError, IndexError):
             prots = None
 
         if hasattr(obj, 'serializer') and not isinstance(obj.serializer, ProteinSerializer):
-            if level_name != "uniprot":
-                if isinstance(obj, list):
-                    for o in obj:
-                        UniprotHandler.remove_proteins(o, level_name, prots)
-                else:
-                    UniprotHandler.remove_proteins(obj, level_name, prots)
-        try:
-            if "proteins" not in obj and prots is not None:
-                obj["proteins"] = prots.count()
-        finally:
-            return obj
+            remove_empty_structures = False
+            arr = obj if isinstance(obj, list) else [obj]
+            for o in arr:
+                if "proteins" in o:
+                    o["proteins"] = [p
+                                     for p in o["proteins"]
+                                     if (level_name == "uniprot" or
+                                         ("source_database"in p and p["source_database"] == level_name)) and
+                                     (prots is None or p["accession"] in prots)]
+                    if len(o["proteins"]) == 0:
+                        remove_empty_structures = True
+            if remove_empty_structures:
+                arr = [a for a in arr if len(a["proteins"]) > 0]
+                if len(arr) == 0:
+                    raise ReferenceError("There are not proteins fo the database {} with the selected filters"
+                                         .format(level_name))
+        return obj
 
 
 class ProteinHandler(CustomView):

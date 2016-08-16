@@ -139,14 +139,16 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     for db3 in api_test_map[endpoint3]:
                         #     TODO: Make a plan to test unintegrated IDs
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
-                        # print(url)
+                        print(url)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3)
+                        print(response.data)
+                        print(expected)
                         self.assertEqual(response.data, expected)
 
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, endpoint2)
-                        # print(url)
+                        print(url)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         self.assertEqual(response.data, expected)
@@ -339,7 +341,6 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 self.assertEqual(response2.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_db_db(self):
-        self.skipTest("still failing... looking for an alternative")
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
                 if endpoint1 == endpoint2:
@@ -350,14 +351,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     for db1 in api_test_map[endpoint1]:
                         for db2 in api_test_map[endpoint2]:
                             for db3 in api_test_map[endpoint3]:
-                                # endpoint1 = "protein"
-                                # db1 = "uniprot"
-                                # endpoint2 = "structure"
-                                # db2 = "pdb"
-                                # endpoint3 = "entry"
-                                # db3 = "interpro"
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, db2, endpoint3, db3)
-                                print(url)
                                 response = self._get_in_debug_mode(url)
                                 expected = self.get_expected_list_payload(endpoint1, db1, endpoint2, endpoint3, db2=db2, db3=db3)
                                 if response.status_code == status.HTTP_200_OK:

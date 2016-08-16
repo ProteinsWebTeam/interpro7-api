@@ -283,7 +283,11 @@ class PDBHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         try:
-            structures = [x[0] for x in general_handler.get_from_store(UniprotHandler, "structures")]
+            # structures = [x[0] for x in general_handler.get_from_store(UniprotHandler, "structures")]
+            structures = [x[0]
+                          for x in general_handler.queryset_manager.get_queryset("structure")
+                          .values_list("accession").distinct()]
+
             for result in obj:
                 result["structures"] = [x for x in result["structures"] if x["accession"] in structures]
         finally:

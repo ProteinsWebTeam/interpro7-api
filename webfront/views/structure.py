@@ -3,7 +3,6 @@ from webfront.constants import get_queryset_type, QuerysetType
 from webfront.models import Structure, ProteinStructureFeature, EntryStructureFeature
 from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.views.protein import UniprotHandler
 
 
 def filter_protein_overview(obj, general_handler, accession=None, chain=None):
@@ -279,7 +278,8 @@ class PDBHandler(CustomView):
                           for x in general_handler.queryset_manager.get_queryset("structure")
                           .values_list("accession").distinct()]
 
-            for result in obj:
+            arr = [obj] if isinstance(obj, dict) else obj
+            for result in arr:
                 result["structures"] = [x for x in result["structures"] if x["accession"] in structures]
         finally:
             try:

@@ -24,6 +24,7 @@ class QuerysetManager:
         del self.filters[endpoint][f]
 
     def get_queryset(self, endpoint=None, only_main_endpoint=False):
+        queryset = Entry.objects.all()
         if endpoint is None:
             endpoint = self.main_endpoint
         if endpoint == "entry":
@@ -37,6 +38,6 @@ class QuerysetManager:
             if ep == endpoint:
                 current_filters = {**current_filters, **self.filters[ep]}
             elif not only_main_endpoint:
-                current_filters = {**current_filters, **{ep+"__"+k: v for k,v in self.filters[ep].items()}}
+                current_filters = {**current_filters, **{ep+"__"+k: v for k, v in self.filters[ep].items()}}
 
         return queryset.filter(**current_filters)

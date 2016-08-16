@@ -371,7 +371,7 @@ class UnintegratedHandler(CustomView):
         if hasattr(obj, 'serializer'):
             entries = [x[0]
                        for x in general_handler.queryset_manager.get_queryset("entry")
-                           .values_list("accession").distinct()]
+                       .values_list("accession").distinct()]
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
@@ -480,8 +480,6 @@ class EntryHandler(CustomView):
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
         )
-
-    # TODO: Check the filter option for endpoints combinations
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):

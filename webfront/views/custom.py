@@ -36,10 +36,6 @@ class CustomView(GenericAPIView):
         # if this is the last level
         if len(endpoint_levels) == level:
             if self.from_model:
-
-                # consolidation = consolidate_protein_entry(self)
-                # if consolidation is not None:
-                #     return consolidation
                 self.queryset = general_handler.queryset_manager.get_queryset().distinct()
                 if self.queryset.count() == 0:
                     if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct().count():
@@ -47,7 +43,7 @@ class CustomView(GenericAPIView):
                                         .format(endpoint_levels))
 
                     raise ReferenceError("The URL requested didn't have any data related.\nList of endpoints: {}"
-                                    .format(endpoint_levels))
+                                         .format(endpoint_levels))
                 if self.many:
                     self.queryset = self.paginate_queryset(self.get_queryset())
                 else:
@@ -63,12 +59,6 @@ class CustomView(GenericAPIView):
                     serializer_detail=self.serializer_detail,
                     serializer_detail_filters=general_handler.filter_serializers,
                 )
-                # data_tmp = general_handler.post_serializer(serialized.data,
-                #                                            general_handler.last_endpoint_level,
-                #                                 general_handler)
-                # data_tmp = self.post_serializer(serialized.data,
-                #                                            endpoint_levels[level - 1],
-                #                                            general_handler)
                 data_tmp = general_handler.execute_post_serializers(serialized.data)
 
                 if self.many:
@@ -76,19 +66,12 @@ class CustomView(GenericAPIView):
                 else:
                     return Response(data_tmp)
 
-            # data_tmp = general_handler.post_serializer(self.queryset,
-            #                                            general_handler.last_endpoint_level,
-            #                                 general_handler)
-            # data_tmp = self.post_serializer(self.queryset,
-            #                                 endpoint_levels[level - 1],
-            #                                 general_handler)
             data_tmp = general_handler.execute_post_serializers(self.queryset)
             return Response(data_tmp)
 
         else:
             # combine the children handlers with the available endpoints
             endpoints = available_endpoint_handlers.copy()
-            # handlers = {**self.child_handlers, **endpoints}
             handlers = endpoints + self.child_handlers
 
             # get next level name provided by the client
@@ -125,8 +108,6 @@ class CustomView(GenericAPIView):
                         *args, **kwargs
                     )
 
-            # general_handler.post_serializer = handler_class.post_serializer
-            # general_handler.last_endpoint_level = level_name
             general_handler.register_post_serializer(handler_class.post_serializer, level_name)
 
             # delegate to the lower level handler

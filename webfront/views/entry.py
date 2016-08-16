@@ -257,12 +257,9 @@ class MemberHandler(CustomView):
     def post_serializer(obj, level_name="", general_handler=None):
         remove_empty_structures = False
         if hasattr(obj, 'serializer'):
-            try:
-                entries = [x[0]
-                           for x in general_handler.queryset_manager.get_queryset("entry")
-                           .values_list("accession").distinct()]
-            except (IndexError, KeyError):
-                entries = None
+            entries = [x[0]
+                       for x in general_handler.queryset_manager.get_queryset("entry")
+                       .values_list("accession").distinct()]
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
@@ -374,17 +371,22 @@ class UnintegratedHandler(CustomView):
                 "entry",
                 integrated__isnull=True,
                 source_database__iregex=db_members)
+        return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         remove_empty_structures = False
         if hasattr(obj, 'serializer'):
+            entries = [x[0]
+                       for x in general_handler.queryset_manager.get_queryset("entry")
+                           .values_list("accession").distinct()]
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
                     o["entries"] = [e for e in o["entries"]
                                     if re.match(db_members, e["source_database"]) and
-                                    "integrated" not in e]
+                                    "integrated" not in e and
+                                    e["accession"] in entries]
                     if len(o["entries"]) == 0:
                         remove_empty_structures = True
             if remove_empty_structures:

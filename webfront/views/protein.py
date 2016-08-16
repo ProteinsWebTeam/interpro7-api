@@ -109,15 +109,7 @@ class UniprotAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
-        if parent_queryset is not None:
-            self.queryset = parent_queryset
         general_handler.queryset_manager.add_filter("protein", accession=endpoint_levels[level - 1])
-
-        if self.queryset.count() == 0:
-            raise Exception("The ID '{}' has not been found in {}".format(
-                endpoint_levels[level - 1], endpoint_levels[level - 2]))
         return super(UniprotAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -143,14 +135,23 @@ class UniprotAccessionHandler(CustomView):
     def post_serializer(obj, level_name="", general_handler=None):
         if type(obj) != dict:
             if not isinstance(obj.serializer, ProteinSerializer):
+                prots = [x[0]
+                         for x in general_handler.queryset_manager.get_queryset("protein")
+                         .values_list("accession").distinct()]
+                remove_empty_structures = False
                 arr = [obj] if isinstance(obj, dict) else obj
                 for o in arr:
                     if "proteins" in o:
-                        for p in o["proteins"]:
-                            if "accession" in p and p["accession"] != level_name:
-                                o["proteins"].remove(p)
-                            elif "protein" in p and p["protein"]["accession"] != level_name:
-                                o["proteins"].remove(p)
+                        o["proteins"] = [p for p in o["proteins"]
+                                         if level_name in prots and(
+                                             (("accession" in p and p["accession"] == level_name) or
+                                              ("protein" in p and p["protein"]["accession"] == level_name)))]
+                        if len(o["proteins"]) == 0:
+                            remove_empty_structures = True
+                if remove_empty_structures:
+                    arr = [a for a in arr if len(a["proteins"]) > 0]
+                    if len(arr) == 0:
+                        raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
         return obj
 
 
@@ -162,9 +163,6 @@ class IDAccessionHandler(UniprotAccessionHandler):
         if parent_queryset is not None:
             self.queryset = parent_queryset
         self.queryset = self.queryset.filter(identifier=endpoint_levels[level - 1])
-        if self.queryset.count() == 0:
-            raise Exception("The ID '{}' has not been found in {}".format(
-                endpoint_levels[level - 1], endpoint_levels[level - 2]))
         new_url = request.get_full_path().replace(endpoint_levels[level - 1], self.queryset.first().accession)
         return redirect(new_url)
 
@@ -182,8 +180,6 @@ class UniprotHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
         ds = endpoint_levels[level - 1].lower()
         if ds != "uniprot":
             general_handler.queryset_manager.add_filter("protein", source_database__iexact=ds)
@@ -210,13 +206,9 @@ class UniprotHandler(CustomView):
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
-        try:
-            prots = [x[0]
-                     for x in general_handler.queryset_manager.get_queryset("protein")
-                     .values_list("accession").distinct()]
-        except (KeyError, IndexError):
-            prots = None
-
+        prots = [x[0]
+                 for x in general_handler.queryset_manager.get_queryset("protein")
+                 .values_list("accession").distinct()]
         if hasattr(obj, 'serializer') and not isinstance(obj.serializer, ProteinSerializer):
             remove_empty_structures = False
             arr = obj if isinstance(obj, list) else [obj]
@@ -258,8 +250,6 @@ class ProteinHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = {}
 
         general_handler.queryset_manager.reset_filters("protein")
         self.queryset = {"proteins": ProteinHandler.get_database_contributions(Protein.objects.all())}
@@ -280,8 +270,6 @@ class ProteinHandler(CustomView):
                 qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
             elif qs_type == QuerysetType.STRUCTURE:
                 qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
-            elif qs_type == QuerysetType.STRUCTURE_PROTEIN:
-                qs = Protein.objects.filter(accession__in=queryset.values('protein'))
             general_handler.set_in_store(ProteinHandler,
                                          "protein_count",
                                          ProteinHandler.get_database_contributions(qs))

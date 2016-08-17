@@ -171,7 +171,7 @@ class PDBAccessionHandler(CustomView):
     queryset = Structure.objects
     many = False
     child_handlers = [
-        (r'[a-z]|[A-Z]', ChainPDBAccessionHandler),
+        (r'[a-zA-Z\d]{1,4}', ChainPDBAccessionHandler),
     ]
     serializer_detail_filter = SerializerDetail.STRUCTURE_DETAIL
 
@@ -236,7 +236,7 @@ class PDBAccessionHandler(CustomView):
 class PDBHandler(CustomView):
     level_description = 'pdb level'
     child_handlers = [
-        (r'([a-z]|[A-Z]|\d){4}', PDBAccessionHandler),
+        (r'[a-zA-Z\d]{4}', PDBAccessionHandler),
         # (r'.+', IDAccessionHandler),
     ]
     queryset = Structure.objects.all()

@@ -121,7 +121,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_structure_details(response.data["metadata"])
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
-                             "The nember of entries dhould be the sem URL: [{}]".format(url))
+                             "The number of entries should be the same URL: [{}]".format(url))
             for entry in response.data["entries"]:
                 self.assertIn(entry["accession"], urls[url])
 

@@ -123,7 +123,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_protein_details(response.data["metadata"])
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
-                             "The nember of entries dhould be the sem URL: [{}]".format(url))
+                             "The number of entries should be the same URL: [{}]".format(url))
             self.assertIn(response.data["entries"][0]["accession"], urls[url])
 
     def test_urls_that_should_fails(self):

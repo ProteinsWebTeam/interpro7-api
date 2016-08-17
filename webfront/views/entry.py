@@ -189,7 +189,6 @@ class MemberHandler(CustomView):
                 queryset = queryset.filter(
                     entrystructurefeature__chain__in=queryset.values('proteinstructurefeature__chain'),
                     entries__in=qs).distinct()
-
             if queryset.count() == 0:
                 raise ReferenceError("There are no entries of the type {} in this query".format(level_name))
             return queryset

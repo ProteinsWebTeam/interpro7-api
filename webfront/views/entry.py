@@ -250,7 +250,7 @@ class MemberHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         remove_empty_structures = False
-        if hasattr(obj, 'serializer'):
+        if hasattr(obj, 'serializer') or isinstance(obj, list):
             entries = [x[0]
                        for x in general_handler.queryset_manager.get_queryset("entry")
                        .values_list("accession").distinct()]
@@ -411,7 +411,6 @@ class InterproHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(InterproHandler, "interpro", True)
-        # TODO: Keep the filtered entries in the store.
         if isinstance(queryset, dict):
             del queryset["entries"]  # at this level (db) the counter is embedded in other endpoint.
             if "proteins" in queryset:

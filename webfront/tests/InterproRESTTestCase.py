@@ -9,13 +9,7 @@ chains = {
     "2BKM": ["A", "B"],
     "1JZ8": ["A", "B"],
 }
-#
-# chains = {
-#     "1JM7": [{"A": "A1CUJ5"}, {"B": "M5ADK6"}],
-#     "1T2V": [{"A": "P16582"}, {"B": "P16582"}, {"C": "P16582"}, {"D": "P16582"}, {"E": "P16582"}],
-#     "2BKM": [{"A": "A0A0A2L2G2"}, {"B": "M5ADK6"}],
-#     "1JZ8": [{"A": "A0A0A2L2G2"}, {"B": "A0A0A2L2G2"}],
-# }
+
 
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [

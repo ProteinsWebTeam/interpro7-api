@@ -113,13 +113,22 @@ class ChainPDBAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        try:
+            pdb_accession = general_handler.get_from_store(PDBAccessionHandler, "pdb_accession")
+        except (IndexError, KeyError):
+            pdb_accession = None
+
         if not isinstance(queryset, dict):
             general_handler.queryset_manager.add_filter("structure", proteinstructurefeature__chain=level_name)
             return queryset
         if "entries" in queryset:
-            queryset["entries"] = filter_entry_overview(queryset["entries"], general_handler, chain=level_name)
+            queryset["entries"] = filter_entry_overview(queryset["entries"], general_handler,
+                                                        accession=pdb_accession,
+                                                        chain=level_name)
         if "proteins" in queryset:
-            filter_protein_overview(queryset["proteins"], general_handler, chain=level_name)
+            filter_protein_overview(queryset["proteins"], general_handler,
+                                    accession=pdb_accession,
+                                    chain=level_name)
 
         return queryset
 
@@ -319,7 +328,6 @@ class StructureHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
         qs = Structure.objects.all()
         if isinstance(queryset, dict):
             queryset["structures"] = StructureHandler.get_database_contributions(qs)

@@ -52,6 +52,21 @@ api_test_map = {
             "1JZ8",
         ]
     },
+    "chain": {
+        "pdb": [
+            "1JM7/A",
+            "1JM7/B",
+            "1T2V/A",
+            "1T2V/B",
+            "1T2V/C",
+            "1T2V/D",
+            "1T2V/E",
+            "2BKM/A",
+            "2BKM/B",
+            "1JZ8/A",
+            "1JZ8/B",
+        ]
+    },
 }
 rel_aux = {
     ("protein", "structure"): [
@@ -66,6 +81,19 @@ rel_aux = {
         ["P16582", "1T2V"],
         ["P16582", "1T2V"],
         ["P16582", "1T2V"],
+    ],
+    ("protein", "chain"): [
+        ["A1CUJ5", "1JM7/A"],
+        ["M5ADK6", "2BKM/B"],
+        ["M5ADK6", "1JM7/B"],
+        ["A0A0A2L2G2", "1JZ8/A"],
+        ["A0A0A2L2G2", "1JZ8/B"],
+        ["A0A0A2L2G2", "2BKM/A"],
+        ["P16582", "1T2V/A"],
+        ["P16582", "1T2V/B"],
+        ["P16582", "1T2V/C"],
+        ["P16582", "1T2V/D"],
+        ["P16582", "1T2V/E"],
     ],
     ("entry", "protein"): [
         ["IPR003165", "A1CUJ5"],
@@ -95,8 +123,38 @@ rel_aux = {
         ["PS50822", "1T2V"],
         ["PS50822", "1T2V"],
         ["SM00950", "1JM7"],
+    ],
+    ("entry", "chain"): [
+        ["IPR003165", "1JM7/A"],
+        ["IPR003165", "1T2V/A"],
+        ["IPR003165", "1T2V/B"],
+        ["IPR003165", "1T2V/C"],
+        ["IPR003165", "1T2V/D"],
+        ["IPR003165", "1T2V/E"],
+        ["IPR001165", "1JM7/A"],
+        ["PF02171", "1JM7/A"],
+        ["PF17180", "2BKM/B"],
+        ["PF17180", "1JM7/B"],
+        ["PF17176", "1JM7/A"],
+        ["PS50822", "1T2V/A"],
+        ["PS50822", "1T2V/B"],
+        ["PS50822", "1T2V/C"],
+        ["PS50822", "1T2V/D"],
+        ["PS50822", "1T2V/E"],
+        ["SM00950", "1JM7/A"],
     ]
 }
+
+chains = {
+    "1JM7": {"A": "A1CUJ5", "B": "M5ADK6"},
+    "1T2V": {"A": "P16582", "B": "P16582", "C": "P16582", "D": "P16582", "E": "P16582"},
+    "2BKM": {"A": "A0A0A2L2G2", "B": "M5ADK6"},
+    "1JZ8": {"A": "A0A0A2L2G2", "B": "A0A0A2L2G2"},
+}
+chains_entry = {k: {ch: [r[0] for r in rel_aux["entry", "protein"] if r[1] == pr]
+                    for ch, pr in v.items()}
+                for k, v in chains.items()}
+print(chains_entry)
 relationships = {}
 for e1, e2 in rel_aux:
     relationships[(e1, e2)] = rel_aux[(e1, e2)]
@@ -108,33 +166,38 @@ plurals = {
     "structure": "structures",
 }
 singular = {v: k for k, v in plurals.items()}
+plurals["chain"] = "structures"
 
 
 class ThreeEndpointsContentTest(InterproRESTTestCase):
-
     def test_endpoint_endpoint_endpoint(self):
         response1 = self.client.get("/api/entry/protein/structure")
         self.assertEqual(response1.status_code, status.HTTP_200_OK)
         self._check_entry_count_overview(response1.data)
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     url = "/api/{}/{}/{}".format(endpoint1, endpoint2, endpoint3)
+                    print(url)
                     response2 = self.client.get(url)
                     self.assertEqual(response2.status_code, status.HTTP_200_OK)
                     self.assertEqual(response1.data, response2.data)
 
     def test_endpoint_endpoint_db(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     for db3 in api_test_map[endpoint3]:
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
@@ -150,36 +213,53 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_endpoint_endpoint_acc(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if endpoint1 == endpoint3 or endpoint2 == endpoint3 or \
+                       (endpoint3 == "chain" and (endpoint1 == "structure" or endpoint2 == "structure")):
                         continue
                     for db3 in api_test_map[endpoint3]:
                         for acc3 in api_test_map[endpoint3][db3]:
+                            ep3 = "structure" if endpoint3 == "chain" else endpoint3
+
                             unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                 if db3 == "unintegrated" else ""
-                            url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3+unintegrated, acc3)
+                            url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, ep3, db3 + unintegrated, acc3)
                             response = self.client.get(url)
                             self.assertEqual(response.status_code, status.HTTP_200_OK)
                             expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
                                                                          acc3=acc3)
                             self.assertEqual(response.data, expected)
 
-                            url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint3, db3+unintegrated, acc3, endpoint2)
+                            url = "/api/{}/{}/{}/{}/{}".format(endpoint1, ep3, db3 + unintegrated, acc3, endpoint2)
                             response = self.client.get(url)
                             self.assertEqual(response.status_code, status.HTTP_200_OK)
                             self.assertEqual(response.data, expected)
 
+                            # if db3 == "structure":
+                            #     for chain3 in chains[acc3]:
+                            #         url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2,
+                            #                                               endpoint3, db3+unintegrated, acc3, chain3)
+                            #         response = self.client.get(url)
+                            #         self.assertEqual(response.status_code, status.HTTP_200_OK)
+                            #         expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
+                            #                                                      acc3=acc3, chain3=chain3)
+                            #         self.assertEqual(response.data, expected)
+
     def test_endpoint_db_db(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                        if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                             continue
                         for db3 in api_test_map[endpoint3]:
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2, endpoint3, db3)
@@ -195,26 +275,29 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_endpoint_db_acc(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                        if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3]:
                             continue
+                        ep3 = "structure" if endpoint3 == "chain" else endpoint3
                         for db3 in api_test_map[endpoint3]:
                             for acc3 in api_test_map[endpoint3][db3]:
                                 unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                     if db3 == "unintegrated" else ""
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2,
-                                                                      endpoint3, db3+unintegrated, acc3)
+                                                                      ep3, db3 + unintegrated, acc3)
                                 response = self.client.get(url)
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                                 expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
                                                                              db2=db2, acc3=acc3)
                                 self.assertEqual(response.data, expected)
 
-                                url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint3, db3+unintegrated, acc3,
+                                url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, ep3, db3 + unintegrated, acc3,
                                                                       endpoint2, db2)
                                 response = self.client.get(url)
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -222,13 +305,17 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_endpoint_acc_acc(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if plurals[endpoint1] == plurals[endpoint2]:
                     continue
+                ep2 = "structure" if endpoint2 == "chain" else endpoint2
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                        if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3]:
                             continue
+                        ep3 = "structure" if endpoint3 == "chain" else endpoint3
                         for db3 in api_test_map[endpoint3]:
                             for acc2 in api_test_map[endpoint2][db2]:
                                 for acc3 in api_test_map[endpoint3][db3]:
@@ -237,8 +324,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     un2 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc2[:2]] \
                                         if db2 == "unintegrated" else ""
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}".format(endpoint1,
-                                                                             endpoint2, db2+un2, acc2,
-                                                                             endpoint3, db3+un3, acc3)
+                                                                             ep2, db2 + un2, acc2,
+                                                                             ep3, db3 + un3, acc3)
                                     response = self.client.get(url)
                                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                                     expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
@@ -247,11 +334,13 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_db_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     for db3 in api_test_map[endpoint3]:
                         url = "/api/{}/{}/{}/{}".format(endpoint3, db3, endpoint1, endpoint2)
@@ -293,7 +382,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                 self.assertEqual(
                     len(expected[key]), len(response[key]),
                     "Check length of the {} array  of the {} {} \nEXP: {}\nRES: {}"
-                    .format(key, endpoint1, expected["metadata"]["accession"], expected[key], response[key]))
+                        .format(key, endpoint1, expected["metadata"]["accession"], expected[key], response[key]))
                 expected[key].sort(key=lambda obj: obj["accession"])
                 response[key].sort(key=lambda obj: obj["accession"])
                 for match in expected[key]:
@@ -309,11 +398,13 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_db_db_endpoint(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     for db2 in api_test_map[endpoint2]:
                         for db1 in api_test_map[endpoint1]:
@@ -334,11 +425,13 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_db_db_db(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     for db1 in api_test_map[endpoint1]:
                         for db2 in api_test_map[endpoint2]:
@@ -354,53 +447,70 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_db_endpoint_acc(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3]:
                         continue
+                    ep3 = "structure" if endpoint3 == "chain" else endpoint3
                     for db1 in api_test_map[endpoint1]:
-                            for db3 in api_test_map[endpoint3]:
-                                for acc3 in api_test_map[endpoint3][db3]:
-                                    un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                        if db3 == "unintegrated" else ""
-                                    expected = self.get_expected_list_payload(endpoint1, db1, endpoint2, endpoint3,
-                                                                              db3=db3, acc3=acc3)
-                                    url = "/api/{}/{}/{}/{}/{}/{}" \
-                                        .format(endpoint1, db1, endpoint2, endpoint3, db3+un3, acc3)
-                                    response = self._get_in_debug_mode(url)
-                                    if response.status_code == status.HTTP_200_OK:
-                                        self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
-                                    else:
-                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                        for db3 in api_test_map[endpoint3]:
+                            for acc3 in api_test_map[endpoint3][db3]:
+                                un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
+                                    if db3 == "unintegrated" else ""
+                                expected = self.get_expected_list_payload(endpoint1, db1, endpoint2, endpoint3,
+                                                                          db3=db3, acc3=acc3)
+                                url = "/api/{}/{}/{}/{}/{}/{}" \
+                                    .format(endpoint1, db1, endpoint2, ep3, db3 + un3, acc3)
+                                response = self._get_in_debug_mode(url)
+                                if response.status_code == status.HTTP_200_OK:
+                                    self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
+                                else:
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_db_acc(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if endpoint1 == endpoint2 or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3]:
                         continue
+                    ep3 = "structure" if endpoint3 == "chain" else endpoint3
                     for db1 in api_test_map[endpoint1]:
                         for db2 in api_test_map[endpoint2]:
                             for db3 in api_test_map[endpoint3]:
                                 for acc3 in api_test_map[endpoint3][db3]:
+
+                                    # endpoint1 = "protein"
+                                    # db1 = "trembl"
+                                    # endpoint2 = "entry"
+                                    # db2 = "interpro"
+                                    # endpoint3 = "chain"
+                                    # ep3 = "structure"
+                                    # db3 = "pdb"
+                                    # acc3 = "1T2V/A"
                                     un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                         if db3 == "unintegrated" else ""
                                     expected = self.get_expected_list_payload(endpoint1, db1, endpoint2, endpoint3,
                                                                               db2=db2, db3=db3, acc3=acc3)
-                                    url = "/api/{}/{}/{}/{}/{}/{}/{}"\
-                                        .format(endpoint1, db1, endpoint2, db2, endpoint3, db3+un3, acc3)
+                                    url = "/api/{}/{}/{}/{}/{}/{}/{}" \
+                                        .format(endpoint1, db1, endpoint2, db2, ep3, db3 + un3, acc3)
+                                    print(url)
                                     response = self._get_in_debug_mode(url)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-                                    url = "/api/{}/{}/{}/{}/{}/{}/{}"\
-                                        .format(endpoint1, db1, endpoint3, db3+un3, acc3, endpoint2, db2)
+                                    url = "/api/{}/{}/{}/{}/{}/{}/{}" \
+                                        .format(endpoint1, db1, ep3, db3 + un3, acc3, endpoint2, db2)
+                                    print(url)
                                     response = self._get_in_debug_mode(url)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
@@ -409,12 +519,16 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_db_acc_acc(self):
         for endpoint1 in api_test_map:
+            if endpoint1 == "chain":
+                continue
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if plurals[endpoint1] == plurals[endpoint2]:
                     continue
+                ep2 = "structure" if endpoint2 == "chain" else endpoint2
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3]:
                         continue
+                    ep3 = "structure" if endpoint3 == "chain" else endpoint3
                     for db1 in api_test_map[endpoint1]:
                         for db2 in api_test_map[endpoint2]:
                             for db3 in api_test_map[endpoint3]:
@@ -428,7 +542,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                             endpoint1, db1, endpoint2, endpoint3,
                                             db2=db2, db3=db3, acc2=acc2, acc3=acc3)
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}/{}" \
-                                            .format(endpoint1, db1, endpoint2, db2+un2, acc2, endpoint3, db3+un3, acc3)
+                                            .format(endpoint1, db1, ep2, db2 + un2, acc2, ep3, db3 + un3,
+                                                    acc3)
                                         response = self._get_in_debug_mode(url)
                                         if response.status_code == status.HTTP_200_OK:
                                             self.compare_db_db_endpoint_expected_vs_response(
@@ -438,18 +553,19 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_acc_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
+            ep1 = "structure" if endpoint1 == "chain" else endpoint1
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if plurals[endpoint1] == plurals[endpoint2] or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                    if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3] or endpoint3 == "chain":
                         continue
                     for db1 in api_test_map[endpoint1]:
                         for acc1 in api_test_map[endpoint1][db1]:
                             un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
                                 if db1 == "unintegrated" else ""
                             url = "/api/{}/{}/{}/{}/{}" \
-                                .format(endpoint1, db1+un1, acc1, endpoint2, endpoint3)
+                                .format(ep1, db1 + un1, acc1, endpoint2, endpoint3)
                             response = self._get_in_debug_mode(url)
                             expected = self.get_expected_object_payload(endpoint1, db1, acc1, endpoint2, endpoint3)
                             if response.status_code == status.HTTP_200_OK:
@@ -458,21 +574,52 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             else:
                                 self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_acc_endpoint_acc(self):
+        for endpoint1 in api_test_map:
+            ep1 = "structure" if endpoint1 == "chain" else endpoint1
+            for endpoint2 in api_test_map:
+                if plurals[endpoint1] == plurals[endpoint2] or endpoint2 == "chain":
+                    continue
+                for endpoint3 in api_test_map:
+                    if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3]:
+                        continue
+                    ep3 = "structure" if endpoint3 == "chain" else endpoint3
+                    for db3 in api_test_map[endpoint3]:
+                        for db1 in api_test_map[endpoint1]:
+                            for acc1 in api_test_map[endpoint1][db1]:
+                                un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
+                                    if db1 == "unintegrated" else ""
+                                for acc3 in api_test_map[endpoint3][db3]:
+                                    un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
+                                        if db3 == "unintegrated" else ""
+                                    url = "/api/{}/{}/{}/{}/{}/{}/{}" \
+                                        .format(ep1, db1 + un1, acc1, endpoint2, ep3, db3 + un3, acc3)
+                                    response = self._get_in_debug_mode(url)
+                                    expected = self.get_expected_object_payload(endpoint1, db1, acc1,
+                                                                                endpoint2, endpoint3,
+                                                                                db3=db3, acc3=acc3)
+                                    if response.status_code == status.HTTP_200_OK:
+                                        self.compare_objects_expected_vs_response(
+                                            expected, response.data, endpoint1)
+                                    else:
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_acc_db_endpoint(self):
         for endpoint1 in api_test_map:
+            ep1 = "structure" if endpoint1 == "chain" else endpoint1
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if plurals[endpoint1] == plurals[endpoint2] or endpoint2 == "chain":
                     continue
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                        if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3] or endpoint3 == "chain":
                             continue
                         for db1 in api_test_map[endpoint1]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
                                     if db1 == "unintegrated" else ""
                                 url = "/api/{}/{}/{}/{}/{}/{}" \
-                                    .format(endpoint1, db1+un1, acc1, endpoint2, db2, endpoint3)
+                                    .format(ep1, db1 + un1, acc1, endpoint2, db2, endpoint3)
                                 response = self._get_in_debug_mode(url)
                                 expected = self.get_expected_object_payload(endpoint1, db1, acc1, endpoint2, endpoint3,
                                                                             db2=db2)
@@ -483,7 +630,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
                                 url = "/api/{}/{}/{}/{}/{}/{}" \
-                                    .format(endpoint1, db1+un1, acc1, endpoint3, endpoint2, db2)
+                                    .format(ep1, db1 + un1, acc1, endpoint3, endpoint2, db2)
                                 response = self._get_in_debug_mode(url)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.compare_objects_expected_vs_response(
@@ -493,12 +640,13 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_acc_db_db(self):
         for endpoint1 in api_test_map:
+            ep1 = "structure" if endpoint1 == "chain" else endpoint1
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if plurals[endpoint1] == plurals[endpoint2] or endpoint2 == "chain":
                     continue
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                        if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3] or endpoint3 == "chain":
                             continue
                         for db3 in api_test_map[endpoint3]:
                             for db1 in api_test_map[endpoint1]:
@@ -506,7 +654,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
                                         if db1 == "unintegrated" else ""
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
-                                        .format(endpoint1, db1+un1, acc1, endpoint2, db2, endpoint3, db3)
+                                        .format(ep1, db1 + un1, acc1, endpoint2, db2, endpoint3, db3)
                                     response = self._get_in_debug_mode(url)
                                     expected = self.get_expected_object_payload(endpoint1, db1, acc1,
                                                                                 endpoint2, endpoint3,
@@ -519,13 +667,15 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_acc_db_acc(self):
         for endpoint1 in api_test_map:
+            ep1 = "structure" if endpoint1 == "chain" else endpoint1
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if plurals[endpoint1] == plurals[endpoint2] or endpoint2 == "chain":
                     continue
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                        if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3]:
                             continue
+                        ep3 = "structure" if endpoint3 == "chain" else endpoint3
                         for db3 in api_test_map[endpoint3]:
                             for db1 in api_test_map[endpoint1]:
                                 for acc1 in api_test_map[endpoint1][db1]:
@@ -535,7 +685,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                         un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                             if db3 == "unintegrated" else ""
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}/{}" \
-                                            .format(endpoint1, db1+un1, acc1, endpoint2, db2, endpoint3, db3+un3, acc3)
+                                            .format(ep1, db1 + un1, acc1, endpoint2, db2, ep3, db3 + un3,
+                                                    acc3)
                                         response = self._get_in_debug_mode(url)
                                         expected = self.get_expected_object_payload(endpoint1, db1, acc1,
                                                                                     endpoint2, endpoint3,
@@ -547,7 +698,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                             self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}/{}" \
-                                            .format(endpoint1, db1+un1, acc1, endpoint3, db3+un3, acc3, endpoint2, db2)
+                                            .format(ep1, db1 + un1, acc1, ep3, db3 + un3, acc3, endpoint2,
+                                                    db2)
                                         response = self._get_in_debug_mode(url)
                                         if response.status_code == status.HTTP_200_OK:
                                             self.compare_objects_expected_vs_response(
@@ -557,13 +709,16 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def test_acc_acc_acc(self):
         for endpoint1 in api_test_map:
+            ep1 = "structure" if endpoint1 == "chain" else endpoint1
             for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
+                if plurals[endpoint1] == plurals[endpoint2] or endpoint2 == "chain":
                     continue
+                ep2 = "structure" if endpoint2 == "chain" else endpoint2
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                        if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3]:
                             continue
+                        ep3 = "structure" if endpoint3 == "chain" else endpoint3
                         for db3 in api_test_map[endpoint3]:
                             for db1 in api_test_map[endpoint1]:
                                 for acc1 in api_test_map[endpoint1][db1]:
@@ -576,9 +731,9 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                             un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles"}[acc3[:2]] \
                                                 if db3 == "unintegrated" else ""
                                             url = "/api/{}/{}/{}/{}/{}/{}/{}/{}/{}" \
-                                                .format(endpoint1, db1+un1, acc1,
-                                                        endpoint2, db2+un2, acc2,
-                                                        endpoint3, db3+un3, acc3)
+                                                .format(ep1, db1 + un1, acc1,
+                                                        ep2, db2 + un2, acc2,
+                                                        ep3, db3 + un3, acc3)
                                             response = self._get_in_debug_mode(url)
                                             expected = self.get_expected_object_payload(endpoint1, db1, acc1,
                                                                                         endpoint2, endpoint3,
@@ -589,34 +744,6 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                                     expected, response.data, endpoint1)
                                             else:
                                                 self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-    def test_acc_endpoint_acc(self):
-        for endpoint1 in api_test_map:
-            for endpoint2 in api_test_map:
-                if endpoint1 == endpoint2:
-                    continue
-                for endpoint3 in api_test_map:
-                    if endpoint1 == endpoint3 or endpoint2 == endpoint3:
-                        continue
-                    for db3 in api_test_map[endpoint3]:
-                        for db1 in api_test_map[endpoint1]:
-                            for acc1 in api_test_map[endpoint1][db1]:
-                                un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
-                                    if db1 == "unintegrated" else ""
-                                for acc3 in api_test_map[endpoint3][db3]:
-                                    un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                        if db3 == "unintegrated" else ""
-                                    url = "/api/{}/{}/{}/{}/{}/{}/{}" \
-                                        .format(endpoint1, db1+un1, acc1, endpoint2, endpoint3, db3+un3, acc3)
-                                    response = self._get_in_debug_mode(url)
-                                    expected = self.get_expected_object_payload(endpoint1, db1, acc1,
-                                                                                endpoint2, endpoint3,
-                                                                                db3=db3, acc3=acc3)
-                                    if response.status_code == status.HTTP_200_OK:
-                                        self.compare_objects_expected_vs_response(
-                                            expected, response.data, endpoint1)
-                                    else:
-                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def get_expected_object_payload(self, endpoint1, db1, acc1, endpoint2, endpoint3, db2=None, db3=None,
                                     acc2=None, acc3=None):
@@ -638,7 +765,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                 accs3 = api_test_map[endpoint3][db3]
         else:
             accs3 = [acc3]
-        payload = {"metadata": {"accession": acc1, "source_database": db1}}
+
+        payload = {"metadata": {"accession": acc1.split("/")[0], "source_database": db1}}
 
         if db2 is None:
             payload[plurals[endpoint2]] = self.get_counter_object(endpoint2, plurals[endpoint2],
@@ -684,7 +812,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
         payload = payload if db3 is None else [obj for obj in payload if len(obj[plurals[endpoint3]]) > 0]
         return payload
 
-    def get_expected_counter_payload(self, endpoint1, endpoint2, endpoint3, db3, db2=None, acc3=None, acc2=None):
+    def get_expected_counter_payload(self, endpoint1, endpoint2, endpoint3,
+                                     db3, db2=None, acc3=None, acc2=None):
         payload = {}
         accs3 = api_test_map[endpoint3][db3]
         if acc3 in accs3:
@@ -694,9 +823,13 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
             accs2 = [acc2]
 
         for ep in api_test_map:
+            if ep == "chain":
+                continue
             eps = plurals[ep]
             if eps == plurals[endpoint1] or (db2 is None and eps == plurals[endpoint2]):
-                payload[eps] = self.get_counter_object(ep, eps, endpoint2, db2, accs2, endpoint3, db3, accs3)
+                payload[eps] = self.get_counter_object(ep, eps,
+                                                       endpoint2, db2, accs2,
+                                                       endpoint3, db3, accs3)
         return payload
 
     def get_counter_object(self, ep, eps, endpoint2, db2, accs2, endpoint3, db3, accs3):
@@ -723,17 +856,18 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                                                              endpoint3, db3, accs3))
         return _obj
 
-    def get_set_of_shared_ids(self, endpoint1, accs1, endpoint2, accs2, endpoint3=None, db3=None, accs3=None):
+    def get_set_of_shared_ids(self, endpoint1, accs1, endpoint2, accs2, endpoint3=None, db3=None, accs3=None,
+                              chain2=None):
         shared_ids = set([x[1]
-                         for x in relationships[endpoint1, endpoint2]
-                         if x[0] in accs1 and x[1] in accs2])
+                          for x in relationships[endpoint1, endpoint2]
+                          if x[0] in accs1 and x[1] in accs2])
         if db3 is not None:
             link_ids = set([x[1]
                             for x in relationships[endpoint1, endpoint3]
                             if x[0] in accs1 and x[1] in accs3])
             return set([x[1]
-                       for x in relationships[endpoint3, endpoint2]
-                       if x[0] in accs3 and x[1] in accs2 and x[0] in link_ids and x[1] in shared_ids])
+                        for x in relationships[endpoint3, endpoint2]
+                        if x[0] in accs3 and x[1] in accs2 and x[0] in link_ids and x[1] in shared_ids])
 
         return shared_ids
 

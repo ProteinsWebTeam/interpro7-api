@@ -50,10 +50,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #
+    # added
     'webfront',
     'release',
-    # added
+    # third-party added libraries
     'rest_framework',
 )
 
@@ -142,7 +142,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/static_files/'
+STATIC_URL = '/interpro/static_files/'
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'static_files'))
 
 
@@ -164,7 +164,6 @@ l = logging.getLogger('django.db.backends')
 l.setLevel(logging.DEBUG)
 l.addHandler(logging.StreamHandler())
 if DEBUG and ("TRAVIS" not in os.environ):
-
     LOGGING = {
         'version': 1,
         'handlers': {
@@ -180,8 +179,6 @@ if DEBUG and ("TRAVIS" not in os.environ):
             },
         },
     }
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 # Debug toolbar
 # DEBUG_TOOLBAR_PATCH_SETTINGS = False

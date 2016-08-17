@@ -52,7 +52,7 @@ def filter_entry_overview(obj, accession=None, chain=None):
 
 
 class ChainPDBAccessionHandler(CustomView):
-    level_description = 'pdb accession level'
+    level_description = 'structure chain level'
     serializer_class = StructureSerializer
     queryset = Structure.objects
     many = False

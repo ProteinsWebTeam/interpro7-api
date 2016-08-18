@@ -186,7 +186,6 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/protein/swissprot/entry/interpro/"+acc,
             "/api/protein/trembl/entry/interpro/"+acc,
             "/api/protein/uniprot/entry/pfam/"+pfam,
-            "/api/protein/uniprot/entry/unintegrated/pfam/"+pfam,
             "/api/protein/uniprot/entry/interpro/smart/"+smart,
             "/api/protein/uniprot/entry/interpro/pfam/"+pfam,
             "/api/protein/uniprot/entry/interpro/"+acc+"/pfam/"+pfam,
@@ -245,6 +244,7 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/protein/uniprot/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
             "/api/protein/uniprot/"+sp_1+"/entry/interpro/"+acc,
             "/api/protein/uniprot/"+sp_1+"/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/protein/uniprot/entry/unintegrated/pfam/"+pfam,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")

@@ -39,6 +39,7 @@ class Protein(models.Model):
     genomic_context = JSONField()
     source_database = models.CharField(max_length=20, default="uniprot", db_index=True)
     structures = models.ManyToManyField('Structure', through='ProteinStructureFeature')
+    entries = models.ManyToManyField('Entry', through='ProteinEntryFeature')
 
 
 class ProteinEntryFeature(models.Model):

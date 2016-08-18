@@ -1,7 +1,8 @@
 from enum import Enum
 from django.db import models
 
-from webfront.models import ProteinEntryFeature, Entry, Protein, ProteinStructureFeature, Structure
+from webfront.models import ProteinEntryFeature, Entry, Protein, ProteinStructureFeature, Structure, \
+    EntryStructureFeature
 
 
 class SerializerDetail(Enum):
@@ -31,6 +32,7 @@ class QuerysetType(Enum):
     PROTEIN = 200
     STRUCTURE = 300
     ENTRY_PROTEIN = 150
+    ENTRY_STRUCTURE = 160
     STRUCTURE_PROTEIN = 250
 
 
@@ -47,6 +49,8 @@ def get_queryset_type(queryset):
             return QuerysetType.ENTRY_PROTEIN
         elif isinstance(queryset, ProteinStructureFeature):
             return QuerysetType.STRUCTURE_PROTEIN
+        elif isinstance(queryset, EntryStructureFeature):
+            return QuerysetType.ENTRY_STRUCTURE
 
     if hasattr(queryset, "model"):
         if queryset.model is Entry:
@@ -59,4 +63,6 @@ def get_queryset_type(queryset):
             return QuerysetType.ENTRY_PROTEIN
         elif queryset.model is ProteinStructureFeature:
             return QuerysetType.STRUCTURE_PROTEIN
+        elif queryset.model is EntryStructureFeature:
+            return QuerysetType.ENTRY_STRUCTURE
     return None

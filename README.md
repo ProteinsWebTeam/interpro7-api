@@ -17,5 +17,7 @@ The user can freely combine each of the endpoints. the only limitation is that a
 
 The google doc here contains more information about the design of this API: [Document](https://docs.google.com/document/d/1JkZAkGI6KjZdqwJFXYlTFPna82p68vom_CojYYaTAR0/edit?usp=sharing)
 
+The procedure to install this project can be seen [HERE](deploy_tools/README.md).
+
 This project follows the recommendations and guidelines presented in the book:
 [Test-Driven Development with Python](http://chimera.labs.oreilly.com/books/1234000000754/index.html)

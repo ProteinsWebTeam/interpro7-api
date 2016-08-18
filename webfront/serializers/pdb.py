@@ -4,19 +4,17 @@ from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import SerializerDetail
 from webfront.models import Structure
 
+
 class StructureSerializer(ModelContentSerializer):
 
     def to_representation(self, instance):
         representation = {}
-
         representation = self.endpoint_representation(representation, instance, self.detail)
         representation = self.filter_representation(representation, instance, self.detail_filters)
-
         return representation
 
     @staticmethod
     def endpoint_representation(representation, instance, detail):
-        qs_type = get_queryset_type(instance)
         if detail == SerializerDetail.ALL:
             representation = StructureSerializer.to_full_representation(instance)
         elif detail == SerializerDetail.STRUCTURE_HEADERS:
@@ -25,7 +23,7 @@ class StructureSerializer(ModelContentSerializer):
             representation = StructureSerializer.to_full_representation(instance)
             representation["metadata"]["chains"] = {
                 chain.chain: StructureSerializer.to_chain_representation(chain)
-                for chain in instance.proteinstructurefeature_set.all() }
+                for chain in instance.proteinstructurefeature_set.all()}
         return representation
 
     @staticmethod
@@ -53,9 +51,6 @@ class StructureSerializer(ModelContentSerializer):
             else:
                 representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance)
         if SerializerDetail.ENTRY_PROTEIN_HEADERS in detail_filters:
-        #     if qs_type == QuerysetType.STRUCTURE_PROTEIN:
-        #         representation["proteins"] = 1
-        #     else:
             representation["proteins"] = StructureSerializer.to_proteins_count_representation(instance)
         if SerializerDetail.ENTRY_DETAIL in detail_filters:
             if qs_type == QuerysetType.STRUCTURE:
@@ -121,6 +116,7 @@ class StructureSerializer(ModelContentSerializer):
                 StructureSerializer.to_chain_representation(match, is_full)
                 for match in instance.proteinstructurefeature_set.all()
                 ]
+
     @staticmethod
     def to_proteins_detail_representation(instance):
         return [StructureSerializer.to_chain_representation(instance, True)]
@@ -140,7 +136,7 @@ class StructureSerializer(ModelContentSerializer):
             "coordinates": instance.coordinates,
         }
         if instance.entry.integrated is not None:
-            chain["integrated"]= instance.entry.integrated.accession,
+            chain["integrated"] = instance.entry.integrated.accession,
         if full:
             chain["entry"] = EntrySerializer.to_metadata_representation(instance.entry)
         return chain

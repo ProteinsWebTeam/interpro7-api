@@ -119,6 +119,7 @@ class GeneralHandler(CustomView):
                 "filter_serializer": filter_serializer,
                 "value": value
             }
+
     def get_previous_queryset(self):
         try:
             prev_queryset = self.get_from_store(CustomView, "queryset_for_previous_count")

@@ -159,7 +159,7 @@ class MemberAccesionHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         remove_empty_structures = False
-        if hasattr(obj, 'serializer'):
+        if hasattr(obj, 'serializer') or isinstance(obj, list):
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
@@ -308,7 +308,7 @@ class AccesionHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         remove_empty_structures = False
-        if hasattr(obj, 'serializer'):
+        if hasattr(obj, 'serializer') or isinstance(obj, list):
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
@@ -368,7 +368,7 @@ class UnintegratedHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         remove_empty_structures = False
-        if hasattr(obj, 'serializer'):
+        if hasattr(obj, 'serializer') or isinstance(obj, list):
             entries = [x[0]
                        for x in general_handler.queryset_manager.get_queryset("entry")
                        .values_list("accession").distinct()]
@@ -428,7 +428,7 @@ class InterproHandler(CustomView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         remove_empty_structures = False
-        if hasattr(obj, 'serializer'):
+        if hasattr(obj, 'serializer') or isinstance(obj, list):
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
@@ -495,8 +495,7 @@ class EntryHandler(CustomView):
             elif qs_type == QuerysetType.PROTEIN:
                 qs = Entry.objects.filter(accession__in=queryset_tmp.values('proteinentryfeature__entry'))
 
-            general_handler.set_in_store(EntryHandler,
-                                         "entry_count",
+            general_handler.set_in_store(EntryHandler, "entry_count",
                                          EntryHandler.get_database_contributions(qs))
 
         return queryset

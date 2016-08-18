@@ -145,16 +145,6 @@ rel_aux = {
     ]
 }
 
-chains = {
-    "1JM7": {"A": "A1CUJ5", "B": "M5ADK6"},
-    "1T2V": {"A": "P16582", "B": "P16582", "C": "P16582", "D": "P16582", "E": "P16582"},
-    "2BKM": {"A": "A0A0A2L2G2", "B": "M5ADK6"},
-    "1JZ8": {"A": "A0A0A2L2G2", "B": "A0A0A2L2G2"},
-}
-chains_entry = {k: {ch: [r[0] for r in rel_aux["entry", "protein"] if r[1] == pr]
-                    for ch, pr in v.items()}
-                for k, v in chains.items()}
-print(chains_entry)
 relationships = {}
 for e1, e2 in rel_aux:
     relationships[(e1, e2)] = rel_aux[(e1, e2)]
@@ -184,7 +174,6 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     url = "/api/{}/{}/{}".format(endpoint1, endpoint2, endpoint3)
-                    print(url)
                     response2 = self.client.get(url)
                     self.assertEqual(response2.status_code, status.HTTP_200_OK)
                     self.assertEqual(response1.data, response2.data)
@@ -486,22 +475,12 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for db3 in api_test_map[endpoint3]:
                                 for acc3 in api_test_map[endpoint3][db3]:
-
-                                    # endpoint1 = "protein"
-                                    # db1 = "trembl"
-                                    # endpoint2 = "entry"
-                                    # db2 = "interpro"
-                                    # endpoint3 = "chain"
-                                    # ep3 = "structure"
-                                    # db3 = "pdb"
-                                    # acc3 = "1T2V/A"
                                     un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                         if db3 == "unintegrated" else ""
                                     expected = self.get_expected_list_payload(endpoint1, db1, endpoint2, endpoint3,
                                                                               db2=db2, db3=db3, acc3=acc3)
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
                                         .format(endpoint1, db1, endpoint2, db2, ep3, db3 + un3, acc3)
-                                    print(url)
                                     response = self._get_in_debug_mode(url)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
@@ -510,7 +489,6 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
                                         .format(endpoint1, db1, ep3, db3 + un3, acc3, endpoint2, db2)
-                                    print(url)
                                     response = self._get_in_debug_mode(url)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)

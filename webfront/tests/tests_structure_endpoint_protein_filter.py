@@ -152,7 +152,7 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_s = "M5ADK6"
         prot_t = "P16582"
         tests = [
-            "/api/structure/pdb/"+pdb+"/protein/uniprot/bad_uniprot"
+            "/api/structure/pdb/"+pdb+"/protein/uniprot/bad_uniprot",
             "/api/structure/pdb/"+pdb+"/protein/trembl/"+prot_s,
             "/api/structure/pdb/protein/trembl/"+prot_s,
             "/api/structure/pdb/protein/swissprot/"+prot_t,

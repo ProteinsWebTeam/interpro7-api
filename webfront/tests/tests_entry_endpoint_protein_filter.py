@@ -97,14 +97,12 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         acc = "IPR003165"
         pfam = "PF02171"
         pfam_u = "PF17180"
-        smart = "SM00002"
         tests = {
             "/api/entry/interpro/"+acc+"/protein/uniprot": ["A1CUJ5", "P16582"],
             "/api/entry/interpro/"+acc+"/protein/swissprot": ["A1CUJ5"],
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/uniprot": ["A1CUJ5"],
             "/api/entry/pfam/"+pfam+"/protein/uniprot": ["A1CUJ5"],
             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot": ["M5ADK6"],
-            "/api/entry/unintegrated/smart/"+smart+"/protein/uniprot": []
         }
         for url in tests:
             response = self.client.get(url)
@@ -179,13 +177,15 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot = "A1CUJ5"
         pfam_u = "PF17180"
         prot_u = "M5ADK6"
+        smart = "SM00002"
         tests = [
             "/api/entry/interpro/protein/uniprot/"+prot_u,
             "/api/entry/interpro/"+acc+"/protein/trembl/"+prot,
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/trembl/"+prot,
             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot/"+prot,
             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/trembl/"+prot_u,
-            ]
+            "/api/entry/unintegrated/smart/"+smart+"/protein/uniprot",
+        ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 

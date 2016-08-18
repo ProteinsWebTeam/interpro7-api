@@ -63,17 +63,15 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
                 # self.assertIn(match["structure"], data_in_fixtures[result["accession"]])
                 self._check_entry_structure_details(match)
 
-    def test_urls_that_should_fails_with_no_content(self):
+    def test_can_get_structures_from_entry_acc_structure(self):
         acc = "IPR003165"
         pfam = "PF02171"
         pfam_u = "PF17180"
-        smart = "SM00002"
         tests = {
             "/api/entry/interpro/"+acc+"/structure/pdb": ["1JM7", "1T2V", "1T2V", "1T2V", "1T2V", "1T2V"],
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/structure/pdb": ["1JM7"],
             "/api/entry/pfam/"+pfam+"/structure/pdb": ["1JM7"],
             "/api/entry/unintegrated/pfam/"+pfam_u+"/structure/pdb": ["1JM7", "2BKM"],
-            "/api/entry/unintegrated/smart/"+smart+"/structure/pdb": []
         }
         for url in tests:
             response = self.client.get(url)
@@ -84,6 +82,13 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
             ids = [x["accession"] for x in response.data["structures"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
+    def test_urls_that_should_fails_with_no_content(self):
+        smart = "SM00002"
+        tests = [
+            "/api/entry/unintegrated/smart/"+smart+"/structure/pdb"
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
 class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_entry_overview_filtered_by_structure(self):

@@ -17,14 +17,8 @@ class EntrySerializer(ModelContentSerializer):
     def endpoint_representation(representation, instance, detail):
         if detail == SerializerDetail.ALL or detail == SerializerDetail.ENTRY_DETAIL:
             representation["metadata"] = EntrySerializer.to_metadata_representation(instance)
-
-        # elif self.detail == SerializerDetail.PROTEIN_ENTRY_DETAIL:
-        #     representation["metadata"] = self.to_metadata_representation(instance.entry)
-        #     representation["proteins"] = self.to_proteins_detail_representation(instance.protein)
         elif detail == SerializerDetail.ENTRY_HEADERS:
             representation = EntrySerializer.to_headers_representation(instance)
-            # representation["metadata"] = self.to_metadata_representation(instance.entry)
-            # representation["proteins"] = [ProteinSerializer.to_metadata_representation(instance.protein)]
         return representation
 
     @staticmethod
@@ -34,7 +28,6 @@ class EntrySerializer(ModelContentSerializer):
         if SerializerDetail.PROTEIN_DETAIL in detail_filters:
             representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance)
         if SerializerDetail.ENTRY_PROTEIN_HEADERS in detail_filters:
-        # #         detail_filter == SerializerDetail.ENTRY_DETAIL:
             representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
         if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
             representation["structures"] = EntrySerializer.to_structures_count_representation(instance)

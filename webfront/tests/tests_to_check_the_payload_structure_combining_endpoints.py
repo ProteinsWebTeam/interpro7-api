@@ -75,7 +75,7 @@ plurals = {
 # TODO: Crete tests for entry/unintegrated
 
 
-class ObjectStructureTest(InterproRESTTestCase):
+class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
 
     def test_endpoints_independently(self):
         for endpoint in api_test_map:
@@ -97,8 +97,7 @@ class ObjectStructureTest(InterproRESTTestCase):
 
                     self._check_structure_and_chains(response_acc, endpoint, db, acc)
 
-    def test_combining_two_endpoints(self):
-        tested = []
+    def test_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
                 if endpoint1 == endpoint2:
@@ -106,16 +105,19 @@ class ObjectStructureTest(InterproRESTTestCase):
 
                 # [endpoint]/[endpoint]
                 current = "/api/"+endpoint1+"/"+endpoint2
-                tested.append(current)
                 response = self.client.get(current)
                 self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                 self._check_counter_by_endpoint(endpoint1, response.data, "URL : [{}]".format(current))
                 self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
 
+    def test_db_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
                 for db in api_test_map[endpoint1]:
                     # [endpoint]/[db]/[endpoint]
                     current = "/api/"+endpoint1+"/"+db+"/"+endpoint2
-                    tested.append(current)
                     response = self.client.get(current)
                     self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                     self._check_is_list_of_metadata_objects(response.data["results"], "URL : [{}]".format(current))
@@ -123,9 +125,14 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                             plurals[endpoint2],
                                                             "URL : [{}]".format(current))
 
+    def test_endpoint_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for db in api_test_map[endpoint1]:
                     # [endpoint]/[endpoint]/[db]
                     current = "/api/"+endpoint2+"/"+endpoint1+"/"+db+"/"
-                    tested.append(current)
                     response = self.client.get(current)
                     self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                     self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
@@ -134,20 +141,30 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                              plurals[endpoint2],
                                                              "URL : [{}]".format(current))
 
+    def test_acc_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for db in api_test_map[endpoint1]:
                     for acc in api_test_map[endpoint1][db]:
                         # [endpoint]/[db]/[acc]/[endpoint]
                         current = "/api/"+endpoint1+"/"+db+"/"+acc+"/"+endpoint2
-                        tested.append(current)
                         response = self.client.get(current)
                         self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                         self._check_object_by_accesssion(response.data, "URL : [{}]".format(current))
                         self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                        self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2)
 
-                        tested += self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2)
-
+    def test_endpoint_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for db in api_test_map[endpoint1]:
+                    for acc in api_test_map[endpoint1][db]:
                         # [endpoint]/[endpoint]/[db]/[acc]
                         current = "/api/"+endpoint2+"/"+endpoint1+"/"+db+"/"+acc+"/"
-                        tested.append(current)
                         response = self.client.get(current)
                         self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                         self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
@@ -155,14 +172,18 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                  plurals[endpoint1],
                                                                  plurals[endpoint2],
                                                                  "URL : [{}]".format(current))
+                        self._check_structure_chains_as_counter_filter(endpoint1, db, acc, endpoint2, "",
+                                                                       plurals[endpoint1], plurals[endpoint2])
 
-                        tested += self._check_structure_chains_as_counter_filter(endpoint1, db, acc, endpoint2, "",
-                                                                                 plurals[endpoint1], plurals[endpoint2])
-
+    def test_db_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for db in api_test_map[endpoint1]:
                     # [endpoint]/[db]/[endpoint]/[db]
                     for db2 in api_test_map[endpoint2]:
                         current = "/api/"+endpoint1+"/"+db+"/"+endpoint2+"/"+db2
-                        tested.append(current)
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
                             self._check_is_list_of_metadata_objects(response.data["results"],
@@ -177,10 +198,40 @@ class ObjectStructureTest(InterproRESTTestCase):
                             logging.info("({}) - [{}]".format(response.status_code, current))
                             self.client.get(current)
 
+    def test_db_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for db in api_test_map[endpoint1]:
+                    for db2 in api_test_map[endpoint2]:
+                        for acc in api_test_map[endpoint1][db]:
+                            # [endpoint]/[db]/[endpoint]/[db]/[acc]
+                            current = "/api/"+endpoint2+"/"+db2+"/"+endpoint1+"/"+db+"/"+acc
+                            response = self._get_in_debug_mode(current)
+                            if response.status_code == status.HTTP_200_OK:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                 "URL : [{}]".format(current))
+                                self._check_is_list_of_metadata_objects(response.data["results"])
+                                for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
+                                    self._check_list_of_matches(result, "URL : [{}]".format(current))
+                                self._check_structure_chains_as_filter(endpoint1, db, acc,
+                                                                       endpoint2+"/"+db2, "",
+                                                                       plurals[endpoint1])
+                            elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                logging.info("({}) - [{}]".format(response.status_code, current))
+                                self.client.get(current)
+
+    def test_acc_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for db in api_test_map[endpoint1]:
+                    for db2 in api_test_map[endpoint2]:
                         for acc in api_test_map[endpoint1][db]:
                             # [endpoint]/[db]/[acc]/[endpoint]/[db]
                             current = "/api/"+endpoint1+"/"+db+"/"+acc+"/"+endpoint2+"/"+db2
-                            tested.append(current)
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -189,34 +240,22 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                  "URL : [{}]".format(current))
                                 self._check_list_of_matches(response.data[plurals[endpoint2]],
                                                             "URL : [{}]".format(current))
-                                tested += self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2+"/"+db2, plurals[endpoint2])
+                                self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2+"/"+db2, plurals[endpoint2])
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 logging.info("({}) - [{}]".format(response.status_code, current))
                                 self.client.get(current)
 
-
-                            # [endpoint]/[db]/[endpoint]/[db]/[acc]
-                            current = "/api/"+endpoint2+"/"+db2+"/"+endpoint1+"/"+db+"/"+acc
-                            tested.append(current)
-                            response = self._get_in_debug_mode(current)
-                            if response.status_code == status.HTTP_200_OK:
-                                self.assertEqual(response.status_code, status.HTTP_200_OK,
-                                                 "URL : [{}]".format(current))
-                                self._check_is_list_of_metadata_objects(response.data["results"])
-                                for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
-                                    self._check_list_of_matches(result, "URL : [{}]".format(current))
-                                tested += self._check_structure_chains_as_filter(endpoint1, db, acc,
-                                                                                 endpoint2+"/"+db2, "",
-                                                                                 plurals[endpoint1])
-
-                            elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                logging.info("({}) - [{}]".format(response.status_code, current))
-                                self.client.get(current)
-
+    def test_acc_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for db in api_test_map[endpoint1]:
+                    for db2 in api_test_map[endpoint2]:
+                        for acc in api_test_map[endpoint1][db]:
                             # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
                             for acc2 in api_test_map[endpoint2][db2]:
                                 current = "/api/"+endpoint1+"/"+db+"/"+acc+"/"+endpoint2+"/"+db2+"/"+acc2
-                                tested.append(current)
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -224,17 +263,17 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     self._check_object_by_accesssion(response.data)
                                     self._check_list_of_matches(response.data[plurals[endpoint2]],
                                                                 "URL : [{}]".format(current))
-                                    tested += self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2+"/"+db2+"/"+acc2, plurals[endpoint2])
-                                    tested += self._check_structure_chains_as_filter(endpoint2, db2, acc2,
+                                    self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2+"/"+db2+"/"+acc2, plurals[endpoint2])
+                                    self._check_structure_chains_as_filter(endpoint2, db2, acc2,
                                                                                      endpoint1+"/"+db+"/"+acc, "",
                                                                                      plurals[endpoint2])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
-        print("{} combinations have been tested. {} of those are unique".format(len(tested), len(set(tested))))
 
-    def test_combining_three_endpoints(self):
-        tested = []
+
+class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
+    def test_endpoint_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
                 if endpoint1 == endpoint2:
@@ -245,96 +284,171 @@ class ObjectStructureTest(InterproRESTTestCase):
 
                     # [endpoint]/[endpoint]
                     current = "/api/"+endpoint1+"/"+endpoint2+"/"+endpoint3
-                    tested.append(current)
                     response = self.client.get(current)
                     self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                     self._check_counter_by_endpoint(endpoint1, response.data, "URL : [{}]".format(current))
                     self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
                     self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
 
+    def test_endpoint_db_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        # [endpoint]/[endpoint]/[endpoint]/[db]
+                        current = "/api/"+endpoint2+"/"+endpoint3+"/"+endpoint1+"/"+db1
+                        response = self.client.get(current)
+                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                        self._check_count_overview_per_endpoints(response.data,
+                                                                 plurals[endpoint1],
+                                                                 plurals[endpoint2],
+                                                                 "URL : [{}]".format(current))
+
+    def test_endpoint_db_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        # [endpoint]/[endpoint]/[db]/[endpoint]
+                        current = "/api/"+endpoint2+"/"+endpoint1+"/"+db1+"/"+endpoint3
+                        response = self.client.get(current)
+                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                        self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                        self._check_count_overview_per_endpoints(response.data,
+                                                                 plurals[endpoint1],
+                                                                 plurals[endpoint2],
+                                                                 "URL : [{}]".format(current))
+
+    def test_db_endpoint_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
                     for db1 in api_test_map[endpoint1]:
                         # [endpoint]/[db]/[endpoint]/[endpoint]
                         current = "/api/"+endpoint1+"/"+db1+"/"+endpoint2+"/"+endpoint3
-                        tested.append(current)
                         response = self.client.get(current)
                         self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                         self._check_is_list_of_metadata_objects(response.data["results"], "URL : [{}]".format(current))
                         self._check_is_list_of_objects_with_key(response.data["results"],
                                                                 plurals[endpoint2],
                                                                 "URL : [{}]".format(current))
-                        # [endpoint]/[endpoint]/[db]/[endpoint]
-                        current = "/api/"+endpoint2+"/"+endpoint1+"/"+db1+"/"+endpoint3
-                        tested.append(current)
-                        response = self.client.get(current)
-                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
-                        self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
-                        self._check_count_overview_per_endpoints(response.data,
-                                                                 plurals[endpoint1],
-                                                                 plurals[endpoint2],
-                                                                 "URL : [{}]".format(current))
 
-                        # [endpoint]/[endpoint]/[endpoint]/[db]
-                        current = "/api/"+endpoint2+"/"+endpoint3+"/"+endpoint1+"/"+db1
-                        tested.append(current)
-                        response = self.client.get(current)
-                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
-                        self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
-                        self._check_count_overview_per_endpoints(response.data,
-                                                                 plurals[endpoint1],
-                                                                 plurals[endpoint2],
-                                                                 "URL : [{}]".format(current))
+    def test_endpoint_endpoint_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for acc in api_test_map[endpoint1][db1]:
+                            # [endpoint]/[endpoint]/[endpoint]/[db]/[acc]
+                            current = "/api/"+endpoint2+"/"+endpoint3+"/"+endpoint1+"/"+db1+"/"+acc+"/"
+                            response = self.client.get(current)
+                            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                            self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                            self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                            self._check_count_overview_per_endpoints(response.data,
+                                                                     plurals[endpoint1],
+                                                                     plurals[endpoint2],
+                                                                     "URL : [{}]".format(current))
+                            self._check_structure_chains_as_counter_filter(endpoint1, db1, acc,
+                                                                           endpoint2+"/"+endpoint3, "",
+                                                                           plurals[endpoint1],
+                                                                           plurals[endpoint2])
 
+    def test_endpoint_endpoint_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                            # [endpoint]/[endpoint]/[endpoint]/[db]
+                            current = "/api/"+endpoint2+"/"+endpoint3+"/"+endpoint1+"/"+db1+"/"
+                            response = self.client.get(current)
+                            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                            self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                            self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                            self._check_count_overview_per_endpoints(response.data,
+                                                                     plurals[endpoint1],
+                                                                     plurals[endpoint2],
+                                                                     "URL : [{}]".format(current))
+
+    def test_endpoint_acc_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for acc in api_test_map[endpoint1][db1]:
+                            # [endpoint]/[endpoint]/[db]/[acc]/[endpoint]
+                            current = "/api/"+endpoint2+"/"+endpoint1+"/"+db1+"/"+acc+"/"+"/"+endpoint3
+                            response = self.client.get(current)
+                            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                            self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                            self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                            self._check_count_overview_per_endpoints(response.data,
+                                                                     plurals[endpoint1],
+                                                                     plurals[endpoint2],
+                                                                     "URL : [{}]".format(current))
+                            self._check_structure_chains_as_counter_filter(endpoint1, db1, acc, endpoint2,
+                                                                           "/"+endpoint3, plurals[endpoint1],
+                                                                           plurals[endpoint2])
+
+    def test_acc_endpoint_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
                         for acc in api_test_map[endpoint1][db1]:
                             # [endpoint]/[db]/[acc]/[endpoint]/[endpoint]
                             current = "/api/"+endpoint1+"/"+db1+"/"+acc+"/"+endpoint2+"/"+endpoint3
-                            tested.append(current)
                             response = self.client.get(current)
                             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                             self._check_object_by_accesssion(response.data, "URL : [{}]".format(current))
                             self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
                             self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
 
-                            tested += self._check_structure_and_chains(response, endpoint1, db1, acc,
-                                                                       "/"+endpoint2+"/"+endpoint3)
+                            self._check_structure_and_chains(response, endpoint1, db1, acc, "/"+endpoint2+"/"+endpoint3)
 
-                            # [endpoint]/[endpoint]/[db]/[acc]/[endpoint]
-                            current = "/api/"+endpoint2+"/"+endpoint1+"/"+db1+"/"+acc+"/"+"/"+endpoint3
-                            tested.append(current)
-                            response = self.client.get(current)
-                            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                            self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
-                            self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
-                            self._check_count_overview_per_endpoints(response.data,
-                                                                     plurals[endpoint1],
-                                                                     plurals[endpoint2],
-                                                                     "URL : [{}]".format(current))
-
-                            tested += self._check_structure_chains_as_counter_filter(endpoint1, db1, acc, endpoint2,
-                                                                                     "/"+endpoint3, plurals[endpoint1],
-                                                                                     plurals[endpoint2])
-
-                            # [endpoint]/[endpoint]/[endpoint]/[db]/[acc]
-                            current = "/api/"+endpoint2+"/"+endpoint3+"/"+endpoint1+"/"+db1+"/"+acc+"/"
-                            tested.append(current)
-                            response = self.client.get(current)
-                            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                            self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
-                            self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
-                            self._check_count_overview_per_endpoints(response.data,
-                                                                     plurals[endpoint1],
-                                                                     plurals[endpoint2],
-                                                                     "URL : [{}]".format(current))
-
-                            tested += self._check_structure_chains_as_counter_filter(endpoint1, db1, acc,
-                                                                                     endpoint2+"/"+endpoint3, "",
-                                                                                     plurals[endpoint1],
-                                                                                     plurals[endpoint2])
+    def test_db_db_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
                         # [endpoint]/[db]/[endpoint]/[db]/[endpoint]
                         for db2 in api_test_map[endpoint2]:
                             current = "/api/"+endpoint1+"/"+db1+"/"+endpoint2+"/"+db2+"/"+endpoint3
-                            tested.append(current)
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self._check_is_list_of_metadata_objects(response.data["results"],
@@ -351,9 +465,18 @@ class ObjectStructureTest(InterproRESTTestCase):
                                 logging.info("({}) - [{}]".format(response.status_code, current))
                                 self.client.get(current)
 
+    def test_db_endpoint_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
                             # [endpoint]/[db]/[endpoint]/[endpoint]/[db]
                             current = "/api/"+endpoint1+"/"+db1+"/"+endpoint3+"/"+endpoint2+"/"+db2
-                            tested.append(current)
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self._check_is_list_of_metadata_objects(response.data["results"],
@@ -370,9 +493,18 @@ class ObjectStructureTest(InterproRESTTestCase):
                                 logging.info("({}) - [{}]".format(response.status_code, current))
                                 self.client.get(current)
 
+    def test_endpoint_db_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
                             # [endpoint]/[endpoint]/[db]/[endpoint]/[db]
                             current = "/api/"+endpoint3+"/"+endpoint2+"/"+db2+"/"+endpoint1+"/"+db1
-                            tested.append(current)
                             response = self.client.get(current)
                             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                             self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
@@ -385,10 +517,19 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                      plurals[endpoint3],
                                                                      "URL : [{}]".format(current))
 
+    def test_acc_db_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 # [endpoint]/[db]/[acc]/[endpoint]/[db]/[endpoint]
                                 current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2+"/"+endpoint3
-                                tested.append(current)
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -399,15 +540,25 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                 "URL : [{}]".format(current))
                                     self._check_counter_by_endpoint(endpoint3, response.data,
                                                                     "URL : [{}]".format(current))
-                                    tested += self._check_structure_and_chains(response, endpoint1, db1, acc1,
+                                    self._check_structure_and_chains(response, endpoint1, db1, acc1,
                                                                                "/"+endpoint2+"/"+db2+"/"+endpoint3)
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
 
+    def test_acc_endpoint_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for acc1 in api_test_map[endpoint1][db1]:
                                 # [endpoint]/[db]/[acc]/[endpoint]/[endpoint]/[db]
                                 current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3+"/"+endpoint2+"/"+db2
-                                tested.append(current)
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -417,15 +568,25 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                 "URL : [{}]".format(current))
                                     self._check_counter_by_endpoint(endpoint3, response.data,
                                                                     "URL : [{}]".format(current))
-                                    tested += self._check_structure_and_chains(response, endpoint1, db1, acc1,
+                                    self._check_structure_and_chains(response, endpoint1, db1, acc1,
                                                                                "/"+endpoint3+"/"+endpoint2+"/"+db2)
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
 
+    def test_db_acc_endpoint(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for acc1 in api_test_map[endpoint1][db1]:
                                 # /[endpoint]/[db]/[endpoint]/[db]/[acc]/[endpoint]
                                 current = "/api/"+endpoint2+"/"+db2+"/"+endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3
-                                tested.append(current)
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -436,7 +597,7 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     self._check_is_list_of_objects_with_key(response.data["results"],
                                                                             plurals[endpoint3],
                                                                             "URL : [{}]".format(current))
-                                    tested += self._check_structure_chains_as_filter(endpoint1, db1, acc1,
+                                    self._check_structure_chains_as_filter(endpoint1, db1, acc1,
                                                                                      endpoint2+"/"+db2, "/"+endpoint3,
                                                                                      plurals[endpoint1],
                                                                                      plurals[endpoint3])
@@ -444,9 +605,19 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
 
+    def test_db_endpoint_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for acc1 in api_test_map[endpoint1][db1]:
                                 # /[endpoint]/[db]/[endpoint]/[endpoint]/[db]/[acc]
                                 current = "/api/"+endpoint2+"/"+db2+"/"+endpoint3+"/"+endpoint1+"/"+db1+"/"+acc1
-                                tested.append(current)
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -457,17 +628,27 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     self._check_is_list_of_objects_with_key(response.data["results"],
                                                                             plurals[endpoint3],
                                                                             "URL : [{}]".format(current))
-                                    tested += self._check_structure_chains_as_filter(endpoint1, db1, acc1,
-                                                                                     endpoint2+"/"+db2+"/"+endpoint3,
-                                                                                     "", plurals[endpoint1],
-                                                                                     plurals[endpoint3])
+                                    self._check_structure_chains_as_filter(endpoint1, db1, acc1,
+                                                                           endpoint2+"/"+db2+"/"+endpoint3,
+                                                                           "", plurals[endpoint1],
+                                                                           plurals[endpoint3])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
 
+    def test_endpoint_db_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for acc1 in api_test_map[endpoint1][db1]:
                                 # /[endpoint]/[endpoint]/[db]/[endpoint]/[db]/[acc]
                                 current = "/api/"+endpoint3+"/"+endpoint2+"/"+db2+"/"+endpoint1+"/"+db1+"/"+acc1
-                                tested.append(current)
                                 response = self.client.get(current)
                                 self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
                                 self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
@@ -480,12 +661,24 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                          plurals[endpoint3],
                                                                          "URL : [{}]".format(current))
 
-                                tested += self._check_structure_chains_as_counter_filter(
+                                self._check_structure_chains_as_counter_filter(
                                     endpoint1, db1, acc1,
                                     endpoint3+"/"+endpoint2+"/"+db2+"/", "",
                                     plurals[endpoint1],
                                     plurals[endpoint3])
 
+    def test_endpoint_acc_db(self):
+        tested = []
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for acc1 in api_test_map[endpoint1][db1]:
                                 # /[endpoint]/[endpoint]/[db]/[acc]/[endpoint]/[db]
                                 current = "/api/"+endpoint3+"/"+endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2
                                 tested.append(current)
@@ -507,6 +700,18 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     plurals[endpoint1],
                                     plurals[endpoint3])
 
+    def test_acc_acc_endpoint(self):
+        tested = []
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for acc1 in api_test_map[endpoint1][db1]:
                                 for acc2 in api_test_map[endpoint2][db2]:
                                     # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]
                                     current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"\
@@ -534,10 +739,21 @@ class ObjectStructureTest(InterproRESTTestCase):
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
 
+    def test_acc_endpoint_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for acc1 in api_test_map[endpoint1][db1]:
+                                for acc2 in api_test_map[endpoint2][db2]:
                                     # [endpoint]/[db]/[acc]/[endpoint]/[endpoint]/[db]/[acc]
                                     current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"\
                                               + endpoint3+"/"+endpoint2+"/"+db2+"/"+acc2
-                                    tested.append(current)
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -548,17 +764,30 @@ class ObjectStructureTest(InterproRESTTestCase):
                                         self._check_counter_by_endpoint(endpoint3, response.data,
                                                                         "URL : [{}]".format(current))
 
-                                        tested += self._check_structure_and_chains(
+                                        self._check_structure_and_chains(
                                             response, endpoint1, db1, acc1,
                                             "/"+endpoint3+"/"+endpoint2+"/"+db2+"/"+acc2)
 
-                                        tested += self._check_structure_chains_as_filter(
+                                        self._check_structure_chains_as_filter(
                                             endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3, "",
                                             plurals[endpoint2])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
 
+    def test_endpoint_acc_acc(self):
+        tested = []
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for acc1 in api_test_map[endpoint1][db1]:
+                                for acc2 in api_test_map[endpoint2][db2]:
                                     # /[endpoint]/[endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
                                     current = "/api/"+endpoint3+"/"+endpoint1+"/"+db1+"/"+acc1+"/"\
                                               + endpoint2+"/"+db2+"/"+acc2
@@ -587,11 +816,19 @@ class ObjectStructureTest(InterproRESTTestCase):
                                         plurals[endpoint2],
                                         plurals[endpoint3])
 
-                                # [endpoint]/[db]/[endpoint]/[db]/[endpoint]/[db]
+    def test_db_db_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
                             for db3 in api_test_map[endpoint3]:
                                 current = "/api/"+endpoint1+"/"+db1\
                                           + "/"+endpoint2+"/"+db2+"/"+endpoint3+"/"+db3
-                                tested.append(current)
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self._check_is_list_of_metadata_objects(response.data["results"],
@@ -610,11 +847,21 @@ class ObjectStructureTest(InterproRESTTestCase):
                                     logging.info("({}) - [{}]".format(response.status_code, current))
                                     self.client.get(current)
 
+    def test_acc_db_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for db3 in api_test_map[endpoint3]:
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     # [endpoint]/[db]/[acc]/[endpoint]/[db]/[endpoint]/[db]
                                     current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"\
                                               + endpoint2+"/"+db2+"/"+endpoint3+"/"+db3
-                                    tested.append(current)
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -625,17 +872,28 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                     "URL : [{}]".format(current))
                                         self._check_list_of_matches(response.data[plurals[endpoint3]],
                                                                     "URL : [{}]".format(current))
-                                        tested += self._check_structure_and_chains(
+                                        self._check_structure_and_chains(
                                             response, endpoint1, db1, acc1,
                                             "/"+endpoint2+"/"+db2+"/"+endpoint3+"/"+db3)
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
 
+    def test_db_acc_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for db3 in api_test_map[endpoint3]:
+                                for acc1 in api_test_map[endpoint1][db1]:
                                     # /[endpoint]/[db]/[endpoint]/[db]/[acc]/[endpoint]/[db]
                                     current = "/api/"+endpoint2+"/"+db2+"/"\
                                               + endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3+"/"+db3
-                                    tested.append(current)
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -646,17 +904,28 @@ class ObjectStructureTest(InterproRESTTestCase):
                                         for result in [x[plurals[endpoint3]] for x in response.data["results"]]:
                                             self._check_list_of_matches(result, "URL : [{}]".format(current))
 
-                                        tested += self._check_structure_chains_as_filter(
+                                        self._check_structure_chains_as_filter(
                                             endpoint1, db1, acc1, endpoint2+"/"+db2, "/"+endpoint3+"/"+db3,
                                             plurals[endpoint1])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
 
+    def test_db_db_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for db3 in api_test_map[endpoint3]:
+                                for acc1 in api_test_map[endpoint1][db1]:
                                     # /[endpoint]/[db]/[endpoint]/[db]/[endpoint]/[db]/[acc]
                                     current = "/api/"+endpoint2+"/"+db2+"/"\
                                               + endpoint3+"/"+db3+"/"+endpoint1+"/"+db1+"/"+acc1
-                                    tested.append(current)
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -668,7 +937,7 @@ class ObjectStructureTest(InterproRESTTestCase):
                                         for result in [x[plurals[endpoint3]] for x in response.data["results"]]:
                                             self._check_list_of_matches(result,
                                                                         "URL : [{}]".format(current))
-                                        tested += self._check_structure_chains_as_filter(
+                                        self._check_structure_chains_as_filter(
                                             endpoint1, db1, acc1, endpoint2+"/"+db2+"/"+endpoint3+"/"+db3, "",
                                             plurals[endpoint1])
 
@@ -676,81 +945,22 @@ class ObjectStructureTest(InterproRESTTestCase):
                                         logging.info("({}) - [{}]".format(response.status_code, current))
                                         self.client.get(current)
 
-                                for acc2 in api_test_map[endpoint2][db2]:
-                                    # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]/[db]
-                                    current = "/api/"+endpoint1+"/"+db1+"/"+acc1\
-                                              + "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3
-                                    tested.append(current)
-                                    response = self._get_in_debug_mode(current)
-                                    if response.status_code == status.HTTP_200_OK:
-                                        self.assertEqual(response.status_code, status.HTTP_200_OK,
-                                                         "URL : [{}]".format(current))
-                                        self._check_object_by_accesssion(response.data)
-                                        self._check_list_of_matches(response.data[plurals[endpoint2]],
-                                                                    "URL : [{}]".format(current))
-                                        self._check_list_of_matches(response.data[plurals[endpoint3]],
-                                                                    "URL : [{}]".format(current))
-                                        tested += self._check_structure_and_chains(
-                                            response, endpoint1, db1, acc1,
-                                            "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3)
-                                        tested += self._check_structure_chains_as_filter(
-                                            endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1, "/"+endpoint3+"/"+db3,
-                                            plurals[endpoint2])
-                                    elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        logging.info("({}) - [{}]".format(response.status_code, current))
-                                        self.client.get(current)
-
-                                    # [endpoint]/[db]/[acc]/[endpoint]/[db]/[endpoint]/[db]/[acc]
-                                    current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"\
-                                              + endpoint3+"/"+db3+"/"+endpoint2+"/"+db2+"/"+acc2
-                                    tested.append(current)
-                                    response = self._get_in_debug_mode(current)
-                                    if response.status_code == status.HTTP_200_OK:
-                                        self.assertEqual(response.status_code, status.HTTP_200_OK,
-                                                         "URL : [{}]".format(current))
-                                        self._check_object_by_accesssion(response.data)
-                                        self._check_list_of_matches(response.data[plurals[endpoint2]],
-                                                                    "URL : [{}]".format(current))
-                                        self._check_list_of_matches(response.data[plurals[endpoint3]],
-                                                                    "URL : [{}]".format(current))
-                                        tested += self._check_structure_and_chains(
-                                            response, endpoint1, db1, acc1,
-                                            "/"+endpoint3+"/"+db3+"/"+endpoint2+"/"+db2+"/"+acc2)
-                                        tested += self._check_structure_chains_as_filter(
-                                            endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3+"/"+db3, "",
-                                            plurals[endpoint2])
-                                    elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        logging.info("({}) - [{}]".format(response.status_code, current))
-                                        self.client.get(current)
-
-                                    # [endpoint]/[db]/[endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
-                                    current = "/api/"+endpoint3+"/"+db3+"/"\
-                                              + endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2+"/"+acc2
-                                    tested.append(current)
-                                    response = self._get_in_debug_mode(current)
-                                    if response.status_code == status.HTTP_200_OK:
-                                        self.assertEqual(response.status_code, status.HTTP_200_OK,
-                                                         "URL : [{}]".format(current))
-                                        self._check_is_list_of_metadata_objects(response.data["results"])
-                                        for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
-                                            self._check_list_of_matches(result, "URL : [{}]".format(current))
-                                        for result in [x[plurals[endpoint2]] for x in response.data["results"]]:
-                                            self._check_list_of_matches(result, "URL : [{}]".format(current))
-                                        tested += self._check_structure_chains_as_filter(
-                                            endpoint1, db1, acc1, endpoint3+"/"+db3, "/"+endpoint2+"/"+db2+"/"+acc2,
-                                            plurals[endpoint2])
-                                        tested += self._check_structure_chains_as_filter(
-                                            endpoint2, db2, acc2, endpoint3+"/"+db3+"/"+endpoint1+"/"+db1+"/"+acc1, "",
-                                            plurals[endpoint2])
-                                    elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        logging.info("({}) - [{}]".format(response.status_code, current))
-                                        self.client.get(current)
-
-                                    # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
-                                    for acc3 in api_test_map[endpoint3][db3]:
-                                        current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"\
-                                                  + endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3+"/"+acc3
-                                        tested.append(current)
+    def test_acc_acc_db(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for db3 in api_test_map[endpoint3]:
+                                for acc1 in api_test_map[endpoint1][db1]:
+                                    for acc2 in api_test_map[endpoint2][db2]:
+                                        # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]/[db]
+                                        current = "/api/"+endpoint1+"/"+db1+"/"+acc1\
+                                                  + "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3
                                         response = self._get_in_debug_mode(current)
                                         if response.status_code == status.HTTP_200_OK:
                                             self.assertEqual(response.status_code, status.HTTP_200_OK,
@@ -760,18 +970,121 @@ class ObjectStructureTest(InterproRESTTestCase):
                                                                         "URL : [{}]".format(current))
                                             self._check_list_of_matches(response.data[plurals[endpoint3]],
                                                                         "URL : [{}]".format(current))
-                                            tested += self._check_structure_and_chains(
+                                            self._check_structure_and_chains(
                                                 response, endpoint1, db1, acc1,
-                                                "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3+"/"+acc3)
-                                            tested += self._check_structure_chains_as_filter(
-                                                endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1, "/"+endpoint3+"/"+db3+"/"+acc3,
+                                                "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3)
+                                            self._check_structure_chains_as_filter(
+                                                endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1, "/"+endpoint3+"/"+db3,
                                                 plurals[endpoint2])
-                                            tested += self._check_structure_chains_as_filter(
-                                                endpoint3, db3, acc3, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2+"/"+acc2, "",
-                                                plurals[endpoint3])
                                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                                             logging.info("({}) - [{}]".format(response.status_code, current))
                                             self.client.get(current)
 
-        print("{} combinations have been tested. {} of those are unique".format(len(tested), len(set(tested))))
-        print(set([x for x in tested if tested.count(x) > 1]))
+    def test_acc_db_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for db3 in api_test_map[endpoint3]:
+                                for acc1 in api_test_map[endpoint1][db1]:
+                                    for acc2 in api_test_map[endpoint2][db2]:
+                                        # [endpoint]/[db]/[acc]/[endpoint]/[db]/[endpoint]/[db]/[acc]
+                                        current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"\
+                                                  + endpoint3+"/"+db3+"/"+endpoint2+"/"+db2+"/"+acc2
+                                        response = self._get_in_debug_mode(current)
+                                        if response.status_code == status.HTTP_200_OK:
+                                            self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                             "URL : [{}]".format(current))
+                                            self._check_object_by_accesssion(response.data)
+                                            self._check_list_of_matches(response.data[plurals[endpoint2]],
+                                                                        "URL : [{}]".format(current))
+                                            self._check_list_of_matches(response.data[plurals[endpoint3]],
+                                                                        "URL : [{}]".format(current))
+                                            self._check_structure_and_chains(
+                                                response, endpoint1, db1, acc1,
+                                                "/"+endpoint3+"/"+db3+"/"+endpoint2+"/"+db2+"/"+acc2)
+                                            self._check_structure_chains_as_filter(
+                                                endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3+"/"+db3, "",
+                                                plurals[endpoint2])
+                                        elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                            logging.info("({}) - [{}]".format(response.status_code, current))
+                                            self.client.get(current)
+
+    def test_db_acc_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for db3 in api_test_map[endpoint3]:
+                                for acc1 in api_test_map[endpoint1][db1]:
+                                    for acc2 in api_test_map[endpoint2][db2]:
+                                        # [endpoint]/[db]/[endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
+                                        current = "/api/"+endpoint3+"/"+db3+"/"\
+                                                  + endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2+"/"+acc2
+                                        response = self._get_in_debug_mode(current)
+                                        if response.status_code == status.HTTP_200_OK:
+                                            self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                             "URL : [{}]".format(current))
+                                            self._check_is_list_of_metadata_objects(response.data["results"])
+                                            for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
+                                                self._check_list_of_matches(result, "URL : [{}]".format(current))
+                                            for result in [x[plurals[endpoint2]] for x in response.data["results"]]:
+                                                self._check_list_of_matches(result, "URL : [{}]".format(current))
+                                            self._check_structure_chains_as_filter(
+                                                endpoint1, db1, acc1, endpoint3+"/"+db3, "/"+endpoint2+"/"+db2+"/"+acc2,
+                                                plurals[endpoint1])
+                                            self._check_structure_chains_as_filter(
+                                                endpoint2, db2, acc2, endpoint3+"/"+db3+"/"+endpoint1+"/"+db1+"/"+acc1, "",
+                                                plurals[endpoint2])
+                                        elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                            logging.info("({}) - [{}]".format(response.status_code, current))
+                                            self.client.get(current)
+
+    def test_acc_acc_acc(self):
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
+                if endpoint1 == endpoint2:
+                    continue
+                for endpoint3 in api_test_map:
+                    if endpoint3 == endpoint1 or endpoint3 == endpoint2:
+                        continue
+                    for db1 in api_test_map[endpoint1]:
+                        for db2 in api_test_map[endpoint2]:
+                            for db3 in api_test_map[endpoint3]:
+                                for acc1 in api_test_map[endpoint1][db1]:
+                                    for acc2 in api_test_map[endpoint2][db2]:
+                                        # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
+                                        for acc3 in api_test_map[endpoint3][db3]:
+                                            current = "/api/"+endpoint1+"/"+db1+"/"+acc1+"/"\
+                                                      + endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3+"/"+acc3
+                                            response = self._get_in_debug_mode(current)
+                                            if response.status_code == status.HTTP_200_OK:
+                                                self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                                 "URL : [{}]".format(current))
+                                                self._check_object_by_accesssion(response.data)
+                                                self._check_list_of_matches(response.data[plurals[endpoint2]],
+                                                                            "URL : [{}]".format(current))
+                                                self._check_list_of_matches(response.data[plurals[endpoint3]],
+                                                                            "URL : [{}]".format(current))
+                                                self._check_structure_and_chains(
+                                                    response, endpoint1, db1, acc1,
+                                                    "/"+endpoint2+"/"+db2+"/"+acc2+"/"+endpoint3+"/"+db3+"/"+acc3)
+                                                self._check_structure_chains_as_filter(
+                                                    endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1, "/"+endpoint3+"/"+db3+"/"+acc3,
+                                                    plurals[endpoint2])
+                                                self._check_structure_chains_as_filter(
+                                                    endpoint3, db3, acc3, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2+"/"+acc2, "",
+                                                    plurals[endpoint3])
+                                            elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                                logging.info("({}) - [{}]".format(response.status_code, current))
+                                                self.client.get(current)

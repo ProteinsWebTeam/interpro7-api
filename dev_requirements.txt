@@ -4,3 +4,4 @@ ipdb~=0.10.1
 coveralls~=1.1
 tqdm~=4.8.3
 cx_Oracle~=5.2.1
+django-cors-headers~=1.1.0

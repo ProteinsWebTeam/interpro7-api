@@ -36,6 +36,15 @@ class CustomView(GenericAPIView):
         # if this is the last level
         if len(endpoint_levels) == level:
             if self.from_model:
+                # search filter, from request parameters
+                search = request.query_params.get("search")
+                if search:
+                    general_handler.queryset_manager.add_filter(
+                        "search",
+                        accession__icontains=search,
+                        name__icontains=search
+                    )
+
                 self.queryset = general_handler.queryset_manager.get_queryset().distinct()
                 if self.queryset.count() == 0:
                     if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct().count():

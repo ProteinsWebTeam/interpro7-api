@@ -195,3 +195,23 @@ class InterproRESTTestCase(APITransactionTestCase):
                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)
         return urls
+    
+    def assertSubset(self, subset, set, proper=False):
+        if proper:
+            self.assertLess(
+                len(subset),
+                len(set),
+                "Can't be proper subset if number of elements"
+            )
+        else:
+            self.assertLessEqual(
+                len(subset),
+                len(set),
+                "Can't be subset if more elements in subset than in set"
+            )
+        for element in subset:
+            self.assertIn(
+                element,
+                set,
+                "Element {} in subset but not in set".format(element)
+            )

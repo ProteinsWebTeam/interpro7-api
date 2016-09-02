@@ -103,7 +103,7 @@ def filter_protein_overview(obj, general_handler, database=None, is_unintegrated
     return obj
 
 
-class MemberAccesionHandler(CustomView):
+class MemberAccessionHandler(CustomView):
     level_description = 'DB member accession level'
     serializer_class = EntrySerializer
     many = False
@@ -112,7 +112,7 @@ class MemberAccesionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("entry", accession__iexact=endpoint_levels[level - 1])
-        return super(MemberAccesionHandler, self).get(
+        return super(MemberAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset,
             handler, general_handler, *args, **kwargs
         )
@@ -132,7 +132,7 @@ class MemberAccesionHandler(CustomView):
         except (IndexError, KeyError):
             database = None
         try:
-            interpro_acc = general_handler.get_from_store(AccesionHandler, "accession")
+            interpro_acc = general_handler.get_from_store(AccessionHandler, "accession")
         except (IndexError, KeyError):
             interpro_acc = None
         if isinstance(queryset, dict):
@@ -178,7 +178,7 @@ class MemberAccesionHandler(CustomView):
 class MemberHandler(CustomView):
     level_description = 'DB member level'
     child_handlers = [
-        (db_members_accessions, MemberAccesionHandler),
+        (db_members_accessions, MemberAccessionHandler),
     ]
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
@@ -214,7 +214,7 @@ class MemberHandler(CustomView):
         except (IndexError, KeyError):
             is_interpro = False
         try:
-            interpro_acc = general_handler.get_from_store(AccesionHandler, "accession")
+            interpro_acc = general_handler.get_from_store(AccessionHandler, "accession")
         except (IndexError, KeyError):
             interpro_acc = None
         general_handler.set_in_store(MemberHandler, "database", level_name)
@@ -270,7 +270,7 @@ class MemberHandler(CustomView):
         return obj
 
 
-class AccesionHandler(CustomView):
+class AccessionHandler(CustomView):
     level_description = 'interpro accession level'
     child_handlers = [
         (db_members, MemberHandler)
@@ -285,14 +285,14 @@ class AccesionHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
         general_handler.queryset_manager.add_filter("entry", accession__iexact=endpoint_levels[level - 1])
-        return super(AccesionHandler, self).get(
+        return super(AccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, parent_queryset,
             handler, general_handler, *args, **kwargs
         )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.set_in_store(AccesionHandler, "accession", level_name)
+        general_handler.set_in_store(AccessionHandler, "accession", level_name)
         if isinstance(queryset, dict):
             if "proteins" in queryset:
                 queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler,
@@ -392,7 +392,7 @@ class InterproHandler(CustomView):
     level_description = 'interpro level'
     queryset = Entry.objects.filter(source_database__iexact="interpro")
     child_handlers = [
-        (r'IPR\d{6}', AccesionHandler),
+        (r'IPR\d{6}', AccessionHandler),
         (db_members, MemberHandler),
     ]
     serializer_class = EntrySerializer

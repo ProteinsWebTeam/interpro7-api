@@ -75,7 +75,9 @@ class CustomView(GenericAPIView):
                 else:
                     return Response(data_tmp)
 
-            data_tmp = general_handler.execute_post_serializers(self.queryset)
+            self.queryset = general_handler.queryset_manager.get_queryset().distinct()
+            obj = self.get_database_contributions(self.queryset)
+            data_tmp = general_handler.execute_post_serializers(obj)
             return Response(data_tmp)
 
         else:
@@ -156,6 +158,9 @@ class CustomView(GenericAPIView):
                 endpoints.pop(index)
             except ValueError:
                 pass
+
+    def get_database_contributions(self, prefix=""):
+        return
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):

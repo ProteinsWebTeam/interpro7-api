@@ -189,11 +189,17 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     for db3 in api_test_map[endpoint3]:
+                        # endpoint1 = "entry"
+                        # endpoint2 = "structure"
+                        # endpoint3 = "protein"
+                        # db3 = "uniprot"
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3)
-                        self.assertEqual(response.data, expected)
+                        self.assertEqual(response.data, expected,
+                                         "The URL {} wasn't equal to the expected response.\nRESPONSE: {}\nEXPECTED: {}"
+                                         .format(url, response.data, expected))
 
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, endpoint2)
                         response = self.client.get(url)
@@ -214,7 +220,6 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     for db3 in api_test_map[endpoint3]:
                         for acc3 in api_test_map[endpoint3][db3]:
                             ep3 = "structure" if endpoint3 == "chain" else endpoint3
-
                             unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                 if db3 == "unintegrated" else ""
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, ep3, db3 + unintegrated, acc3)
@@ -222,7 +227,10 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             self.assertEqual(response.status_code, status.HTTP_200_OK)
                             expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
                                                                          acc3=acc3)
-                            self.assertEqual(response.data, expected)
+                            self.assertEqual(
+                                response.data, expected,
+                                "The URL {} wasn't equal to the expected response.\nRESPONSE: {}\nEXPECTED: {}"
+                                .format(url, response.data, expected))
 
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, ep3, db3 + unintegrated, acc3, endpoint2)
                             response = self.client.get(url)
@@ -270,6 +278,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     if db3 == "unintegrated" else ""
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2,
                                                                       ep3, db3 + unintegrated, acc3)
+                                print(url)
                                 response = self.client.get(url)
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                                 expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
@@ -278,6 +287,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, ep3, db3 + unintegrated, acc3,
                                                                       endpoint2, db2)
+                                print(url)
                                 response = self.client.get(url)
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                                 self.assertEqual(response.data, expected)
@@ -534,6 +544,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 if db1 == "unintegrated" else ""
                             url = "/api/{}/{}/{}/{}/{}" \
                                 .format(ep1, db1 + un1, acc1, endpoint2, endpoint3)
+                            print(url)
                             response = self._get_in_debug_mode(url)
                             expected = self.get_expected_object_payload(endpoint1, db1, acc1, endpoint2, endpoint3)
                             if response.status_code == status.HTTP_200_OK:
@@ -737,16 +748,16 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
         payload = {"metadata": {"accession": acc1.split("/")[0], "source_database": db1}}
 
         if db2 is None:
-            payload[plurals[endpoint2]] = self.get_counter_object(endpoint2, plurals[endpoint2],
-                                                                  endpoint1, db1, [acc1],
-                                                                  endpoint3, db3, accs3)
+            payload[plurals[endpoint2]] = self.get_counter_object(endpoint2,
+                                                                  endpoint1, [acc1],
+                                                                  endpoint3, accs3)
         else:
             self.set_object_for_db_filter(payload, endpoint1, acc1, endpoint2, db2, accs2, endpoint3, db3, accs3)
 
         if db3 is None:
-            payload[plurals[endpoint3]] = self.get_counter_object(endpoint3, plurals[endpoint3],
-                                                                  endpoint2, db2, accs2,
-                                                                  endpoint1, db1, [acc1])
+            payload[plurals[endpoint3]] = self.get_counter_object(endpoint3,
+                                                                  endpoint2, accs2,
+                                                                  endpoint1, [acc1])
         else:
             self.set_object_for_db_filter(payload, endpoint1, acc1, endpoint3, db3, accs3, endpoint2, db2, accs2)
         return payload
@@ -771,6 +782,9 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                 accs3 = api_test_map[endpoint3][db3]
         else:
             accs3 = [acc3]
+        accs1 = self.get_set_of_shared_ids(endpoint3, accs3,
+                                           endpoint1, accs1,
+                                           endpoint2, accs2)
         payload = [{"metadata": {"accession": x, "source_database": db1}} for x in accs1]
         for obj in payload:
             acc = obj["metadata"]["accession"]
@@ -786,50 +800,75 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
         accs3 = api_test_map[endpoint3][db3]
         if acc3 in accs3:
             accs3 = [acc3]
-        accs2 = api_test_map[endpoint2][db2] if db2 is not None else None
+        # accs2 = api_test_map[endpoint2][db2] if db2 is not None else None
+        accs2 = []
+        if db2 is None:
+            for db in api_test_map[endpoint2]:
+                accs2 += api_test_map[endpoint2][db]
+        else:
+            accs2 = api_test_map[endpoint2][db2]
         if accs2 is not None and acc2 in accs2:
             accs2 = [acc2]
+        accs1 = []
+        for db in api_test_map[endpoint1]:
+            accs1 += api_test_map[endpoint1][db]
 
         for ep in api_test_map:
             if ep == "chain":
                 continue
             eps = plurals[ep]
-            if eps == plurals[endpoint1] or (db2 is None and eps == plurals[endpoint2]):
-                payload[eps] = self.get_counter_object(ep, eps,
-                                                       endpoint2, db2, accs2,
-                                                       endpoint3, db3, accs3)
+            if eps == plurals[endpoint1]:
+                payload[eps] = self.get_counter_object(ep,
+                                                       endpoint2, accs2,
+                                                       endpoint3, accs3,
+                                                       include_3rd_endpoint=not(db2 is None))
+            elif db2 is None and eps == plurals[endpoint2]:
+                payload[plurals[endpoint2]] = self.get_counter_object(endpoint2,
+                                                                      endpoint1, accs1,
+                                                                      endpoint3, accs3,
+                                                                      include_3rd_endpoint=not(db2 is None))
         return payload
 
-    def get_counter_object(self, ep, eps, endpoint2, db2, accs2, endpoint3, db3, accs3):
+    def get_counter_object(self, endpoint1, endpoint2, accs2, endpoint3, accs3,
+                           include_3rd_endpoint=False):
         _obj = {}
-        for db in api_test_map[ep]:
-            accs = api_test_map[ep][db]
-            if ep != "entry" or db == "interpro" or db == "unintegrated":
+        eps = plurals[endpoint1]
+        for db in api_test_map[endpoint1]:
+            accs = api_test_map[endpoint1][db]
+            if endpoint1 != "entry" or db == "interpro" or db == "unintegrated":
                 obj = _obj
             else:
                 if "member_databases" not in _obj:
                     _obj["member_databases"] = {}
                 obj = _obj["member_databases"]
             obj[db] = {
-                plurals[endpoint3]: len(self.get_set_of_shared_ids(ep, accs,
+                plurals[endpoint3]: len(self.get_set_of_shared_ids(endpoint1, accs,
                                                                    endpoint3, accs3,
-                                                                   endpoint2, db2, accs2)),
+                                                                   endpoint2, accs2)),
                 eps: len(self.get_set_of_shared_ids(endpoint3, accs3,
-                                                    ep, accs,
-                                                    endpoint2, db2, accs2)),
+                                                    endpoint1, accs,
+                                                    endpoint2, accs2)),
             }
-            if db2 is not None:
-                obj[db][plurals[endpoint2]] = len(self.get_set_of_shared_ids(ep, accs,
+            if db != "unintegrated" and \
+                    db != "pdb" and \
+                    db != "interpro" and \
+                    db != "uniprot" and \
+                    sum(obj[db].values()) < 1:
+                del obj[db]
+
+            if include_3rd_endpoint and db in obj:
+                obj[db][plurals[endpoint2]] = len(self.get_set_of_shared_ids(endpoint1, accs,
                                                                              endpoint2, accs2,
-                                                                             endpoint3, db3, accs3))
+                                                                             endpoint3, accs3))
         return _obj
 
-    def get_set_of_shared_ids(self, endpoint1, accs1, endpoint2, accs2, endpoint3=None, db3=None, accs3=None,
-                              chain2=None):
+    def get_set_of_shared_ids(self, endpoint1, accs1,
+                              endpoint2, accs2,
+                              endpoint3=None, accs3=None):
         shared_ids = set([x[1]
                           for x in relationships[endpoint1, endpoint2]
                           if x[0] in accs1 and x[1] in accs2])
-        if db3 is not None:
+        if endpoint3 is not None:
             link_ids = set([x[1]
                             for x in relationships[endpoint1, endpoint3]
                             if x[0] in accs1 and x[1] in accs3])
@@ -840,12 +879,19 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
         return shared_ids
 
     def set_object_for_db_filter(self, obj, endpoint1, acc, endpoint2, db2, accs2, endpoint3, db3, accs3):
+        accs2 = self.get_set_of_shared_ids(endpoint3, accs3,
+                                           endpoint2, accs2,
+                                           endpoint1, [acc])
+        accs3 = self.get_set_of_shared_ids(endpoint1, [acc],
+                                           endpoint3, accs3,
+                                           endpoint2, accs2)
+        accs=self.get_set_of_shared_ids(endpoint1, [acc], endpoint2, accs2, endpoint3, accs3)
         if db2 is None:
-            obj[plurals[endpoint2]] = len(self.get_set_of_shared_ids(endpoint1, [acc], endpoint2, accs2))
+            obj[plurals[endpoint2]] = len(accs)
         else:
             obj[plurals[endpoint2]] = [{"accession": x[1], "source_database": db2, "coordinates": [], "name": ""}
                                        for x in relationships[endpoint1, endpoint2]
-                                       if x[0] == acc and x[1] in accs2]
+                                       if x[0] == acc and x[1] in accs]
             if db3 is not None:
                 ids = [x["accession"] for x in obj[plurals[endpoint2]]]
                 ids2 = [x[0] for x in relationships[endpoint2, endpoint3] if x[0] in ids and x[1] in accs3]

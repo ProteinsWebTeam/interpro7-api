@@ -40,17 +40,23 @@ class GeneralHandler(CustomView):
         ('protein', ProteinHandler),
         ('structure', StructureHandler),
     ]
+    plurals = {
+        "entry": "entries",
+        "protein": "proteins",
+        "structure": "structures",
+    }
     child_handlers = []
     queryset = Entry.objects
     store = {}
     last_endpoint_level = None
     queryset_manager = QuerysetManager()
+    endpoint_levels = []
 
     def get(self, request, url='', *args, **kwargs):
         self.store = {}
         self.post_serializers = {}
         self.filter_serializers = {}
-        endpoint_levels = map_url_to_levels(url)
+        self.endpoint_levels = endpoint_levels = map_url_to_levels(url)
 
         self.set_in_store(GeneralHandler, "pagination", pagination_information(request))
         try:
@@ -103,8 +109,9 @@ class GeneralHandler(CustomView):
             }
 
     def execute_post_serializers(self, data):
-        for key in self.post_serializers:
-            ps = self.post_serializers[key]
+        pss = list(self.post_serializers.items())
+        pss.sort(key=lambda e: self.endpoint_levels.index(e[0]))
+        for key, ps in pss:
             data = ps["post_serializer"](data, ps["value"], self)
         return data
 

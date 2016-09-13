@@ -1,106 +1,33 @@
 import re
 from django.db.models import Count
 
-from webfront.constants import QuerysetType
-from webfront.constants import get_queryset_type
-from webfront.models import Entry, ProteinEntryFeature, EntryStructureFeature
+from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
-members = settings.DB_MEMBERS
-db_members = '|'.join(members)
+db_members = '|'.join(settings.DB_MEMBERS)
 db_members_accessions = (
-    r'^({})$'.format('|'.join((db['accession'] for (_, db) in members.items())))
+    r'^({})$'.format('|'.join((db['accession'] for (_, db) in settings.DB_MEMBERS.items())))
 )
 
 
-def filter_structure_overview(obj, general_handler, database=None, is_unintegrated=False, accession=None,
-                              is_interpro=False, interpro_acc=None):
-    prev_queryset, qs_type = general_handler.get_previous_queryset()
-    matches = EntryStructureFeature.objects.all()
-    if is_unintegrated:
-        matches = matches \
-            .filter(entry__integrated__isnull=True) \
-            .exclude(entry__source_database__iexact="interpro")
-    if database is not None:
-        matches = matches.filter(entry__source_database__iexact=database)
-    if accession is not None:
-        matches = matches.filter(entry=accession)
-    if is_interpro:
-        matches = matches.filter(entry__integrated__isnull=False)
-    if interpro_acc is not None:
-        matches = matches.filter(entry__integrated=interpro_acc)
+def filter_entry_overview(obj, general_handler, endpoint):
+    obj = EntryHandler.flat_counter_object(obj)
 
-    entries = matches.values("entry")
-    structs = matches.values("structure")
-    include_prots = False
-    if prev_queryset is not None:
-        if qs_type == QuerysetType.STRUCTURE_PROTEIN:
-            matches = matches.filter(structure__accession__in=prev_queryset.values("structure")) \
-                .filter(entry__in=prev_queryset.values("protein__entry"))
-            include_prots = True
-        elif qs_type == QuerysetType.ENTRY_STRUCTURE:
-            matches = matches.all() & prev_queryset.all()
-            include_prots = True
-        structs = matches.values("structure")
-        entries = matches.values("entry")
-        if include_prots:
-            prots = set(matches.values_list("entry__protein__accession")) \
-                .intersection(matches.values_list("structure__protein__accession"))
-            CustomView.set_counter_attributte(obj, "pdb", "proteins", len(prots))
+    for entry_db in obj:
+        qm = general_handler.queryset_manager.clone()
+        if entry_db == "unintegrated":
+            qm.add_filter("entry",
+                          integrated__isnull=True,
+                          source_database__iregex=db_members)
+        else:
+            qm.add_filter("entry", source_database__iexact=entry_db)
 
-    general_handler.set_in_store(CustomView, "queryset_for_previous_count", matches)
-
-    CustomView.set_counter_attributte(obj, "pdb", "structures",
-                                      structs.distinct().count())
-    CustomView.set_counter_attributte(obj, "pdb", "entries",
-                                      entries.distinct().count())
-    return obj
-
-
-def filter_protein_overview(obj, general_handler, database=None, is_unintegrated=False, accession=None,
-                            is_interpro=False, interpro_acc=None):
-    prev_queryset, qs_type = general_handler.get_previous_queryset()
-    matches = ProteinEntryFeature.objects.all()
-    if is_unintegrated:
-        matches = matches \
-            .filter(entry__integrated__isnull=True) \
-            .exclude(entry__source_database__iexact="interpro")
-    if database is not None:
-        matches = matches.filter(entry__source_database__iexact=database)
-    if accession is not None:
-        matches = matches.filter(entry=accession)
-    if is_interpro:
-        matches = matches.filter(entry__integrated__isnull=False)
-    if interpro_acc is not None:
-        matches = matches.filter(entry__integrated=interpro_acc)
-
-    if prev_queryset is not None:
-        if qs_type == QuerysetType.STRUCTURE_PROTEIN:
-            matches = matches.filter(protein__proteinstructurefeature__in=prev_queryset) \
-                .filter(entry__accession__in=prev_queryset.values("structure__entry"))
-        elif qs_type == QuerysetType.ENTRY_PROTEIN:
-            matches = matches.all() & prev_queryset.all()
-
-    general_handler.set_in_store(CustomView, "queryset_for_previous_count", matches)
-
-    for prot_db in obj:
-        matches2 = matches.all()
-        if prot_db != "uniprot":
-            matches2 = matches.filter(protein__source_database__iexact=prot_db)
-        prots = matches2.values("protein")
-        entries = matches2.values("entry")
-
-        if prev_queryset is not None and (qs_type == QuerysetType.STRUCTURE_PROTEIN or
-                                          qs_type == QuerysetType.ENTRY_PROTEIN):
-            structs = set(matches2.values_list("entry__structure__accession")) \
-                .intersection(matches2.values_list("protein__structure__accession"))
-            CustomView.set_counter_attributte(obj, prot_db, "structures", len(structs))
-
-        CustomView.set_counter_attributte(obj, prot_db, "proteins", prots.distinct().count())
-        CustomView.set_counter_attributte(obj, prot_db, "entries", entries.distinct().count())
-    return obj
+        if not isinstance(obj[entry_db], dict):
+            obj[entry_db] = {"entries": obj[entry_db]}
+        obj[entry_db][general_handler.plurals[endpoint]] = qm.get_queryset(endpoint).values("accession").distinct().count()
+    return EntryHandler.unflat_counter_object(obj)
 
 
 class MemberAccessionHandler(CustomView):
@@ -119,45 +46,29 @@ class MemberAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        try:
-            is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
-        except (IndexError, KeyError):
-            is_unintegrated = False
-        try:
-            is_interpro = general_handler.get_from_store(InterproHandler, "interpro")
-        except (IndexError, KeyError):
-            is_interpro = False
-        try:
-            database = general_handler.get_from_store(MemberHandler, "database")
-        except (IndexError, KeyError):
-            database = None
-        try:
-            interpro_acc = general_handler.get_from_store(AccessionHandler, "accession")
-        except (IndexError, KeyError):
-            interpro_acc = None
-        if isinstance(queryset, dict):
-            if "proteins" in queryset:
-                queryset["proteins"] = filter_protein_overview(
-                    queryset["proteins"], general_handler,
-                    database=database,
-                    accession=level_name,
-                    is_unintegrated=is_unintegrated,
-                    interpro_acc=interpro_acc,
-                    is_interpro=is_interpro)
-            if "structures" in queryset:
-                queryset["structures"] = filter_structure_overview(
-                    queryset["structures"], general_handler,
-                    database=database,
-                    accession=level_name,
-                    is_unintegrated=is_unintegrated,
-                    interpro_acc=interpro_acc,
-                    is_interpro=is_interpro)
-            return queryset
+        # from webfront.views.protein import filter_protein_overview
+        # from webfront.views.structure import filter_structure_overview
+        # if isinstance(queryset, dict):
+        #     if "proteins" in queryset:
+        #         queryset["proteins"] = filter_protein_overview(
+        #             queryset["proteins"], general_handler, "entry")
+        #     if "structures" in queryset:
+        #         queryset["structures"] = filter_structure_overview(
+        #             queryset["structures"], general_handler, "entry")
+        #     return queryset
         general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
         return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+            from webfront.views.protein import filter_protein_overview
+            from webfront.views.structure import filter_structure_overview
+            if "structures" in obj:
+                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+            if "proteins" in obj:
+                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+            return obj
         remove_empty_structures = False
         if hasattr(obj, 'serializer') or isinstance(obj, list):
             arr = [obj] if isinstance(obj, dict) else obj
@@ -220,22 +131,16 @@ class MemberHandler(CustomView):
         general_handler.set_in_store(MemberHandler, "database", level_name)
 
         if isinstance(queryset, dict):
+            # from webfront.views.protein import filter_protein_overview
+            # from webfront.views.structure import filter_structure_overview
             if "entries" in queryset:
                 del queryset["entries"]
-
-            if "proteins" in queryset:
-                queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler,
-                                                               database=level_name,
-                                                               is_unintegrated=is_unintegrated,
-                                                               interpro_acc=interpro_acc,
-                                                               is_interpro=is_interpro)
-            if "structures" in queryset:
-                queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler,
-                                                                   database=level_name,
-                                                                   is_unintegrated=is_unintegrated,
-                                                                   interpro_acc=interpro_acc,
-                                                                   is_interpro=is_interpro)
-            return queryset
+            #
+            # if "proteins" in queryset:
+            #     queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler, "entry")
+            # if "structures" in queryset:
+            #     queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler, "entry")
+            # return queryset
         else:
             if is_unintegrated:
                 general_handler.queryset_manager.add_filter("entry", integrated__isnull=True)
@@ -249,6 +154,14 @@ class MemberHandler(CustomView):
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+            from webfront.views.protein import filter_protein_overview
+            from webfront.views.structure import filter_structure_overview
+            if "structures" in obj:
+                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+            if "proteins" in obj:
+                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+            return obj
         remove_empty_structures = False
         if hasattr(obj, 'serializer') or isinstance(obj, list):
             entries = [x[0]
@@ -293,20 +206,24 @@ class AccessionHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(AccessionHandler, "accession", level_name)
-        if isinstance(queryset, dict):
-            if "proteins" in queryset:
-                queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler,
-                                                               database="interpro",
-                                                               accession=level_name)
-            if "structures" in queryset:
-                queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler,
-                                                                   database="interpro",
-                                                                   accession=level_name)
-            return queryset
+        # if isinstance(queryset, dict):
+        #     if "proteins" in queryset:
+        #         queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler, "entry")
+        #     if "structures" in queryset:
+        #         queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler, "entry")
+        #     return queryset
         general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+            from webfront.views.protein import filter_protein_overview
+            from webfront.views.structure import filter_structure_overview
+            if "structures" in obj:
+                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+            if "proteins" in obj:
+                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+            return obj
         remove_empty_structures = False
         if hasattr(obj, 'serializer') or isinstance(obj, list):
             arr = [obj] if isinstance(obj, dict) else obj
@@ -351,13 +268,11 @@ class UnintegratedHandler(CustomView):
         general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
         if isinstance(queryset, dict):
             del queryset["entries"]
-            if "proteins" in queryset:
-                queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler,
-                                                               is_unintegrated=True)
-            if "structures" in queryset:
-                queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler,
-                                                                   is_unintegrated=True)
-            return queryset
+            # if "proteins" in queryset:
+            #     queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler, "entry")
+            # if "structures" in queryset:
+            #     queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler, "entry")
+            # return queryset
         else:
             general_handler.queryset_manager.add_filter(
                 "entry",
@@ -367,6 +282,14 @@ class UnintegratedHandler(CustomView):
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+            from webfront.views.protein import filter_protein_overview
+            from webfront.views.structure import filter_structure_overview
+            if "structures" in obj:
+                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+            if "proteins" in obj:
+                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+            return obj
         remove_empty_structures = False
         if hasattr(obj, 'serializer') or isinstance(obj, list):
             entries = [x[0]
@@ -411,22 +334,31 @@ class InterproHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(InterproHandler, "interpro", True)
-        if isinstance(queryset, dict):
-            del queryset["entries"]  # at this level (db) the counter is embedded in other endpoint.
-            if "proteins" in queryset:
-                queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler,
-                                                               database="interpro")
-            if "structures" in queryset:
-                queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler,
-                                                                   "interpro")
-            return queryset
-        else:
-            general_handler.queryset_manager.add_filter("entry",
-                                                        source_database__iexact=level_name)
-            return queryset
+        # if isinstance(queryset, dict):
+        #     del queryset["entries"]  # at this level (db) the counter is embedded in other endpoint.
+        #     if "proteins" in queryset:
+        #         queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler,
+        #                                                        database="interpro")
+        #     if "structures" in queryset:
+        #         queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler,
+        #                                                            "interpro")
+        #     return queryset
+        # else:
+        general_handler.queryset_manager.add_filter("entry",
+                                                    source_database__iexact=level_name)
+        return queryset
 
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
+        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+            from webfront.views.protein import filter_protein_overview
+            from webfront.views.structure import filter_structure_overview
+            if "structures" in obj:
+                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+            if "proteins" in obj:
+                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+            return obj
+
         remove_empty_structures = False
         if hasattr(obj, 'serializer') or isinstance(obj, list):
             arr = [obj] if isinstance(obj, dict) else obj
@@ -454,7 +386,8 @@ class EntryHandler(CustomView):
 
     @staticmethod
     def get_database_contributions(queryset, prefix=""):
-        entry_counter = queryset.values(prefix + 'source_database').annotate(total=Count(prefix + 'source_database'))
+        qs = Entry.objects.filter(accession__in=queryset.values(prefix+"accession"))
+        entry_counter = qs.values(prefix + 'source_database').annotate(total=Count(prefix + 'source_database'))
         output = {
             "interpro": 0,
             "unintegrated": 0,
@@ -466,15 +399,15 @@ class EntryHandler(CustomView):
             else:
                 output["member_databases"][row[prefix + 'source_database'].lower()] = row["total"]
 
-        output["unintegrated"] = queryset \
+        output["unintegrated"] = qs \
             .exclude(**{prefix + 'source_database__iexact': "interpro"}) \
             .filter(**{prefix + 'integrated__isnull': True}).count()
-        return output
+        return {"entries": output}
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.reset_filters("entry")
-        self.queryset = {"entries": EntryHandler.get_database_contributions(Entry.objects.all())}
+        general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
+        general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
@@ -483,28 +416,56 @@ class EntryHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
-        queryset_tmp = general_handler.queryset_manager.get_queryset()
-        qs = Entry.objects.all()
-        if isinstance(queryset, dict):
-            queryset["entries"] = EntryHandler.get_database_contributions(qs)
-        else:
-            qs_type = get_queryset_type(queryset_tmp)
-            if qs_type == QuerysetType.STRUCTURE:
-                # TODO: Check on how to filter the chains.
-                qs = Entry.objects.filter(accession__in=queryset_tmp.values('entrystructurefeature__entry'))
-            elif qs_type == QuerysetType.PROTEIN:
-                qs = Entry.objects.filter(accession__in=queryset_tmp.values('proteinentryfeature__entry'))
-
-            general_handler.set_in_store(EntryHandler, "entry_count",
-                                         EntryHandler.get_database_contributions(qs))
+        # queryset_tmp = general_handler.queryset_manager.get_queryset()
+        # qs = Entry.objects.all()
+        # if isinstance(queryset, dict):
+        #     queryset["entries"] = EntryHandler.get_database_contributions(qs)
+        # else:
+        #     qs_type = get_queryset_type(queryset_tmp)
+        #     if qs_type == QuerysetType.STRUCTURE:
+        #         # TODO: Check on how to filter the chains.
+        #         qs = Entry.objects.filter(accession__in=queryset_tmp.values('entrystructurefeature__entry'))
+        #     elif qs_type == QuerysetType.PROTEIN:
+        #         qs = Entry.objects.filter(accession__in=queryset_tmp.values('proteinentryfeature__entry'))
+        #
+        #     general_handler.set_in_store(EntryHandler, "entry_count",
+        #                                  EntryHandler.get_database_contributions(qs))
+        general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
 
         return queryset
 
     @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None):
-        if not isinstance(obj, list):
-            try:
-                obj["entries"] = general_handler.get_from_store(EntryHandler, "entry_count")
-            finally:
-                return obj
+    def post_serializer(obj, level_name="", general_handler=None, queryset=None):
+        if general_handler.queryset_manager.main_endpoint != "entry":
+            if isinstance(obj, dict):
+                qs = general_handler.queryset_manager.get_queryset("entry")
+                return {**obj, **EntryHandler.get_database_contributions(qs)}
+            elif isinstance(obj, list):
+                pc = general_handler.queryset_manager.group_and_count("entry")
+                for item in obj:
+                    item["entries"] = pc[item["metadata"]["accession"]]
+        return obj
+        #
+        # if not isinstance(obj, list):
+        #     try:
+        #         obj["entries"] = general_handler.get_from_store(EntryHandler, "entry_count")
+        #     finally:
+        #         return obj
+        # return obj
+
+    @staticmethod
+    def flat_counter_object(obj):
+        obj = {**obj, **obj["member_databases"]}
+        del obj["member_databases"]
+        return obj
+
+    @staticmethod
+    def unflat_counter_object(obj):
+        new_obj = {"member_databases": {}}
+        for key, value in obj.items():
+            if key == "interpro" or key == "unintegrated":
+                new_obj[key] = value
+            else:
+                new_obj["member_databases"][key] = value
+        obj = new_obj
         return obj

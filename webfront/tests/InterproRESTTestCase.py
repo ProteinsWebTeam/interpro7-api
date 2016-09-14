@@ -53,9 +53,6 @@ class InterproRESTTestCase(APITransactionTestCase):
         for obj in _list:
             self.assertIn(key, obj, msg)
 
-    def _check_is_list_of_objects_with_accession(self, _list, msg=""):
-        self._check_is_list_of_objects_with_key(_list, "accession", msg)
-
     def _check_HTTP_response_code(self, url, code=status.HTTP_204_NO_CONTENT, msg=""):
         prev = settings.DEBUG
         settings.DEBUG = False
@@ -74,7 +71,10 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_protein_count_overview(self, main_obj, msg=""):
         obj = main_obj["proteins"]
         self.assertIn("uniprot", obj, msg)
-        if (isinstance(obj["uniprot"], int) and obj["uniprot"] > 0) or (isinstance(obj["uniprot"], dict) and isinstance(obj["uniprot"]["proteins"], int) and obj["uniprot"]["proteins"] > 0):
+        if (isinstance(obj["uniprot"], int) and obj["uniprot"] > 0) or \
+            (isinstance(obj["uniprot"], dict) and
+             isinstance(obj["uniprot"]["proteins"], int) and
+             obj["uniprot"]["proteins"] > 0):
             self.assertTrue("trembl" in obj or "swissprot" in obj, msg)
 
     def _check_protein_details(self, obj):
@@ -176,7 +176,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                     self.client.get(current)
         return urls
 
-    def _check_structure_chains_as_filter(self, endpoint, db, acc, prefix="", postfix="", key1=None, key2=None):
+    def _check_structure_chains_as_filter(self, endpoint, db, acc, prefix="", postfix="", key1=None):
         urls = []
         if "structure" == endpoint:
             for chain in chains[acc]:
@@ -186,7 +186,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                 if response.status_code == status.HTTP_200_OK:
                     obj = [response.data] if "structures" in response.data else response.data["results"]
                     self._check_is_list_of_metadata_objects(obj)
-                    for result in [x[key1] for x in obj]:
+                    for result in [x[key1] for x in obj if key1 in x]:
                         self._check_list_of_matches(result, "URL : [{}]".format(current))
                         self.assertGreaterEqual(len(result), 1)
                         for r in result:
@@ -196,22 +196,15 @@ class InterproRESTTestCase(APITransactionTestCase):
                     self.client.get(current)
         return urls
     
-    def assertSubset(self, subset, set, proper=False):
-        if proper:
-            self.assertLess(
-                len(subset),
-                len(set),
-                "Can't be proper subset if number of elements"
-            )
-        else:
-            self.assertLessEqual(
-                len(subset),
-                len(set),
-                "Can't be subset if more elements in subset than in set"
-            )
+    def assertSubset(self, subset, superset, proper=False):
+        self.assertLessEqual(
+            len(subset),
+            len(superset),
+            "Can't be subset if more elements in subset than in set"
+        )
         for element in subset:
             self.assertIn(
                 element,
-                set,
+                superset,
                 "Element {} in subset but not in set".format(element)
             )

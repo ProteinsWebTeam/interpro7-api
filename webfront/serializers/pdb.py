@@ -30,26 +30,21 @@ class StructureSerializer(ModelContentSerializer):
     def to_full_representation(instance):
         return {
             "metadata": StructureSerializer.to_metadata_representation(instance),
-            # "entries": StructureSerializer.to_entries_count_representation(instance),
-            # "representation": instance.feature,
-            # "structure": instance.structure,
-            # "genomicContext": instance.genomic_context,
-            # "source_database": instance.source_database
         }
 
     @staticmethod
     def filter_representation(representation, instance, detail_filters):
         qs_type = get_queryset_type(instance)
         if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
-            if qs_type == QuerysetType.STRUCTURE_PROTEIN:
-                representation["proteins"] = [StructureSerializer.to_chain_representation(instance)]
-            else:
+            # if qs_type == QuerysetType.STRUCTURE_PROTEIN:
+            #     representation["proteins"] = [StructureSerializer.to_chain_representation(instance)]
+            # else:
                 representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance)
         if SerializerDetail.PROTEIN_DETAIL in detail_filters:
-            if qs_type == QuerysetType.STRUCTURE:
+            # if qs_type == QuerysetType.STRUCTURE:
                 representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance, True)
-            else:
-                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance)
+            # else:
+            #     representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance)
         if SerializerDetail.ENTRY_PROTEIN_HEADERS in detail_filters:
             representation["proteins"] = StructureSerializer.to_proteins_count_representation(instance)
         if SerializerDetail.ENTRY_DETAIL in detail_filters:
@@ -117,9 +112,9 @@ class StructureSerializer(ModelContentSerializer):
                 for match in instance.proteinstructurefeature_set.all()
                 ]
 
-    @staticmethod
-    def to_proteins_detail_representation(instance):
-        return [StructureSerializer.to_chain_representation(instance, True)]
+    # @staticmethod
+    # def to_proteins_detail_representation(instance):
+    #     return [StructureSerializer.to_chain_representation(instance, True)]
 
     @staticmethod
     def to_entries_count_representation(instance):

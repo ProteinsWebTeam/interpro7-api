@@ -26,7 +26,9 @@ def filter_entry_overview(obj, general_handler, endpoint):
 
         if not isinstance(obj[entry_db], dict):
             obj[entry_db] = {"entries": obj[entry_db]}
-        obj[entry_db][general_handler.plurals[endpoint]] = qm.get_queryset(endpoint).values("accession").distinct().count()
+        obj[entry_db][general_handler.plurals[endpoint]] = qm.get_queryset(endpoint)\
+            .values("accession")\
+            .distinct().count()
     return EntryHandler.unflat_counter_object(obj)
 
 
@@ -46,16 +48,6 @@ class MemberAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        # from webfront.views.protein import filter_protein_overview
-        # from webfront.views.structure import filter_structure_overview
-        # if isinstance(queryset, dict):
-        #     if "proteins" in queryset:
-        #         queryset["proteins"] = filter_protein_overview(
-        #             queryset["proteins"], general_handler, "entry")
-        #     if "structures" in queryset:
-        #         queryset["structures"] = filter_structure_overview(
-        #             queryset["structures"], general_handler, "entry")
-        #     return queryset
         general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
         return queryset
 
@@ -100,7 +92,6 @@ class MemberHandler(CustomView):
 
         general_handler.queryset_manager.add_filter("entry", source_database__iexact=endpoint_levels[level - 1])
 
-        # if parent_queryset is not None and isinstance(parent_queryset, QuerySet):
         if endpoint_levels[level - 2] == "unintegrated":
             general_handler.queryset_manager.add_filter("entry", integrated__isnull=True)
         if endpoint_levels[level - 2] == "interpro":
@@ -131,16 +122,8 @@ class MemberHandler(CustomView):
         general_handler.set_in_store(MemberHandler, "database", level_name)
 
         if isinstance(queryset, dict):
-            # from webfront.views.protein import filter_protein_overview
-            # from webfront.views.structure import filter_structure_overview
             if "entries" in queryset:
                 del queryset["entries"]
-            #
-            # if "proteins" in queryset:
-            #     queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler, "entry")
-            # if "structures" in queryset:
-            #     queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler, "entry")
-            # return queryset
         else:
             if is_unintegrated:
                 general_handler.queryset_manager.add_filter("entry", integrated__isnull=True)
@@ -206,12 +189,6 @@ class AccessionHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(AccessionHandler, "accession", level_name)
-        # if isinstance(queryset, dict):
-        #     if "proteins" in queryset:
-        #         queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler, "entry")
-        #     if "structures" in queryset:
-        #         queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler, "entry")
-        #     return queryset
         general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
 
     @staticmethod
@@ -268,11 +245,6 @@ class UnintegratedHandler(CustomView):
         general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
         if isinstance(queryset, dict):
             del queryset["entries"]
-            # if "proteins" in queryset:
-            #     queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler, "entry")
-            # if "structures" in queryset:
-            #     queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler, "entry")
-            # return queryset
         else:
             general_handler.queryset_manager.add_filter(
                 "entry",
@@ -334,18 +306,7 @@ class InterproHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.set_in_store(InterproHandler, "interpro", True)
-        # if isinstance(queryset, dict):
-        #     del queryset["entries"]  # at this level (db) the counter is embedded in other endpoint.
-        #     if "proteins" in queryset:
-        #         queryset["proteins"] = filter_protein_overview(queryset["proteins"], general_handler,
-        #                                                        database="interpro")
-        #     if "structures" in queryset:
-        #         queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler,
-        #                                                            "interpro")
-        #     return queryset
-        # else:
-        general_handler.queryset_manager.add_filter("entry",
-                                                    source_database__iexact=level_name)
+        general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
         return queryset
 
     @staticmethod
@@ -416,20 +377,6 @@ class EntryHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
-        # queryset_tmp = general_handler.queryset_manager.get_queryset()
-        # qs = Entry.objects.all()
-        # if isinstance(queryset, dict):
-        #     queryset["entries"] = EntryHandler.get_database_contributions(qs)
-        # else:
-        #     qs_type = get_queryset_type(queryset_tmp)
-        #     if qs_type == QuerysetType.STRUCTURE:
-        #         # TODO: Check on how to filter the chains.
-        #         qs = Entry.objects.filter(accession__in=queryset_tmp.values('entrystructurefeature__entry'))
-        #     elif qs_type == QuerysetType.PROTEIN:
-        #         qs = Entry.objects.filter(accession__in=queryset_tmp.values('proteinentryfeature__entry'))
-        #
-        #     general_handler.set_in_store(EntryHandler, "entry_count",
-        #                                  EntryHandler.get_database_contributions(qs))
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
 
         return queryset
@@ -447,13 +394,6 @@ class EntryHandler(CustomView):
         else:
             obj = {"entries": obj}
         return obj
-        #
-        # if not isinstance(obj, list):
-        #     try:
-        #         obj["entries"] = general_handler.get_from_store(EntryHandler, "entry_count")
-        #     finally:
-        #         return obj
-        # return obj
 
     @staticmethod
     def flat_counter_object(obj):

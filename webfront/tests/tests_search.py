@@ -15,7 +15,7 @@ class EntryRESTSearchTest(InterproRESTTestCase):
             "/api/entry/interpro/?search=piwi"
         ).data["results"]
         unfiltered = self.client.get("/api/entry/interpro/").data["results"]
-        self.assertSubset(subset=filtered, set=unfiltered, proper=True)
+        self.assertSubset(subset=filtered, superset=unfiltered, proper=True)
 
     def test_return_same_case_insensitive(self):
         response = self.client.get("/api/entry/interpro/?search=piwi").json()
@@ -40,7 +40,7 @@ class ProteinRESTSearchTest(InterproRESTTestCase):
             "/api/protein/uniprot/?search=carboxy"
         ).data["results"]
         unfiltered = self.client.get("/api/protein/uniprot/").data["results"]
-        self.assertSubset(subset=filtered, set=unfiltered, proper=True)
+        self.assertSubset(subset=filtered, superset=unfiltered, proper=True)
 
     def test_return_same_case_insensitive(self):
         response = self.client.get(
@@ -67,7 +67,7 @@ class StructureRESTSearchTest(InterproRESTTestCase):
             "/api/structure/pdb/?search=brca"
         ).data["results"]
         unfiltered = self.client.get("/api/structure/pdb/").data["results"]
-        self.assertSubset(subset=filtered, set=unfiltered, proper=True)
+        self.assertSubset(subset=filtered, superset=unfiltered, proper=True)
 
     def test_return_same_case_insensitive(self):
         response = self.client.get("/api/structure/pdb/?search=brca").json()

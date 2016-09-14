@@ -31,8 +31,6 @@ class CustomView(GenericAPIView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        if available_endpoint_handlers is None:
-            available_endpoint_handlers = []
         # if this is the last level
         if len(endpoint_levels) == level:
             if self.from_model:
@@ -75,6 +73,7 @@ class CustomView(GenericAPIView):
                 else:
                     return Response(data_tmp)
 
+            # if it gets here it is a endpoint request checking for database contributions.
             self.queryset = general_handler.queryset_manager.get_queryset().distinct()
             obj = self.get_database_contributions(self.queryset)
             data_tmp = general_handler.execute_post_serializers(obj)
@@ -133,8 +132,6 @@ class CustomView(GenericAPIView):
             self.queryset = handler_class.filter(self.queryset, endpoint_levels[level], general_handler)
             general_handler.register_filter_serializer(handler_class.serializer_detail_filter, endpoint_levels[level])
             general_handler.register_post_serializer(handler_class.post_serializer, endpoint_levels[level])
-
-            # handlers = {**self.child_handlers, **endpoints}
             handlers = endpoints + handler_class.child_handlers
 
             try:
@@ -169,9 +166,3 @@ class CustomView(GenericAPIView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         return obj
-
-    @staticmethod
-    def set_counter_attributte(obj, dict_key, key, value):
-        if dict_key not in obj or not isinstance(obj[dict_key], dict):
-            obj[dict_key] = {}
-        obj[dict_key][key] = value

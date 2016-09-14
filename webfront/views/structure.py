@@ -27,8 +27,7 @@ class ChainPDBAccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("structure",
-                                                    proteinstructurefeature__chain=endpoint_levels[level - 1],
-                                                    entrystructurefeature__chain=endpoint_levels[level - 1])
+                                                    proteinstructurefeature__chain=endpoint_levels[level - 1])
         return super(ChainPDBAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -257,7 +256,7 @@ class StructureHandler(CustomView):
         for row in protein_counter:
             output[row[prefix+"source_database"]] = row["total"]
         output = output if output != {} else {"pdb": 0}
-        return {"structures": output}
+        return output
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -273,18 +272,18 @@ class StructureHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("structure", accession__isnull=False)
-        qs = Structure.objects.all()
-        if isinstance(queryset, dict):
-            queryset["structures"] = StructureHandler.get_database_contributions(qs)
-        else:
-            qs_type = get_queryset_type(queryset)
-            if qs_type == QuerysetType.PROTEIN:
-                qs = Structure.objects.filter(accession__in=queryset.values('structures'))
-            elif qs_type == QuerysetType.ENTRY:
-                qs = Structure.objects.filter(accession__in=queryset.values('structures'))
-            general_handler.set_in_store(StructureHandler,
-                                         "structure_count",
-                                         StructureHandler.get_database_contributions(qs))
+        # qs = Structure.objects.all()
+        # if isinstance(queryset, dict):
+        #     queryset["structures"] = StructureHandler.get_database_contributions(qs)
+        # else:
+        #     qs_type = get_queryset_type(queryset)
+        #     if qs_type == QuerysetType.PROTEIN:
+        #         qs = Structure.objects.filter(accession__in=queryset.values('structures'))
+        #     elif qs_type == QuerysetType.ENTRY:
+        #         qs = Structure.objects.filter(accession__in=queryset.values('structures'))
+        #     general_handler.set_in_store(StructureHandler,
+        #                                  "structure_count",
+        #                                  StructureHandler.get_database_contributions(qs))
         return queryset
 
     @staticmethod
@@ -292,11 +291,13 @@ class StructureHandler(CustomView):
         if general_handler.queryset_manager.main_endpoint != "structure":
             if isinstance(obj, dict):
                 qs = general_handler.queryset_manager.get_queryset("structure")
-                return {**obj, **StructureHandler.get_database_contributions(qs)}
+                obj["structures"] = StructureHandler.get_database_contributions(qs)
             elif isinstance(obj, list):
                 pc = general_handler.queryset_manager.group_and_count("structure")
                 for item in obj:
                     item["structures"] = pc[item["metadata"]["accession"]]
+        else:
+            obj = {"structures": obj}
         return obj
         # if not isinstance(obj, list):
         #     try:

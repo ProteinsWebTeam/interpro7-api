@@ -37,16 +37,12 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_protein_details(response.data["metadata"])
             self._check_entry_count_overview(response.data)
 
-    def test_gets_empty_entries_array_for_protein_with_no_matches(self):
-        acc = "A0A0A2L2G2"
-        response = self.client.get("/api/protein/uniprot/"+acc+"/entry/")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self._check_protein_details(response.data["metadata"])
-        self._check_entry_count_overview(response.data)
-        self.assertDictEqual(response.data["entries"]["member_databases"], {},
-                             "there should not be reports of member db")
-        self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
-        self.assertEqual(response.data["entries"]["unintegrated"], 0, "no unintegrated entries")
+    def test_urls_that_should_fails_with_no_content(self):
+        tests = [
+            "/api/protein/uniprot/A0A0A2L2G2/entry/"
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
     def test_urls_that_should_fails(self):
         swissprot = "A1CUJ5"
@@ -138,7 +134,6 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
 
     def test_urls_that_should_fails_with_no_content(self):
         tr_1 = "P16582"
-        sp_1 = "M5ADK6"
         tests = [
             "/api/protein/uniprot/entry/unintegrated/smart",
             "/api/protein/uniprot/"+tr_1+"/entry/unintegrated",

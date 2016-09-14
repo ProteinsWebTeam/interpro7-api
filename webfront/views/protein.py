@@ -1,10 +1,9 @@
 from django.db.models import Count
 from django.shortcuts import redirect
 
-from webfront.constants import get_queryset_type, QuerysetType
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.models import Protein, ProteinEntryFeature, ProteinStructureFeature
+from webfront.models import Protein
 from django.conf import settings
 
 
@@ -178,7 +177,7 @@ class ProteinHandler(CustomView):
             output[row[prefix+"source_database"]] = row["total"]
 
         output["uniprot"] = sum(output.values())
-        return {"proteins": output}
+        return output
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -215,11 +214,13 @@ class ProteinHandler(CustomView):
         if endpoint != "protein":
             if isinstance(obj, dict):
                 qs = general_handler.queryset_manager.get_queryset("protein")
-                return {**obj, **ProteinHandler.get_database_contributions(qs)}
+                obj["proteins"] = ProteinHandler.get_database_contributions(qs)
             elif isinstance(obj, list):
                 pc = general_handler.queryset_manager.group_and_count("protein")
                 for item in obj:
                     item["proteins"] = pc[item["metadata"]["accession"]]
+        else:
+            obj = {"proteins": obj}
         return obj
         # if not isinstance(obj, list):
         #     try:

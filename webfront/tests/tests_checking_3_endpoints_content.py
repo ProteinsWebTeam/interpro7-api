@@ -599,6 +599,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     if db1 == "unintegrated" else ""
                                 url = "/api/{}/{}/{}/{}/{}/{}" \
                                     .format(ep1, db1 + un1, acc1, endpoint2, db2, endpoint3)
+                                print(url)
                                 response = self._get_in_debug_mode(url)
                                 expected = self.get_expected_object_payload(endpoint1, db1, acc1, endpoint2, endpoint3,
                                                                             db2=db2)
@@ -610,6 +611,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
                                 url = "/api/{}/{}/{}/{}/{}/{}" \
                                     .format(ep1, db1 + un1, acc1, endpoint3, endpoint2, db2)
+                                print(url)
                                 response = self._get_in_debug_mode(url)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.compare_objects_expected_vs_response(

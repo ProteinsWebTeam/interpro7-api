@@ -1,6 +1,5 @@
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
-import logging
 
 api_test_map = {
     "entry": {
@@ -118,12 +117,15 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                 for db in api_test_map[endpoint1]:
                     # [endpoint]/[db]/[endpoint]
                     current = "/api/"+endpoint1+"/"+db+"/"+endpoint2
-                    response = self.client.get(current)
-                    self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                    self._check_is_list_of_metadata_objects(response.data["results"], "URL : [{}]".format(current))
-                    self._check_is_list_of_objects_with_key(response.data["results"],
-                                                            plurals[endpoint2],
-                                                            "URL : [{}]".format(current))
+                    response = self._get_in_debug_mode(current)
+                    if response.status_code == status.HTTP_200_OK:
+                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                        self._check_is_list_of_metadata_objects(response.data["results"], "URL : [{}]".format(current))
+                        self._check_is_list_of_objects_with_key(response.data["results"],
+                                                                plurals[endpoint2],
+                                                                "URL : [{}]".format(current))
+                    elif response.status_code != status.HTTP_204_NO_CONTENT:
+                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_endpoint_db(self):
         for endpoint1 in api_test_map:
@@ -150,11 +152,14 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     for acc in api_test_map[endpoint1][db]:
                         # [endpoint]/[db]/[acc]/[endpoint]
                         current = "/api/"+endpoint1+"/"+db+"/"+acc+"/"+endpoint2
-                        response = self.client.get(current)
-                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                        self._check_object_by_accesssion(response.data, "URL : [{}]".format(current))
-                        self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
-                        self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2)
+                        response = self._get_in_debug_mode(current)
+                        if response.status_code == status.HTTP_200_OK:
+                            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                            self._check_object_by_accesssion(response.data, "URL : [{}]".format(current))
+                            self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                            self._check_structure_and_chains(response, endpoint1, db, acc, "/"+endpoint2)
+                        elif response.status_code != status.HTTP_204_NO_CONTENT:
+                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_endpoint_acc(self):
         for endpoint1 in api_test_map:
@@ -195,8 +200,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                 self._check_list_of_matches(result, "URL : [{}]".format(current))
 
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
-                            logging.info("({}) - [{}]".format(response.status_code, current))
-                            self.client.get(current)
+                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_acc(self):
         for endpoint1 in api_test_map:
@@ -219,8 +223,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                                                        endpoint2+"/"+db2, "",
                                                                        plurals[endpoint1])
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                logging.info("({}) - [{}]".format(response.status_code, current))
-                                self.client.get(current)
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_acc_db(self):
         for endpoint1 in api_test_map:
@@ -243,8 +246,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                 self._check_structure_and_chains(response, endpoint1, db, acc,
                                                                  "/"+endpoint2+"/"+db2, plurals[endpoint2])
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                logging.info("({}) - [{}]".format(response.status_code, current))
-                                self.client.get(current)
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -270,8 +272,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                                                            endpoint1+"/"+db+"/"+acc, "",
                                                                            plurals[endpoint2])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    logging.info("({}) - [{}]".format(response.status_code, current))
-                                    self.client.get(current)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
@@ -323,12 +324,16 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                     for db1 in api_test_map[endpoint1]:
                         # [endpoint]/[db]/[endpoint]/[endpoint]
                         current = "/api/"+endpoint1+"/"+db1+"/"+endpoint2+"/"+endpoint3
-                        response = self.client.get(current)
-                        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                        self._check_is_list_of_metadata_objects(response.data["results"], "URL : [{}]".format(current))
-                        self._check_is_list_of_objects_with_key(response.data["results"],
-                                                                plurals[endpoint2],
-                                                                "URL : [{}]".format(current))
+                        response = self._get_in_debug_mode(current)
+                        if response.status_code == status.HTTP_200_OK:
+                            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                            self._check_is_list_of_metadata_objects(response.data["results"], "URL : [{}]".format(current))
+                            self._check_is_list_of_objects_with_key(response.data["results"],
+                                                                    plurals[endpoint2],
+                                                                    "URL : [{}]".format(current))
+
+                        elif response.status_code != status.HTTP_204_NO_CONTENT:
+                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_endpoint_endpoint_acc(self):
         for endpoint1 in api_test_map:
@@ -411,13 +416,16 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for acc in api_test_map[endpoint1][db1]:
                             # [endpoint]/[db]/[acc]/[endpoint]/[endpoint]
                             current = "/api/"+endpoint1+"/"+db1+"/"+acc+"/"+endpoint2+"/"+endpoint3
-                            response = self.client.get(current)
-                            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                            self._check_object_by_accesssion(response.data, "URL : [{}]".format(current))
-                            self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
-                            self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                            response = self._get_in_debug_mode(current)
 
-                            self._check_structure_and_chains(response, endpoint1, db1, acc, "/"+endpoint2+"/"+endpoint3)
+                            if response.status_code == status.HTTP_200_OK:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
+                                self._check_object_by_accesssion(response.data, "URL : [{}]".format(current))
+                                self._check_counter_by_endpoint(endpoint2, response.data, "URL : [{}]".format(current))
+                                self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                                self._check_structure_and_chains(response, endpoint1, db1, acc, "/"+endpoint2+"/"+endpoint3)
+                            elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_db_endpoint(self):
         for endpoint1 in api_test_map:
@@ -444,8 +452,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                                         plurals[endpoint3],
                                                                         "URL : [{}]".format(current))
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                logging.info("({}) - [{}]".format(response.status_code, current))
-                                self.client.get(current)
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_endpoint_db(self):
         for endpoint1 in api_test_map:
@@ -472,8 +479,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                                         plurals[endpoint3],
                                                                         "URL : [{}]".format(current))
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                logging.info("({}) - [{}]".format(response.status_code, current))
-                                self.client.get(current)
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_endpoint_db_db(self):
         for endpoint1 in api_test_map:
@@ -525,8 +531,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     self._check_structure_and_chains(response, endpoint1, db1, acc1,
                                                                      "/"+endpoint2+"/"+db2+"/"+endpoint3)
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    logging.info("({}) - [{}]".format(response.status_code, current))
-                                    self.client.get(current)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_acc_endpoint_db(self):
         for endpoint1 in api_test_map:
@@ -553,8 +558,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     self._check_structure_and_chains(response, endpoint1, db1, acc1,
                                                                      "/"+endpoint3+"/"+endpoint2+"/"+db2)
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    logging.info("({}) - [{}]".format(response.status_code, current))
-                                    self.client.get(current)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_acc_endpoint(self):
         for endpoint1 in api_test_map:
@@ -584,8 +588,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                                            plurals[endpoint1],
                                                                            plurals[endpoint3])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    logging.info("({}) - [{}]".format(response.status_code, current))
-                                    self.client.get(current)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_endpoint_acc(self):
         for endpoint1 in api_test_map:
@@ -615,8 +618,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                                            "", plurals[endpoint1],
                                                                            plurals[endpoint3])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    logging.info("({}) - [{}]".format(response.status_code, current))
-                                    self.client.get(current)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_endpoint_db_acc(self):
         for endpoint1 in api_test_map:
@@ -718,8 +720,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             plurals[endpoint2])
 
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        logging.info("({}) - [{}]".format(response.status_code, current))
-                                        self.client.get(current)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_acc_endpoint_acc(self):
         for endpoint1 in api_test_map:
@@ -754,8 +755,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3, "",
                                             plurals[endpoint2])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        logging.info("({}) - [{}]".format(response.status_code, current))
-                                        self.client.get(current)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_endpoint_acc_acc(self):
         tested = []
@@ -826,8 +826,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     for result in [x[plurals[endpoint3]] for x in response.data["results"]]:
                                         self._check_list_of_matches(result, "URL : [{}]".format(current))
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    logging.info("({}) - [{}]".format(response.status_code, current))
-                                    self.client.get(current)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_acc_db_db(self):
         for endpoint1 in api_test_map:
@@ -858,8 +857,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             response, endpoint1, db1, acc1,
                                             "/"+endpoint2+"/"+db2+"/"+endpoint3+"/"+db3)
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        logging.info("({}) - [{}]".format(response.status_code, current))
-                                        self.client.get(current)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_acc_db(self):
         for endpoint1 in api_test_map:
@@ -890,8 +888,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             endpoint1, db1, acc1, endpoint2+"/"+db2, "/"+endpoint3+"/"+db3,
                                             plurals[endpoint1])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        logging.info("({}) - [{}]".format(response.status_code, current))
-                                        self.client.get(current)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_db_acc(self):
         for endpoint1 in api_test_map:
@@ -924,8 +921,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             plurals[endpoint1])
 
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        logging.info("({}) - [{}]".format(response.status_code, current))
-                                        self.client.get(current)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_acc_acc_db(self):
         for endpoint1 in api_test_map:
@@ -959,8 +955,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 endpoint2, db2, acc2, endpoint1+"/"+db1+"/"+acc1, "/"+endpoint3+"/"+db3,
                                                 plurals[endpoint2])
                                         elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                            logging.info("({}) - [{}]".format(response.status_code, current))
-                                            self.client.get(current)
+                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_acc_db_acc(self):
         for endpoint1 in api_test_map:
@@ -995,8 +990,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 endpoint1+"/"+db1+"/"+acc1+"/"+endpoint3+"/"+db3, "",
                                                 plurals[endpoint2])
                                         elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                            logging.info("({}) - [{}]".format(response.status_code, current))
-                                            self.client.get(current)
+                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_db_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -1031,8 +1025,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 endpoint3+"/"+db3+"/"+endpoint1+"/"+db1+"/"+acc1, "",
                                                 plurals[endpoint2])
                                         elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                            logging.info("({}) - [{}]".format(response.status_code, current))
-                                            self.client.get(current)
+                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_acc_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -1072,5 +1065,4 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                     endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2+"/"+acc2, "",
                                                     plurals[endpoint3])
                                             elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                                logging.info("({}) - [{}]".format(response.status_code, current))
-                                                self.client.get(current)
+                                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

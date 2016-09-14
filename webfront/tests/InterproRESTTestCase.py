@@ -67,6 +67,7 @@ class InterproRESTTestCase(APITransactionTestCase):
         prev = settings.DEBUG
         settings.DEBUG = False
         response = self.client.get(url)
+        print(url, response.status_code)
         settings.DEBUG = prev
         return response
 

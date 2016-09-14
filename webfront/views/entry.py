@@ -402,7 +402,7 @@ class EntryHandler(CustomView):
         output["unintegrated"] = qs \
             .exclude(**{prefix + 'source_database__iexact': "interpro"}) \
             .filter(**{prefix + 'integrated__isnull': True}).count()
-        return {"entries": output}
+        return output
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -439,11 +439,13 @@ class EntryHandler(CustomView):
         if general_handler.queryset_manager.main_endpoint != "entry":
             if isinstance(obj, dict):
                 qs = general_handler.queryset_manager.get_queryset("entry")
-                return {**obj, **EntryHandler.get_database_contributions(qs)}
+                obj["entries"] = EntryHandler.get_database_contributions(qs)
             elif isinstance(obj, list):
                 pc = general_handler.queryset_manager.group_and_count("entry")
                 for item in obj:
                     item["entries"] = pc[item["metadata"]["accession"]]
+        else:
+            obj = {"entries": obj}
         return obj
         #
         # if not isinstance(obj, list):

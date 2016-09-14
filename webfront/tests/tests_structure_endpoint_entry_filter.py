@@ -41,14 +41,17 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
 
     def test_gets_empty_entries_array_for_structure_with_no_matches(self):
         acc = "1JZ8"
-        response = self.client.get("/api/structure/pdb/"+acc+"/entry/")
-        self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-        self._check_structure_details(response.data["metadata"])
-        self._check_entry_count_overview(response.data)
-        self.assertDictEqual(response.data["entries"]["member_databases"], {},
-                             "there should not be reports of member db")
-        self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
-        self.assertEqual(response.data["entries"]["unintegrated"], 0, "no unintegrated entries")
+        response = self._get_in_debug_mode("/api/structure/pdb/"+acc+"/entry/")
+        if response.status_code == status.HTTP_200_OK:
+            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self._check_structure_details(response.data["metadata"])
+            self._check_entry_count_overview(response.data)
+            self.assertDictEqual(response.data["entries"]["member_databases"], {},
+                                 "there should not be reports of member db")
+            self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
+            self.assertEqual(response.data["entries"]["unintegrated"], 0, "no unintegrated entries")
+        else:
+            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_urls_that_should_fails(self):
         tests = [

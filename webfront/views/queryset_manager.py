@@ -14,6 +14,7 @@ class QuerysetManager:
         "structure": {},
         "protein": {},
     }
+    endpoints = []
 
     def reset_filters(self, endpoint, endpoint_levels=[]):
         self.main_endpoint = endpoint
@@ -24,32 +25,6 @@ class QuerysetManager:
             "structure": {},
             "protein": {},
         }
-        # if "entry" in endpoint_levels:
-        #     if "structure" in endpoint_levels:
-        #         self.add_filter("structure", entrystructurefeature__entry_id=F('entry__accession'))
-        #         self.add_filter("entry", entrystructurefeature__structure_id=F('structure__accession'))
-        #         if "protein" in endpoint_levels:
-        #             self.add_filter("structure", proteinstructurefeature__protein_id=F('structure__accession'))
-        #             self.add_filter("protein", proteinstructurefeature__structure_id=F('protein__accession'))
-        #     if "protein" in endpoint_levels:
-        #         self.add_filter("entry", proteinentryfeature__protein_id=F('entry__accession'))
-        #         self.add_filter("protein", proteinentryfeature__entry_id=F('protein__accession'))
-        # elif "structure" in endpoint_levels:
-        #     if "protein" in endpoint_levels:
-        #         self.add_filter("structure", proteinstructurefeature__protein_id=F('structure__accession'))
-        #         self.add_filter("protein", proteinstructurefeature__structure_id=F('protein__accession'))
-
-                #         self.add_filter("protein", entry__accession__isnull=False)
-        # if "protein" in endpoint_levels:
-        #     if "structure" in endpoint_levels:
-        #         self.add_filter("structure", protein__accession__isnull=False)
-        #     if "entry" in endpoint_levels:
-        #         self.add_filter("entry", protein__accession__isnull=False)
-        # if "structure" in endpoint_levels:
-        #     if "protein" in endpoint_levels:
-        #         self.add_filter("protein", structure__accession__isnull=False)
-        #     if "entry" in endpoint_levels:
-        #         self.add_filter("entry", structure__accession__isnull=False)
 
     def add_filter(self, endpoint,  **kwargs):
         self.filters[endpoint] = {**self.filters[endpoint], **kwargs}
@@ -114,7 +89,7 @@ class QuerysetManager:
         elif endpoint == "protein":
             queryset = Protein.objects.all()
 
-        current_filters = self.get_join_filters(endpoint)
+        current_filters = {} if only_main_endpoint else self.get_join_filters(endpoint)
 
         # creates an `OR` filter for the search fields
         search_filters = self.filters.get("search")

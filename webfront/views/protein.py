@@ -40,7 +40,6 @@ class UniprotAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        protein_db = general_handler.get_from_store(UniprotHandler, "protein_db")
         if not isinstance(queryset, dict):
             general_handler.queryset_manager.add_filter("protein", accession=level_name)
             return queryset
@@ -112,18 +111,10 @@ class UniprotHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.set_in_store(UniprotHandler, "protein_db", level_name)
-        # if not isinstance(queryset, dict):
         if level_name != "uniprot":
             general_handler.queryset_manager.add_filter("protein", source_database__iexact=level_name)
         else:
             general_handler.queryset_manager.add_filter("protein", source_database__isnull=False)
-        # else:
-        #     del queryset["proteins"]
-        #     if "entries" in queryset:
-        #         queryset["entries"] = filter_entry_overview(queryset["entries"], general_handler, level_name)
-        #     if "structures" in queryset:
-        #         queryset["structures"] = filter_structure_overview(queryset["structures"], general_handler, level_name)
         return queryset
 
     @staticmethod
@@ -184,7 +175,6 @@ class ProteinHandler(CustomView):
 
         general_handler.queryset_manager.reset_filters("protein", endpoint_levels)
         general_handler.queryset_manager.add_filter("protein", accession__isnull=False)
-        # self.queryset = {"proteins": ProteinHandler.get_database_contributions(Protein.objects.all())}
 
         return super(ProteinHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -193,19 +183,7 @@ class ProteinHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        # qs = Protein.objects.all()
         general_handler.queryset_manager.add_filter("protein", accession__isnull=False)
-        # if isinstance(queryset, dict):
-        #     queryset["proteins"] = ProteinHandler.get_database_contributions(qs)
-        # else:
-        #     qs_type = get_queryset_type(queryset)
-        #     if qs_type == QuerysetType.ENTRY:
-        #         qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
-        #     elif qs_type == QuerysetType.STRUCTURE:
-        #         qs = Protein.objects.filter(accession__in=queryset.values('proteins'))
-        #     general_handler.set_in_store(ProteinHandler,
-        #                                  "protein_count",
-        #                                  ProteinHandler.get_database_contributions(qs))
         return queryset
 
     @staticmethod
@@ -222,9 +200,3 @@ class ProteinHandler(CustomView):
         else:
             obj = {"proteins": obj}
         return obj
-        # if not isinstance(obj, list):
-        #     try:
-        #         obj["proteins"] = general_handler.get_from_store(ProteinHandler, "protein_count")
-        #     finally:
-        #         return obj
-        # return obj

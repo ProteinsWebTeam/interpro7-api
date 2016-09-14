@@ -189,10 +189,6 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     for db3 in api_test_map[endpoint3]:
-                        # endpoint1 = "entry"
-                        # endpoint2 = "structure"
-                        # endpoint3 = "protein"
-                        # db3 = "uniprot"
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -371,7 +367,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                 self.assertEqual(
                     len(expected[key]), len(response[key]),
                     "Check length of the {} array  of the {} {} \nEXP: {}\nRES: {}"
-                        .format(key, endpoint1, expected["metadata"]["accession"], expected[key], response[key]))
+                    .format(key, endpoint1, expected["metadata"]["accession"], expected[key], response[key]))
                 expected[key].sort(key=lambda obj: obj["accession"])
                 response[key].sort(key=lambda obj: obj["accession"])
                 for match in expected[key]:
@@ -536,7 +532,9 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                 if plurals[endpoint1] == plurals[endpoint2] or endpoint2 == "chain":
                     continue
                 for endpoint3 in api_test_map:
-                    if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3] or endpoint3 == "chain":
+                    if plurals[endpoint1] == plurals[endpoint3] or \
+                            plurals[endpoint2] == plurals[endpoint3] or \
+                            endpoint3 == "chain":
                         continue
                     for db1 in api_test_map[endpoint1]:
                         for acc1 in api_test_map[endpoint1][db1]:
@@ -591,7 +589,9 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     continue
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3] or endpoint3 == "chain":
+                        if plurals[endpoint1] == plurals[endpoint3] or \
+                                plurals[endpoint2] == plurals[endpoint3] or \
+                                endpoint3 == "chain":
                             continue
                         for db1 in api_test_map[endpoint1]:
                             for acc1 in api_test_map[endpoint1][db1]:
@@ -627,7 +627,9 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     continue
                 for db2 in api_test_map[endpoint2]:
                     for endpoint3 in api_test_map:
-                        if plurals[endpoint1] == plurals[endpoint3] or plurals[endpoint2] == plurals[endpoint3] or endpoint3 == "chain":
+                        if plurals[endpoint1] == plurals[endpoint3] or \
+                                plurals[endpoint2] == plurals[endpoint3] or \
+                                endpoint3 == "chain":
                             continue
                         for db3 in api_test_map[endpoint3]:
                             for db1 in api_test_map[endpoint1]:
@@ -887,7 +889,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
         accs3 = self.get_set_of_shared_ids(endpoint1, [acc],
                                            endpoint3, accs3,
                                            endpoint2, accs2)
-        accs=self.get_set_of_shared_ids(endpoint1, [acc], endpoint2, accs2, endpoint3, accs3)
+        accs = self.get_set_of_shared_ids(endpoint1, [acc], endpoint2, accs2, endpoint3, accs3)
         if db2 is None:
             obj[plurals[endpoint2]] = len(accs)
         else:

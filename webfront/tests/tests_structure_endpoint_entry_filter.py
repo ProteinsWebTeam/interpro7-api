@@ -40,25 +40,16 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
                 self.assertEqual(chain["chain"], "A")
 
     def test_gets_empty_entries_array_for_structure_with_no_matches(self):
-        acc = "1JZ8"
-        response = self._get_in_debug_mode("/api/structure/pdb/"+acc+"/entry/")
-        if response.status_code == status.HTTP_200_OK:
-            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-            self._check_structure_details(response.data["metadata"])
-            self._check_entry_count_overview(response.data)
-            self.assertDictEqual(response.data["entries"]["member_databases"], {},
-                                 "there should not be reports of member db")
-            self.assertEqual(response.data["entries"]["interpro"], 0, "no interpro entries")
-            self.assertEqual(response.data["entries"]["unintegrated"], 0, "no unintegrated entries")
-        else:
-            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        response = self._get_in_debug_mode("/api/structure/pdb/1JZ8/entry/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_urls_that_should_fails(self):
         tests = [
             "/api/structure/bad_db/entry/",
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND,
+                                           msg="The URL ["+url+"] should've failed.")
 
 
 class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
@@ -171,7 +162,8 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/structure/pdb/entry/unintegrated/smart",
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT,
+                                           msg="The URL ["+url+"] should've failed.")
 
 
 class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
@@ -258,11 +250,9 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             self._check_entry_details(response.data["entries"][0]["entry"])
 
     def test_urls_that_should_fail(self):
-        pdb_1 = "1JM7"
         pdb_2 = "2BKM"
         acc = "IPR003165"
         pfam = "PF02171"
-        pfam_u = "PF17180"
         smart = "SM00950"
         tests = [
             "/api/structure/pdb/"+pdb_2+"/entry/interpro/"+acc,
@@ -291,4 +281,5 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/structure/pdb/"+pdb_2+"/A/entry/unintegrated/pfam/"+pfam_u,
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT,
+                                           msg="The URL ["+url+"] should've failed.")

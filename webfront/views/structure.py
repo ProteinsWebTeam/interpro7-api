@@ -222,13 +222,12 @@ class StructureHandler(CustomView):
     serializer_detail_filter = SerializerDetail.STRUCTURE_HEADERS
 
     @staticmethod
-    def get_database_contributions(queryset, prefix=""):
-        qs = Structure.objects.filter(accession__in=queryset.values(prefix+"accession"))
-        protein_counter = qs.values(prefix+'source_database').annotate(total=Count(prefix+'source_database'))
-        output = {}
-        for row in protein_counter:
-            output[row[prefix+"source_database"]] = row["total"]
-        output = output if output != {} else {"pdb": 0}
+    def get_database_contributions(queryset):
+        qs = Structure.objects.filter(accession__in=queryset)
+        protein_counter = qs.values_list('source_database').annotate(total=Count('source_database'))
+        output = {"pdb": 0}
+        for (source_database, total) in protein_counter:
+            output[source_database] = total
         return output
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,

@@ -154,7 +154,7 @@ class MemberHandler(CustomView):
             for o in arr:
                 if "entries" in o:
                     o["entries"] = [e for e in o["entries"]
-                                    if e["source_database"] == level_name and
+                                    if e["source_database"].lower() == level_name and
                                     (entries is None or e["accession"] in entries)
                                     ]
                     if len(o["entries"]) == 0:
@@ -271,7 +271,7 @@ class UnintegratedHandler(CustomView):
             for o in arr:
                 if "entries" in o:
                     o["entries"] = [e for e in o["entries"]
-                                    if re.match(db_members, e["source_database"]) and
+                                    if re.match(db_members, e["source_database"], flags=re.IGNORECASE) and
                                     "integrated" not in e and
                                     e["accession"] in entries]
                     if len(o["entries"]) == 0:
@@ -325,7 +325,7 @@ class InterproHandler(CustomView):
             arr = [obj] if isinstance(obj, dict) else obj
             for o in arr:
                 if "entries" in o:
-                    o["entries"] = [e for e in o["entries"] if e["source_database"] == "interpro"]
+                    o["entries"] = [e for e in o["entries"] if e["source_database"].lower() == "interpro"]
                     if len(o["entries"]) == 0:
                         remove_empty_structures = True
             if remove_empty_structures:

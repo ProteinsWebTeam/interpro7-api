@@ -55,6 +55,7 @@ INSTALLED_APPS = (
     'release',
     # third-party added libraries
     'rest_framework',
+    'haystack'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -81,7 +82,7 @@ ROOT_URLCONF = 'interpro.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,6 +131,14 @@ DATABASES = {
         'PASSWORD': ORACLE_CONFIG.get('password'),
         'HOST': ORACLE_CONFIG.get('host', 'HOST'),
         'PORT': ORACLE_CONFIG.get('port', 1540),
+    },
+}
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://10.7.50.96:8983/solr/interpro7'
+        # ...or for multicore...
+        # 'URL': 'http://127.0.0.1:8983/solr/mysite',
     },
 }
 TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'

@@ -1,10 +1,12 @@
 import re
 from django.db.models import Count
+from haystack.query import SearchQuerySet
 
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
+from haystack.inputs import Raw
 
 db_members = '|'.join(settings.DB_MEMBERS)
 db_members_accessions = (
@@ -369,6 +371,10 @@ class EntryHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
+        results = SearchQuerySet().facet('dbcode')
+        print(results.facet_counts());
+        results = SearchQuerySet().exclude(integrated = Raw("[* TO *]")).facet('source_database')
+        print(results.facet_counts());
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs

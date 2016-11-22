@@ -6,12 +6,16 @@ from django.core.management.base import BaseCommand
 import cx_Oracle
 import pysolr
 from tqdm import tqdm
+from haystack.utils import get_model_ct
+from django.utils.encoding import force_text
 
 from interpro.settings import HAYSTACK_CONNECTIONS, DATABASES
 
 import time
 
 # global array
+from webfront.models import ProteinEntryFeature
+
 errors = []
 
 
@@ -19,21 +23,24 @@ def get_column_dict_from_cursor(cur):
     return {cur.description[i][0]: i for i in range(len(cur.description))}
 
 
-def get_object_from_row(row, col):
+def get_object_from_row(row, col, is_for_interpro_entries=True):
     return {
-        "text": row[col["PROTEIN_AC"]]+" "+row[col["METHOD_AC"]],
-        "protein_ac": row[col["PROTEIN_AC"]],
-        "method_ac": row[col["METHOD_AC"]],
-        "pos_from": row[col["POS_FROM"]],
-        "pos_to": row[col["POS_TO"]],
-        "status": row[col["STATUS"]],
-        "dbcode": row[col["DBCODE"]],
-        "evidence": row[col["EVIDENCE"]],
-        "seq_date": row[col["SEQ_DATE"]],
-        "match_date": row[col["MATCH_DATE"]],
-        "timestamp": row[col["TIMESTAMP"]],
-        "userstamp": row[col["USERSTAMP"]],
-        "score": row[col["SCORE"]]
+        "text": row[col["ENTRY_AC"]]+" "+row[col["PROTEIN_AC"]],
+        "entry_acc": row[col["ENTRY_AC"]],
+        "entry_type": row[col["ENTRY_TYPE"]],
+        "entry_db": "interpro" if is_for_interpro_entries else row[col["ENTRY_DB"]],
+        "protein_acc": row[col["PROTEIN_AC"]],
+        "protein_db": row[col["PROTEIN_DB"]],
+        "tax_id": row[col["TAX_ID"]],
+        "entry_protein_from": row[col["ENTRY_PROTEIN_FROM"]],
+        "entry_protein_to": row[col["ENTRY_PROTEIN_TO"]],
+        "structure_acc": row[col["STRUCTURE_AC"]],
+        "chain": row[col["CHAIN"]],
+        "protein_structure_from": row[col["PROTEIN_STRUCTURE_FROM"]],
+        "protein_structure_to": row[col["PROTEIN_STRUCTURE_TO"]],
+
+        "django_ct": get_model_ct(ProteinEntryFeature),
+        "django_id": 0,
     }
 
 
@@ -42,13 +49,39 @@ def chunks(iterable, max=1000):
     for first in iterator:
         yield chain([first], islice(iterator, max - 1))
 
+query_for_interpro_entries = '''  SELECT
+    e.ENTRY_AC, e.ENTRY_TYPE,
+    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID,
+    pe.POS_FROM as ENTRY_PROTEIN_FROM, pe.POS_TO as ENTRY_PROTEIN_TO,
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN,
+    ps.BEG_SEQ as PROTEIN_STRUCTURE_FROM, ps.END_SEQ as PROTEIN_STRUCTURE_TO
+  FROM INTERPRO.ENTRY e
+    JOIN  INTERPRO.SUPERMATCH pe ON e.ENTRY_AC=pe.ENTRY_AC
+    JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
+    LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=p.PROTEIN_AC
+  WHERE ROWNUM <= {} {}'''
 
-def get_from_db(con, ends):
+query_for_memberdb_entries = '''SELECT
+    e.METHOD_AC, e.SIG_TYPE, e.DBCODE as ENTRY_DB,
+    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID,
+    pe.POS_FROM as ENTRY_PROTEIN_FROM, pe.POS_TO as ENTRY_PROTEIN_TO,
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN,
+    ps.BEG_SEQ as PROTEIN_STRUCTURE_FROM, ps.END_SEQ as PROTEIN_STRUCTURE_TO
+  FROM INTERPRO.METHOD e
+    JOIN  INTERPRO.MATCH pe ON e.METHOD_AC=pe.METHOD_AC
+    JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
+    LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=pe.PROTEIN_AC
+  WHERE ROWNUM <= {} {}'''
+
+
+def get_from_db(con, ends, where='', is_for_interpro_entries=True):
     cur = con.cursor()
-    cur.execute('SELECT * FROM INTERPRO.MATCH WHERE ROWNUM <= {}'.format(ends))
+    sql = query_for_interpro_entries if is_for_interpro_entries else query_for_memberdb_entries
+    print(sql.format(ends, where))
+    cur.execute(sql.format(ends, where))
     col = get_column_dict_from_cursor(cur)
     return tqdm(
-        (get_object_from_row(row, col) for row in cur),
+        (get_object_from_row(row, col, is_for_interpro_entries) for row in cur),
         initial=0,
         total=ends,
         mininterval=1,
@@ -56,13 +89,22 @@ def get_from_db(con, ends):
         position=0
     )
 
+conditions = [
+    "",
+    "AND e.ENTRY_TYPE='F' AND p.DBCODE='S'",
+    "AND e.ENTRY_TYPE='F' AND p.DBCODE='T'",
+    "AND e.ENTRY_TYPE!='F' AND p.DBCODE='S'",
+    "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T'",
+]
 
-def upload_to_solr(n, bs):
-    interpro_ro = DATABASES['interpro_ro']
+
+def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True):
     t = time.time()
-    con = cx_Oracle.connect('{USER}/{PASSWORD}@{HOST}:{PORT}/{NAME}'.format(**interpro_ro))
+    ipro = DATABASES['interpro_ro']
+    con = cx_Oracle.connect(ipro['USER'], ipro['PASSWORD'], cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']))
+
     solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
-    for chunk in chunks(get_from_db(con, n), bs):
+    for chunk in chunks(get_from_db(con, n, conditions[subset], is_for_interpro_entries), bs):
         solr.add(chunk)
     con.close()
     t2 = time.time()
@@ -90,6 +132,29 @@ class Command(BaseCommand):
             )
         )
         parser.add_argument(
+            "--query_filter", "-qf",
+            type=int,
+            default=0,
+            help=(
+                "Usef the query needs to be partitioned" +
+                "\n0: No partition (default)" +
+                "\n1: Entry type is Family and proteins are swissprot" +
+                "\n2: Entry type is Family and proteins are trembl" +
+                "\n3: Entry type is NOT a Family and proteins are swissprot" +
+                "\n4: Entry type is NOT a Family and proteins are trembl"
+            )
+        )
+        parser.add_argument(
+            "--type_of_entry", "-t",
+            type=int,
+            default=0,
+            help=(
+                "This loading run in 2 different stages" +
+                "\n0: for interpro entries" +
+                "\n1: for member databases entries"
+            )
+        )
+        parser.add_argument(
             "--logs", "-l",
             action='store_true',
             help="Activates Django logs"
@@ -102,6 +167,8 @@ class Command(BaseCommand):
         if not options["logs"]:
             logging.disable(logging.CRITICAL)
         bs = options["block_size"]
+        t = options["type_of_entry"]
+        qf = options["query_filter"]
         if not bs:
             bs = 1000
-        upload_to_solr(n, bs)
+        upload_to_solr(n, bs, subset=qf, is_for_interpro_entries=(t == 0))

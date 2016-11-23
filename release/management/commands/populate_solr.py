@@ -23,6 +23,10 @@ def get_column_dict_from_cursor(cur):
     return {cur.description[i][0]: i for i in range(len(cur.description))}
 
 
+def get_id(*args):
+    return "-".join([a for a in args if a is not None])
+
+
 def get_object_from_row(row, col, is_for_interpro_entries=True):
     return {
         "text": row[col["ENTRY_AC"]]+" "+row[col["PROTEIN_AC"]],
@@ -41,6 +45,7 @@ def get_object_from_row(row, col, is_for_interpro_entries=True):
 
         "django_ct": get_model_ct(ProteinEntryFeature),
         "django_id": 0,
+        "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
     }
 
 

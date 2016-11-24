@@ -33,6 +33,7 @@ def get_object_from_row(row, col, is_for_interpro_entries=True):
         "entry_acc": row[col["ENTRY_AC"]],
         "entry_type": row[col["ENTRY_TYPE"]],
         "entry_db": "interpro" if is_for_interpro_entries else row[col["ENTRY_DB"]],
+        "integrated": None if is_for_interpro_entries else row[col["INTEGRATED"]],
         "protein_acc": row[col["PROTEIN_AC"]],
         "protein_db": row[col["PROTEIN_DB"]],
         "tax_id": row[col["TAX_ID"]],
@@ -67,7 +68,7 @@ query_for_interpro_entries = '''  SELECT
   WHERE ROWNUM <= {} {}'''
 
 query_for_memberdb_entries = '''SELECT
-    e.METHOD_AC, e.SIG_TYPE, e.DBCODE as ENTRY_DB,
+    e.METHOD_AC as ENTRY_AC, e.SIG_TYPE as ENTRY_TYPE, e.DBCODE as ENTRY_DB, em.ENTRY_AC as INTEGRATED,
     p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID,
     pe.POS_FROM as ENTRY_PROTEIN_FROM, pe.POS_TO as ENTRY_PROTEIN_TO,
     ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN,
@@ -75,6 +76,7 @@ query_for_memberdb_entries = '''SELECT
   FROM INTERPRO.METHOD e
     JOIN  INTERPRO.MATCH pe ON e.METHOD_AC=pe.METHOD_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
+    LEFT JOIN INTERPRO.ENTRY2METHOD em ON em.METHOD_AC=e.METHOD_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=pe.PROTEIN_AC
   WHERE ROWNUM <= {} {}'''
 
@@ -102,6 +104,7 @@ conditions = [
     "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T'",
 ]
 
+dbcodes = ["H", "M", "R", "V", "g", "B", "P", "X", "N", "J", "Y", "U", "D", "Q", "F"]
 
 def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True):
     t = time.time()
@@ -109,7 +112,12 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True):
     con = cx_Oracle.connect(ipro['USER'], ipro['PASSWORD'], cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']))
 
     solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
-    for chunk in chunks(get_from_db(con, n, conditions[subset], is_for_interpro_entries), bs):
+    where = ''
+    if is_for_interpro_entries:
+        where = conditions[subset]
+    elif subset in dbcodes:
+        where = "AND e.DBCODE='{}'".format(subset)
+    for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries), bs):
         solr.add(chunk)
     con.close()
     t2 = time.time()
@@ -150,6 +158,28 @@ class Command(BaseCommand):
             )
         )
         parser.add_argument(
+            "--dbcode", "-db",
+            default='',
+            help=(
+                "When running the loader for member databases, you can partition the query by member DB" +
+                " - H: Pfam" +
+                " - M: Prosite profiles" +
+                " - R: SMART" +
+                " - V: PHANTER" +
+                " - g: MobiDB" +
+                " - B: SFLD" +
+                " - P: Prosite patterns" +
+                " - X: GENE 3D" +
+                " - N: TIGRFAMs" +
+                " - J: CDD" +
+                " - Y: SUPERFAMILY" +
+                " - U: PIRSF" +
+                " - D: ProDom" +
+                " - Q: HAMAP" +
+                " - F: Prints"
+        )
+        )
+        parser.add_argument(
             "--type_of_entry", "-t",
             type=int,
             default=0,
@@ -173,7 +203,9 @@ class Command(BaseCommand):
             logging.disable(logging.CRITICAL)
         bs = options["block_size"]
         t = options["type_of_entry"]
-        qf = options["query_filter"]
+        subset = options["query_filter"]
         if not bs:
             bs = 1000
-        upload_to_solr(n, bs, subset=qf, is_for_interpro_entries=(t == 0))
+        if options["dbcode"] != '':
+            subset = options["dbcode"]
+        upload_to_solr(n, bs, subset=subset, is_for_interpro_entries=(t == 0))

@@ -106,7 +106,7 @@ query_for_memberdb_entries = '''SELECT
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
     LEFT JOIN INTERPRO.ENTRY2METHOD em ON em.METHOD_AC=e.METHOD_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=pe.PROTEIN_AC
-  WHERE ROWNUM <= {} {} AND ps.ENTRY_ID=\'4pzn\''''
+  WHERE ROWNUM <= {} {}'''
 
 
 def get_from_db(con, ends, where='', is_for_interpro_entries=True):

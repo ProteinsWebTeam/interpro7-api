@@ -8,6 +8,7 @@ import pysolr
 from tqdm import tqdm
 from haystack.utils import get_model_ct
 from django.utils.encoding import force_text
+import json
 
 from interpro.settings import HAYSTACK_CONNECTIONS, DATABASES
 
@@ -27,8 +28,43 @@ def get_id(*args):
     return "-".join([a for a in args if a is not None])
 
 
-def get_object_from_row(row, col, is_for_interpro_entries=True):
-    return {
+def attach_coordinates(con, obj, is_for_interpro_entries):
+    cur = con.cursor()
+    if is_for_interpro_entries:
+        sql = """  SELECT *
+                   FROM INTERPRO.SUPERMATCH
+                   WHERE ENTRY_AC='{}' AND PROTEIN_AC='{}'"""
+    else:
+        sql = """ SELECT *
+                  FROM INTERPRO.MATCH
+                  WHERE METHOD_AC='{}' AND PROTEIN_AC='{}'"""
+
+    cur.execute(sql.format(obj["entry_acc"], obj["protein_acc"]))
+    col = get_column_dict_from_cursor(cur)
+    obj["entry_protein_coordinates"] = json.dumps(
+        [{"from": row[col["POS_FROM"]], "to": row[col["POS_TO"]]} for row in cur]
+    )
+    return attach_structure_coordinates(con, obj)
+
+
+def attach_structure_coordinates(con, obj):
+    if "structure_acc" in obj and obj["structure_acc"] is not None:
+        cur = con.cursor()
+        sql = """ SELECT *
+                  FROM INTERPRO.UNIPROT_PDBE
+                  WHERE ENTRY_ID='{}' AND SPTR_AC='{}' AND CHAIN='{}'"""\
+            .format(obj["structure_acc"], obj["protein_acc"], obj["chain"])
+        print(sql)
+        cur.execute(sql)
+        col = get_column_dict_from_cursor(cur)
+        obj["protein_structure_coordinates"] = json.dumps(
+            [{"from": row[col["BEG_SEQ"]], "to": row[col["END_SEQ"]]} for row in cur]
+        )
+        print(obj)
+    return obj
+
+def get_object_from_row(con, row, col, is_for_interpro_entries=True):
+    return attach_coordinates(con, {
         "text": row[col["ENTRY_AC"]]+" "+row[col["PROTEIN_AC"]],
         "entry_acc": row[col["ENTRY_AC"]],
         "entry_type": row[col["ENTRY_TYPE"]],
@@ -37,17 +73,13 @@ def get_object_from_row(row, col, is_for_interpro_entries=True):
         "protein_acc": row[col["PROTEIN_AC"]],
         "protein_db": row[col["PROTEIN_DB"]],
         "tax_id": row[col["TAX_ID"]],
-        "entry_protein_from": row[col["ENTRY_PROTEIN_FROM"]],
-        "entry_protein_to": row[col["ENTRY_PROTEIN_TO"]],
         "structure_acc": row[col["STRUCTURE_AC"]],
         "chain": row[col["CHAIN"]],
-        "protein_structure_from": row[col["PROTEIN_STRUCTURE_FROM"]],
-        "protein_structure_to": row[col["PROTEIN_STRUCTURE_TO"]],
 
         "django_ct": get_model_ct(ProteinEntryFeature),
         "django_id": 0,
         "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
-    }
+    }, is_for_interpro_entries)
 
 
 def chunks(iterable, max=1000):
@@ -55,12 +87,10 @@ def chunks(iterable, max=1000):
     for first in iterator:
         yield chain([first], islice(iterator, max - 1))
 
-query_for_interpro_entries = '''  SELECT
+query_for_interpro_entries = '''SELECT DISTINCT
     e.ENTRY_AC, e.ENTRY_TYPE,
     p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID,
-    pe.POS_FROM as ENTRY_PROTEIN_FROM, pe.POS_TO as ENTRY_PROTEIN_TO,
-    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN,
-    ps.BEG_SEQ as PROTEIN_STRUCTURE_FROM, ps.END_SEQ as PROTEIN_STRUCTURE_TO
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN
   FROM INTERPRO.ENTRY e
     JOIN  INTERPRO.SUPERMATCH pe ON e.ENTRY_AC=pe.ENTRY_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
@@ -70,15 +100,13 @@ query_for_interpro_entries = '''  SELECT
 query_for_memberdb_entries = '''SELECT
     e.METHOD_AC as ENTRY_AC, e.SIG_TYPE as ENTRY_TYPE, e.DBCODE as ENTRY_DB, em.ENTRY_AC as INTEGRATED,
     p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID,
-    pe.POS_FROM as ENTRY_PROTEIN_FROM, pe.POS_TO as ENTRY_PROTEIN_TO,
-    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN,
-    ps.BEG_SEQ as PROTEIN_STRUCTURE_FROM, ps.END_SEQ as PROTEIN_STRUCTURE_TO
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN
   FROM INTERPRO.METHOD e
-    JOIN  INTERPRO.MATCH pe ON e.METHOD_AC=pe.METHOD_AC
+    JOIN INTERPRO.MATCH pe ON e.METHOD_AC=pe.METHOD_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
     LEFT JOIN INTERPRO.ENTRY2METHOD em ON em.METHOD_AC=e.METHOD_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=pe.PROTEIN_AC
-  WHERE ROWNUM <= {} {}'''
+  WHERE ROWNUM <= {} {} AND ps.ENTRY_ID=\'4pzn\''''
 
 
 def get_from_db(con, ends, where='', is_for_interpro_entries=True):
@@ -88,7 +116,7 @@ def get_from_db(con, ends, where='', is_for_interpro_entries=True):
     cur.execute(sql.format(ends, where))
     col = get_column_dict_from_cursor(cur)
     return tqdm(
-        (get_object_from_row(row, col, is_for_interpro_entries) for row in cur),
+        (get_object_from_row(con, row, col, is_for_interpro_entries) for row in cur),
         initial=0,
         total=ends,
         mininterval=1,

@@ -1,7 +1,11 @@
+import haystack
+from django.test import override_settings
+
 from interpro import settings
 from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
+from webfront.tests.fixtures_reader import FixtureReader
 
 chains = {
     "1JM7": ["A", "B"],
@@ -10,13 +14,33 @@ chains = {
     "1JZ8": ["A", "B"],
 }
 
+TEST_INDEX = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr/interpro7',
+    },
+}
 
+
+@override_settings(HAYSTACK_CONNECTIONS=TEST_INDEX)
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [
         'webfront/tests/fixtures.json',
         'webfront/tests/protein_fixtures.json',
         'webfront/tests/structure_fixtures.json'
     ]
+
+    @classmethod
+    def setUpClass(cls):
+        super(InterproRESTTestCase, cls).setUpClass()
+        haystack.connections.reload('default')
+        fr = FixtureReader(cls.fixtures)
+        fr.get_solr_fixtures()
+
+    # @classmethod
+    # def tearDownClass(cls):
+    #     haystack.connections['default'].get_backend().clear()
+    #     super(InterproRESTTestCase, cls).tearDownClass()
 
     # methods to check entry related responses
     def _check_single_entry_response(self, response, msg=""):

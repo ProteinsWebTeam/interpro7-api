@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from webfront.views.custom import SerializerDetail
+from webfront.solr_controller import SolrController
 
 #
 # class ContentSerializer(serializers.Serializer):
@@ -17,8 +18,11 @@ from webfront.views.custom import SerializerDetail
 
 
 class ModelContentSerializer(serializers.ModelSerializer):
+
     def __init__(self, *args, **kwargs):
         content = kwargs.pop('content', [])
+        self.queryset_manager = kwargs.pop('queryset_manager', None)
+        self.solr = SolrController(self.queryset_manager)
         self.detail = kwargs.pop('serializer_detail', SerializerDetail.ALL)
         self.detail_filters = kwargs.pop('serializer_detail_filters', SerializerDetail.ALL)
 

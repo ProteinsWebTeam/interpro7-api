@@ -2,6 +2,8 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
+import unittest
+@unittest.skip("refactoring for solr")
 class EntryWithFilterStructureRESTTest(InterproRESTTestCase):
 
     def test_can_get_structure_overview_from_entry(self):
@@ -46,6 +48,7 @@ class EntryWithFilterStructureRESTTest(InterproRESTTestCase):
             self._check_structure_count_overview(response.data)
 
 
+@unittest.skip("refactoring for solr")
 class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
 
     def test_can_get_structure_match_from_entry(self):
@@ -90,6 +93,7 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
+@unittest.skip("refactoring for solr")
 class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_entry_overview_filtered_by_structure(self):
         pdb = "1JM7"

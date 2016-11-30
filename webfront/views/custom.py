@@ -65,6 +65,7 @@ class CustomView(GenericAPIView):
                     context={"request": request},
                     serializer_detail=self.serializer_detail,
                     serializer_detail_filters=general_handler.filter_serializers,
+                    queryset_manager=general_handler.queryset_manager,
                 )
                 data_tmp = general_handler.execute_post_serializers(serialized.data)
 

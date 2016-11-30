@@ -16,40 +16,34 @@ class ProteinSerializer(ModelContentSerializer):
 
         return representation
 
-    @staticmethod
-    def endpoint_representation(representation, instance, detail):
+    def endpoint_representation(self, representation, instance, detail):
         if detail == SerializerDetail.ALL:
-            representation = ProteinSerializer.to_full_representation(instance)
-        # if self.detail == SerializerDetail.ENTRY_PROTEIN:
-        #     representation = self.to_full_representation(instance.protein)
-        #     representation["entries"] = [self.to_match_representation(instance)]
-        # el
+            representation = self.to_full_representation(instance)
         elif detail == SerializerDetail.PROTEIN_HEADERS:
-            representation = ProteinSerializer.to_headers_representation(instance)
+            representation = self.to_headers_representation(instance)
         return representation
 
     @staticmethod
     def filter_representation(representation, instance, detail_filters):
-        qs_type = get_queryset_type(instance)
-        if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
-            representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
-        if SerializerDetail.ENTRY_MATCH in detail_filters:
-            representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, False)
-        if SerializerDetail.ENTRY_DETAIL in detail_filters:
-            representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, True)
-        if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
-            representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
-        if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
-            representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance)
-        if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-            if qs_type == QuerysetType.PROTEIN:
-                representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance, True)
+        # qs_type = get_queryset_type(instance)
+        # if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
+        #     representation["entries"] = ProteinSerializer.to_entries_count_representation(instance)
+        # if SerializerDetail.ENTRY_MATCH in detail_filters:
+        #     representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, False)
+        # if SerializerDetail.ENTRY_DETAIL in detail_filters:
+        #     representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, True)
+        # if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
+        #     representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
+        # if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
+        #     representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance)
+        # if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
+        #     if qs_type == QuerysetType.PROTEIN:
+        #         representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance, True)
         return representation
 
-    @staticmethod
-    def to_full_representation(instance):
+    def to_full_representation(self, instance):
         return {
-            "metadata": ProteinSerializer.to_metadata_representation(instance),
+            "metadata": self.to_metadata_representation(instance),
             "representation": instance.feature,
             "genomic_context": instance.genomic_context,
             # "source_database": instance.source_database
@@ -66,8 +60,7 @@ class ProteinSerializer(ModelContentSerializer):
             }
         }
 
-    @staticmethod
-    def to_metadata_representation(instance):
+    def to_metadata_representation(self, instance):
         return {
             "accession": instance.accession,
             "id": instance.identifier,
@@ -86,8 +79,8 @@ class ProteinSerializer(ModelContentSerializer):
             "protein_evidence": 4,
             "source_database": instance.source_database,
             "counters": {
-                "entries": instance.proteinentryfeature_set.count(),
-                "structures": instance.structures.distinct().count(),
+                "entries": self.solr.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
+                "structures": self.solr.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
             }
         }
 

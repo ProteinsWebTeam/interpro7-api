@@ -1,3 +1,5 @@
+import json
+
 import re
 from django.db.models import Count
 from haystack.query import SearchQuerySet
@@ -6,7 +8,6 @@ from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
-from interpro.settings import HAYSTACK_CONNECTIONS
 
 import pysolr
 
@@ -49,37 +50,37 @@ class MemberAccessionHandler(CustomView):
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset,
             handler, general_handler, *args, **kwargs
         )
-
-    @staticmethod
-    def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
-        return queryset
-
-    @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None):
-        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
-            from webfront.views.protein import filter_protein_overview
-            from webfront.views.structure import filter_structure_overview
-            if "structures" in obj:
-                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
-            if "proteins" in obj:
-                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
-            return obj
-        remove_empty_structures = False
-        if hasattr(obj, 'serializer') or isinstance(obj, list):
-            arr = [obj] if isinstance(obj, dict) else obj
-            for o in arr:
-                if "entries" in o:
-                    o["entries"] = [e for e in o["entries"]
-                                    if e["entry"] == level_name or
-                                    (isinstance(e["entry"], dict) and e["entry"]["accession"] == level_name)]
-                    if len(o["entries"]) == 0:
-                        remove_empty_structures = True
-            if remove_empty_structures:
-                arr = [a for a in arr if len(a["entries"]) > 0]
-                if len(arr) == 0:
-                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
-        return obj
+    #
+    # @staticmethod
+    # def filter(queryset, level_name="", general_handler=None):
+    #     general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
+    #     return queryset
+    #
+    # @staticmethod
+    # def post_serializer(obj, level_name="", general_handler=None):
+    #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+    #         from webfront.views.protein import filter_protein_overview
+    #         from webfront.views.structure import filter_structure_overview
+    #         if "structures" in obj:
+    #             obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+    #         if "proteins" in obj:
+    #             obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+    #         return obj
+    #     remove_empty_structures = False
+    #     if hasattr(obj, 'serializer') or isinstance(obj, list):
+    #         arr = [obj] if isinstance(obj, dict) else obj
+    #         for o in arr:
+    #             if "entries" in o:
+    #                 o["entries"] = [e for e in o["entries"]
+    #                                 if e["entry"] == level_name or
+    #                                 (isinstance(e["entry"], dict) and e["entry"]["accession"] == level_name)]
+    #                 if len(o["entries"]) == 0:
+    #                     remove_empty_structures = True
+    #         if remove_empty_structures:
+    #             arr = [a for a in arr if len(a["entries"]) > 0]
+    #             if len(arr) == 0:
+    #                 raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
+    #     return obj
 
 
 class MemberHandler(CustomView):
@@ -109,65 +110,65 @@ class MemberHandler(CustomView):
             general_handler, *args, **kwargs
         )
 
-    @staticmethod
-    def filter(queryset, level_name="", general_handler=None):
-        try:
-            is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
-        except (IndexError, KeyError):
-            is_unintegrated = False
-        try:
-            is_interpro = general_handler.get_from_store(InterproHandler, "interpro")
-        except (IndexError, KeyError):
-            is_interpro = False
-        try:
-            interpro_acc = general_handler.get_from_store(AccessionHandler, "accession")
-        except (IndexError, KeyError):
-            interpro_acc = None
-        general_handler.set_in_store(MemberHandler, "database", level_name)
-
-        if isinstance(queryset, dict):
-            if "entries" in queryset:
-                del queryset["entries"]
-        else:
-            if is_unintegrated:
-                general_handler.queryset_manager.add_filter("entry", integrated__isnull=True)
-            elif interpro_acc is not None:
-                general_handler.queryset_manager.add_filter("entry", integrated=interpro_acc)
-                general_handler.queryset_manager.remove_filter("entry", "accession__iexact")
-            elif is_interpro:
-                general_handler.queryset_manager.add_filter("entry", integrated__isnull=False)
-            general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
-            return queryset
-
-    @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None):
-        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
-            from webfront.views.protein import filter_protein_overview
-            from webfront.views.structure import filter_structure_overview
-            if "structures" in obj:
-                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
-            if "proteins" in obj:
-                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
-            return obj
-        remove_empty_structures = False
-        if hasattr(obj, 'serializer') or isinstance(obj, list):
-            entries = [x[0]
-                       for x in general_handler.queryset_manager.get_queryset("entry")
-                       .values_list("accession").distinct()]
-            arr = [obj] if isinstance(obj, dict) else obj
-            for o in arr:
-                if "entries" in o:
-                    o["entries"] = [e for e in o["entries"]
-                                    if e["source_database"].lower() == level_name and
-                                    (entries is None or e["accession"] in entries)
-                                    ]
-                    if len(o["entries"]) == 0:
-                        remove_empty_structures = True
-            if remove_empty_structures:
-                arr = [a for a in arr if len(a["entries"]) > 0]
-                if len(arr) == 0:
-                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
-        return obj
+    # @staticmethod
+    # def filter(queryset, level_name="", general_handler=None):
+    #     try:
+    #         is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
+    #     except (IndexError, KeyError):
+    #         is_unintegrated = False
+    #     try:
+    #         is_interpro = general_handler.get_from_store(InterproHandler, "interpro")
+    #     except (IndexError, KeyError):
+    #         is_interpro = False
+    #     try:
+    #         interpro_acc = general_handler.get_from_store(AccessionHandler, "accession")
+    #     except (IndexError, KeyError):
+    #         interpro_acc = None
+    #     general_handler.set_in_store(MemberHandler, "database", level_name)
+    #
+    #     if isinstance(queryset, dict):
+    #         if "entries" in queryset:
+    #             del queryset["entries"]
+    #     else:
+    #         if is_unintegrated:
+    #             general_handler.queryset_manager.add_filter("entry", integrated__isnull=True)
+    #         elif interpro_acc is not None:
+    #             general_handler.queryset_manager.add_filter("entry", integrated=interpro_acc)
+    #             general_handler.queryset_manager.remove_filter("entry", "accession__iexact")
+    #         elif is_interpro:
+    #             general_handler.queryset_manager.add_filter("entry", integrated__isnull=False)
+    #         general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
+    #         return queryset
+    #
+    # @staticmethod
+    # def post_serializer(obj, level_name="", general_handler=None):
+    #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+    #         from webfront.views.protein import filter_protein_overview
+    #         from webfront.views.structure import filter_structure_overview
+    #         if "structures" in obj:
+    #             obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+    #         if "proteins" in obj:
+    #             obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+    #         return obj
+    #     remove_empty_structures = False
+    #     if hasattr(obj, 'serializer') or isinstance(obj, list):
+    #         entries = [x[0]
+    #                    for x in general_handler.queryset_manager.get_queryset("entry")
+    #                    .values_list("accession").distinct()]
+    #         arr = [obj] if isinstance(obj, dict) else obj
+    #         for o in arr:
+    #             if "entries" in o:
+    #                 o["entries"] = [e for e in o["entries"]
+    #                                 if e["source_database"].lower() == level_name and
+    #                                 (entries is None or e["accession"] in entries)
+    #                                 ]
+    #                 if len(o["entries"]) == 0:
+    #                     remove_empty_structures = True
+    #         if remove_empty_structures:
+    #             arr = [a for a in arr if len(a["entries"]) > 0]
+    #             if len(arr) == 0:
+    #                 raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
+    #     return obj
 
 
 class AccessionHandler(CustomView):
@@ -190,36 +191,36 @@ class AccessionHandler(CustomView):
             handler, general_handler, *args, **kwargs
         )
 
-    @staticmethod
-    def filter(queryset, level_name="", general_handler=None):
-        general_handler.set_in_store(AccessionHandler, "accession", level_name)
-        general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
-
-    @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None):
-        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
-            from webfront.views.protein import filter_protein_overview
-            from webfront.views.structure import filter_structure_overview
-            if "structures" in obj:
-                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
-            if "proteins" in obj:
-                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
-            return obj
-        remove_empty_structures = False
-        if hasattr(obj, 'serializer') or isinstance(obj, list):
-            arr = [obj] if isinstance(obj, dict) else obj
-            for o in arr:
-                if "entries" in o:
-                    o["entries"] = [e for e in o["entries"]
-                                    if e["entry"] == level_name or
-                                    (isinstance(e["entry"], dict) and e["entry"]["accession"] == level_name)]
-                    if len(o["entries"]) == 0:
-                        remove_empty_structures = True
-            if remove_empty_structures:
-                arr = [a for a in arr if len(a["entries"]) > 0]
-                if len(arr) == 0:
-                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
-        return obj
+    # @staticmethod
+    # def filter(queryset, level_name="", general_handler=None):
+    #     general_handler.set_in_store(AccessionHandler, "accession", level_name)
+    #     general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
+    #
+    # @staticmethod
+    # def post_serializer(obj, level_name="", general_handler=None):
+    #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+    #         from webfront.views.protein import filter_protein_overview
+    #         from webfront.views.structure import filter_structure_overview
+    #         if "structures" in obj:
+    #             obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+    #         if "proteins" in obj:
+    #             obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+    #         return obj
+    #     remove_empty_structures = False
+    #     if hasattr(obj, 'serializer') or isinstance(obj, list):
+    #         arr = [obj] if isinstance(obj, dict) else obj
+    #         for o in arr:
+    #             if "entries" in o:
+    #                 o["entries"] = [e for e in o["entries"]
+    #                                 if e["entry"] == level_name or
+    #                                 (isinstance(e["entry"], dict) and e["entry"]["accession"] == level_name)]
+    #                 if len(o["entries"]) == 0:
+    #                     remove_empty_structures = True
+    #         if remove_empty_structures:
+    #             arr = [a for a in arr if len(a["entries"]) > 0]
+    #             if len(arr) == 0:
+    #                 raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
+    #     return obj
 
 
 class UnintegratedHandler(CustomView):
@@ -244,47 +245,47 @@ class UnintegratedHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    @staticmethod
-    def filter(queryset, level_name="", general_handler=None):
-        general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
-        if isinstance(queryset, dict):
-            del queryset["entries"]
-        else:
-            general_handler.queryset_manager.add_filter(
-                "entry",
-                integrated__isnull=True,
-                source_database__iregex=db_members)
-        return queryset
-
-    @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None):
-        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
-            from webfront.views.protein import filter_protein_overview
-            from webfront.views.structure import filter_structure_overview
-            if "structures" in obj:
-                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
-            if "proteins" in obj:
-                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
-            return obj
-        remove_empty_structures = False
-        if hasattr(obj, 'serializer') or isinstance(obj, list):
-            entries = [x[0]
-                       for x in general_handler.queryset_manager.get_queryset("entry")
-                       .values_list("accession").distinct()]
-            arr = [obj] if isinstance(obj, dict) else obj
-            for o in arr:
-                if "entries" in o:
-                    o["entries"] = [e for e in o["entries"]
-                                    if re.match(db_members, e["source_database"], flags=re.IGNORECASE) and
-                                    "integrated" not in e and
-                                    e["accession"] in entries]
-                    if len(o["entries"]) == 0:
-                        remove_empty_structures = True
-            if remove_empty_structures:
-                arr = [a for a in arr if len(a["entries"]) > 0]
-                if len(arr) == 0:
-                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
-        return obj
+    # @staticmethod
+    # def filter(queryset, level_name="", general_handler=None):
+    #     general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
+    #     if isinstance(queryset, dict):
+    #         del queryset["entries"]
+    #     else:
+    #         general_handler.queryset_manager.add_filter(
+    #             "entry",
+    #             integrated__isnull=True,
+    #             source_database__iregex=db_members)
+    #     return queryset
+    #
+    # @staticmethod
+    # def post_serializer(obj, level_name="", general_handler=None):
+    #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+    #         from webfront.views.protein import filter_protein_overview
+    #         from webfront.views.structure import filter_structure_overview
+    #         if "structures" in obj:
+    #             obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+    #         if "proteins" in obj:
+    #             obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+    #         return obj
+    #     remove_empty_structures = False
+    #     if hasattr(obj, 'serializer') or isinstance(obj, list):
+    #         entries = [x[0]
+    #                    for x in general_handler.queryset_manager.get_queryset("entry")
+    #                    .values_list("accession").distinct()]
+    #         arr = [obj] if isinstance(obj, dict) else obj
+    #         for o in arr:
+    #             if "entries" in o:
+    #                 o["entries"] = [e for e in o["entries"]
+    #                                 if re.match(db_members, e["source_database"], flags=re.IGNORECASE) and
+    #                                 "integrated" not in e and
+    #                                 e["accession"] in entries]
+    #                 if len(o["entries"]) == 0:
+    #                     remove_empty_structures = True
+    #         if remove_empty_structures:
+    #             arr = [a for a in arr if len(a["entries"]) > 0]
+    #             if len(arr) == 0:
+    #                 raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
+    #     return obj
 
 
 class InterproHandler(CustomView):
@@ -302,41 +303,43 @@ class InterproHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("entry",
                                                     source_database__iexact=endpoint_levels[level - 1])
+
+
         return super(InterproHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    @staticmethod
-    def filter(queryset, level_name="", general_handler=None):
-        general_handler.set_in_store(InterproHandler, "interpro", True)
-        general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
-        return queryset
-
-    @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None):
-        if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
-            from webfront.views.protein import filter_protein_overview
-            from webfront.views.structure import filter_structure_overview
-            if "structures" in obj:
-                obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
-            if "proteins" in obj:
-                obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
-            return obj
-
-        remove_empty_structures = False
-        if hasattr(obj, 'serializer') or isinstance(obj, list):
-            arr = [obj] if isinstance(obj, dict) else obj
-            for o in arr:
-                if "entries" in o:
-                    o["entries"] = [e for e in o["entries"] if e["source_database"].lower() == "interpro"]
-                    if len(o["entries"]) == 0:
-                        remove_empty_structures = True
-            if remove_empty_structures:
-                arr = [a for a in arr if len(a["entries"]) > 0]
-                if len(arr) == 0:
-                    raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
-        return obj
+    # @staticmethod
+    # def filter(queryset, level_name="", general_handler=None):
+    #     general_handler.set_in_store(InterproHandler, "interpro", True)
+    #     general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
+    #     return queryset
+    #
+    # @staticmethod
+    # def post_serializer(obj, level_name="", general_handler=None):
+    #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
+    #         from webfront.views.protein import filter_protein_overview
+    #         from webfront.views.structure import filter_structure_overview
+    #         if "structures" in obj:
+    #             obj["structures"] = filter_structure_overview(obj["structures"], general_handler, "entry")
+    #         if "proteins" in obj:
+    #             obj["proteins"] = filter_protein_overview(obj["proteins"], general_handler, "entry")
+    #         return obj
+    #
+    #     remove_empty_structures = False
+    #     if hasattr(obj, 'serializer') or isinstance(obj, list):
+    #         arr = [obj] if isinstance(obj, dict) else obj
+    #         for o in arr:
+    #             if "entries" in o:
+    #                 o["entries"] = [e for e in o["entries"] if e["source_database"].lower() == "interpro"]
+    #                 if len(o["entries"]) == 0:
+    #                     remove_empty_structures = True
+    #         if remove_empty_structures:
+    #             arr = [a for a in arr if len(a["entries"]) > 0]
+    #             if len(arr) == 0:
+    #                 raise ReferenceError("The entry {} doesn't exist in the selected url".format(level_name))
+    #     return obj
 
 
 class EntryHandler(CustomView):
@@ -367,17 +370,13 @@ class EntryHandler(CustomView):
         output["unintegrated"] = qs \
             .exclude(**{'source_database__iexact': "interpro"}) \
             .filter(**{'integrated__isnull': True}).count()
-        return output
+        return {"entries": output}
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
-        results = SearchQuerySet().facet('entry_db')
-        print(results.facet_counts());
-        solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
-        res = solr.search("*:*", **{'facet': 'on', 'facet.field': 'entry_db'})
-        print(res.facets['facet_fields'])
+        # print(res.facets['facet_fields'])
 
         # results = SearchQuerySet().exclude(integrated = Raw("[* TO *]")).facet('source_database')
         # print(results.facet_counts());
@@ -385,27 +384,44 @@ class EntryHandler(CustomView):
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
         )
-
-    @staticmethod
-    def filter(queryset, level_name="", general_handler=None):
-        # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
-        general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
-
-        return queryset
-
-    @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None, queryset=None):
-        if general_handler.queryset_manager.main_endpoint != "entry":
-            if isinstance(obj, dict):
-                qs = general_handler.queryset_manager.get_queryset("entry")
-                obj["entries"] = EntryHandler.get_database_contributions(qs)
-            elif isinstance(obj, list):
-                pc = general_handler.queryset_manager.group_and_count("entry")
-                for item in obj:
-                    item["entries"] = pc[item["metadata"]["accession"]]
-        else:
-            obj = {"entries": obj}
-        return obj
+    #
+    # @staticmethod
+    # def filter(queryset, level_name="", general_handler=None):
+    #     # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
+    #     general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
+    #
+    #     return queryset
+    #
+    # @staticmethod
+    # def post_serializer(obj, level_name="", general_handler=None, queryset=None):
+    #     if general_handler.queryset_manager.main_endpoint != "entry":
+    #         if isinstance(obj, dict):
+    #             qs = general_handler.queryset_manager.get_solr_query("entry")
+    #             facet = {
+    #                 "unintegrated": {
+    #                     "type": "query",
+    #                     "q": "!entry_db:interpro AND !integrated:*",
+    #                     "facet": {"unique": "unique(entry_acc)"}
+    #                 },
+    #                 "member_databases": {
+    #                     "type": "terms",
+    #                     "field": "entry_db",
+    #                     "facet": {"unique": "unique(entry_acc)"}
+    #                 },
+    #
+    #             }
+    #             solr = pysolr.Solr(settings.HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
+    #             res = solr.search(qs, **{'facet': 'on', 'json.facet': json.dumps(facet)})
+    #             obj["entries"] = res.raw_response["facets"]
+    #             # qs = general_handler.queryset_manager.get_queryset("entry")
+    #             # obj["entries"] = EntryHandler.get_database_contributions(qs)
+    #         elif isinstance(obj, list):
+    #             pc = general_handler.queryset_manager.group_and_count("entry")
+    #             for item in obj:
+    #                 item["entries"] = pc[item["metadata"]["accession"]]
+    #     else:
+    #         obj = {"entries": obj}
+    #     return obj
 
     @staticmethod
     def flat_counter_object(obj):

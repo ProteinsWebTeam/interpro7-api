@@ -20,6 +20,10 @@ class ProteinRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self._check_protein_details(response.data["metadata"])
+        self.assertIn("structures", response.data["metadata"]["counters"])
+        self.assertIn("entries", response.data["metadata"]["counters"])
+        self.assertEqual(1, response.data["metadata"]["counters"]["structures"])
+        self.assertEqual(2, response.data["metadata"]["counters"]["entries"])
 
     def test_can_read_protein_id(self):
         url_id = "/api/protein/uniprot/CBPYA_ASPCL"
@@ -38,6 +42,10 @@ class ProteinRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self._check_protein_details(response.data["metadata"])
+        self.assertIn("structures", response.data["metadata"]["counters"])
+        self.assertIn("entries", response.data["metadata"]["counters"])
+        self.assertEqual(1, response.data["metadata"]["counters"]["structures"])
+        self.assertEqual(5, response.data["metadata"]["counters"]["entries"])
 
     def test_cant_read_protein_bad_db(self):
         self._check_HTTP_response_code("/api/protein/bad_db", code=status.HTTP_404_NOT_FOUND)

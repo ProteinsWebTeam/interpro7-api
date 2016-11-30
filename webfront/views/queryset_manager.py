@@ -10,6 +10,7 @@ class QuerysetManager:
     main_endpoint = None
     filters = {
         "search": {},
+        "solr": {},
         "entry": {},
         "structure": {},
         "protein": {},
@@ -21,6 +22,7 @@ class QuerysetManager:
         self.endpoints = endpoint_levels
         self.filters = {
             "search": {},
+            "solr": {},
             "entry": {},
             "structure": {},
             "protein": {},
@@ -78,6 +80,30 @@ class QuerysetManager:
                 # join_filters["proteinstructurefeature__structure_id"] = F('accession')
         return join_filters
 
+    def get_solr_query(self, endpoint=None):
+        if endpoint is None:
+            endpoint = self.main_endpoint
+        q = ""
+        sep = ""
+        for ep in self.filters:
+            if q != "":
+                sep = " AND "
+            if ep == "search":
+                continue
+            # if ep == endpoint:
+            #     continue
+                # current_filters = {**current_filters, **{k: self.check_for_f(v, endpoint)
+                #                                          for k, v in self.filters[ep].items()}
+                #                    }
+
+            else:
+                for k, v in self.filters[ep].items():
+                    if ep == "solr":
+                        q += sep+k+":"+v
+                    elif k == "accession" or k == "accession__iexact":
+                        q += sep+ep+"_acc:"+v
+        return q
+
     def get_queryset(self, endpoint=None, only_main_endpoint=False):
         queryset = Entry.objects.all()
         if endpoint is None:
@@ -89,7 +115,7 @@ class QuerysetManager:
         elif endpoint == "protein":
             queryset = Protein.objects.all()
 
-        current_filters = {} if only_main_endpoint else self.get_join_filters(endpoint)
+        current_filters = {} #if only_main_endpoint else self.get_join_filters(endpoint)
 
         # creates an `OR` filter for the search fields
         search_filters = self.filters.get("search")
@@ -100,7 +126,7 @@ class QuerysetManager:
             )
 
         for ep in self.filters:
-            if ep == "search":
+            if ep == "search" or ep == "solr":
                 continue
             if ep == endpoint:
                 current_filters = {**current_filters, **{k: self.check_for_f(v, endpoint)

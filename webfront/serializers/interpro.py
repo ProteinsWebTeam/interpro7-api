@@ -2,6 +2,7 @@ from webfront.models import Entry
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
+import webfront.serializers.pdb
 
 
 class EntrySerializer(ModelContentSerializer):
@@ -32,8 +33,8 @@ class EntrySerializer(ModelContentSerializer):
         #     representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
         # if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
         #     representation["structures"] = EntrySerializer.to_structures_count_representation(instance)
-        # if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
-        #     representation["structures"] = EntrySerializer.to_structures_overview_representation(instance)
+        if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
+            representation["structures"] = EntrySerializer.to_structures_count_representation(instance, self.solr)
         # if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
         #     representation["structures"] = EntrySerializer.to_structures_overview_representation(instance, True)
         return representation
@@ -135,9 +136,17 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_proteins_count_representation(instance, solr):
+        solr_query = "entry_acc:"+instance.accession if hasattr(instance, 'accession') else None
         return webfront.serializers.uniprot.ProteinSerializer.to_counter_representation(
-            solr.get_counter_object("protein")
+            solr.get_counter_object("protein", solr_query)
         )["proteins"]
+
+    @staticmethod
+    def to_structures_count_representation(instance, solr):
+        solr_query = "entry_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
+            solr.get_counter_object("structure", solr_query)
+        )["structures"]
     #
     # @staticmethod
     # def to_structures_count_representation(instance):

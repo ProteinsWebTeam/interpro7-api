@@ -3,7 +3,7 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
 import unittest
-@unittest.skip("refactoring for solr")
+
 class EntryWithFilterStructureRESTTest(InterproRESTTestCase):
 
     def test_can_get_structure_overview_from_entry(self):

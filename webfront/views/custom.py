@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from webfront.constants import SerializerDetail
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
+from webfront.solr_controller import SolrController
 
 
 class CustomView(GenericAPIView):
@@ -33,6 +34,7 @@ class CustomView(GenericAPIView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         # if this is the last level
         if len(endpoint_levels) == level:
+            solr = SolrController(general_handler.queryset_manager)
             if self.from_model:
                 # search filter, from request parameters
                 search = request.query_params.get("search")
@@ -42,8 +44,11 @@ class CustomView(GenericAPIView):
                         accession__icontains=search,
                         name__icontains=search
                     )
+                if self.is_single_endpoint(general_handler) or not self.expected_response_is_list():
+                    self.queryset = general_handler.queryset_manager.get_queryset().distinct()
+                else:
+                    self.update_queryset_from_solr(solr, general_handler)
 
-                self.queryset = general_handler.queryset_manager.get_queryset().distinct()
                 if self.queryset.count() == 0:
                     if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct().count():
                         raise Exception("The URL requested didn't have any data related.\nList of endpoints: {}"
@@ -55,30 +60,27 @@ class CustomView(GenericAPIView):
                     self.queryset = self.paginate_queryset(self.get_queryset())
                 else:
                     self.queryset = self.get_queryset().first()
+            else:
+                # if it gets here it is a endpoint request checking for database contributions.
+                self.queryset = self.get_counter_response(general_handler, solr)
 
-                serialized = self.serializer_class(
-                    # passed to DRF's view
-                    self.queryset,
-                    many=self.many,
-                    # extracted out in the custom view
-                    content=request.GET.getlist('content'),
-                    context={"request": request},
-                    serializer_detail=self.serializer_detail,
-                    serializer_detail_filters=general_handler.filter_serializers,
-                    queryset_manager=general_handler.queryset_manager,
-                )
-                data_tmp = general_handler.execute_post_serializers(serialized.data)
+            serialized = self.serializer_class(
+                # passed to DRF's view
+                self.queryset,
+                many=self.many,
+                # extracted out in the custom view
+                content=request.GET.getlist('content'),
+                context={"request": request},
+                serializer_detail=self.serializer_detail,
+                serializer_detail_filters=general_handler.filter_serializers,
+                queryset_manager=general_handler.queryset_manager,
+            )
+            data_tmp = general_handler.execute_post_serializers(serialized.data)
 
-                if self.many:
-                    return self.get_paginated_response(data_tmp)
-                else:
-                    return Response(data_tmp)
-
-            # if it gets here it is a endpoint request checking for database contributions.
-            self.queryset = general_handler.queryset_manager.get_queryset().distinct()
-            obj = self.get_database_contributions(self.queryset)
-            data_tmp = general_handler.execute_post_serializers(obj)
-            return Response(data_tmp)
+            if self.many:
+                return self.get_paginated_response(data_tmp)
+            else:
+                return Response(data_tmp)
 
         else:
             # combine the children handlers with the available endpoints
@@ -157,6 +159,15 @@ class CustomView(GenericAPIView):
             except ValueError:
                 pass
 
+    def get_counter_response(self, general_handler, solr):
+        if self.is_single_endpoint(general_handler):
+            self.queryset = general_handler.queryset_manager.get_queryset().distinct()
+            obj = self.get_database_contributions(self.queryset)
+            data_tmp = general_handler.execute_post_serializers(obj)
+            return data_tmp
+        else:
+            return solr.get_counter_object(general_handler.queryset_manager.main_endpoint)
+
     def get_database_contributions(self, prefix=""):
         return
 
@@ -167,3 +178,17 @@ class CustomView(GenericAPIView):
     @staticmethod
     def post_serializer(obj, level_name="", general_handler=None):
         return obj
+
+    def expected_response_is_list(self):
+        return self.many
+
+    def is_single_endpoint(self, general_handler):
+        return general_handler.filter_serializers == {}
+
+    def update_queryset_from_solr(self, solr, general_handler):
+        ep = general_handler.queryset_manager.main_endpoint
+        res = solr.get_list_of_endpoint(ep)
+        self.queryset = general_handler.queryset_manager\
+            .get_base_queryset(ep)\
+            .filter(accession__in=res)
+        print(self.queryset.count())

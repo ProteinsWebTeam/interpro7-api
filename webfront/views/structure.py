@@ -219,6 +219,9 @@ class StructureHandler(CustomView):
         ("pdb", PDBHandler),
     ]
     to_add = None
+    many = False
+    serializer_class = StructureSerializer
+    serializer_detail = SerializerDetail.STRUCTURE_OVERVIEW
     serializer_detail_filter = SerializerDetail.STRUCTURE_HEADERS
 
     @staticmethod

@@ -350,6 +350,9 @@ class EntryHandler(CustomView):
         ('unintegrated', UnintegratedHandler),
         (db_members, MemberHandler),
     ]
+    many = False
+    serializer_class = EntrySerializer
+    serializer_detail = SerializerDetail.ENTRY_OVERVIEW
     serializer_detail_filter = SerializerDetail.ENTRY_OVERVIEW
 
     @staticmethod

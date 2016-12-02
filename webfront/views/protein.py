@@ -151,13 +151,16 @@ class UniprotHandler(CustomView):
 
 
 class ProteinHandler(CustomView):
+    serializer_class = ProteinSerializer
+    many = False
+    serializer_detail = SerializerDetail.PROTEIN_OVERVIEW
     level_description = 'section level'
     from_model = False
     child_handlers = [
         (db_members, UniprotHandler),
     ]
     to_add = None
-    serializer_detail_filter = SerializerDetail.ENTRY_PROTEIN_HEADERS
+    serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW
 
     @staticmethod
     def get_database_contributions(queryset):

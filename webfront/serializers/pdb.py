@@ -16,6 +16,8 @@ class StructureSerializer(ModelContentSerializer):
     def endpoint_representation(self, representation, instance, detail):
         if detail == SerializerDetail.ALL:
             representation = self.to_full_representation(instance)
+        elif detail == SerializerDetail.STRUCTURE_OVERVIEW:
+            representation = self.to_counter_representation(instance)
         elif detail == SerializerDetail.STRUCTURE_HEADERS:
             representation = self.to_headers_representation(instance)
         elif detail == SerializerDetail.STRUCTURE_CHAIN:
@@ -150,6 +152,9 @@ class StructureSerializer(ModelContentSerializer):
             "chain": ch["chain"],
             "source_database": ch["protein_db"]
         } for ch in chains}
+
+    def to_counter_representation(self, instance):
+        return instance
 
     class Meta:
         model = Structure

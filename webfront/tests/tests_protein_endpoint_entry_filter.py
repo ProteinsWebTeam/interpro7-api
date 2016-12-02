@@ -3,7 +3,8 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
 import unittest
-@unittest.skip("refactoring for solr")
+
+
 class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
 
     def test_can_get_protein_amount_from_entry(self):

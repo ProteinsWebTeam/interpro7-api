@@ -104,17 +104,20 @@ class QuerysetManager:
                         q += sep+ep+"_acc:"+v
         return q
 
-    def get_queryset(self, endpoint=None, only_main_endpoint=False):
+    def get_base_queryset(self, endpoint):
         queryset = Entry.objects.all()
-        if endpoint is None:
-            endpoint = self.main_endpoint
         if endpoint == "entry":
             queryset = Entry.objects.all()
         elif endpoint == "structure":
             queryset = Structure.objects.all()
         elif endpoint == "protein":
             queryset = Protein.objects.all()
+        return queryset
 
+    def get_queryset(self, endpoint=None, only_main_endpoint=False):
+        if endpoint is None:
+            endpoint = self.main_endpoint
+        queryset = self.get_base_queryset(endpoint)
         current_filters = {} #if only_main_endpoint else self.get_join_filters(endpoint)
 
         # creates an `OR` filter for the search fields

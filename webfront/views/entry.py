@@ -387,13 +387,13 @@ class EntryHandler(CustomView):
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
         )
-    #
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
-    #     general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
-    #
-    #     return queryset
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
+        general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
+
+        return queryset
     #
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None, queryset=None):

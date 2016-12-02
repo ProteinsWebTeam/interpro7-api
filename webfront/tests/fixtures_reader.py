@@ -68,6 +68,22 @@ class FixtureReader:
                     to_add.append(c)
             else:
                 to_add.append(obj)
+        proteins = [p["protein"] for p in self.entry_protein_list]
+        for p, chains in self.protein_structure_list.items():
+            if p not in proteins:
+                for sp in chains:
+                    to_add.append({
+                        "text": p + " " + sp["structure"],
+                        "protein_acc": p,
+                        "protein_db": self.proteins[p]["source_database"],
+                        "tax_id": self.proteins[p]["organism"]["taxid"],
+                        "django_ct": get_model_ct(ProteinEntryFeature),
+                        "django_id": 0,
+                        "id": get_id(None, p, sp["structure"], sp["chain"]),
+                        "structure_acc": sp["structure"],
+                        "chain": sp["chain"],
+                        "protein_structure_coordinates": json.dumps(sp["coordinates"]),
+                    });
 
         solr = pysolr.Solr(settings.HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
         solr.add(to_add)

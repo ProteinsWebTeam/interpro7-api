@@ -184,11 +184,11 @@ class ProteinHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.queryset_manager.add_filter("protein", accession__isnull=False)
-    #     return queryset
-    #
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("protein", accession__isnull=False)
+        return queryset
+
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):
     #     endpoint = general_handler.queryset_manager.main_endpoint

@@ -84,10 +84,7 @@ class QuerysetManager:
         if endpoint is None:
             endpoint = self.main_endpoint
         q = ""
-        sep = ""
         for ep in self.filters:
-            if q != "":
-                sep = " AND "
             if ep == "search":
                 continue
             # if ep == endpoint:
@@ -99,10 +96,12 @@ class QuerysetManager:
             else:
                 for k, v in self.filters[ep].items():
                     if ep == "solr":
-                        q += sep+k+":"+v
+                        q += " AND {}:{}".format(k, v)
                     elif k == "accession" or k == "accession__iexact":
-                        q += sep+ep+"_acc:"+v
-        return q
+                        q += " AND {}_acc:{}".format(ep, v)
+                    elif k == "accession__isnull":
+                        q += " AND {}{}_acc:*".format("!" if v else "", ep)
+        return q[5:]
 
     def get_base_queryset(self, endpoint):
         queryset = Entry.objects.all()

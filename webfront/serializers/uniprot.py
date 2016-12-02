@@ -3,6 +3,7 @@ from webfront.models import Protein
 
 from webfront.serializers.content_serializers import ModelContentSerializer
 import webfront.serializers.interpro
+import webfront.serializers.pdb
 from webfront.views.custom import SerializerDetail
 
 
@@ -29,8 +30,6 @@ class ProteinSerializer(ModelContentSerializer):
         # qs_type = get_queryset_type(instance)
         if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
             representation["entries"] = ProteinSerializer.to_entries_count_representation(instance, self.solr)
-            if representation["entries"] == 0:
-                raise ReferenceError('There are not entries associated with protein {}'.format(instance.accession))
 
         # if SerializerDetail.ENTRY_MATCH in detail_filters:
         #     representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, False)
@@ -38,8 +37,8 @@ class ProteinSerializer(ModelContentSerializer):
         #     representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, True)
         # if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
         #     representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
-        # if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
-        #     representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance)
+        if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
+            representation["structures"] = ProteinSerializer.to_structures_count_representation(instance, self.solr)
         # if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
         #     if qs_type == QuerysetType.PROTEIN:
         #         representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance, True)
@@ -91,6 +90,8 @@ class ProteinSerializer(ModelContentSerializer):
     @staticmethod
     def to_counter_representation(instance):
         if "proteins" not in instance:
+            if instance["count"] == 0:
+                raise ReferenceError('There are not entries for this request')
             instance = {"proteins": {
                             bucket["val"]: bucket["unique"]
                             for bucket in instance["databases"]["buckets"]
@@ -132,6 +133,13 @@ class ProteinSerializer(ModelContentSerializer):
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
             solr.get_counter_object("entry", solr_query)
         )["entries"]
+
+    @staticmethod
+    def to_structures_count_representation(instance, solr):
+        solr_query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
+            solr.get_counter_object("structure", solr_query)
+        )["structures"]
     # #
     # @staticmethod
     # def to_structures_count_representation(instance):

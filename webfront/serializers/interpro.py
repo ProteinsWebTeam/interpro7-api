@@ -1,8 +1,7 @@
 from webfront.models import Entry
 from webfront.serializers.content_serializers import ModelContentSerializer
-from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import SerializerDetail
-import webfront.serializers.interpro
+import webfront.serializers.uniprot
 
 
 class EntrySerializer(ModelContentSerializer):
@@ -112,8 +111,10 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_counter_representation(instance):
         if "entries" not in instance:
-            if instance["count"] == 0:
-                return {"entries": 0}
+            if instance["count"] == 0 or (
+                        len(instance["databases"]["buckets"]) == 0 and instance["unintegrated"]["unique"] == 0
+            ):
+                raise ReferenceError('There are not entries for this request')
             result = {
                 "entries": {
                     "member_databases": {
@@ -134,7 +135,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_proteins_count_representation(instance, solr):
-        return webfront.serializers.interpro.ProteinSerializer.to_counter_representation(
+        return webfront.serializers.uniprot.ProteinSerializer.to_counter_representation(
             solr.get_counter_object("protein")
         )["proteins"]
     #

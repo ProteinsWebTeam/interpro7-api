@@ -1,8 +1,8 @@
 from webfront.constants import get_queryset_type, QuerysetType
 from webfront.serializers.content_serializers import ModelContentSerializer
-from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import SerializerDetail
 from webfront.models import Structure
+import webfront.serializers.uniprot
 
 
 class StructureSerializer(ModelContentSerializer):
@@ -38,8 +38,8 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def filter_representation(representation, instance, detail_filters):
         # qs_type = get_queryset_type(instance)
-        # if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
-        #     representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance)
+        if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
+            representation["proteins"] = StructureSerializer.to_proteins_count_representation(instance, self.solr)
         # if SerializerDetail.PROTEIN_DETAIL in detail_filters:
         #     representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance, True)
         # if SerializerDetail.ENTRY_PROTEIN_HEADERS in detail_filters:
@@ -83,10 +83,13 @@ class StructureSerializer(ModelContentSerializer):
             }
         }
     #
-    # @staticmethod
-    # def to_proteins_count_representation(instance):
-    #     return instance.proteins.distinct().count()
-    #
+    @staticmethod
+    def to_proteins_count_representation(instance, solr):
+        solr_query = "structure_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        return webfront.serializers.interpro.ProteinSerializer.to_counter_representation(
+            solr.get_counter_object("protein", solr_query)
+        )["proteins"]
+
     # @staticmethod
     # def to_chain_representation(instance, full=False):
     #     chain = {
@@ -153,7 +156,14 @@ class StructureSerializer(ModelContentSerializer):
             "source_database": ch["protein_db"]
         } for ch in chains}
 
-    def to_counter_representation(self, instance):
+    @staticmethod
+    def to_counter_representation(instance):
+        if "structures" not in instance:
+            if instance["ngroups"] == 0:
+                raise ReferenceError('There are not structures for this request')
+            instance = {"structures": {
+                            "pdb": instance["ngroups"]
+                        }}
         return instance
 
     class Meta:

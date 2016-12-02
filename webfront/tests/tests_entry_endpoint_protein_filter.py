@@ -2,7 +2,8 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 import unittest
-@unittest.skip("refactoring for solr")
+
+
 class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
 
     def test_can_get_protein_overview_from_entry(self):

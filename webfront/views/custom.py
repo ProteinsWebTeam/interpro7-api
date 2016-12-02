@@ -45,7 +45,7 @@ class CustomView(GenericAPIView):
                         name__icontains=search
                     )
                 if self.is_single_endpoint(general_handler) or not self.expected_response_is_list():
-                    self.queryset = general_handler.queryset_manager.get_queryset().distinct()
+                    self.queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct()
                 else:
                     self.update_queryset_from_solr(solr, general_handler)
 
@@ -191,4 +191,3 @@ class CustomView(GenericAPIView):
         self.queryset = general_handler.queryset_manager\
             .get_base_queryset(ep)\
             .filter(accession__in=res)
-        print(self.queryset.count())

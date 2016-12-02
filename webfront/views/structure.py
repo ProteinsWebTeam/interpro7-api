@@ -222,7 +222,7 @@ class StructureHandler(CustomView):
     many = False
     serializer_class = StructureSerializer
     serializer_detail = SerializerDetail.STRUCTURE_OVERVIEW
-    serializer_detail_filter = SerializerDetail.STRUCTURE_HEADERS
+    serializer_detail_filter = SerializerDetail.STRUCTURE_OVERVIEW
 
     @staticmethod
     def get_database_contributions(queryset):
@@ -242,10 +242,10 @@ class StructureHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.queryset_manager.add_filter("structure", accession__isnull=False)
-    #     return queryset
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("structure", accession__isnull=False)
+        return queryset
     #
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):

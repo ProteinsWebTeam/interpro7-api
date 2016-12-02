@@ -22,10 +22,7 @@ class StructureRESTTest(InterproRESTTestCase):
         self._check_structure_details(response.data["metadata"])
         self.assertIn("proteins", response.data["metadata"]["counters"])
         self.assertIn("entries", response.data["metadata"]["counters"])
-        # TODO: Should've return 2 proteins?
-        # even when the second protein doesn't have an entry?
-        # Solr core doesn't have this info
-        self.assertEqual(1, response.data["metadata"]["counters"]["proteins"])
+        self.assertEqual(2, response.data["metadata"]["counters"]["proteins"])
         self.assertEqual(1, response.data["metadata"]["counters"]["entries"])
 
     def test_can_read_structure_pdb_accession_chain(self):

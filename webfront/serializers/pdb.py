@@ -3,6 +3,7 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 from webfront.models import Structure
 import webfront.serializers.uniprot
+import webfront.serializers.interpro
 
 
 class StructureSerializer(ModelContentSerializer):
@@ -35,11 +36,10 @@ class StructureSerializer(ModelContentSerializer):
             "metadata": self.to_metadata_representation(instance),
         }
 
-    @staticmethod
-    def filter_representation(representation, instance, detail_filters):
+    def filter_representation(self, representation, instance, detail_filters):
         # qs_type = get_queryset_type(instance)
         if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
-            representation["proteins"] = StructureSerializer.to_proteins_count_representation(instance, self.solr)
+            representation["proteins"] = StructureSerializer.to_proteins_count_representation(representation, self.solr)
         # if SerializerDetail.PROTEIN_DETAIL in detail_filters:
         #     representation["proteins"] = StructureSerializer.to_proteins_overview_representation(instance, True)
         # if SerializerDetail.ENTRY_PROTEIN_HEADERS in detail_filters:
@@ -47,8 +47,9 @@ class StructureSerializer(ModelContentSerializer):
         # if SerializerDetail.ENTRY_DETAIL in detail_filters:
         #     if qs_type == QuerysetType.STRUCTURE:
         #         representation["entries"] = StructureSerializer.to_entries_overview_representation(instance, True)
-        # if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
-        #     representation["entries"] = StructureSerializer.to_entries_count_representation(instance)
+        if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
+            representation["entries"] = StructureSerializer.to_entries_count_representation(representation, self.solr)
+
         # if SerializerDetail.ENTRY_MATCH in detail_filters:
         #     representation["entries"] = StructureSerializer.to_entries_overview_representation(instance)
 
@@ -82,13 +83,29 @@ class StructureSerializer(ModelContentSerializer):
                 "proteins": self.solr.get_number_of_field_by_endpoint("structure", "protein_acc", instance.accession),
             }
         }
-    #
+
     @staticmethod
-    def to_proteins_count_representation(instance, solr):
-        solr_query = "structure_acc:"+instance.accession if hasattr(instance, 'accession') else None
-        return webfront.serializers.interpro.ProteinSerializer.to_counter_representation(
+    def get_solr_from_representation(representation):
+        solr_query = None
+        if "metadata" in representation:
+            solr_query = "structure_acc:" + representation["metadata"]["accession"]
+            if "chains" in representation["metadata"] and len(representation["metadata"]["chains"]) == 1:
+                solr_query += " AND chain:" + list(representation["metadata"]["chains"].keys())[0]
+        return solr_query
+
+    @staticmethod
+    def to_proteins_count_representation(representation, solr):
+        solr_query = StructureSerializer.get_solr_from_representation(representation)
+        return webfront.serializers.uniprot.ProteinSerializer.to_counter_representation(
             solr.get_counter_object("protein", solr_query)
         )["proteins"]
+
+    @staticmethod
+    def to_entries_count_representation(representation, solr):
+        solr_query = StructureSerializer.get_solr_from_representation(representation)
+        return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
+            solr.get_counter_object("entry", solr_query)
+        )["entries"]
 
     # @staticmethod
     # def to_chain_representation(instance, full=False):

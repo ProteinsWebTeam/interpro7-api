@@ -10,7 +10,8 @@ data_in_fixtures = {
 
 
 import unittest
-@unittest.skip("refactoring for solr")
+
+
 class StructureWithFilterProteinRESTTest(InterproRESTTestCase):
 
     def test_can_get_protein_overview_from_structure(self):

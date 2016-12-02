@@ -29,7 +29,7 @@ class ProteinSerializer(ModelContentSerializer):
     def filter_representation(self, representation, instance, detail_filters):
         # qs_type = get_queryset_type(instance)
         if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
-            representation["entries"] = ProteinSerializer.to_entries_count_representation(instance, self.solr)
+            representation["entries"] = ProteinSerializer.to_entries_count_representation(instance,self.solr)
 
         # if SerializerDetail.ENTRY_MATCH in detail_filters:
         #     representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, False)

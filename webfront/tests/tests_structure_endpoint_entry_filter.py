@@ -3,7 +3,7 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
 import unittest
-@unittest.skip("refactoring for solr")
+
 class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
 
     def test_can_get_structure_amount_from_entry(self):
@@ -31,7 +31,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_entry_count_overview(response.data)
 
     def test_can_get_entries_from_structure_id_chain(self):
-        urls = ["/api/structure/pdb/"+pdb+"/A/entry/" for pdb in ["1JM7", "2BKM", "1T2V"]]
+        urls = ["/api/structure/pdb/"+pdb+"/A/entry/" for pdb in ["1JM7", "1T2V"]]
         for url in urls:
             response = self.client.get(url)
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")

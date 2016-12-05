@@ -97,16 +97,17 @@ class QuerysetManager:
                 for k, v in self.filters[ep].items():
                     if ep == "solr":
                         q += " AND {}:{}".format(k, v)
-                    elif ep != "structure" and (
-                                k == "source_database" or k == "source_database__iexact"
-                    ):
-                        q += " AND {}_db:{}".format(ep, v)
+                    elif k == "source_database__isnull":
+                        q += " AND {}{}_acc:*".format("!" if v else "", ep)
                     elif k == "accession" or k == "accession__iexact":
                         q += " AND {}_acc:{}".format(ep, v)
                     elif k == "accession__isnull":
                         q += " AND {}{}_acc:*".format("!" if v else "", ep)
                     elif k == "integrated__isnull":
                         q += " AND {}integrated:*".format("!entry_db:interpro !" if v else "")
+                    elif ep != "structure":
+                        if k == "source_database" or k == "source_database__iexact":
+                            q += " AND {}_db:{}".format(ep, v)
         return q[5:]
 
     def get_base_queryset(self, endpoint):

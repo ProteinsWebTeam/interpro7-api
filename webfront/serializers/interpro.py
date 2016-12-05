@@ -11,7 +11,7 @@ class EntrySerializer(ModelContentSerializer):
         representation = {}
 
         representation = self.endpoint_representation(representation, instance, self.detail)
-        representation = self.filter_representation(representation, instance, self.detail_filters)
+        representation = self.filter_representation(representation, instance, self.detail_filters, self.detail)
 
         return representation
 
@@ -24,7 +24,7 @@ class EntrySerializer(ModelContentSerializer):
             representation = self.to_headers_representation(instance)
         return representation
 
-    def filter_representation(self, representation, instance, detail_filters):
+    def filter_representation(self, representation, instance, detail_filters, detail):
         if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
             representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance, self.solr)
         # if SerializerDetail.PROTEIN_DETAIL in detail_filters:
@@ -37,6 +37,11 @@ class EntrySerializer(ModelContentSerializer):
             representation["structures"] = EntrySerializer.to_structures_count_representation(instance, self.solr)
         # if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
         #     representation["structures"] = EntrySerializer.to_structures_overview_representation(instance, True)
+
+        if detail != SerializerDetail.ENTRY_OVERVIEW:
+            if SerializerDetail.PROTEIN_DB in detail_filters:
+                representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.solr)
+
         return representation
 
     def to_metadata_representation(self, instance):
@@ -92,12 +97,14 @@ class EntrySerializer(ModelContentSerializer):
     #
     #     return output
     #
-    # @staticmethod
-    # def to_proteins_detail_representation(instance):
-    #     return [
-    #         EntrySerializer.to_match_representation(match, True)
-    #         for match in instance.proteinentryfeature_set.all()
-    #     ]
+    @staticmethod
+    def to_proteins_detail_representation(instance, solr):
+        solr_query = "entry_acc:" + instance.accession
+        response = [
+            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_solr_object(r["doclist"]["docs"][0])
+            for r in solr.get_group_obj_of_field_by_query(None, "protein_acc", fq=solr_query, rows=10)["groups"]
+        ]
+        return response
 
     def to_headers_representation(self, instance):
         return {
@@ -109,6 +116,18 @@ class EntrySerializer(ModelContentSerializer):
             }
         }
 
+
+    @staticmethod
+    def serialize_counter_bucket(bucket):
+        output = bucket["unique"]
+        if "protein" in bucket or "structure" in bucket:
+            output = {"entries": bucket["unique"]}
+            if "protein" in bucket:
+                output["proteins"] = bucket["protein"]
+            if "structure" in bucket:
+                output["structures"] = bucket["structure"]
+        return output
+
     @staticmethod
     def to_counter_representation(instance):
         if "entries" not in instance:
@@ -119,7 +138,7 @@ class EntrySerializer(ModelContentSerializer):
             result = {
                 "entries": {
                     "member_databases": {
-                        bucket["val"]: bucket["unique"]
+                        bucket["val"]: EntrySerializer.serialize_counter_bucket(bucket)
                         for bucket in instance["databases"]["buckets"]
                     },
                     "unintegrated": 0,
@@ -127,7 +146,7 @@ class EntrySerializer(ModelContentSerializer):
                 }
             }
             if "unintegrated" in instance and instance["unintegrated"]["count"]>0:
-                result["entries"]["unintegrated"] = instance["unintegrated"]["unique"]
+                result["entries"]["unintegrated"] = EntrySerializer.serialize_counter_bucket(instance["unintegrated"])
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]

@@ -97,7 +97,7 @@ class UniprotHandler(CustomView):
     queryset = Protein.objects.all()
     serializer_class = ProteinSerializer
     serializer_detail = SerializerDetail.PROTEIN_HEADERS
-    serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW
+    serializer_detail_filter = SerializerDetail.PROTEIN_DB
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -109,14 +109,14 @@ class UniprotHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     if level_name != "uniprot":
-    #         general_handler.queryset_manager.add_filter("protein", source_database__iexact=level_name)
-    #     else:
-    #         general_handler.queryset_manager.add_filter("protein", source_database__isnull=False)
-    #     return queryset
-    #
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        if level_name != "uniprot":
+            general_handler.queryset_manager.add_filter("protein", source_database__iexact=level_name)
+        else:
+            general_handler.queryset_manager.add_filter("protein", source_database__isnull=False)
+        return queryset
+
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):
     #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):

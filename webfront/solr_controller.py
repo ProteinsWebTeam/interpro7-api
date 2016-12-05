@@ -10,13 +10,19 @@ class SolrController:
         self.solr = pysolr.Solr(settings.HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
         self.queryset_manager = queryset_manager
 
-    def get_group_obj_of_field_by_query(self, query, field):
-        res = self.solr.search(query, **{
+    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=0, start=0):
+        query = self.queryset_manager.get_solr_query() if query is None else query
+        parameters = {
             'group': 'true',
             'group.field': field,
             'group.ngroups': 'true',
-            'rows': 0,
-        })
+            'rows': rows,
+            'start': start,
+            'fl': '*, entry_protein_coordinates:[json], protein_structure_coordinates:[json]',
+        }
+        if fq is not None:
+            parameters['fq']=fq
+        res = self.solr.search(query, **parameters)
         return res.grouped[field]
 
     def get_number_of_field_by_endpoint(self, endpoint, field, accession):
@@ -30,7 +36,7 @@ class SolrController:
         })
         return res.raw_response["response"]["docs"]
 
-    def get_counter_object(self, endpoint, solr_query=None):
+    def get_counter_object(self, endpoint, solr_query=None, extra_counters=[]):
         qs = self.queryset_manager.get_solr_query(endpoint) if solr_query is None else solr_query
         if qs == '':
             qs = '*:*'
@@ -41,12 +47,16 @@ class SolrController:
                 "facet": {"unique": "unique({}_acc)".format(endpoint)}
             }
         }
+        for ec in extra_counters:
+            facet["databases"]["facet"][ec] = "unique({}_acc)".format(ec)
         if endpoint=="entry":
             facet["unintegrated"] = {
                 "type": "query",
                 "q": "!entry_db:interpro AND !integrated:*",
                 "facet": {"unique": "unique(entry_acc)"}
             }
+            for ec in extra_counters:
+                facet["unintegrated"]["facet"][ec] = "unique({}_acc)".format(ec)
         elif endpoint=="structure":
             return self.get_group_obj_of_field_by_query(qs, "structure_acc")
         res = self.solr.search(qs, **{'facet': 'on', 'json.facet': json.dumps(facet)})

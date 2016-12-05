@@ -162,7 +162,7 @@ class StructureSerializer(ModelContentSerializer):
     # TODO: Missing the length
     def to_chains_representation(self, chains):
         if len(chains) < 1:
-            raise ValueError('Trying to display an empty list of chains')
+            raise ReferenceError('Trying to display an empty list of chains')
         return {ch["chain"]: {
             "coordinates": ch["protein_structure_coordinates"],
             "organism": {

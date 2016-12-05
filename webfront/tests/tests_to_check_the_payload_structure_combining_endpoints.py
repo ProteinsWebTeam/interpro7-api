@@ -75,7 +75,7 @@ plurals = {
 
 
 import unittest
-@unittest.skip("refactoring for solr")
+
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
 
     def test_endpoints_independently(self):
@@ -129,6 +129,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_endpoint_db(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
@@ -145,6 +146,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                                              plurals[endpoint2],
                                                              "URL : [{}]".format(current))
 
+    @unittest.skip("refactoring for solr")
     def test_acc_endpoint(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
@@ -163,6 +165,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_endpoint_acc(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
@@ -182,6 +185,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                         self._check_structure_chains_as_counter_filter(endpoint1, db, acc, endpoint2, "",
                                                                        plurals[endpoint1], plurals[endpoint2])
 
+    @unittest.skip("refactoring for solr")
     def test_db_db(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
@@ -204,6 +208,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_db_acc(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
@@ -227,6 +232,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_acc_db(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
@@ -250,6 +256,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_acc_acc(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:

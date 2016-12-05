@@ -166,7 +166,11 @@ class CustomView(GenericAPIView):
             data_tmp = general_handler.execute_post_serializers(obj)
             return data_tmp
         else:
-            return solr.get_counter_object(general_handler.queryset_manager.main_endpoint)
+            extra = [k
+                     for k, v in general_handler.filter_serializers.items()
+                     if v["filter_serializer"] in [SerializerDetail.PROTEIN_DB]
+                     ]
+            return solr.get_counter_object(general_handler.queryset_manager.main_endpoint, extra_counters=extra)
 
     def get_database_contributions(self, prefix=""):
         return

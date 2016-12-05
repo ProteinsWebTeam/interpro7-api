@@ -48,7 +48,6 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
             self._check_protein_count_overview(response.data)
 
 
-@unittest.skip("refactoring for solr")
 class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
 
     def test_can_get_protein_match_from_entry(self):

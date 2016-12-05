@@ -159,7 +159,8 @@ singular = {v: k for k, v in plurals.items()}
 plurals["chain"] = "structures"
 
 import unittest
-@unittest.skip("refactoring for solr")
+
+
 class ThreeEndpointsContentTest(InterproRESTTestCase):
     def test_endpoint_endpoint_endpoint(self):
         response1 = self.client.get("/api/entry/protein/structure")
@@ -177,8 +178,10 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     url = "/api/{}/{}/{}".format(endpoint1, endpoint2, endpoint3)
                     response2 = self.client.get(url)
                     self.assertEqual(response2.status_code, status.HTTP_200_OK)
-                    self.assertEqual(response1.data, response2.data)
+                    for ep, counter in response1.data.items():
+                        self.assertEqual(counter, response2.data[ep])
 
+    @unittest.skip("refactoring for solr")
     def test_endpoint_endpoint_db(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -203,6 +206,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         self.assertEqual(response.data, expected)
 
+    @unittest.skip("refactoring for solr")
     def test_endpoint_endpoint_acc(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -234,6 +238,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             self.assertEqual(response.status_code, status.HTTP_200_OK)
                             self.assertEqual(response.data, expected)
 
+    @unittest.skip("refactoring for solr")
     def test_endpoint_db_db(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -257,6 +262,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             self.assertEqual(response.status_code, status.HTTP_200_OK)
                             self.assertEqual(response.data, expected)
 
+    @unittest.skip("refactoring for solr")
     def test_endpoint_db_acc(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -287,6 +293,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                                 self.assertEqual(response.data, expected)
 
+    @unittest.skip("refactoring for solr")
     def test_endpoint_acc_acc(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -316,6 +323,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                                                                  db2=db2, acc2=acc2, acc3=acc3)
                                     self.assertEqual(response.data, expected)
 
+    @unittest.skip("refactoring for solr")
     def test_db_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -380,6 +388,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                  "the number of {} of the {} {} doesn't match"
                                  .format(key, endpoint1, expected["metadata"]["accession"]))
 
+    @unittest.skip("refactoring for solr")
     def test_db_db_endpoint(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -407,6 +416,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             else:
                                 self.assertEqual(response2.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_db_db_db(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -429,6 +439,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 else:
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_db_endpoint_acc(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -455,6 +466,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 else:
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_db_db_acc(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -490,6 +502,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_db_acc_acc(self):
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
@@ -549,6 +562,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             else:
                                 self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_acc_endpoint_acc(self):
         for endpoint1 in api_test_map:
             ep1 = "structure" if endpoint1 == "chain" else endpoint1
@@ -579,6 +593,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_acc_db_endpoint(self):
         for endpoint1 in api_test_map:
             ep1 = "structure" if endpoint1 == "chain" else endpoint1
@@ -615,6 +630,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 else:
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_acc_db_db(self):
         for endpoint1 in api_test_map:
             ep1 = "structure" if endpoint1 == "chain" else endpoint1
@@ -644,6 +660,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_acc_db_acc(self):
         for endpoint1 in api_test_map:
             ep1 = "structure" if endpoint1 == "chain" else endpoint1
@@ -686,6 +703,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                         else:
                                             self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @unittest.skip("refactoring for solr")
     def test_acc_acc_acc(self):
         for endpoint1 in api_test_map:
             ep1 = "structure" if endpoint1 == "chain" else endpoint1

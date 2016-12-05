@@ -175,5 +175,15 @@ class ProteinSerializer(ModelContentSerializer):
     #         for match in instance.proteinentryfeature_set.all()
     #         ]
 
+    @staticmethod
+    def get_protein_header_from_solr_object(obj):
+        return {
+                    "accession": obj["protein_acc"],
+                    "coordinates": obj["entry_protein_coordinates"],
+                    # "name": "PTHP_BUCAI",
+                    # "length": 85,
+                    "source_database": obj["protein_db"],
+                    "organism": obj["tax_id"],
+                }
     class Meta:
         model = Protein

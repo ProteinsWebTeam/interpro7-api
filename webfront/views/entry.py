@@ -90,7 +90,7 @@ class MemberHandler(CustomView):
     ]
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
-    serializer_detail_filter = SerializerDetail.ENTRY_MATCH
+    serializer_detail_filter = SerializerDetail.ENTRY_DB
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -110,8 +110,8 @@ class MemberHandler(CustomView):
             general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
     #     try:
     #         is_unintegrated = general_handler.get_from_store(UnintegratedHandler, "unintegrated")
     #     except (IndexError, KeyError):
@@ -137,8 +137,9 @@ class MemberHandler(CustomView):
     #             general_handler.queryset_manager.remove_filter("entry", "accession__iexact")
     #         elif is_interpro:
     #             general_handler.queryset_manager.add_filter("entry", integrated__isnull=False)
-    #         general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
-    #         return queryset
+            general_handler.queryset_manager.update_interpro_filter()
+            general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
+            return queryset
     #
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):
@@ -230,7 +231,7 @@ class UnintegratedHandler(CustomView):
         .filter(integrated__isnull=True)
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
-    serializer_detail_filter = SerializerDetail.ENTRY_MATCH
+    serializer_detail_filter = SerializerDetail.ENTRY_DB
     child_handlers = [
         (db_members, MemberHandler)
     ]
@@ -245,17 +246,17 @@ class UnintegratedHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
-    #     if isinstance(queryset, dict):
-    #         del queryset["entries"]
-    #     else:
-    #         general_handler.queryset_manager.add_filter(
-    #             "entry",
-    #             integrated__isnull=True,
-    #             source_database__iregex=db_members)
-    #     return queryset
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        # general_handler.set_in_store(UnintegratedHandler, "unintegrated", True)
+        # if isinstance(queryset, dict):
+        #     del queryset["entries"]
+        # else:
+        general_handler.queryset_manager.add_filter(
+            "entry",
+            integrated__isnull=True,
+            source_database__iregex=db_members)
+        return queryset
     #
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):
@@ -297,7 +298,7 @@ class InterproHandler(CustomView):
     ]
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
-    serializer_detail_filter = SerializerDetail.ENTRY_MATCH
+    serializer_detail_filter = SerializerDetail.ENTRY_DB
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -310,12 +311,12 @@ class InterproHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.set_in_store(InterproHandler, "interpro", True)
-    #     general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
-    #     return queryset
-    #
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        # general_handler.set_in_store(InterproHandler, "interpro", True)
+        general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
+        return queryset
+
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):
     #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):

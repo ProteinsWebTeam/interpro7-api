@@ -168,7 +168,6 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertEqual(chains[acc], response.data["metadata"]["chains"])
             for chain in chains[acc]:
                 current = "/api/"+endpoint+"/"+db+"/"+acc+"/"+chain+postfix
-                print(current)
                 urls.append(current)
                 response_acc = self._get_in_debug_mode(current)
                 if response_acc.status_code == status.HTTP_200_OK:

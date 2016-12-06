@@ -13,6 +13,7 @@ class SerializerDetail(Enum):
     ENTRY_DETAIL = 102
     ENTRY_MATCH = 103
     ENTRY_PROTEIN_HEADERS = 105
+    ENTRY_DB = 106
 
     PROTEIN_HEADERS = 200
     PROTEIN_OVERVIEW = 201
@@ -26,6 +27,7 @@ class SerializerDetail(Enum):
     STRUCTURE_CHAIN = 303
     STRUCTURE_ENTRY_DETAIL = 304
     STRUCTURE_PROTEIN_DETAIL = 305
+    STRUCTURE_DB = 306
 
 
 class QuerysetType(Enum):

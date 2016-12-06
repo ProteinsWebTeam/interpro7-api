@@ -59,7 +59,6 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
 
 
-@unittest.skip("refactoring for solr")
 class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
 
     def test_urls_that_return_object_of_protein_and_entry_counts(self):
@@ -69,7 +68,6 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/protein/entry/pfam",
             "/api/protein/entry/unintegrated",
             "/api/protein/entry/unintegrated/pfam",
-            "/api/protein/entry/unintegrated/smart",
             "/api/protein/entry/interpro/pfam",
             "/api/protein/entry/interpro/"+acc+"/pfam",
         ]
@@ -139,10 +137,12 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
     def test_urls_that_should_fails_with_no_content(self):
         tr_1 = "P16582"
         tests = [
+            "/api/protein/entry/unintegrated/smart",
             "/api/protein/uniprot/entry/unintegrated/smart",
             "/api/protein/uniprot/"+tr_1+"/entry/unintegrated",
             ]
         for url in tests:
+            print(url)
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
 

@@ -103,6 +103,10 @@ class QuerysetManager:
                         q += " AND {}_acc:{}".format(ep, v)
                     elif k == "accession__isnull":
                         q += " AND {}{}_acc:*".format("!" if v else "", ep)
+                    elif k == "integrated" or k == "integrated__iexact":
+                        q += " AND integrated:{}".format(v)
+                    # elif k == "integrated__isnull":
+                    #     q += " AND {}integrated:*".format("!" if v else "")
                     elif k == "integrated__isnull":
                         q += " AND {}integrated:*".format("!entry_db:interpro !" if v else "")
                     elif ep != "structure":
@@ -174,3 +178,12 @@ class QuerysetManager:
                 pc[row[me + '__accession']] = 0
             pc[row[me + '__accession']] += 1
         return pc
+
+    def update_interpro_filter(self):
+        for k, f in self.filters["entry"].items():
+            if k == "source_database" or k == "source_database__iexact":
+                self.filters["entry"]["integrated__isnull"] = False
+                del self.filters["entry"][k]
+            elif k == "accession" or k == "accession__iexact":
+                self.filters["entry"]["integrated__iexact"] = f
+                del self.filters["entry"][k]

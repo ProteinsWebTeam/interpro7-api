@@ -49,7 +49,7 @@ class SolrController:
         }
         for ec in extra_counters:
             facet["databases"]["facet"][ec] = "unique({}_acc)".format(ec)
-        if endpoint=="entry":
+        if endpoint == "entry":
             facet["unintegrated"] = {
                 "type": "query",
                 "q": "!entry_db:interpro AND !integrated:*",
@@ -57,7 +57,15 @@ class SolrController:
             }
             for ec in extra_counters:
                 facet["unintegrated"]["facet"][ec] = "unique({}_acc)".format(ec)
-        elif endpoint=="structure":
+        elif endpoint == "protein":
+            facet["uniprot"] = {
+                "type": "query",
+                "q": "protein_db:*",
+                "facet": {"unique": "unique(protein_acc)"}
+            }
+            for ec in extra_counters:
+                facet["uniprot"]["facet"][ec] = "unique({}_acc)".format(ec)
+        elif endpoint == "structure":
             return self.get_group_obj_of_field_by_query(qs, "structure_acc")
         res = self.solr.search(qs, **{'facet': 'on', 'json.facet': json.dumps(facet)})
         return res.raw_response["facets"]

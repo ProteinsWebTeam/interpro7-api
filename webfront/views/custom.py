@@ -168,7 +168,9 @@ class CustomView(GenericAPIView):
         else:
             extra = [k
                      for k, v in general_handler.filter_serializers.items()
-                     if v["filter_serializer"] in [SerializerDetail.PROTEIN_DB]
+                     if v["filter_serializer"] in [SerializerDetail.PROTEIN_DB,
+                                                   SerializerDetail.ENTRY_DB,
+                                                   SerializerDetail.STRUCTURE_DB]
                      ]
             return solr.get_counter_object(general_handler.queryset_manager.main_endpoint, extra_counters=extra)
 

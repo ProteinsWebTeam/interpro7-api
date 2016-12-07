@@ -53,8 +53,8 @@ class FixtureReader:
                 "protein_db": self.proteins[p]["source_database"],
                 "tax_id": self.proteins[p]["organism"]["taxid"],
                 "entry_protein_coordinates": json.dumps(ep["coordinates"]),
-                "django_ct": get_model_ct(ProteinEntryFeature),
-                "django_id": 0,
+                # "django_ct": get_model_ct(ProteinEntryFeature),
+                # "django_id": 0,
                 "id": get_id(e, p)
 
             }
@@ -77,8 +77,8 @@ class FixtureReader:
                         "protein_acc": p,
                         "protein_db": self.proteins[p]["source_database"],
                         "tax_id": self.proteins[p]["organism"]["taxid"],
-                        "django_ct": get_model_ct(ProteinEntryFeature),
-                        "django_id": 0,
+                        # "django_ct": get_model_ct(ProteinEntryFeature),
+                        # "django_id": 0,
                         "id": get_id(None, p, sp["structure"], sp["chain"]),
                         "structure_acc": sp["structure"],
                         "chain": sp["chain"],

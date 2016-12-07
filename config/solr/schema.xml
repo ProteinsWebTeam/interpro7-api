@@ -129,8 +129,6 @@
   <fields>
     <!-- general -->
     <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
-    <field name="django_ct" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="django_id" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="_version_" type="long" indexed="true" stored ="true"/>
 
     <dynamicField name="*_i"  type="int"    indexed="true"  stored="true"/>

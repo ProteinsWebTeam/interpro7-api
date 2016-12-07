@@ -47,7 +47,7 @@
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"   />
+        <!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"   />
         <!-- in this example, we will only use synonyms at query time
         <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
         -->
@@ -145,29 +145,29 @@
     <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="false"/>
 
 
-    <field name="entry_acc" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="entry_acc" type="text_general" indexed="true" stored="true" multiValued="false" docValues="true"/>
 
-    <field name="entry_type" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="entry_type" type="text_general" indexed="true" stored="true" multiValued="false" docValues="true"/>
 
-    <field name="entry_db" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="entry_db" type="text_general" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
-    <field name="integrated" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="integrated" type="text_general" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
-    <field name="protein_acc" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="protein_acc" type="text_general" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
-    <field name="protein_db" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="protein_db" type="text_general" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
     <field name="entry_protein_coordinates" type="text_general" indexed="true" stored="true" multiValued="false" />
 
-    <field name="tax_id" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="tax_id" type="text_general" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
-    <field name="structure_acc" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="structure_acc" type="text_general" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
-    <field name="chain" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="chain" type="text_general" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
-    <field name="protein_structure_coordinates" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="protein_structure_coordinates" type="text_general" indexed="true" stored="true" multiValued="false"/>
 
-    <field name="text" type="text_general" indexed="true" stored="true" multiValued="false" />
+    <field name="text" type="text_general" indexed="true" stored="true" multiValued="false"/>
 
   </fields>
 

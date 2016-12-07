@@ -142,7 +142,6 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/protein/uniprot/"+tr_1+"/entry/unintegrated",
             ]
         for url in tests:
-            print(url)
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
 

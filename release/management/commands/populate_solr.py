@@ -42,7 +42,7 @@ def attach_coordinates(con, obj, is_for_interpro_entries):
     cur.execute(sql.format(obj["entry_acc"], obj["protein_acc"]))
     col = get_column_dict_from_cursor(cur)
     obj["entry_protein_coordinates"] = json.dumps(
-        [{"from": row[col["POS_FROM"]], "to": row[col["POS_TO"]]} for row in cur]
+        [{"protein": [row[col["POS_FROM"]], row[col["POS_TO"]]]} for row in cur]
     )
     return attach_structure_coordinates(con, obj)
 
@@ -54,13 +54,12 @@ def attach_structure_coordinates(con, obj):
                   FROM INTERPRO.UNIPROT_PDBE
                   WHERE ENTRY_ID='{}' AND SPTR_AC='{}' AND CHAIN='{}'"""\
             .format(obj["structure_acc"], obj["protein_acc"], obj["chain"])
-        print(sql)
         cur.execute(sql)
         col = get_column_dict_from_cursor(cur)
         obj["protein_structure_coordinates"] = json.dumps(
-            [{"from": row[col["BEG_SEQ"]], "to": row[col["END_SEQ"]]} for row in cur]
+            [{"protein": [row[col["BEG_SEQ"]], row[col["END_SEQ"]]]} for row in cur]
         )
-        print(obj)
+
     return obj
 
 def get_object_from_row(con, row, col, is_for_interpro_entries=True):
@@ -137,6 +136,7 @@ dbcodes = ["H", "M", "R", "V", "g", "B", "P", "X", "N", "J", "Y", "U", "D", "Q",
 def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True):
     t = time.time()
     ipro = DATABASES['interpro_ro']
+    print(ipro)
     con = cx_Oracle.connect(ipro['USER'], ipro['PASSWORD'], cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']))
 
     solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
@@ -146,7 +146,7 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True):
     elif subset in dbcodes:
         where = "AND e.DBCODE='{}'".format(subset)
     for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries), bs):
-        solr.add(chunk)
+        solr.add(chunk, commit=False)
     con.close()
     t2 = time.time()
     print("TIME: :", t2-t)

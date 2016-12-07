@@ -48,7 +48,6 @@ class EntryWithFilterStructureRESTTest(InterproRESTTestCase):
             self._check_structure_count_overview(response.data)
 
 
-@unittest.skip("refactoring for solr")
 class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
 
     def test_can_get_structure_match_from_entry(self):

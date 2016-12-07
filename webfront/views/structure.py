@@ -173,7 +173,7 @@ class PDBHandler(CustomView):
     queryset = Structure.objects.all()
     serializer_class = StructureSerializer
     serializer_detail = SerializerDetail.STRUCTURE_HEADERS
-    serializer_detail_filter = SerializerDetail.STRUCTURE_OVERVIEW
+    serializer_detail_filter = SerializerDetail.STRUCTURE_DB
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):

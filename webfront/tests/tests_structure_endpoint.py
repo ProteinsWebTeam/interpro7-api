@@ -32,7 +32,7 @@ class StructureRESTTest(InterproRESTTestCase):
         self._check_structure_details(response.data["metadata"])
         for chain in response.data["metadata"]["chains"].values():
             self._check_structure_chain_details(chain)
-            self.assertEqual(chain["chain"], "B")
+            self.assertEqual(chain["chain"].upper(), "B")
 
 
     # TODO:

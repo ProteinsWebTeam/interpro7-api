@@ -86,4 +86,7 @@ class FixtureReader:
                     });
 
         solr = pysolr.Solr(settings.HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
-        solr.add(to_add)
+        lower =[]
+        for doc in to_add:
+            lower.append({k: v.lower() if type(v) == str else v for k,v in doc.items()})
+        solr.add(lower)

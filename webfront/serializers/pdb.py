@@ -90,7 +90,7 @@ class StructureSerializer(ModelContentSerializer):
         if "metadata" in representation:
             solr_query = "structure_acc:" + representation["metadata"]["accession"]
             if "chains" in representation["metadata"] and len(representation["metadata"]["chains"]) == 1:
-                solr_query += " AND chain:" + list(representation["metadata"]["chains"].keys())[0]
+                solr_query += " && chain:" + list(representation["metadata"]["chains"].keys())[0]
         return solr_query
 
     @staticmethod

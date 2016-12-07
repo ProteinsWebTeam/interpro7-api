@@ -24,6 +24,7 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
             "/api/entry/interpro/"+acc+"/pfam/protein",
             ]
         for url in urls:
+            print(url)
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
@@ -112,7 +113,7 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["proteins"]), len(tests[url]))
             for match in response.data["proteins"]:
                 self._check_match(match)
-            ids = [x["accession"] for x in response.data["proteins"]]
+            ids = [x["accession"].upper() for x in response.data["proteins"]]
             self.assertEqual(tests[url], ids)
 
 

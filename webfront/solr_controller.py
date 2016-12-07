@@ -11,7 +11,7 @@ class SolrController:
         self.queryset_manager = queryset_manager
 
     def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=0, start=0):
-        query = self.queryset_manager.get_solr_query() if query is None else query
+        query = self.queryset_manager.get_solr_query() if query is None else query.lower()
         parameters = {
             'group': 'true',
             'group.field': field,
@@ -21,13 +21,13 @@ class SolrController:
             'fl': '*, entry_protein_coordinates:[json], protein_structure_coordinates:[json]',
         }
         if fq is not None:
-            parameters['fq']=fq
+            parameters['fq'] = fq.lower()
         res = self.solr.search(query, **parameters)
         return res.grouped[field]
 
     def get_number_of_field_by_endpoint(self, endpoint, field, accession):
         return self.get_group_obj_of_field_by_query(
-             "{}:* AND {}_acc:{}".format(field, endpoint, accession), field
+             "{}:* && {}_acc:{}".format(field, endpoint, accession), field
         )["ngroups"]
 
     def get_chain(self):
@@ -37,7 +37,7 @@ class SolrController:
         return res.raw_response["response"]["docs"]
 
     def get_counter_object(self, endpoint, solr_query=None, extra_counters=[]):
-        qs = self.queryset_manager.get_solr_query(endpoint) if solr_query is None else solr_query
+        qs = self.queryset_manager.get_solr_query(endpoint) if solr_query is None else solr_query.lower()
         if qs == '':
             qs = '*:*'
         facet = {
@@ -52,7 +52,7 @@ class SolrController:
         if endpoint == "entry":
             facet["unintegrated"] = {
                 "type": "query",
-                "q": "!entry_db:interpro AND !integrated:*",
+                "q": "!entry_db:interpro && !integrated:*",
                 "facet": {"unique": "unique(entry_acc)"}
             }
             for ec in extra_counters:

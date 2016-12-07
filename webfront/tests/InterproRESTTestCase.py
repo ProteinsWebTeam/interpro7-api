@@ -177,8 +177,8 @@ class InterproRESTTestCase(APITransactionTestCase):
                     if key is not None:
                         for ch2 in response_acc.data[key]:
                             self.assertEqual(ch2["chain"], chain)
-                    self.assertIn(chain, response_acc.data["metadata"]["chains"])
-                    self._check_match(response_acc.data["metadata"]["chains"][chain])
+                    self.assertIn(chain.lower(), response_acc.data["metadata"]["chains"])
+                    self._check_match(response_acc.data["metadata"]["chains"][chain.lower()])
                 elif response_acc.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)
         return urls

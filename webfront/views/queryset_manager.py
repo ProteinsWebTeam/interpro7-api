@@ -96,23 +96,23 @@ class QuerysetManager:
             else:
                 for k, v in self.filters[ep].items():
                     if ep == "solr":
-                        q += " AND {}:{}".format(k, v)
+                        q += " && {}:{}".format(k, v)
                     elif k == "source_database__isnull":
-                        q += " AND {}{}_acc:*".format("!" if v else "", ep)
+                        q += " && {}{}_acc:*".format("!" if v else "", ep)
                     elif k == "accession" or k == "accession__iexact":
-                        q += " AND {}_acc:{}".format(ep, v)
+                        q += " && {}_acc:{}".format(ep, v)
                     elif k == "accession__isnull":
-                        q += " AND {}{}_acc:*".format("!" if v else "", ep)
+                        q += " && {}{}_acc:*".format("!" if v else "", ep)
                     elif k == "integrated" or k == "integrated__iexact":
-                        q += " AND integrated:{}".format(v)
+                        q += " && integrated:{}".format(v)
                     # elif k == "integrated__isnull":
-                    #     q += " AND {}integrated:*".format("!" if v else "")
+                    #     q += " && {}integrated:*".format("!" if v else "")
                     elif k == "integrated__isnull":
-                        q += " AND {}integrated:*".format("!entry_db:interpro !" if v else "")
+                        q += " && {}integrated:*".format("!entry_db:interpro !" if v else "")
                     elif ep != "structure":
                         if k == "source_database" or k == "source_database__iexact":
-                            q += " AND {}_db:{}".format(ep, v)
-        return q[5:]
+                            q += " && {}_db:{}".format(ep, v)
+        return q[4:].lower()
 
     def get_base_queryset(self, endpoint):
         queryset = Entry.objects.all()

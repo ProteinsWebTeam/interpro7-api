@@ -39,7 +39,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_entry_count_overview(response.data)
             for chain in response.data["metadata"]["chains"].values():
                 self._check_structure_chain_details(chain)
-                self.assertEqual(chain["chain"], "A")
+                self.assertEqual(chain["chain"].upper(), "A")
 
     def test_gets_empty_entries_array_for_structure_with_no_matches(self):
         response = self._get_in_debug_mode("/api/structure/pdb/1JZ8/entry/")

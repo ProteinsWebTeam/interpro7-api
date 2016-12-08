@@ -63,22 +63,23 @@ def attach_structure_coordinates(con, obj):
     return obj
 
 def get_object_from_row(con, row, col, is_for_interpro_entries=True):
-    return attach_coordinates(con, {
+    obj = attach_coordinates(con, {
         "text": row[col["ENTRY_AC"]]+" "+row[col["PROTEIN_AC"]],
-        "entry_acc": row[col["ENTRY_AC"]].lower(),
-        "entry_type": row[col["ENTRY_TYPE"]].lower(),
-        "entry_db": "interpro" if is_for_interpro_entries else row[col["ENTRY_DB"]].lower(),
-        "integrated": None if is_for_interpro_entries else row[col["INTEGRATED"]].lower(),
-        "protein_acc": row[col["PROTEIN_AC"]].lower(),
-        "protein_db": row[col["PROTEIN_DB"]].lower(),
+        "entry_acc": row[col["ENTRY_AC"]],
+        "entry_type": row[col["ENTRY_TYPE"]],
+        "entry_db": "interpro" if is_for_interpro_entries else row[col["ENTRY_DB"]],
+        "integrated": None if is_for_interpro_entries else row[col["INTEGRATED"]],
+        "protein_acc": row[col["PROTEIN_AC"]],
+        "protein_db": row[col["PROTEIN_DB"]],
         "tax_id": row[col["TAX_ID"]],
-        "structure_acc": row[col["STRUCTURE_AC"]].lower() if row[col["STRUCTURE_AC"]] is not None else None,
-        "chain": row[col["CHAIN"]].lower() if row[col["CHAIN"]] is not None else None,
+        "structure_acc": row[col["STRUCTURE_AC"]] if row[col["STRUCTURE_AC"]] is not None else None,
+        "chain": row[col["CHAIN"]] if row[col["CHAIN"]] is not None else None,
 
         # "django_ct": get_model_ct(ProteinEntryFeature),
         # "django_id": 0,
         "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
     }, is_for_interpro_entries)
+    return {k: v.lower() if type(v) == str else v for k, v in obj.items()}
 
 
 def chunks(iterable, max=1000):

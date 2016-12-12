@@ -6,7 +6,9 @@ unifam/mysql.conf
 .DS_Store
 unifam/settings-private.py
 .coverage
+config/~oracle.yml
 config/oracle.yml
 config/oracle_dw.yml
 config/mysql.yml
+config/~mysql.yml
 *.db

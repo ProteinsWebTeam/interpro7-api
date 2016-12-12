@@ -90,7 +90,7 @@ class CustomView(GenericAPIView):
                 # get the corresponding handler name
                 handler_name, handler_class = next(
                     h for h in handlers
-                    if re.match(r'(?i)^{}$'.format(h[0]), level_name)
+                    if re.match(r'(?i)^{}$'.format(h[0]), level_name, flags=re.IGNORECASE)
                 )
             except StopIteration:
                 # no handler has been found
@@ -143,7 +143,7 @@ class CustomView(GenericAPIView):
                 # get the corresponding handler name
                 handler_name, handler_class = next(
                     h for h in handlers
-                    if re.match(r'(?i)^{}$'.format(h[0]), level_name)
+                    if re.match(r'(?i)^{}$'.format(h[0]), level_name, flags=re.IGNORECASE)
                 )
             except StopIteration:
                 # no handler has been found

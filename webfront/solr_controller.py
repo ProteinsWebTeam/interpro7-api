@@ -80,3 +80,15 @@ class SolrController:
             'rows': 0,
         })
         return [x['value'].upper() for x in res.facets["facet_pivot"]['{}_acc'.format(endpoint)]]
+
+    def execute_query(self, query, fq=None, rows=0, start=0):
+        query = self.queryset_manager.get_solr_query() if query is None else query.lower()
+        parameters = {
+            'rows': rows,
+            'start': start,
+            'fl': '*, entry_protein_coordinates:[json], protein_structure_coordinates:[json]',
+        }
+        if fq is not None:
+            parameters['fq'] = fq.lower()
+        res = self.solr.search(query, **parameters)
+        return res.docs

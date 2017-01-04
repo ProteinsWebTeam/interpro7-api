@@ -163,15 +163,30 @@ class StructureSerializer(ModelContentSerializer):
     def to_chains_representation(self, chains):
         if len(chains) < 1:
             raise ReferenceError('Trying to display an empty list of chains')
-        return {ch["chain"]: {
-            "coordinates": ch["protein_structure_coordinates"],
+        return {
+            ch["chain"]: StructureSerializer.get_chain_from_solr_object(ch)
+            for ch in chains
+        }
+
+    @staticmethod
+    def get_chain_from_solr_object(obj):
+        return {
+            "coordinates": obj["protein_structure_coordinates"],
             "organism": {
-                "taxid": ch["tax_id"]
+                "taxid": obj["tax_id"]
             },
-            "accession": ch["protein_acc"],
-            "chain": ch["chain"],
-            "source_database": ch["protein_db"]
-        } for ch in chains}
+            "accession": obj["protein_acc"],
+            "chain": obj["chain"],
+            "source_database": obj["protein_db"]
+        }
+
+    @staticmethod
+    def get_structure_from_solr_object(obj):
+        output = StructureSerializer.get_chain_from_solr_object(obj)
+        output["accession"] = obj["structure_acc"]
+        output["protein"] = obj["protein_acc"]
+        output["source_database"] = "pdb"
+        return output
 
     @staticmethod
     def to_counter_representation(instance):

@@ -41,6 +41,8 @@ class EntrySerializer(ModelContentSerializer):
         if detail != SerializerDetail.ENTRY_OVERVIEW:
             if SerializerDetail.PROTEIN_DB in detail_filters:
                 representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.solr)
+            if SerializerDetail.STRUCTURE_DB in detail_filters:
+                representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.solr)
 
         return representation
 
@@ -97,6 +99,7 @@ class EntrySerializer(ModelContentSerializer):
     #
     #     return output
     #
+
     @staticmethod
     def to_proteins_detail_representation(instance, solr):
         solr_query = "entry_acc:" + instance.accession
@@ -104,6 +107,17 @@ class EntrySerializer(ModelContentSerializer):
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_solr_object(r["doclist"]["docs"][0])
             for r in solr.get_group_obj_of_field_by_query(None, "protein_acc", fq=solr_query, rows=10)["groups"]
         ]
+        return response
+
+    @staticmethod
+    def to_structures_detail_representation(instance, solr):
+        solr_query = "entry_acc:" + instance.accession
+        response = [
+            webfront.serializers.pdb.StructureSerializer.get_structure_from_solr_object(r)
+            for r in solr.execute_query(None, fq=solr_query, rows=10)
+        ]
+        if len(response) == 0:
+            raise ReferenceError('There are not structures for this request')
         return response
 
     def to_headers_representation(self, instance):

@@ -161,6 +161,8 @@
 
     <field name="structure_acc" type="string" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
+    <field name="structure_chain" type="string" indexed="true" stored="true" multiValued="false"  docValues="true"/>
+
     <field name="chain" type="string" indexed="true" stored="true" multiValued="false"  docValues="true"/>
 
     <field name="protein_structure_coordinates" type="text_general" indexed="true" stored="true" multiValued="false"/>

@@ -49,7 +49,6 @@ class ProteinWithFilterStructureRESTTest(InterproRESTTestCase):
                 self.assertEqual(response.data["metadata"]["counters"]["structures"], len(list(set(data_in_fixtures[prot]))))
 
 
-@unittest.skip("refactoring for solr")
 class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
 
     def test_can_get_protein_match_from_structure(self):
@@ -66,7 +65,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
                              len(data_in_fixtures[result["metadata"]["accession"]]),
                              "failing for "+result["metadata"]["accession"])
             for match in result["structures"]:
-                self.assertIn(match["accession"], data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_swissprot_from_pdb_structures(self):
@@ -78,7 +77,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
                              "failing for "+result["metadata"]["accession"])
             self.assertIn(result["metadata"]["accession"], data_swissprot)
             for match in result["structures"]:
-                self.assertIn(match["accession"], data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_uniprot_matches_from_structures(self):

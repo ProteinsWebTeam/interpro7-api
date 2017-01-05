@@ -62,6 +62,7 @@ class FixtureReader:
                 for sp in self.protein_structure_list[p]:
                     c =copy.copy(obj)
                     c["structure_acc"] = sp["structure"]
+                    c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["chain"] = sp["chain"]
                     c["id"] = get_id(e, p, sp["structure"], sp["chain"])
                     c["protein_structure_coordinates"] = json.dumps(sp["coordinates"]),
@@ -81,6 +82,7 @@ class FixtureReader:
                         # "django_id": 0,
                         "id": get_id(None, p, sp["structure"], sp["chain"]),
                         "structure_acc": sp["structure"],
+                        "structure_chain": sp["structure"] + " - " + sp["chain"],
                         "chain": sp["chain"],
                         "protein_structure_coordinates": json.dumps(sp["coordinates"]),
                     });

@@ -159,7 +159,7 @@ class EntrySerializer(ModelContentSerializer):
                     "interpro": 0,
                 }
             }
-            if "unintegrated" in instance and instance["unintegrated"]["count"]>0:
+            if "unintegrated" in instance and instance["unintegrated"]["count"] > 0:
                 result["entries"]["unintegrated"] = EntrySerializer.serialize_counter_bucket(instance["unintegrated"])
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]

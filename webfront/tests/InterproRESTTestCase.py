@@ -153,7 +153,7 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     def _check_count_overview_per_endpoints(self, obj, endpoints1, endpoints2, msg=""):
         for inner_obj in obj[endpoints2]:
-            if inner_obj in ["interpro", "unintegrated", "uniprot", "swissprot", "trembl", "pdb"]:
+            if inner_obj in ["interpro", "unintegrated", "uniprot", "swissprot", "trembl", "pdb"] and not (inner_obj == "unintegrated" and obj[endpoints2][inner_obj] == 0):
                 self.assertIn(endpoints1,
                               obj[endpoints2][inner_obj],
                               msg)

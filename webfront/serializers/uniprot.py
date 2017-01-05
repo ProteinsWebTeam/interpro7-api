@@ -91,6 +91,7 @@ class ProteinSerializer(ModelContentSerializer):
                 "structures": self.solr.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
             }
         }
+
     @staticmethod
     def serialize_counter_bucket(bucket):
         output = bucket["unique"]
@@ -219,15 +220,19 @@ class ProteinSerializer(ModelContentSerializer):
     #         ]
 
     @staticmethod
-    def get_protein_header_from_solr_object(obj):
-        return {
-                    "accession": obj["protein_acc"],
-                    "coordinates": obj["entry_protein_coordinates"],
-                    # "name": "PTHP_BUCAI",
-                    # "length": 85,
-                    "source_database": obj["protein_db"],
-                    "organism": obj["tax_id"],
-                }
+    def get_protein_header_from_solr_object(obj, for_entry=True):
+        key_coord = "entry_protein_coordinates" if for_entry else "protein_structure_coordinates"
+        header = {
+            "accession": obj["protein_acc"],
+            "coordinates": obj[key_coord],
+            # "name": "PTHP_BUCAI",
+            # "length": 85,
+            "source_database": obj["protein_db"],
+            "organism": obj["tax_id"],
+        }
+        if not for_entry:
+            header["chain"] = obj["chain"]
+        return header
 
     class Meta:
         model = Protein

@@ -10,11 +10,12 @@ class StructureSerializer(ModelContentSerializer):
 
     def to_representation(self, instance):
         representation = {}
-        representation = self.endpoint_representation(representation, instance, self.detail)
-        representation = self.filter_representation(representation, instance, self.detail_filters)
+        representation = self.endpoint_representation(representation, instance)
+        representation = self.filter_representation(representation, instance)
         return representation
 
-    def endpoint_representation(self, representation, instance, detail):
+    def endpoint_representation(self, representation, instance):
+        detail = self.detail
         if detail == SerializerDetail.ALL:
             representation = self.to_full_representation(instance)
         elif detail == SerializerDetail.STRUCTURE_OVERVIEW:
@@ -36,8 +37,9 @@ class StructureSerializer(ModelContentSerializer):
             "metadata": self.to_metadata_representation(instance),
         }
 
-    def filter_representation(self, representation, instance, detail_filters):
+    def filter_representation(self, representation, instance):
         # qs_type = get_queryset_type(instance)
+        detail_filters = self.detail_filters
         if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
             representation["proteins"] = StructureSerializer.to_proteins_count_representation(representation, self.solr)
         # if SerializerDetail.PROTEIN_DETAIL in detail_filters:
@@ -52,6 +54,11 @@ class StructureSerializer(ModelContentSerializer):
 
         # if SerializerDetail.ENTRY_MATCH in detail_filters:
         #     representation["entries"] = StructureSerializer.to_entries_overview_representation(instance)
+        if self.detail != SerializerDetail.STRUCTURE_OVERVIEW:
+            if SerializerDetail.PROTEIN_DB in detail_filters:
+                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, self.solr)
+            # if SerializerDetail.ENTRY_DB in detail_filters:
+            #     representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, self.solr)
 
         return representation
 
@@ -132,6 +139,16 @@ class StructureSerializer(ModelContentSerializer):
     # # def to_proteins_detail_representation(instance):
     # #     return [StructureSerializer.to_chain_representation(instance, True)]
     #
+
+    @staticmethod
+    def to_proteins_detail_representation(instance, solr):
+        solr_query = "structure_acc:" + instance.accession
+        response = [
+            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_solr_object(r["doclist"]["docs"][0], False)
+            for r in solr.get_group_obj_of_field_by_query(None, "structure_chain", fq=solr_query, rows=10)["groups"]
+        ]
+        return response
+
     # @staticmethod
     # def to_entries_count_representation(instance):
     #     return instance.entrystructurefeature_set.values("entry").distinct().count()
@@ -191,12 +208,29 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def to_counter_representation(instance):
         if "structures" not in instance:
-            if instance["ngroups"] == 0:
+            if instance["count"] == 0:
                 raise ReferenceError('There are not structures for this request')
-            instance = {"structures": {
-                            "pdb": instance["ngroups"]
-                        }}
+            # instance = {"structures": {
+            #                 "pdb": instance["ngroups"]
+            #             }}
+            instance = {
+                "structures": {
+                    "pdb": StructureSerializer.serialize_counter_bucket(instance["databases"])
+                }
+            }
+
         return instance
+
+    @staticmethod
+    def serialize_counter_bucket(bucket):
+        output = bucket["unique"]
+        if "entry" in bucket or "protein" in bucket:
+            output = {"structures": bucket["unique"]}
+            if "entry" in bucket:
+                output["entries"] = bucket["entry"]
+            if "protein" in bucket:
+                output["proteins"] = bucket["protein"]
+        return output
 
     class Meta:
         model = Structure

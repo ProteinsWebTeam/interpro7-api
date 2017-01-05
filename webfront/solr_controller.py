@@ -66,7 +66,11 @@ class SolrController:
             for ec in extra_counters:
                 facet["uniprot"]["facet"][ec] = "unique({}_acc)".format(ec)
         elif endpoint == "structure":
-            return self.get_group_obj_of_field_by_query(qs, "structure_acc")
+            facet["databases"]["type"] = "query"
+            facet["databases"]["q"] = "structure_acc:*"
+            for ec in extra_counters:
+                facet["databases"]["facet"][ec] = "unique({}_acc)".format(ec)
+            # return self.get_group_obj_of_field_by_query(qs, "structure_acc")
         res = self.solr.search(qs, **{'facet': 'on', 'json.facet': json.dumps(facet)})
         return res.raw_response["facets"]
 

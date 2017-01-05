@@ -43,6 +43,8 @@ class EntrySerializer(ModelContentSerializer):
                 representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.solr)
             if SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.solr, True)
+            if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
+                representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.solr, True)
 
         return representation
 
@@ -116,10 +118,14 @@ class EntrySerializer(ModelContentSerializer):
         return response
 
     @staticmethod
-    def to_structures_detail_representation(instance, solr):
+    def to_structures_detail_representation(instance, solr, is_full=False):
         solr_query = "entry_acc:" + instance.accession
         response = [
-            webfront.serializers.pdb.StructureSerializer.get_structure_from_solr_object(r)
+            webfront.serializers.pdb.StructureSerializer.get_structure_from_solr_object(
+                r,
+                include_structure = is_full,
+                solr = solr
+            )
             for r in solr.execute_query(None, fq=solr_query, rows=10)
         ]
         if len(response) == 0:

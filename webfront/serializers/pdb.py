@@ -34,7 +34,7 @@ class StructureSerializer(ModelContentSerializer):
 
     def to_full_representation(self, instance):
         return {
-            "metadata": self.to_metadata_representation(instance),
+            "metadata": self.to_metadata_representation(instance, self.solr),
         }
 
     def filter_representation(self, representation, instance):
@@ -72,7 +72,8 @@ class StructureSerializer(ModelContentSerializer):
             }
         }
 
-    def to_metadata_representation(self, instance):
+    @staticmethod
+    def to_metadata_representation(instance, solr):
         return {
             "accession": instance.accession,
             "name": {
@@ -86,8 +87,8 @@ class StructureSerializer(ModelContentSerializer):
             "chains": instance.chains,
             "source_database": instance.source_database,
             "counters": {
-                "entries": self.solr.get_number_of_field_by_endpoint("structure", "entry_acc", instance.accession),
-                "proteins": self.solr.get_number_of_field_by_endpoint("structure", "protein_acc", instance.accession),
+                "entries": solr.get_number_of_field_by_endpoint("structure", "entry_acc", instance.accession),
+                "proteins": solr.get_number_of_field_by_endpoint("structure", "protein_acc", instance.accession),
             }
         }
 
@@ -207,11 +208,15 @@ class StructureSerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def get_structure_from_solr_object(obj):
+    def get_structure_from_solr_object(obj, include_structure=False, solr=None):
         output = StructureSerializer.get_chain_from_solr_object(obj)
         output["accession"] = obj["structure_acc"]
         output["protein"] = obj["protein_acc"]
         output["source_database"] = "pdb"
+        if include_structure:
+            output["structure"] = StructureSerializer.to_metadata_representation(
+                Structure.objects.get(accession__iexact=obj["structure_acc"]), solr
+            )
         return output
 
     @staticmethod

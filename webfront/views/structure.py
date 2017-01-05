@@ -130,12 +130,11 @@ class PDBAccessionHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.set_in_store(PDBAccessionHandler, "pdb_accession", level_name)
-    #     if not isinstance(queryset, dict):
-    #         general_handler.queryset_manager.add_filter("structure", accession__iexact=level_name)
-    #     return queryset
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        # general_handler.set_in_store(PDBAccessionHandler, "pdb_accession", level_name)
+        general_handler.queryset_manager.add_filter("structure", accession__iexact=level_name)
+        return queryset
     #
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):

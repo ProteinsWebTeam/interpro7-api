@@ -92,7 +92,6 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
-@unittest.skip("refactoring for solr")
 class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_entry_overview_filtered_by_structure(self):
         pdb = "1JM7"

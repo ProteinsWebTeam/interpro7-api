@@ -51,7 +51,7 @@ class ProteinSerializer(ModelContentSerializer):
 
     def to_full_representation(self, instance):
         return {
-            "metadata": self.to_metadata_representation(instance),
+            "metadata": self.to_metadata_representation(instance, self.solr),
             "representation": instance.feature,
             "genomic_context": instance.genomic_context,
             # "source_database": instance.source_database
@@ -68,7 +68,8 @@ class ProteinSerializer(ModelContentSerializer):
             }
         }
 
-    def to_metadata_representation(self, instance):
+    @staticmethod
+    def to_metadata_representation(instance, solr):
         return {
             "accession": instance.accession,
             "id": instance.identifier,
@@ -87,8 +88,8 @@ class ProteinSerializer(ModelContentSerializer):
             "protein_evidence": 4,
             "source_database": instance.source_database,
             "counters": {
-                "entries": self.solr.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
-                "structures": self.solr.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
+                "entries": solr.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
+                "structures": solr.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
             }
         }
 
@@ -220,7 +221,7 @@ class ProteinSerializer(ModelContentSerializer):
     #         ]
 
     @staticmethod
-    def get_protein_header_from_solr_object(obj, for_entry=True):
+    def get_protein_header_from_solr_object(obj, for_entry=True, include_protein=False, solr=None):
         key_coord = "entry_protein_coordinates" if for_entry else "protein_structure_coordinates"
         header = {
             "accession": obj["protein_acc"],
@@ -232,6 +233,10 @@ class ProteinSerializer(ModelContentSerializer):
         }
         if not for_entry:
             header["chain"] = obj["chain"]
+        if include_protein:
+            header["protein"] = ProteinSerializer.to_metadata_representation(
+                Protein.objects.get(accession__iexact=obj["protein_acc"]), solr
+            )
         return header
 
     class Meta:

@@ -27,8 +27,6 @@ class EntrySerializer(ModelContentSerializer):
     def filter_representation(self, representation, instance, detail_filters, detail):
         if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
             representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance, self.solr)
-        # if SerializerDetail.PROTEIN_DETAIL in detail_filters:
-        #     representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance)
         # if SerializerDetail.ENTRY_PROTEIN_HEADERS in detail_filters:
         #     representation["proteins"] = EntrySerializer.to_proteins_count_representation(instance)
         # if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
@@ -43,6 +41,8 @@ class EntrySerializer(ModelContentSerializer):
                 representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.solr)
             if SerializerDetail.STRUCTURE_DB in detail_filters:
                 representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.solr)
+            if SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.solr, True)
 
         return representation
 
@@ -101,12 +101,18 @@ class EntrySerializer(ModelContentSerializer):
     #
 
     @staticmethod
-    def to_proteins_detail_representation(instance, solr):
+    def to_proteins_detail_representation(instance, solr, is_full=False):
         solr_query = "entry_acc:" + instance.accession
         response = [
-            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_solr_object(r["doclist"]["docs"][0])
+            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_solr_object(
+                r["doclist"]["docs"][0],
+                include_protein=is_full,
+                solr=solr
+            )
             for r in solr.get_group_obj_of_field_by_query(None, "protein_acc", fq=solr_query, rows=10)["groups"]
         ]
+        if len(response) == 0:
+            raise ReferenceError('There are not proteins for this request')
         return response
 
     @staticmethod

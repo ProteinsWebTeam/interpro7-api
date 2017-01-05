@@ -117,7 +117,6 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             self.assertEqual(tests[url], ids)
 
 
-@unittest.skip("refactoring for solr")
 class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_entry_overview_filtered_by_protein(self):
         prot_s = "M5ADK6"
@@ -150,10 +149,10 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
             for match in response.data["proteins"]:
                 self._check_match(match)
                 self._check_protein_details(match["protein"])
-            ids = [x["accession"] for x in response.data["proteins"]]
+            ids = [x["accession"].upper() for x in response.data["proteins"]]
             self.assertEqual(tests[url], ids)
 
-    def test_can_get_proteins_from_entr_db_protein_id(self):
+    def test_can_get_proteins_from_entry_db_protein_id(self):
         acc = "IPR003165"
         prot = "A1CUJ5"
         prot_u = "M5ADK6"

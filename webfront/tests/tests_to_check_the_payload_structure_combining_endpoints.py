@@ -148,7 +148,6 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                         self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, current))
 
-    @unittest.skip("refactoring for solr")
     def test_acc_endpoint(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:

@@ -206,15 +206,19 @@ class EntrySerializer(ModelContentSerializer):
     #         for match in instance.entrystructurefeature_set.all()
     #         ]
     @staticmethod
-    def get_entry_header_from_solr_object(obj):
-        return {
-                    "accession": obj["entry_acc"],
-                    "coordinates": obj["entry_protein_coordinates"],
-                    # "name": "PTHP_BUCAI",
-                    # "length": 85,
-                    "source_database": obj["entry_db"],
-                    "entry_type": obj["entry_type"],
-                }
+    def get_entry_header_from_solr_object(obj, for_structure=False):
+        header = {
+            "accession": obj["entry_acc"],
+            "coordinates": obj["entry_protein_coordinates"],
+            # "name": "PTHP_BUCAI",
+            # "length": 85,
+            "source_database": obj["entry_db"],
+            "entry_type": obj["entry_type"],
+        }
+        if for_structure:
+            header["chain"] = obj["chain"]
+            header["protein"] = obj["protein_acc"]
+        return header
 
     class Meta:
         model = Entry

@@ -57,8 +57,8 @@ class StructureSerializer(ModelContentSerializer):
         if self.detail != SerializerDetail.STRUCTURE_OVERVIEW:
             if SerializerDetail.PROTEIN_DB in detail_filters:
                 representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, self.solr)
-            # if SerializerDetail.ENTRY_DB in detail_filters:
-            #     representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, self.solr)
+            if SerializerDetail.ENTRY_DB in detail_filters:
+                representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, self.solr)
 
         return representation
 
@@ -146,6 +146,15 @@ class StructureSerializer(ModelContentSerializer):
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_solr_object(r["doclist"]["docs"][0], False)
             for r in solr.get_group_obj_of_field_by_query(None, "structure_chain", fq=solr_query, rows=10)["groups"]
+        ]
+        return response
+
+    @staticmethod
+    def to_entries_detail_representation(instance, solr):
+        solr_query = "structure_acc:" + instance.accession
+        response = [
+            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(r["doclist"]["docs"][0], True)
+            for r in solr.get_group_obj_of_field_by_query(None, "entry_acc", fq=solr_query, rows=10)["groups"]
         ]
         return response
 

@@ -54,7 +54,6 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
                                            msg="The URL ["+url+"] should've failed.")
 
 
-@unittest.skip("refactoring for solr")
 class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
 
     def test_urls_that_return_object_of_structure_and_entry_counts(self):
@@ -64,11 +63,11 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/structure/entry/pfam",
             "/api/structure/entry/unintegrated",
             "/api/structure/entry/unintegrated/pfam",
-            "/api/structure/entry/unintegrated/smart",
             "/api/structure/entry/interpro/pfam",
             "/api/structure/entry/interpro/"+acc+"/pfam",
         ]
         for url in urls:
+            print(url)
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIsInstance(response.data, dict, url+" should have returned a dict")
@@ -120,7 +119,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
                              "The number of entries should be the same URL: [{}]".format(url))
             for entry in response.data["entries"]:
-                self.assertIn(entry["accession"], urls[url])
+                self.assertIn(entry["accession"].upper(), urls[url])
 
     def test_urls_that_return_a_structure_details_with_matches_from_chain(self):
         pdb_1 = "1JM7"
@@ -146,7 +145,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
                              "The number of entries should be the same. URL: [{}]".format(url))
             for entry in response.data["entries"]:
-                self.assertIn(entry["accession"], urls[url])
+                self.assertIn(entry["accession"].upper(), urls[url])
 
     def test_urls_that_should_return_empty_entries(self):
         pdb_1 = "1JM7"
@@ -163,6 +162,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/structure/pdb/"+pdb_2+"/A/entry/unintegrated/pfam",
             "/api/structure/pdb/"+pdb_2+"/B/entry/unintegrated/smart",
             "/api/structure/pdb/entry/unintegrated/smart",
+            "/api/structure/entry/unintegrated/smart",
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT,

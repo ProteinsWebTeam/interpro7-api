@@ -50,12 +50,12 @@ class MemberAccessionHandler(CustomView):
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset,
             handler, general_handler, *args, **kwargs
         )
-    #
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
-    #     return queryset
-    #
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
+        return queryset
+
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):
     #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):
@@ -192,11 +192,10 @@ class AccessionHandler(CustomView):
             handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.set_in_store(AccessionHandler, "accession", level_name)
-    #     general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
-    #
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("entry", accession__iexact=level_name)
+
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):
     #     if isinstance(obj, dict) and not hasattr(obj, 'serializer'):

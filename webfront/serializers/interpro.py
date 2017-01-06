@@ -17,7 +17,7 @@ class EntrySerializer(ModelContentSerializer):
 
     def endpoint_representation(self, representation, instance, detail):
         if detail == SerializerDetail.ALL or detail == SerializerDetail.ENTRY_DETAIL:
-            representation["metadata"] = self.to_metadata_representation(instance)
+            representation["metadata"] = self.to_metadata_representation(instance, self.solr)
         elif detail == SerializerDetail.ENTRY_OVERVIEW:
             representation = self.to_counter_representation(instance)
         elif detail == SerializerDetail.ENTRY_HEADERS:
@@ -48,8 +48,8 @@ class EntrySerializer(ModelContentSerializer):
 
         return representation
 
-    def to_metadata_representation(self, instance):
-        # results = SearchQuerySet().filter(entry_acc=instance.accession).facet("protein_acc")
+    @staticmethod
+    def to_metadata_representation(instance, solr):
         obj = {
             "accession": instance.accession,
             "entry_id": instance.entry_id,
@@ -67,8 +67,8 @@ class EntrySerializer(ModelContentSerializer):
             "wikipedia": instance.wikipedia,
             "literature": instance.literature,
             "counters": {
-                "proteins": self.solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
-                "structures": self.solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
+                "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
+                "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
             }
         }
         # Just showing the accesion number instead of recursively show the entry to which has been integrated
@@ -218,7 +218,7 @@ class EntrySerializer(ModelContentSerializer):
     #         for match in instance.entrystructurefeature_set.all()
     #         ]
     @staticmethod
-    def get_entry_header_from_solr_object(obj, for_structure=False):
+    def get_entry_header_from_solr_object(obj, for_structure=False, include_entry=False, solr=None):
         header = {
             "accession": obj["entry_acc"],
             "coordinates": obj["entry_protein_coordinates"],
@@ -230,6 +230,11 @@ class EntrySerializer(ModelContentSerializer):
         if for_structure:
             header["chain"] = obj["chain"]
             header["protein"] = obj["protein_acc"]
+        if include_entry:
+            header["entry"] = EntrySerializer.to_metadata_representation(
+                Entry.objects.get(accession__iexact=obj["entry_acc"]), solr
+            )
+
         return header
 
     class Meta:

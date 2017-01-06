@@ -145,7 +145,6 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
 
-@unittest.skip("refactoring for solr")
 class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
 
     def test_urls_that_return_object_of_protein_and_entry_counts(self):
@@ -160,13 +159,10 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/protein/entry/interpro/"+acc,
             ]
         for url in urls:
+            print(url)
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIsInstance(response.data, dict)
-            for prot_db in response.data["proteins"]:
-                self.assertIn(prot_db, ["uniprot", "swissprot", "trembl"])
-                self.assertIn("proteins", response.data["proteins"][prot_db])
-                self.assertIn("entries", response.data["proteins"][prot_db])
+            self._check_protein_count_overview(response.data)
 
     def test_can_get_entries_from_protein_id_interpro_ids(self):
         acc = "A1CUJ5"
@@ -230,8 +226,7 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         pfam = "PF02171"
         response = self.client.get("/api/protein/uniprot/"+acc+"/entry/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # TODO: it is returning 2 entries. FIX!!
-        # self._check_single_entry_response(response)
+        self._check_single_entry_response(response)
 
     def test_urls_that_should_fails_with_no_content(self):
         tr_1 = "P16582"

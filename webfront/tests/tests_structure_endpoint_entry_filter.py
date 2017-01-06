@@ -169,7 +169,6 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
                                            msg="The URL ["+url+"] should've failed.")
 
 
-@unittest.skip("refactoring for solr")
 class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
 
     def test_urls_that_return_object_of_structure_and_entry_counts(self):
@@ -186,11 +185,12 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIsInstance(response.data, dict)
-            for prot_db in response.data["structures"]:
-                self.assertIn(prot_db, ["pdb"])
-                self.assertIn("structures", response.data["structures"][prot_db])
-                self.assertIn("entries", response.data["structures"][prot_db])
+            self._check_structure_count_overview(response.data, "URL: [{}]".format(url))
+            # self.assertIsInstance(response.data, dict)
+            # for prot_db in response.data["structures"]:
+            #     self.assertIn(prot_db, ["pdb"])
+            #     self.assertIn("structures", response.data["structures"][prot_db])
+            #     self.assertIn("entries", response.data["structures"][prot_db])
 
     def test_urls_that_return_list_of_structure_accessions_with_matches_and_detailed_entries(self):
         acc = "IPR003165"

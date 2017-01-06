@@ -102,7 +102,6 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
                 self.assertIn(match["accession"].upper(), tests[url])
 
 
-@unittest.skip("refactoring for solr")
 class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_proteins_from_pdb_id_protein_id(self):
         pdb = "1JM7"

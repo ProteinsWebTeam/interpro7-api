@@ -59,6 +59,10 @@ class StructureSerializer(ModelContentSerializer):
                 representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, self.solr)
             if SerializerDetail.ENTRY_DB in detail_filters:
                 representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, self.solr)
+            if SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, self.solr, True)
+            if SerializerDetail.ENTRY_DETAIL in detail_filters:
+                representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, self.solr, True)
 
         return representation
 
@@ -142,21 +146,34 @@ class StructureSerializer(ModelContentSerializer):
     #
 
     @staticmethod
-    def to_proteins_detail_representation(instance, solr):
+    def to_proteins_detail_representation(instance, solr, is_full=False):
         solr_query = "structure_acc:" + instance.accession
         response = [
-            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_solr_object(r["doclist"]["docs"][0], False)
+            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_solr_object(
+                r["doclist"]["docs"][0],
+                for_entry=False,
+                include_protein=is_full,
+                solr=solr
+            )
             for r in solr.get_group_obj_of_field_by_query(None, "structure_chain", fq=solr_query, rows=10)["groups"]
         ]
+        if len(response) == 0:
+            raise ReferenceError('There are not structures for this request')
         return response
 
     @staticmethod
-    def to_entries_detail_representation(instance, solr):
+    def to_entries_detail_representation(instance, solr, is_full=False):
         solr_query = "structure_acc:" + instance.accession
         response = [
-            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(r["doclist"]["docs"][0], True)
+            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
+                r["doclist"]["docs"][0],
+                for_structure=True,
+                include_entry=is_full,
+                solr=solr)
             for r in solr.get_group_obj_of_field_by_query(None, "entry_acc", fq=solr_query, rows=10)["groups"]
         ]
+        if len(response) == 0:
+            raise ReferenceError('There are not structures for this request')
         return response
 
     # @staticmethod

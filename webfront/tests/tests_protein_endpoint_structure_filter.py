@@ -103,7 +103,6 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
 
 
-@unittest.skip("refactoring for solr")
 class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_proteins_from_pdb_id_protein_id(self):
         pdb = "1JM7"

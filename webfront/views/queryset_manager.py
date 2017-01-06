@@ -109,6 +109,8 @@ class QuerysetManager:
                     #     q += " && {}integrated:*".format("!" if v else "")
                     elif k == "integrated__isnull":
                         q += " && {}integrated:*".format("!entry_db:interpro !" if v else "")
+                    # elif "chain" in k:
+                    #     q += " && chain:{}".format(v)
                     elif ep != "structure":
                         if k == "source_database" or k == "source_database__iexact":
                             q += " && {}_db:{}".format(ep, v)

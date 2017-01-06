@@ -49,8 +49,8 @@ class ProteinSerializer(ModelContentSerializer):
                 representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.solr)
             if SerializerDetail.ENTRY_DETAIL in detail_filters:
                 representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.solr, True)
-            # if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-            #     representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.solr, True)
+            if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
+                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.solr, True)
         return representation
 
     def to_full_representation(self, instance):
@@ -183,10 +183,14 @@ class ProteinSerializer(ModelContentSerializer):
         return response
 
     @staticmethod
-    def to_structures_detail_representation(instance, solr):
+    def to_structures_detail_representation(instance, solr, is_full=False):
         solr_query = "protein_acc:" + instance.accession
         response = [
-            webfront.serializers.pdb.StructureSerializer.get_structure_from_solr_object(r["doclist"]["docs"][0])
+            webfront.serializers.pdb.StructureSerializer.get_structure_from_solr_object(
+                r["doclist"]["docs"][0],
+                include_structure=is_full,
+                solr=solr
+            )
             for r in solr.get_group_obj_of_field_by_query(None, "structure_chain", fq=solr_query, rows=10)["groups"]
         ]
         if len(response) == 0:

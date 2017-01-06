@@ -33,14 +33,14 @@ class ChainPDBAccessionHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     if not isinstance(queryset, dict):
-    #         general_handler.queryset_manager.add_filter("structure",
-    #                                                     proteinstructurefeature__chain=level_name,
-    #                                                     entrystructurefeature__chain=level_name,
-    #                                                     proteinstructurefeature__protein_id=F('protein__accession'))
-    #     return queryset
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        # general_handler.queryset_manager.add_filter("structure",
+        #                                             proteinstructurefeature__chain=level_name,
+        #                                             entrystructurefeature__chain=level_name,
+        #                                             proteinstructurefeature__protein_id=F('protein__accession'))
+        general_handler.queryset_manager.add_filter("solr", chain=level_name)
+        return queryset
     #
     # @staticmethod
     # def post_serializer(obj, level_name="", general_handler=None):

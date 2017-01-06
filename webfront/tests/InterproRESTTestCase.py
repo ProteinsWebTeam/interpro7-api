@@ -153,13 +153,14 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     def _check_count_overview_per_endpoints(self, obj, endpoints1, endpoints2, msg=""):
         for inner_obj in obj[endpoints2]:
-            if inner_obj in ["interpro", "unintegrated", "uniprot", "swissprot", "trembl", "pdb"] and not (inner_obj == "unintegrated" and obj[endpoints2][inner_obj] == 0):
-                self.assertIn(endpoints1,
-                              obj[endpoints2][inner_obj],
-                              msg)
-                self.assertIn(endpoints2,
-                              obj[endpoints2][inner_obj],
-                              msg)
+            if inner_obj in ["interpro", "unintegrated", "uniprot", "swissprot", "trembl", "pdb"] and not (
+                        inner_obj in ["unintegrated", "interpro"] and obj[endpoints2][inner_obj] == 0):
+                    self.assertIn(endpoints1,
+                                  obj[endpoints2][inner_obj],
+                                  msg)
+                    self.assertIn(endpoints2,
+                                  obj[endpoints2][inner_obj],
+                                  msg)
 
     def _check_structure_and_chains(self, response, endpoint, db, acc, postfix="", key=None):
         urls = []
@@ -217,7 +218,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)
         return urls
-    
+
     def assertSubset(self, subset, superset, proper=False):
         self.assertLessEqual(
             len(subset),

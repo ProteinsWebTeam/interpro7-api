@@ -176,7 +176,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                     self.assertEqual(len(response_acc.data["metadata"]["chains"]), 1)
                     if key is not None:
                         for ch2 in response_acc.data[key]:
-                            self.assertEqual(ch2["chain"], chain)
+                            self.assertEqual(ch2["chain"].upper(), chain)
                     self.assertIn(chain.lower(), response_acc.data["metadata"]["chains"])
                     self._check_match(response_acc.data["metadata"]["chains"][chain.lower()])
                 elif response_acc.status_code != status.HTTP_204_NO_CONTENT:
@@ -192,8 +192,8 @@ class InterproRESTTestCase(APITransactionTestCase):
                 response = self._get_in_debug_mode(current)
                 if response.status_code == status.HTTP_200_OK:
                     self._check_counter_by_endpoint(prefix, response.data, "URL : [{}]".format(current))
-                    self._check_count_overview_per_endpoints(response.data, key1, key2,
-                                                             "URL : [{}]".format(current))
+                    # self._check_count_overview_per_endpoints(response.data, key1, key2,
+                    #                                          "URL : [{}]".format(current))
                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)
         return urls
@@ -212,7 +212,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                         self._check_list_of_matches(result, "URL : [{}]".format(current))
                         self.assertGreaterEqual(len(result), 1)
                         for r in result:
-                            self.assertEqual(r["chain"], chain)
+                            self.assertEqual(r["chain"].upper(), chain)
 
                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)

@@ -29,7 +29,7 @@ class ProteinSerializer(ModelContentSerializer):
     def filter_representation(self, representation, instance, detail_filters, detail):
         # qs_type = get_queryset_type(instance)
         if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
-            representation["entries"] = ProteinSerializer.to_entries_count_representation(instance,self.solr)
+            representation["entries"] = self.to_entries_count_representation(instance)
 
         # if SerializerDetail.ENTRY_MATCH in detail_filters:
         #     representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, False)
@@ -38,7 +38,7 @@ class ProteinSerializer(ModelContentSerializer):
         # if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
         #     representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
-            representation["structures"] = ProteinSerializer.to_structures_count_representation(instance, self.solr)
+            representation["structures"] = self.to_structures_count_representation(instance)
         # if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
         #     if qs_type == QuerysetType.PROTEIN:
         #         representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance, True)
@@ -153,18 +153,16 @@ class ProteinSerializer(ModelContentSerializer):
     # def to_entries_count_representation(instance):
     #     return instance.proteinentryfeature_set.count()
 
-    @staticmethod
-    def to_entries_count_representation(instance, solr):
+    def to_entries_count_representation(self, instance):
         solr_query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
-            solr.get_counter_object("entry", solr_query)
+            self.solr.get_counter_object("entry", solr_query, self.get_extra_endpoints_to_count())
         )["entries"]
 
-    @staticmethod
-    def to_structures_count_representation(instance, solr):
+    def to_structures_count_representation(self, instance):
         solr_query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
-            solr.get_counter_object("structure", solr_query)
+            self.solr.get_counter_object("structure", solr_query, self.get_extra_endpoints_to_count())
         )["structures"]
 
     @staticmethod

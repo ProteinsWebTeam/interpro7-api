@@ -33,3 +33,13 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 self.fields.pop(to_be_removed)
         except AttributeError:
             pass
+
+    def get_extra_endpoints_to_count(self):
+        extra = []
+        if SerializerDetail.ENTRY_DB in self.detail_filters:
+            extra.append("entry")
+        if SerializerDetail.PROTEIN_DB in self.detail_filters:
+            extra.append("protein")
+        if SerializerDetail.STRUCTURE_DB in self.detail_filters:
+            extra.append("structure")
+        return extra

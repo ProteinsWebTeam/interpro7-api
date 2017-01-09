@@ -37,9 +37,11 @@ class SolrController:
         return res.raw_response["response"]["docs"]
 
     def get_counter_object(self, endpoint, solr_query=None, extra_counters=[]):
-        qs = self.queryset_manager.get_solr_query(endpoint) if solr_query is None else solr_query.lower()
+        qs = self.queryset_manager.get_solr_query(endpoint)
         if qs == '':
             qs = '*:*'
+        if solr_query is not None:
+            qs += ' && ' + solr_query.lower()
         facet = {
             "databases": {
                 "type": "terms",
@@ -71,7 +73,8 @@ class SolrController:
             for ec in extra_counters:
                 facet["databases"]["facet"][ec] = "unique({}_acc)".format(ec)
             # return self.get_group_obj_of_field_by_query(qs, "structure_acc")
-        res = self.solr.search(qs, **{'facet': 'on', 'json.facet': json.dumps(facet)})
+        parameters = {'facet': 'on', 'json.facet': json.dumps(facet)}
+        res = self.solr.search(qs, **parameters)
         return res.raw_response["facets"]
 
     def get_list_of_endpoint(self, endpoint, solr_query=None):

@@ -350,7 +350,6 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         continue
                     for db3 in api_test_map[endpoint3]:
                         url = "/api/{}/{}/{}/{}".format(endpoint3, db3, endpoint1, endpoint2)
-                        print(url)
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         expected = self.get_expected_list_payload(endpoint3, db3, endpoint1, endpoint2)

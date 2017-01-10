@@ -67,7 +67,6 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/structure/entry/interpro/"+acc+"/pfam",
         ]
         for url in urls:
-            print(url)
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIsInstance(response.data, dict, url+" should have returned a dict")

@@ -159,7 +159,6 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             "/api/protein/entry/interpro/"+acc,
             ]
         for url in urls:
-            print(url)
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_protein_count_overview(response.data)

@@ -74,9 +74,7 @@ def get_object_from_row(con, row, col, is_for_interpro_entries=True):
         "tax_id": row[col["TAX_ID"]],
         "structure_acc": row[col["STRUCTURE_AC"]] if row[col["STRUCTURE_AC"]] is not None else None,
         "chain": row[col["CHAIN"]] if row[col["CHAIN"]] is not None else None,
-
-        # "django_ct": get_model_ct(ProteinEntryFeature),
-        # "django_id": 0,
+        "structure_chain": row[col["STRUCTURE_AC"]] + " - " + row[col["CHAIN"]] if row[col["STRUCTURE_AC"]] is not None else None,
         "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
     }, is_for_interpro_entries)
     return {k: v.lower() if type(v) == str else v for k, v in obj.items()}

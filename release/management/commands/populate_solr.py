@@ -110,7 +110,6 @@ query_for_memberdb_entries = '''SELECT
 def get_from_db(con, ends, where='', is_for_interpro_entries=True):
     cur = con.cursor()
     sql = query_for_interpro_entries if is_for_interpro_entries else query_for_memberdb_entries
-    print(sql.format(ends, where))
     cur.execute(sql.format(ends, where))
     col = get_column_dict_from_cursor(cur)
     return tqdm(
@@ -132,21 +131,33 @@ conditions = [
 
 dbcodes = ["H", "M", "R", "V", "g", "B", "P", "X", "N", "J", "Y", "U", "D", "Q", "F"]
 
-def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True):
+def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr=True):
     t = time.time()
     ipro = DATABASES['interpro_ro']
-    print(ipro)
     con = cx_Oracle.connect(ipro['USER'], ipro['PASSWORD'], cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']))
 
-    solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
-    where = ''
-    if is_for_interpro_entries:
-        where = conditions[subset]
-    elif subset in dbcodes:
-        where = "AND e.DBCODE='{}'".format(subset)
-    for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries), bs):
-        solr.add(chunk, commit=False)
-    con.close()
+    try:
+        solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
+        where = ''
+        if is_for_interpro_entries:
+            where = conditions[subset]
+        elif subset in dbcodes:
+            where = "AND e.DBCODE='{}'".format(subset)
+        part = 0
+        for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries), bs):
+            if submit_to_solr:
+                solr.add(chunk, commit=False)
+            else:
+                f = open("ipro_tst_{}_{}_{:06}.json".format(
+                    "ipro" if is_for_interpro_entries else "DB",
+                    subset,
+                    part
+                ), "w")
+                f.write(json.dumps(list(chunk)))
+                f.close()
+                part += 1
+    finally:
+        con.close()
     t2 = time.time()
     print("TIME: :", t2-t)
 
@@ -221,6 +232,11 @@ class Command(BaseCommand):
             action='store_true',
             help="Activates Django logs"
         )
+        parser.add_argument(
+            "--files", "-f",
+            action='store_true',
+            help="Save files instead of submitting them to solr"
+        )
 
     def handle(self, *args, **options):
         n = options["number"]
@@ -235,4 +251,10 @@ class Command(BaseCommand):
             bs = 1000
         if options["dbcode"] != '':
             subset = options["dbcode"]
-        upload_to_solr(n, bs, subset=subset, is_for_interpro_entries=(t == 0))
+        upload_to_solr(
+            n,
+            bs,
+            subset=subset,
+            is_for_interpro_entries=(t == 0),
+            submit_to_solr=not options["files"]
+        )

@@ -15,6 +15,7 @@ from interpro.settings import HAYSTACK_CONNECTIONS, DATABASES
 import time
 
 # global array
+from release.management.commands.random_solr_documents import RandomDocumentGenerator
 from webfront.models import ProteinEntryFeature
 
 errors = []
@@ -131,6 +132,7 @@ conditions = [
 
 dbcodes = ["H", "M", "R", "V", "g", "B", "P", "X", "N", "J", "Y", "U", "D", "Q", "F"]
 
+
 def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr=True):
     t = time.time()
     ipro = DATABASES['interpro_ro']
@@ -158,8 +160,29 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
                 part += 1
     finally:
         con.close()
+        solr.commit()
+
     t2 = time.time()
     print("TIME: :", t2-t)
+
+
+def random_to_solr(n, bs):
+    solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
+    for step in tqdm(range(0, n, bs)):
+        # return tqdm(
+        # (get_object_from_row(con, row, col, is_for_interpro_entries) for row in cur),
+        # initial=0,
+        # total=ends,
+        # mininterval=1,
+        # dynamic_ncols=True,
+        # position=0
+        # )
+        end = bs*(step+1)
+        if end > n:
+            end = n
+        chunk = [x for x in RandomDocumentGenerator(71209041, 35000, 60000, 125795, bs*step, end)]
+        solr.add(chunk, commit=False)
+    solr.commit()
 
 
 class Command(BaseCommand):
@@ -233,28 +256,40 @@ class Command(BaseCommand):
             help="Activates Django logs"
         )
         parser.add_argument(
+            "--random", "-r",
+            action='store_true',
+            help="Fill the solr instance with n random values. \n" +
+                 "n should be set with the -n parameter"
+        )
+        parser.add_argument(
             "--files", "-f",
             action='store_true',
             help="Save files instead of submitting them to solr"
         )
 
     def handle(self, *args, **options):
-        n = options["number"]
-        if not n:
-            print('Warning: adding everything in the solr instance')
-        if not options["logs"]:
-            logging.disable(logging.CRITICAL)
         bs = options["block_size"]
-        t = options["type_of_entry"]
-        subset = options["query_filter"]
-        if not bs:
-            bs = 1000
-        if options["dbcode"] != '':
-            subset = options["dbcode"]
-        upload_to_solr(
-            n,
-            bs,
-            subset=subset,
-            is_for_interpro_entries=(t == 0),
-            submit_to_solr=not options["files"]
-        )
+        n = options["number"]
+        if options["random"]:
+            if not n:
+                print('Error: the number of random values has to be defined (hint: use -n)')
+                return
+            random_to_solr(n, bs)
+        else:
+            if not n:
+                print('Warning: adding everything in the solr instance')
+            if not options["logs"]:
+                logging.disable(logging.CRITICAL)
+            t = options["type_of_entry"]
+            subset = options["query_filter"]
+            if not bs:
+                bs = 1000
+            if options["dbcode"] != '':
+                subset = options["dbcode"]
+            upload_to_solr(
+                n,
+                bs,
+                subset=subset,
+                is_for_interpro_entries=(t == 0),
+                submit_to_solr=not options["files"]
+            )

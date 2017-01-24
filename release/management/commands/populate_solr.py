@@ -148,7 +148,7 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
         part = 0
         for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries), bs):
             if submit_to_solr:
-                solr.add(chunk, commit=False)
+                add_to_solr(solr, chunk, commit=False)
             else:
                 f = open("ipro_tst_{}_{}_{:06}.json".format(
                     "ipro" if is_for_interpro_entries else "DB",
@@ -166,24 +166,22 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
     print("TIME: :", t2-t)
 
 
-def random_to_solr(n, bs):
+def add_to_solr(solr, chunk, commit=True):
+    try:
+        solr.add(chunk, commit=commit)
+    except pysolr.SolrError:
+        time.sleep(3)
+        solr.add(chunk, commit=commit)
+
+
+def random_to_solr(n, bs, start=0):
     solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
-    for step in tqdm(range(0, n, bs)):
-        # return tqdm(
-        # (get_object_from_row(con, row, col, is_for_interpro_entries) for row in cur),
-        # initial=0,
-        # total=ends,
-        # mininterval=1,
-        # dynamic_ncols=True,
-        # position=0
-        # )
-        end = bs*(step+1)
+    for step in tqdm(range(start, n, bs)):
+        end = bs+step
         if end > n:
             end = n
-        chunk = [x for x in RandomDocumentGenerator(71209041, 35000, 60000, 125795, bs*step, end)]
-        solr.add(chunk, commit=False)
-    solr.commit()
-
+        chunk = [x for x in RandomDocumentGenerator(71209041, 35000, 60000, 125795, step, end)]
+        add_to_solr(solr, chunk)
 
 class Command(BaseCommand):
     help = "populate solr"
@@ -266,6 +264,15 @@ class Command(BaseCommand):
             action='store_true',
             help="Save files instead of submitting them to solr"
         )
+        parser.add_argument(
+            "--resume_at", "-rs",
+            type=int,
+            default=0,
+            help=(
+                "When using the random generator, it can resume the load from the number document given here" +
+                "\n0: default"
+            )
+        )
 
     def handle(self, *args, **options):
         bs = options["block_size"]
@@ -274,7 +281,7 @@ class Command(BaseCommand):
             if not n:
                 print('Error: the number of random values has to be defined (hint: use -n)')
                 return
-            random_to_solr(n, bs)
+            random_to_solr(n, bs, options["resume_at"])
         else:
             if not n:
                 print('Warning: adding everything in the solr instance')

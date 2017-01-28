@@ -1,4 +1,3 @@
-import haystack
 from django.test import override_settings
 
 from interpro import settings
@@ -27,13 +26,13 @@ class InterproRESTTestCase(APITransactionTestCase):
     @classmethod
     def setUpClass(cls):
         super(InterproRESTTestCase, cls).setUpClass()
-        haystack.connections.reload('default')
-        fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
-        fr.get_solr_fixtures()
+        cls.fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
+        docs = cls.fr.get_fixtures()
+        cls.fr.add_to_search_engine(docs)
 
     @classmethod
     def tearDownClass(cls):
-        haystack.connections['default'].get_backend().clear()
+        # cls.fr.clear_search_engine()
         super(InterproRESTTestCase, cls).tearDownClass()
 
     # methods to check entry related responses

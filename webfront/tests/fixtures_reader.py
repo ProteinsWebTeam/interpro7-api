@@ -1,11 +1,8 @@
 import json
 import copy
 
-from haystack.utils import get_model_ct
-import pysolr
+from webfront.views.custom import CustomView
 
-from webfront.models import ProteinEntryFeature
-from django.conf import settings
 
 def get_id(*args):
     return "-".join([a for a in args if a is not None])
@@ -17,6 +14,7 @@ class FixtureReader:
     structures = {}
     entry_protein_list = []
     protein_structure_list = {}
+    search = None
 
     def __init__(self, fixture_paths):
         for path in fixture_paths:
@@ -38,7 +36,7 @@ class FixtureReader:
             elif fixture['model'] == "webfront.ProteinStructureFeature":
                 self.protein_structure_list[fixture['fields']["protein"]].append(fixture['fields'])
 
-    def get_solr_fixtures(self):
+    def get_fixtures(self):
         to_add = []
         for ep in self.entry_protein_list:
             e = ep["entry"]
@@ -60,7 +58,7 @@ class FixtureReader:
             }
             if p in self.protein_structure_list:
                 for sp in self.protein_structure_list[p]:
-                    c =copy.copy(obj)
+                    c = copy.copy(obj)
                     c["structure_acc"] = sp["structure"]
                     c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["chain"] = sp["chain"]
@@ -85,10 +83,16 @@ class FixtureReader:
                         "structure_chain": sp["structure"] + " - " + sp["chain"],
                         "chain": sp["chain"],
                         "protein_structure_coordinates": json.dumps(sp["coordinates"]),
-                    });
+                    })
 
-        solr = pysolr.Solr(settings.HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
-        lower =[]
+        lower = []
         for doc in to_add:
-            lower.append({k: v.lower() if type(v) == str else v for k,v in doc.items()})
-        solr.add(lower)
+            lower.append({k: v.lower() if type(v) == str else v for k, v in doc.items()})
+        return lower
+
+    def add_to_search_engine(self, docs):
+        self.search = CustomView.get_search_controller()
+        self.search.add(docs)
+
+    def clear_search_engine(self):
+        self.search.clear_all_docs()

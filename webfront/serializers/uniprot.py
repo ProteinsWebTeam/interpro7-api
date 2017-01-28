@@ -44,18 +44,18 @@ class ProteinSerializer(ModelContentSerializer):
         #         representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance, True)
         if detail != SerializerDetail.PROTEIN_OVERVIEW:
             if SerializerDetail.ENTRY_DB in detail_filters:
-                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.solr)
+                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.searcher)
             if SerializerDetail.STRUCTURE_DB in detail_filters:
-                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.solr)
+                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.searcher)
             if SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.solr, True)
+                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.searcher, True)
             if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.solr, True)
+                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.searcher, True)
         return representation
 
     def to_full_representation(self, instance):
         return {
-            "metadata": self.to_metadata_representation(instance, self.solr),
+            "metadata": self.to_metadata_representation(instance, self.searcher),
             "representation": instance.feature,
             "genomic_context": instance.genomic_context,
             # "source_database": instance.source_database
@@ -73,7 +73,7 @@ class ProteinSerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def to_metadata_representation(instance, solr):
+    def to_metadata_representation(instance, searcher):
         return {
             "accession": instance.accession,
             "id": instance.identifier,
@@ -92,8 +92,8 @@ class ProteinSerializer(ModelContentSerializer):
             "protein_evidence": 4,
             "source_database": instance.source_database,
             "counters": {
-                "entries": solr.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
-                "structures": solr.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
+                "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
+                "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
             }
         }
 
@@ -154,43 +154,43 @@ class ProteinSerializer(ModelContentSerializer):
     #     return instance.proteinentryfeature_set.count()
 
     def to_entries_count_representation(self, instance):
-        solr_query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
-            self.solr.get_counter_object("entry", solr_query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count())
         )["entries"]
 
     def to_structures_count_representation(self, instance):
-        solr_query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
-            self.solr.get_counter_object("structure", solr_query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
         )["structures"]
 
     @staticmethod
-    def to_entries_detail_representation(instance, solr, is_full=False):
+    def to_entries_detail_representation(instance, searcher, is_full=False):
         solr_query = "protein_acc:" + instance.accession
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
                 r["doclist"]["docs"][0],
                 include_entry=is_full,
-                solr=solr
+                solr=searcher
             )
-            for r in solr.get_group_obj_of_field_by_query(None, "entry_acc", fq=solr_query, rows=10)["groups"]
-        ]
+            for r in searcher.get_group_obj_of_field_by_query(None, "entry_acc", fq=solr_query, rows=10)["groups"]
+            ]
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
         return response
 
     @staticmethod
-    def to_structures_detail_representation(instance, solr, is_full=False):
-        solr_query = "protein_acc:" + instance.accession
+    def to_structures_detail_representation(instance, searcher, is_full=False):
+        query = "protein_acc:" + instance.accession
         response = [
-            webfront.serializers.pdb.StructureSerializer.get_structure_from_solr_object(
+            webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r["doclist"]["docs"][0],
                 include_structure=is_full,
-                solr=solr
+                search=searcher
             )
-            for r in solr.get_group_obj_of_field_by_query(None, "structure_chain", fq=solr_query, rows=10)["groups"]
-        ]
+            for r in searcher.get_group_obj_of_field_by_query(None, "structure_chain", fq=query, rows=10)["groups"]
+            ]
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
         return response
@@ -231,7 +231,7 @@ class ProteinSerializer(ModelContentSerializer):
     #         ]
 
     @staticmethod
-    def get_protein_header_from_solr_object(obj, for_entry=True, include_protein=False, solr=None):
+    def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None):
         key_coord = "entry_protein_coordinates" if for_entry else "protein_structure_coordinates"
         header = {
             "accession": obj["protein_acc"],

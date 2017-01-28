@@ -3,10 +3,12 @@ import json
 
 import pysolr
 
+from webfront.search_controller import SearchController
 
-class SolrController:
 
-    def __init__(self, queryset_manager= None):
+class SolrController(SearchController):
+
+    def __init__(self, queryset_manager=None):
         self.solr = pysolr.Solr(settings.HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
         self.queryset_manager = queryset_manager
 
@@ -24,11 +26,6 @@ class SolrController:
             parameters['fq'] = fq.lower()
         res = self.solr.search(query, **parameters)
         return res.grouped[field]
-
-    def get_number_of_field_by_endpoint(self, endpoint, field, accession):
-        return self.get_group_obj_of_field_by_query(
-             "{}:* && {}_acc:{}".format(field, endpoint, accession), field
-        )["ngroups"]
 
     def get_chain(self):
         res = self.solr.search(self.queryset_manager.get_solr_query(), **{
@@ -74,6 +71,7 @@ class SolrController:
                 facet["databases"]["facet"][ec] = "unique({}_acc)".format(ec)
             # return self.get_group_obj_of_field_by_query(qs, "structure_acc")
         parameters = {'facet': 'on', 'json.facet': json.dumps(facet)}
+        # qs = qs.replace(" && ", "%20AND%20")
         res = self.solr.search(qs, **parameters)
         return res.raw_response["facets"]
 
@@ -85,6 +83,7 @@ class SolrController:
             'facet': 'on',
             'facet.pivot': '{}_acc'.format(endpoint),
             'rows': 0,
+             # & facet.limit = 10 & facet.offset = 1 # for paging
         })
         return [x['value'].upper() for x in res.facets["facet_pivot"]['{}_acc'.format(endpoint)]]
 
@@ -99,3 +98,9 @@ class SolrController:
             parameters['fq'] = fq.lower()
         res = self.solr.search(query, **parameters)
         return res.docs
+
+    def add(self, docs):
+        return self.solr.add(docs)
+
+    def clear_all_docs(self):
+        return self.solr.delete(q='*:*')

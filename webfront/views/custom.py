@@ -6,6 +6,8 @@ from webfront.constants import SerializerDetail
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
 from webfront.solr_controller import SolrController
+from webfront.search_controller import ElasticsearchController
+from django.conf import settings
 
 
 class CustomView(GenericAPIView):
@@ -34,7 +36,7 @@ class CustomView(GenericAPIView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         # if this is the last level
         if len(endpoint_levels) == level:
-            solr = SolrController(general_handler.queryset_manager)
+            searcher = self.get_search_controller(general_handler.queryset_manager)
             if self.from_model:
                 # search filter, from request parameters
                 search = request.query_params.get("search")
@@ -47,7 +49,7 @@ class CustomView(GenericAPIView):
                 if self.is_single_endpoint(general_handler) or not self.expected_response_is_list():
                     self.queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct()
                 else:
-                    self.update_queryset_from_solr(solr, general_handler)
+                    self.update_queryset_from_search(searcher, general_handler)
 
                 if self.queryset.count() == 0:
                     if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct().count():
@@ -62,7 +64,7 @@ class CustomView(GenericAPIView):
                     self.queryset = self.get_queryset().first()
             else:
                 # if it gets here it is a endpoint request checking for database contributions.
-                self.queryset = self.get_counter_response(general_handler, solr)
+                self.queryset = self.get_counter_response(general_handler, searcher)
 
             serialized = self.serializer_class(
                 # passed to DRF's view
@@ -191,9 +193,16 @@ class CustomView(GenericAPIView):
     def is_single_endpoint(self, general_handler):
         return general_handler.filter_serializers == {}
 
-    def update_queryset_from_solr(self, solr, general_handler):
+    def update_queryset_from_search(self, searcher, general_handler):
         ep = general_handler.queryset_manager.main_endpoint
-        res = solr.get_list_of_endpoint(ep)
+        res = searcher.get_list_of_endpoint(ep)
         self.queryset = general_handler.queryset_manager\
             .get_base_queryset(ep)\
             .filter(accession__in=res)
+
+    @staticmethod
+    def get_search_controller(queryset_manager=None):
+        if "solr" in settings.HAYSTACK_CONNECTIONS['default']['URL']:
+            return SolrController(queryset_manager)
+        else:
+            return ElasticsearchController(queryset_manager)

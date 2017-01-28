@@ -30,13 +30,13 @@ class FunctionalTest(StaticLiveServerTestCase):
                 return
         super().setUpClass()
         cls.server_url = cls.live_server_url
-        haystack.connections.reload('default')
-        fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
-        fr.get_solr_fixtures()
+        cls.fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
+        docs = cls.fr.get_fixtures()
+        cls.fr.add_to_search_engine(docs)
 
     @classmethod
     def tearDownClass(cls):
-        haystack.connections['default'].get_backend().clear()
+        cls.fr.clear_search_engine()
         if cls.server_url == cls.live_server_url:
             super().tearDownClass()
 

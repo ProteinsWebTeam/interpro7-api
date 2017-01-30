@@ -136,9 +136,9 @@ DATABASES = {
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://hmmer-prod-db02:8983/solr/interpro7/'
+        # 'URL': 'http://127.0.0.1:9200/test/relationships'
         # ...or for multicore...
-        # 'URL': 'http://127.0.0.1:8983/solr/mysite',
+        'URL': 'http://127.0.0.1:8983/solr/interpro7',
     },
 }
 TEST_INDEX = {

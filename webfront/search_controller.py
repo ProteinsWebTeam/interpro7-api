@@ -120,7 +120,7 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]
 
-    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=0, start=0):
+    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=1, start=0):
         query = self.queryset_manager.get_solr_query() if query is None else query.lower()
         facet = {
             "aggs": {
@@ -129,12 +129,25 @@ class ElasticsearchController(SearchController):
                         "field": field
                     }
                 },
+                "groups": {
+                    "terms": {
+                        "field": field,
+                        "size": rows
+                    },
+                    "aggs": {
+                        "tops": {"top_hits": {"size": 1}}
+                    }
+                },
             },
-            "size": rows
+            "size": 1
         }
         if fq is not None:
             query += " && "+fq
         response = self._elastic_json_query(query, facet)
+        response["aggregations"]["groups"] = [
+            bucket["tops"]["hits"]["hits"][0]["_source"]
+            for bucket in response["aggregations"]["groups"]["buckets"]
+        ]
         return response["aggregations"]
 
     def get_list_of_endpoint(self, endpoint, solr_query=None):

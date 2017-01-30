@@ -100,23 +100,28 @@ class ProteinSerializer(ModelContentSerializer):
     @staticmethod
     def serialize_counter_bucket(bucket):
         output = bucket["unique"]
+        is_solr = True
+        if isinstance(output, dict):
+            output = output["value"]
+            is_solr = False
         if "entry" in bucket or "structure" in bucket:
-            output = {"proteins": bucket["unique"]}
+            output = {"proteins": output}
             if "entry" in bucket:
-                output["entries"] = bucket["entry"]
+                output["entries"] = bucket["entry"] if is_solr else bucket["entry"]["value"]
             if "structure" in bucket:
-                output["structures"] = bucket["structure"]
+                output["structures"] = bucket["structure"] if is_solr else bucket["structure"]["value"]
         return output
 
 
     @staticmethod
     def to_counter_representation(instance):
         if "proteins" not in instance:
-            if instance["count"] == 0:
+            if ("count" in instance and instance["count"] == 0) or \
+               ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0):
                 raise ReferenceError('There are not entries for this request')
 
             instance2 = {"proteins": {
-                            bucket["val"]: ProteinSerializer.serialize_counter_bucket(bucket)
+                            bucket["val"] if "val" in bucket else bucket["key"]: ProteinSerializer.serialize_counter_bucket(bucket)
                             for bucket in instance["databases"]["buckets"]
                         }}
             instance2["proteins"]["uniprot"] = ProteinSerializer.serialize_counter_bucket(
@@ -170,7 +175,7 @@ class ProteinSerializer(ModelContentSerializer):
         solr_query = "protein_acc:" + instance.accession
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
-                r["doclist"]["docs"][0],
+                r,
                 include_entry=is_full,
                 solr=searcher
             )
@@ -185,7 +190,7 @@ class ProteinSerializer(ModelContentSerializer):
         query = "protein_acc:" + instance.accession
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
-                r["doclist"]["docs"][0],
+                r,
                 include_structure=is_full,
                 search=searcher
             )

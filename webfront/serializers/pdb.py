@@ -105,10 +105,10 @@ class StructureSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_proteins_detail_representation(instance, searcher, is_full=False):
-        query = "structure_acc:" + instance.accession
+        query = "structure_acc:" + instance.accession.lower()
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
-                r["doclist"]["docs"][0],
+                r,
                 for_entry=False,
                 include_protein=is_full,
                 solr=searcher
@@ -171,7 +171,8 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def to_counter_representation(instance):
         if "structures" not in instance:
-            if instance["count"] == 0:
+            if ("count" in instance and instance["count"] == 0) or \
+               ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
                 raise ReferenceError('There are not structures for this request')
             instance = {
                 "structures": {
@@ -184,12 +185,16 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def serialize_counter_bucket(bucket):
         output = bucket["unique"]
+        is_solr = True
+        if isinstance(output, dict):
+            output = output["value"]
+            is_solr = False
         if "entry" in bucket or "protein" in bucket:
-            output = {"structures": bucket["unique"]}
+            output = {"structures": output}
             if "entry" in bucket:
-                output["entries"] = bucket["entry"]
+                output["entries"] = bucket["entry"] if is_solr else bucket["entry"]["value"]
             if "protein" in bucket:
-                output["proteins"] = bucket["protein"]
+                output["proteins"] = bucket["protein"] if is_solr else bucket["protein"]["value"]
         return output
 
     class Meta:

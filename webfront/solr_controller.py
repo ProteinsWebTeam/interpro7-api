@@ -25,6 +25,7 @@ class SolrController(SearchController):
         if fq is not None:
             parameters['fq'] = fq.lower()
         res = self.solr.search(query, **parameters)
+        res.grouped[field]["groups"] = [b["doclist"]["docs"][0] for b in res.grouped[field]["groups"]]
         return res.grouped[field]
 
     def get_chain(self):

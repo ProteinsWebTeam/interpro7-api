@@ -75,7 +75,7 @@ class EntrySerializer(ModelContentSerializer):
         solr_query = "entry_acc:" + instance.accession
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
-                r["doclist"]["docs"][0],
+                r,
                 include_protein=is_full,
                 solr=solr
             )
@@ -128,9 +128,7 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_counter_representation(instance):
         if "entries" not in instance:
-            if ("count" in instance and instance["count"] == 0) or (
-                len(instance["databases"]["buckets"]) == 0 and instance["unintegrated"]["unique"] == 0
-            ):
+            if EntrySerializer.counter_is_empty(instance):
                 raise ReferenceError('There are not entries for this request')
             result = {
                 "entries": {
@@ -151,6 +149,16 @@ class EntrySerializer(ModelContentSerializer):
                 del result["entries"]["member_databases"]["interpro"]
             return result
         return instance
+
+    @staticmethod
+    def counter_is_empty(instance):
+        if ("count" in instance and instance["count"] == 0) or \
+           (len(instance["databases"]["buckets"]) == 0 and instance["unintegrated"]["unique"] == 0):
+            return True
+        if ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
+           (len(instance["databases"]["buckets"]) == 0 and instance["unintegrated"]["unique"]["value"] == 0):
+            return True
+        return False
 
     def to_proteins_count_representation(self, instance):
         solr_query = "entry_acc:"+instance.accession if hasattr(instance, 'accession') else None

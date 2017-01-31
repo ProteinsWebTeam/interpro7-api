@@ -94,28 +94,28 @@ class ElasticsearchController(SearchController):
             facet["aggs"]["unintegrated"] = {
               "filter": {
                   "bool": {
-                      "must_not": {"term": {"entry_db": "interpro"}},
-                      "must": {"exists": {"field": "integrated"}}
+                      "must_not": [
+                          {"term": {"entry_db": "interpro"}},
+                          {"exists": {"field": "integrated"}}
+                      ]
                   }
               },
               "aggs": {"unique": {"cardinality": {"field": "entry_acc"}}}
             }
             for ec in extra_counters:
                 facet["aggs"]["unintegrated"]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
-                # for ec in extra_counters:
-            #     facet["unintegrated"]["facet"][ec] = "unique({}_acc)".format(ec)
         elif endpoint == "protein":
             facet["aggs"]["uniprot"] = {
-              "filter": {"exists": {"field": "integrated"}},
+              "filter": {"exists": {"field": "protein_acc"}},
               "aggs": {"unique": {"cardinality": {"field": "protein_acc"}}}
             }
             for ec in extra_counters:
-                facet["aggs"]["uniprot"]["aggs"][ec] = "unique({}_acc)".format(ec)
+                facet["aggs"]["uniprot"]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
         elif endpoint == "structure":
             facet["aggs"]["databases"]["filter"] = {"exists": {"field": "structure_acc"}}
             del facet["aggs"]["databases"]["terms"]
             for ec in extra_counters:
-                facet["aggs"]["databases"]["aggs"][ec] = "unique({}_acc)".format(ec)
+                facet["aggs"]["databases"]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
 
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]
@@ -173,7 +173,19 @@ class ElasticsearchController(SearchController):
         return [ch["_source"] for ch in response["hits"]["hits"]]
 
     def execute_query(self, query, fq=None, rows=0, start=0):
-        pass
+        query = self.queryset_manager.get_solr_query() if query is None else query.lower()
+        conn = http.client.HTTPConnection(self.server, self.port)
+        if fq is not None:
+            q = query+" && "+fq.lower()
+        q = q.replace(" && ", "%20AND%20")
+        conn.request(
+            "GET",
+            "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,
+        )
+        response = conn.getresponse()
+        data = response.read().decode()
+        obj = json.loads(data)
+        return [o["_source"] for o in obj["hits"]["hits"]]
 
     def _elastic_json_query(self, q, query_obj=None):
         if query_obj is None:

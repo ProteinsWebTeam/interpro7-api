@@ -113,7 +113,7 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             for match in response.data["proteins"]:
                 self._check_match(match)
             ids = [x["accession"].upper() for x in response.data["proteins"]]
-            self.assertEqual(tests[url], ids)
+            self.assertEqual(tests[url].sort(), ids.sort())
 
 
 class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):

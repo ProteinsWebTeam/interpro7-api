@@ -72,7 +72,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_proteins_detail_representation(instance, solr, is_full=False):
-        solr_query = "entry_acc:" + instance.accession
+        solr_query = "entry_acc:" + instance.accession.lower()
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
                 r,
@@ -87,7 +87,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_structures_detail_representation(instance, solr, is_full=False):
-        solr_query = "entry_acc:" + instance.accession
+        solr_query = "entry_acc:" + instance.accession.lower()
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r,

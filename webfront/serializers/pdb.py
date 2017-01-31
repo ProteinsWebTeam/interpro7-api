@@ -121,7 +121,7 @@ class StructureSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_entries_detail_representation(instance, searcher, is_full=False):
-        query = "structure_acc:" + instance.accession
+        query = "structure_acc:" + instance.accession.lower()
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
                 r,

@@ -1,7 +1,7 @@
 hmmer_path: "/Users/gsalazar/Downloads/hmmer-3.1b2-macosx-intel/binaries/"
 tmp_path: "/tmp/"
 django_cors: true
-solr_test: "http://localhost:9200/test/relationship"
+solr_test: "http://127.0.0.1:8983/solr/test_shard1_replica1"
 
 members:
   gene3d:

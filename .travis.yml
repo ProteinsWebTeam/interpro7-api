@@ -9,11 +9,14 @@ before_install:
   - "export LD_LIBRARY_PATH=$(pwd)/oracle/"
   - "export DYLD_LIBRARY_PATH=$(pwd)/oracle/"
   - sleep 3
+services:
+  - elasticsearch
 install:
   - pip install -r requirements.txt
   - pip install -r dev_requirements.txt
 before_script:
-  - curl -sSL https://raw.githubusercontent.com/moliware/travis-solr/master/travis-solr.sh | SOLR_VERSION=5.5.2 SOLR_COLLECTION=test SOLR_COLLECTION_CONF=config/solr/ bash
+  - sleep 10
+  - curl -XPUT 'localhost:9200/test?pretty' -d @config/elastic_mapping.json
 script:
   - coverage run --source='.' manage.py test
 after_success:
@@ -22,4 +25,4 @@ branches:
   only:
     - master
     - new_datawarehouse
-    - solr_exploration
+    - elastic_exploration

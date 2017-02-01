@@ -34,9 +34,6 @@
         },
         "id": {
           "type":  "keyword"
-        },
-        "chain": {
-          "type":  "keyword"
         }
       }
     }

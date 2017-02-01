@@ -1,7 +1,10 @@
+sudo: required
+dist: trusty
 language: python
 python:
   - "3.5"
 before_install:
+  - jdk_switcher use oraclejdk8
   - "wget https://www.ebi.ac.uk/~luciani/Oracle/oracle.zip && unzip oracle.zip -d oracle"
   - "sh -e /etc/init.d/xvfb start"
   - "export DISPLAY=:99.0"

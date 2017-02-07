@@ -36,9 +36,9 @@ class EntrySerializer(ModelContentSerializer):
             if SerializerDetail.STRUCTURE_DB in detail_filters:
                 representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.searcher)
             if SerializerDetail.PROTEIN_DETAIL in detail_filters:
-                representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.searcher, True)
+                representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.searcher)
             if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.searcher, True)
+                representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.searcher)
 
         return representation
 
@@ -133,7 +133,7 @@ class EntrySerializer(ModelContentSerializer):
             result = {
                 "entries": {
                     "member_databases": {
-                        bucket["val"] if "val" in bucket else bucket["key"]: EntrySerializer.serialize_counter_bucket(bucket)
+                        EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket)
                         for bucket in instance["databases"]["buckets"]
                     },
                     "unintegrated": 0,
@@ -149,6 +149,31 @@ class EntrySerializer(ModelContentSerializer):
                 del result["entries"]["member_databases"]["interpro"]
             return result
         return instance
+
+    dbcode = {
+        "H": "Pfam",
+        "M": "prosite_profiles",
+        "R": "SMART",
+        "V": "PHANTER",
+        "g": "MobiDB",
+        "B": "SFLD",
+        "P": "prosite_patterns",
+        "X": "GENE 3D",
+        "N": "TIGRFAMs",
+        "J": "CDD",
+        "Y": "SUPERFAMILY",
+        "U": "PIRSF",
+        "D": "ProDom",
+        "Q": "HAMAP",
+        "F": "Prints",
+    }
+
+    @staticmethod
+    def get_key_from_bucket(bucket):
+        key = bucket["val"] if "val" in bucket else bucket["key"]
+        if key.upper() in EntrySerializer.dbcode:
+            return EntrySerializer.dbcode[key.upper()].lower()
+        return key
 
     @staticmethod
     def counter_is_empty(instance):
@@ -187,7 +212,7 @@ class EntrySerializer(ModelContentSerializer):
             header["protein"] = obj["protein_acc"]
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(
-                Entry.objects.get(accession__iexact=obj["entry_acc"]), solr
+                Entry.objects.get(accession=obj["entry_acc"].upper()), solr
             )
 
         return header

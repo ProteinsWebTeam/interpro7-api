@@ -136,7 +136,7 @@ DATABASES = {
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:9200/test/relationships'
+        'URL': 'http://hmmer-prod-db01:9200/interpro/relationship'
         # ...or for multicore...
         # 'URL': 'http://127.0.0.1:8983/solr/interpro7',
     },

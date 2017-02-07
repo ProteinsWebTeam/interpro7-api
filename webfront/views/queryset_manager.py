@@ -87,30 +87,25 @@ class QuerysetManager:
         for ep in self.filters:
             if ep == "search":
                 continue
-            # if ep == endpoint:
-            #     continue
-                # current_filters = {**current_filters, **{k: self.check_for_f(v, endpoint)
-                #                                          for k, v in self.filters[ep].items()}
-                #                    }
-
             else:
                 for k, v in self.filters[ep].items():
                     if ep == "solr":
                         q += " && {}:{}".format(k, v)
                     elif k == "source_database__isnull":
-                        q += " && {}{}_acc:*".format("!" if v else "", ep)
+                        q += " && {}{}_db:*".format("!" if v else "", ep)
                     elif k == "accession" or k == "accession__iexact":
                         q += " && {}_acc:{}".format(ep, v)
                     elif k == "accession__isnull":
-                        q += " && {}{}_acc:*".format("!" if v else "", ep)
+                        # elasticsearch perform better if the "give me all" query runs over a
+                        # low cardinality field such as the _db ones
+                        if ep == 'structure':
+                            q += " && {}{}_acc:*".format("!" if v else "", ep)
+                        else:
+                            q += " && {}{}_db:*".format("!" if v else "", ep)
                     elif k == "integrated" or k == "integrated__iexact":
                         q += " && integrated:{}".format(v)
-                    # elif k == "integrated__isnull":
-                    #     q += " && {}integrated:*".format("!" if v else "")
                     elif k == "integrated__isnull":
                         q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
-                    # elif "chain" in k:
-                    #     q += " && chain:{}".format(v)
                     elif ep != "structure":
                         if k == "source_database" or k == "source_database__iexact":
                             q += " && {}_db:{}".format(ep, v)

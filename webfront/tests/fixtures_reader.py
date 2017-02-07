@@ -1,6 +1,7 @@
 import json
 import copy
 
+from webfront.search_controller import SearchController
 from webfront.views.custom import CustomView
 
 
@@ -45,10 +46,10 @@ class FixtureReader:
                 "text": e + " " + p,
                 "entry_acc": e,
                 "entry_type": self.entries[e]["type"],
-                "entry_db": self.entries[e]["source_database"],
+                "entry_db": SearchController.to_dbcodes(self.entries[e]["source_database"]),
                 "integrated": self.entries[e]["integrated"],
                 "protein_acc": p,
-                "protein_db": self.proteins[p]["source_database"],
+                "protein_db": SearchController.to_dbcodes(self.proteins[p]["source_database"]),
                 "tax_id": self.proteins[p]["organism"]["taxid"],
                 "entry_protein_coordinates": json.dumps(ep["coordinates"]),
                 # "django_ct": get_model_ct(ProteinEntryFeature),
@@ -74,7 +75,7 @@ class FixtureReader:
                     to_add.append({
                         "text": p + " " + sp["structure"],
                         "protein_acc": p,
-                        "protein_db": self.proteins[p]["source_database"],
+                        "protein_db": SearchController.to_dbcodes(self.proteins[p]["source_database"]),
                         "tax_id": self.proteins[p]["organism"]["taxid"],
                         # "django_ct": get_model_ct(ProteinEntryFeature),
                         # "django_id": 0,

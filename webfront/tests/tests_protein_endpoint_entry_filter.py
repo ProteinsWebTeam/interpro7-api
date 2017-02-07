@@ -193,7 +193,7 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             for protein in response.data["results"]:
                 for match in protein["entries"]:
                     self._check_match(match)
-                    self._check_entry_details(match["entry"])
+                    # self._check_entry_details(match["entry"])
 
     def test_urls_that_return_a_protein_details_with_matches(self):
         sp_1 = "M5ADK6"
@@ -218,7 +218,7 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             # self.assertEqual(len(response.data["entries"]), 1,
             #                  "The number of entries should be 1. URL: [{}]".format(url))
             self._check_match(response.data["entries"][0])
-            self._check_entry_details(response.data["entries"][0]["entry"])
+            # self._check_entry_details(response.data["entries"][0]["entry"])
 
     def test_can_get_entries_from_protein_id_pfam_id(self):
         acc = "A1CUJ5"

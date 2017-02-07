@@ -1,6 +1,7 @@
 import abc
 import http.client
 import json
+import re
 import urllib.parse
 from django.conf import settings
 
@@ -43,6 +44,28 @@ class SearchController(metaclass=abc.ABCMeta):
     def clear_all_docs(self):
         raise NotImplementedError('users must define execute_query to use this base class')
 
+    @staticmethod
+    def to_dbcodes(q):
+        re.sub(r'pfam', "p", "some pFam ", flags=re.IGNORECASE)
+
+        q = re.sub(r'Pfam', "h", q, flags=re.IGNORECASE)
+        q = re.sub(r'Prosite?profiles', "m", q, flags=re.IGNORECASE)
+        q = re.sub(r'SMART', "r", q, flags=re.IGNORECASE)
+        q = re.sub(r'PHANTER', "v", q, flags=re.IGNORECASE)
+        q = re.sub(r'MobiDB', "g", q, flags=re.IGNORECASE)
+        q = re.sub(r'SFLD', "b", q, flags=re.IGNORECASE)
+        q = re.sub(r'Prosite?patterns', "p", q, flags=re.IGNORECASE)
+        q = re.sub(r'GENE 3D', "x", q, flags=re.IGNORECASE)
+        q = re.sub(r'TIGRFAMs', "n", q, flags=re.IGNORECASE)
+        q = re.sub(r'CDD', "j", q, flags=re.IGNORECASE)
+        q = re.sub(r'SUPERFAMILY', "y", q, flags=re.IGNORECASE)
+        q = re.sub(r'PIRSF', "u", q, flags=re.IGNORECASE)
+        q = re.sub(r'ProDom', "d", q, flags=re.IGNORECASE)
+        q = re.sub(r'HAMAP', "q", q, flags=re.IGNORECASE)
+        q = re.sub(r'Prints', "f", q, flags=re.IGNORECASE)
+        q = re.sub(r'swissprot', "s", q, flags=re.IGNORECASE)
+        q = re.sub(r'trembl', "t", q, flags=re.IGNORECASE)
+        return q
 
 class ElasticsearchController(SearchController):
 
@@ -177,7 +200,7 @@ class ElasticsearchController(SearchController):
         conn = http.client.HTTPConnection(self.server, self.port)
         if fq is not None:
             q = query+" && "+fq.lower()
-        q = q.replace(" && ", "%20AND%20")
+        q = self.to_dbcodes(q.replace(" && ", "%20AND%20"))
         conn.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,
@@ -191,7 +214,7 @@ class ElasticsearchController(SearchController):
         if query_obj is None:
             query_obj = {"from": 0}
         conn = http.client.HTTPConnection(self.server, self.port)
-        q = q.replace(" && ", "%20AND%20")
+        q = self.to_dbcodes(q.replace(" && ", "%20AND%20"))
         conn.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,
@@ -201,4 +224,3 @@ class ElasticsearchController(SearchController):
         data = response.read().decode()
         obj = json.loads(data)
         return obj
-

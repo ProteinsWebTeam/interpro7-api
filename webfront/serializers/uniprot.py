@@ -48,9 +48,9 @@ class ProteinSerializer(ModelContentSerializer):
             if SerializerDetail.STRUCTURE_DB in detail_filters:
                 representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.searcher)
             if SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.searcher, True)
+                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.searcher)
             if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.searcher, True)
+                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.searcher)
         return representation
 
     def to_full_representation(self, instance):
@@ -112,7 +112,6 @@ class ProteinSerializer(ModelContentSerializer):
                 output["structures"] = bucket["structure"] if is_solr else bucket["structure"]["value"]
         return output
 
-
     @staticmethod
     def to_counter_representation(instance):
         if "proteins" not in instance:
@@ -121,7 +120,7 @@ class ProteinSerializer(ModelContentSerializer):
                 raise ReferenceError('There are not entries for this request')
 
             instance2 = {"proteins": {
-                            bucket["val"] if "val" in bucket else bucket["key"]: ProteinSerializer.serialize_counter_bucket(bucket)
+                            ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket)
                             for bucket in instance["databases"]["buckets"]
                         }}
             instance2["proteins"]["uniprot"] = ProteinSerializer.serialize_counter_bucket(
@@ -130,33 +129,14 @@ class ProteinSerializer(ModelContentSerializer):
             instance =instance2
         return instance
 
-    #
-    # @staticmethod
-    # def to_match_representation(match, full=False):
-    #     output = {
-    #         "coordinates": match.coordinates,
-    #         "accession": match.entry_id,
-    #         "source_database": match.entry.source_database,
-    #         "name": match.entry.name,
-    #     }
-    #     if match.entry.integrated:
-    #         output["integrated"]= match.entry.integrated.accession
-    #
-    #     if full:
-    #         output["entry"] = webfront.serializers.interpro.EntrySerializer.to_metadata_representation(match.entry)
-    #
-    #     return output
-    #
-    # @staticmethod
-    # def to_entries_representation(instance):
-    #     return [
-    #         ProteinSerializer.to_match_representation(match)
-    #         for match in instance.proteinentryfeature_set.all()
-    #     ]
-    #
-    # @staticmethod
-    # def to_entries_count_representation(instance):
-    #     return instance.proteinentryfeature_set.count()
+    @staticmethod
+    def get_key_from_bucket(bucket):
+        key = (bucket["val"] if "val" in bucket else bucket["key"]).upper()
+        if key == "S":
+            return "swissprot"
+        if key == "T":
+            return "trembl"
+        return key
 
     def to_entries_count_representation(self, instance):
         query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
@@ -200,40 +180,6 @@ class ProteinSerializer(ModelContentSerializer):
             raise ReferenceError('There are not entries for this request')
         return response
 
-    # #
-    # @staticmethod
-    # def to_structures_count_representation(instance):
-    #     return instance.structures.distinct().count()
-    #
-    # @staticmethod
-    # def to_chain_representation(instance, full=False):
-    #     from webfront.serializers.pdb import StructureSerializer
-    #
-    #     chain = {
-    #         "chain": instance.chain,
-    #         "accession": instance.structure.accession,
-    #         "source_database": instance.structure.source_database,
-    #         "length": instance.length,
-    #         "organism": instance.organism,
-    #         "coordinates": instance.coordinates,
-    #     }
-    #     if full:
-    #         chain["structure"] = StructureSerializer.to_metadata_representation(instance.structure)
-    #     return chain
-    #
-    # @staticmethod
-    # def to_structures_overview_representation(instance, is_full=False):
-    #     return [
-    #         ProteinSerializer.to_chain_representation(match, is_full)
-    #         for match in instance.proteinstructurefeature_set.all()
-    #         ]
-    #
-    # @staticmethod
-    # def to_entries_overview_representation(instance, is_full=False):
-    #     return [
-    #         ProteinSerializer.to_match_representation(match, is_full)
-    #         for match in instance.proteinentryfeature_set.all()
-    #         ]
 
     @staticmethod
     def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None):

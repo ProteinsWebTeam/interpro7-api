@@ -123,7 +123,7 @@ class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["structures"]), len(tests[url]), "failed at "+url)
             for match in response.data["structures"]:
                 self._check_entry_structure_details(match)
-            ids = [x["structure"]["accession"] for x in response.data["structures"]]
+            ids = [x["accession"].upper() for x in response.data["structures"]]
             self.assertEqual(tests[url], ids)
 
     def test_can_get_structures_from_entry_db_structure_id(self):
@@ -145,7 +145,7 @@ class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
                 self.assertIn("structures", entry, "'structures' should be one of the keys in the response")
                 for match in entry["structures"]:
                     self._check_entry_structure_details(match)
-                    self._check_structure_details(match["structure"])
+                    # self._check_structure_details(match["structure"])
 
     def test_urls_that_should_fails_with_no_content(self):
         acc = "IPR003165"

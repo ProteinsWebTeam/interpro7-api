@@ -147,7 +147,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["proteins"]), len(tests[url]), "failed at "+url)
             for match in response.data["proteins"]:
                 self._check_match(match)
-                self._check_protein_details(match["protein"])
+                # self._check_protein_details(match["protein"])
             ids = [x["accession"].upper() for x in response.data["proteins"]]
             self.assertEqual(tests[url], ids)
 
@@ -171,7 +171,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
                 self.assertIn("proteins", entry, "'proteins' should be one of the keys in the response")
                 for match in entry["proteins"]:
                     self._check_match(match)
-                    self._check_protein_details(match["protein"])
+                    # self._check_protein_details(match["protein"])
 
     def test_urls_that_should_fails_with_no_content(self):
         acc = "IPR003165"

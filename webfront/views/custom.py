@@ -47,12 +47,12 @@ class CustomView(GenericAPIView):
                         name__icontains=search
                     )
                 if self.is_single_endpoint(general_handler) or not self.expected_response_is_list():
-                    self.queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct()
+                    self.queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True)
                 else:
                     self.update_queryset_from_search(searcher, general_handler)
 
                 if self.queryset.count() == 0:
-                    if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).distinct().count():
+                    if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).count():
                         raise Exception("The URL requested didn't have any data related.\nList of endpoints: {}"
                                         .format(endpoint_levels))
 
@@ -77,12 +77,12 @@ class CustomView(GenericAPIView):
                 serializer_detail_filters=general_handler.filter_serializers,
                 queryset_manager=general_handler.queryset_manager,
             )
-            data_tmp = general_handler.execute_post_serializers(serialized.data)
+            # data_tmp = general_handler.execute_post_serializers(serialized.data)
 
             if self.many:
-                return self.get_paginated_response(data_tmp)
+                return self.get_paginated_response(serialized.data)
             else:
-                return Response(data_tmp)
+                return Response(serialized.data)
 
         else:
             # combine the children handlers with the available endpoints

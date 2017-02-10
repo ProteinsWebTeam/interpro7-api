@@ -13,10 +13,10 @@ class SearchController(metaclass=abc.ABCMeta):
         raise NotImplementedError('users must define get_group_obj_of_field_by_query to use this base class')
 
     def get_number_of_field_by_endpoint(self, endpoint, field, accession):
-        db = "pdb_acc"
+        db = field
         if field.startswith("entry"):
             db = "entry_db"
-        elif field.startswith("entry"):
+        elif field.startswith("protein"):
             db = "protein_db"
         ngroups = self.get_group_obj_of_field_by_query(
              "{}:* && {}_acc:{}".format(db, endpoint, accession), field

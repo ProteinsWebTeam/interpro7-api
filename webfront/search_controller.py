@@ -106,7 +106,10 @@ class ElasticsearchController(SearchController):
         facet = {
             "aggs": {
                 "databases": {
-                    "terms": {"field": "{}_db".format(endpoint)},
+                    "terms": {
+                        "field": "{}_db".format(endpoint),
+                        "execution_hint": "map",
+                    },
                     "aggs": {
                         "unique": {
                             "cardinality": {"field": "{}_acc".format(endpoint)}
@@ -160,7 +163,8 @@ class ElasticsearchController(SearchController):
                 "groups": {
                     "terms": {
                         "field": field,
-                        "size": rows
+                        "size": rows,
+                        "execution_hint": "map",
                     },
                     "aggs": {
                         "tops": {"top_hits": {"size": 1}}
@@ -187,6 +191,7 @@ class ElasticsearchController(SearchController):
                 "rscount": {
                     "terms": {
                         "field": '{}_acc'.format(endpoint),
+                        "execution_hint": "map",
                     }
                 }
             },

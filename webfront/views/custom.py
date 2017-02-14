@@ -59,7 +59,7 @@ class CustomView(GenericAPIView):
                     raise ReferenceError("The URL requested didn't have any data related.\nList of endpoints: {}"
                                          .format(endpoint_levels))
                 if self.many:
-                    self.queryset = self.paginate_queryset(self.get_queryset())
+                    self.queryset = self.paginator.paginate_queryset(self.get_queryset(), request, view=self, search_size=self.search_size)
                 else:
                     self.queryset = self.get_queryset().first()
             else:
@@ -193,12 +193,18 @@ class CustomView(GenericAPIView):
     def is_single_endpoint(self, general_handler):
         return general_handler.filter_serializers == {}
 
+    search_size =None
     def update_queryset_from_search(self, searcher, general_handler):
         ep = general_handler.queryset_manager.main_endpoint
-        res = searcher.get_list_of_endpoint(ep)
+        s = general_handler.pagination["size"]
+        i = general_handler.pagination["index"]
+        r = 100 if s<=100 else s
+        st = r*((s*i)//r)
+        res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st)
         self.queryset = general_handler.queryset_manager\
             .get_base_queryset(ep)\
             .filter(accession__in=res)
+        self.search_size = length
 
     @staticmethod
     def get_search_controller(queryset_manager=None):

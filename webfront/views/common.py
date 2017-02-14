@@ -51,14 +51,15 @@ class GeneralHandler(CustomView):
     last_endpoint_level = None
     queryset_manager = QuerysetManager()
     endpoint_levels = []
+    pagination = None
 
     def get(self, request, url='', *args, **kwargs):
         self.store = {}
         self.post_serializers = {}
         self.filter_serializers = {}
         self.endpoint_levels = endpoint_levels = map_url_to_levels(url)
+        self.pagination = pagination_information(request)
 
-        self.set_in_store(GeneralHandler, "pagination", pagination_information(request))
         try:
             return super(GeneralHandler, self).get(
                 request, endpoint_levels,

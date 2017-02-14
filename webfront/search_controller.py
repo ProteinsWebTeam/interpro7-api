@@ -34,7 +34,7 @@ class SearchController(metaclass=abc.ABCMeta):
         raise NotImplementedError('users must define get_counter_object to use this base class')
 
     @abc.abstractmethod
-    def get_list_of_endpoint(self, endpoint, solr_query=None):
+    def get_list_of_endpoint(self, endpoint, solr_query=None, rows=1, start=0):
         raise NotImplementedError('users must define get_list_of_endpoint to use this base class')
 
     @abc.abstractmethod
@@ -182,15 +182,22 @@ class ElasticsearchController(SearchController):
         ]
         return response["aggregations"]
 
-    def get_list_of_endpoint(self, endpoint, solr_query=None):
+    def get_list_of_endpoint(self, endpoint, solr_query=None, rows=10, start=0):
         qs = self.queryset_manager.get_solr_query(endpoint) if solr_query is None else solr_query
         if qs == '':
             qs = '*:*'
         facet = {
             "aggs": {
+                "ngroups": {
+                    "cardinality": {
+                        "field": endpoint+"_acc"
+                    }
+                },
                 "rscount": {
                     "terms": {
                         "field": '{}_acc'.format(endpoint),
+                        "size": start+rows,
+                        "order": {"_term": "asc"},
                         "execution_hint": "map",
                     }
                 }
@@ -198,7 +205,7 @@ class ElasticsearchController(SearchController):
             "size": 0
         }
         response = self._elastic_json_query(qs, facet)
-        return [x['key'].upper() for x in response["aggregations"]["rscount"]["buckets"]]
+        return [x['key'].upper() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
 
     def get_chain(self):
         qs = self.queryset_manager.get_solr_query()

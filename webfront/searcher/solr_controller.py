@@ -1,9 +1,9 @@
-from django.conf import settings
 import json
 
 import pysolr
+from django.conf import settings
 
-from webfront.search_controller import SearchController
+from webfront.searcher.search_controller import SearchController
 
 
 class SolrController(SearchController):

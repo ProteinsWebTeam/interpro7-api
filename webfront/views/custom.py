@@ -1,13 +1,13 @@
 import re
+from django.conf import settings
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from webfront.constants import SerializerDetail
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
-from webfront.solr_controller import SolrController
-from webfront.search_controller import ElasticsearchController
-from django.conf import settings
+from webfront.searcher.elastic_controller import ElasticsearchController
+from webfront.searcher.solr_controller import SolrController
 
 
 class CustomView(GenericAPIView):
@@ -59,7 +59,11 @@ class CustomView(GenericAPIView):
                     raise ReferenceError("The URL requested didn't have any data related.\nList of endpoints: {}"
                                          .format(endpoint_levels))
                 if self.many:
-                    self.queryset = self.paginator.paginate_queryset(self.get_queryset(), request, view=self, search_size=self.search_size)
+                    self.queryset = self.paginator.paginate_queryset(
+                        self.get_queryset(),
+                        request, view=self,
+                        search_size=self.search_size
+                    )
                 else:
                     self.queryset = self.get_queryset().first()
             else:

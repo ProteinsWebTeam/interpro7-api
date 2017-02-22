@@ -1,7 +1,8 @@
 import json
+
 import copy
 
-from webfront.search_controller import SearchController
+from webfront.searcher.search_controller import SearchController
 from webfront.views.custom import CustomView
 
 

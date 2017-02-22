@@ -11,26 +11,6 @@ db_members_accessions = (
 )
 
 
-def filter_entry_overview(obj, general_handler, endpoint):
-    obj = EntryHandler.flat_counter_object(obj)
-
-    for entry_db in obj:
-        qm = general_handler.queryset_manager.clone()
-        if entry_db == "unintegrated":
-            qm.add_filter("entry",
-                          integrated__isnull=True,
-                          source_database__iregex=db_members)
-        else:
-            qm.add_filter("entry", source_database__iexact=entry_db)
-
-        if not isinstance(obj[entry_db], dict):
-            obj[entry_db] = {"entries": obj[entry_db]}
-        obj[entry_db][general_handler.plurals[endpoint]] = qm.get_queryset(endpoint)\
-            .values("accession")\
-            .distinct().count()
-    return EntryHandler.unflat_counter_object(obj)
-
-
 class MemberAccessionHandler(CustomView):
     level_description = 'DB member accession level'
     serializer_class = EntrySerializer
@@ -181,8 +161,7 @@ class EntryHandler(CustomView):
     serializer_detail = SerializerDetail.ENTRY_OVERVIEW
     serializer_detail_filter = SerializerDetail.ENTRY_OVERVIEW
 
-    @staticmethod
-    def get_database_contributions(queryset):
+    def get_database_contributions(self, queryset):
         qs = Entry.objects.filter(accession__in=queryset)
         entry_counter = qs.values_list('source_database').annotate(total=Count('source_database'))
         output = {
@@ -216,20 +195,3 @@ class EntryHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
 
         return queryset
-
-    @staticmethod
-    def flat_counter_object(obj):
-        obj = {**obj, **obj["member_databases"]}
-        del obj["member_databases"]
-        return obj
-
-    @staticmethod
-    def unflat_counter_object(obj):
-        new_obj = {"member_databases": {}}
-        for key, value in obj.items():
-            if key == "interpro" or key == "unintegrated":
-                new_obj[key] = value
-            else:
-                new_obj["member_databases"][key] = value
-        obj = new_obj
-        return obj

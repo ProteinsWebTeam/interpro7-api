@@ -2,39 +2,20 @@
   "mappings": {
     "relationship": {
       "properties": {
-        "entry_acc": {
-          "type":  "keyword"
-        },
-        "protein_acc": {
-          "type":  "keyword"
-        },
-        "structure_acc": {
-          "type":  "keyword"
-        },
-        "entry_db": {
-          "type":  "keyword"
-        },
-        "protein_db": {
-          "type":  "keyword"
-        },
-        "chain": {
-          "type":  "keyword"
-        },
-        "integrated": {
-          "type":  "keyword"
-        },
-        "entry_type": {
-          "type":  "keyword"
-        },
-        "tax_id": {
-          "type":  "long"
-        },
-        "structure_chain": {
-          "type":  "keyword"
-        },
-        "id": {
-          "type":  "keyword"
-        }
+        "entry_acc": {"type":  "keyword"},
+        "protein_acc": {"type":  "keyword"},
+        "structure_acc": {"type":  "keyword"},
+        "entry_db": {"type":  "keyword"},
+        "protein_db": {"type":  "keyword"},
+        "chain": {"type":  "keyword"},
+        "integrated": {"type":  "keyword"},
+        "entry_type": {"type":  "keyword"},
+        "tax_id": {"type":  "long"},
+        "structure_chain": {"type":  "keyword"},
+        "protein_structure_coordinates": {"type":  "text"},
+        "entry_protein_coordinates": {"type":  "text"},
+        "text": {"type":  "text"},
+        "id": {"type":  "keyword"}
       }
     }
   }

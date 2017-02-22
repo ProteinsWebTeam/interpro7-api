@@ -1,4 +1,3 @@
-from webfront.constants import get_queryset_type, QuerysetType
 from webfront.models import Protein
 
 from webfront.serializers.content_serializers import ModelContentSerializer

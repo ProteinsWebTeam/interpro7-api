@@ -12,18 +12,6 @@ entry_db_members = '|'.join(settings.DB_MEMBERS)
 db_members = r'(uniprot)|(trembl)|(swissprot)'
 
 
-def filter_protein_overview(obj, general_handler, endpoint):
-    for prot_db in obj:
-        qm = general_handler.queryset_manager.clone()
-        if prot_db != "uniprot":
-            qm.add_filter("protein", source_database__iexact=prot_db)
-        if not isinstance(obj[prot_db], dict):
-            obj[prot_db] = {"proteins": obj[prot_db]}
-        obj[prot_db][general_handler.plurals[endpoint]] = \
-            qm.get_queryset(endpoint).values("accession").distinct().count()
-    return obj
-
-
 class UniprotAccessionHandler(CustomView):
     level_description = 'uniprot accession level'
     serializer_class = ProteinSerializer
@@ -99,8 +87,7 @@ class ProteinHandler(CustomView):
     to_add = None
     serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW
 
-    @staticmethod
-    def get_database_contributions(queryset):
+    def get_database_contributions(self, queryset):
         qs = Protein.objects.filter(accession__in=queryset)
         protein_counter = qs.values_list('source_database').annotate(total=Count('source_database'))
         output = {}

@@ -1,5 +1,4 @@
 from interpro import settings
-from webfront.constants import get_queryset_type
 from webfront.models import Entry
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
@@ -47,14 +46,12 @@ class GeneralHandler(CustomView):
     }
     child_handlers = []
     queryset = Entry.objects
-    store = {}
     last_endpoint_level = None
     queryset_manager = QuerysetManager()
     endpoint_levels = []
     pagination = None
 
     def get(self, request, url='', *args, **kwargs):
-        self.store = {}
         self.post_serializers = {}
         self.filter_serializers = {}
         self.endpoint_levels = endpoint_levels = map_url_to_levels(url)
@@ -79,20 +76,6 @@ class GeneralHandler(CustomView):
                 raise
             content = {'Error': e.args[0]}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
-
-    def set_in_store(self, handler_class, key, value):
-        if handler_class not in self.store:
-            self.store[handler_class] = {}
-        self.store[handler_class][key] = value
-
-    def get_from_store(self, handler_class, key):
-        if handler_class not in self.store:
-            raise IndexError("The general handler store doesn't have {} registered"
-                             .format(handler_class))
-        if key not in self.store[handler_class]:
-            raise KeyError("The general handler store doesn't have the key {} registered under {}"
-                           .format(key, handler_class))
-        return self.store[handler_class][key]
 
     post_serializers = {}
     current_endpoint = None

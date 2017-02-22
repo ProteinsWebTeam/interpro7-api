@@ -176,7 +176,7 @@ class CustomView(GenericAPIView):
                      ]
             return solr.get_counter_object(general_handler.queryset_manager.main_endpoint, extra_counters=extra)
 
-    def get_database_contributions(self, prefix=""):
+    def get_database_contributions(self, queryset):
         return
 
     @staticmethod
@@ -193,14 +193,16 @@ class CustomView(GenericAPIView):
     def is_single_endpoint(self, general_handler):
         return general_handler.filter_serializers == {}
 
-    search_size =None
+    search_size = None
+
     def update_queryset_from_search(self, searcher, general_handler):
         ep = general_handler.queryset_manager.main_endpoint
         s = general_handler.pagination["size"]
         i = general_handler.pagination["index"]
-        r = 100 if s<=100 else s
+        r = 100 if s <= 100 else s
         st = r*((s*i)//r)
-        res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st)
+        qs = general_handler.queryset_manager.get_solr_query(include_search=True)
+        res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st, solr_query=qs)
         self.queryset = general_handler.queryset_manager\
             .get_base_queryset(ep)\
             .filter(accession__in=res)

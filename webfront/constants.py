@@ -37,35 +37,3 @@ class QuerysetType(Enum):
     ENTRY_PROTEIN = 150
     ENTRY_STRUCTURE = 160
     STRUCTURE_PROTEIN = 250
-
-
-def get_queryset_type(queryset):
-
-    if isinstance(queryset, models.Model):
-        if isinstance(queryset, Entry):
-            return QuerysetType.ENTRY
-        elif isinstance(queryset, Protein):
-            return QuerysetType.PROTEIN
-        elif isinstance(queryset, Structure):
-            return QuerysetType.STRUCTURE
-        elif isinstance(queryset, ProteinEntryFeature):
-            return QuerysetType.ENTRY_PROTEIN
-        elif isinstance(queryset, ProteinStructureFeature):
-            return QuerysetType.STRUCTURE_PROTEIN
-        elif isinstance(queryset, EntryStructureFeature):
-            return QuerysetType.ENTRY_STRUCTURE
-
-    if hasattr(queryset, "model"):
-        if queryset.model is Entry:
-            return QuerysetType.ENTRY
-        elif queryset.model is Protein:
-            return QuerysetType.PROTEIN
-        elif queryset.model is Structure:
-            return QuerysetType.STRUCTURE
-        elif queryset.model is ProteinEntryFeature:
-            return QuerysetType.ENTRY_PROTEIN
-        elif queryset.model is ProteinStructureFeature:
-            return QuerysetType.STRUCTURE_PROTEIN
-        elif queryset.model is EntryStructureFeature:
-            return QuerysetType.ENTRY_STRUCTURE
-    return None

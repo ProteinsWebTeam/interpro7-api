@@ -4,17 +4,6 @@ from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 
 
-def filter_structure_overview(obj, general_handler, endpoint):
-    for str_db in obj:
-        qm = general_handler.queryset_manager.clone()
-        qm.add_filter("structure", source_database__iexact=str_db)
-        if not isinstance(obj[str_db], dict):
-            obj[str_db] = {"structures": obj[str_db]}
-        obj[str_db][general_handler.plurals[endpoint]] = qm.get_queryset(endpoint)\
-            .values("accession").distinct().count()
-    return obj
-
-
 class ChainPDBAccessionHandler(CustomView):
     level_description = 'structure chain level'
     serializer_class = StructureSerializer
@@ -51,7 +40,6 @@ class PDBAccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("structure", accession=endpoint_levels[level - 1].upper())
-        general_handler.set_in_store(PDBAccessionHandler, "pdb_accession", endpoint_levels[level - 1])
         return super(PDBAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -101,8 +89,7 @@ class StructureHandler(CustomView):
     serializer_detail = SerializerDetail.STRUCTURE_OVERVIEW
     serializer_detail_filter = SerializerDetail.STRUCTURE_OVERVIEW
 
-    @staticmethod
-    def get_database_contributions(queryset):
+    def get_database_contributions(self, queryset):
         qs = Structure.objects.filter(accession__in=queryset)
         protein_counter = qs.values_list('source_database').annotate(total=Count('source_database'))
         output = {"pdb": 0}

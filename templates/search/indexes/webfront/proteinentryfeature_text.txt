@@ -1,2 +1,0 @@
-{{ object.protein_id }}
-{{ object.entry_id }}

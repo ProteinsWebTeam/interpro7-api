@@ -32,7 +32,7 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.fr.clear_search_engine()
+        # cls.fr.clear_search_engine()
         super(InterproRESTTestCase, cls).tearDownClass()
 
     # methods to check entry related responses

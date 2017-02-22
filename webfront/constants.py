@@ -1,8 +1,4 @@
 from enum import Enum
-from django.db import models
-
-from webfront.models import ProteinEntryFeature, Entry, Protein, ProteinStructureFeature, Structure, \
-    EntryStructureFeature
 
 
 class SerializerDetail(Enum):

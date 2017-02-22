@@ -98,7 +98,7 @@ class ElasticsearchController(SearchController):
         return conn.getresponse()
 
     def get_counter_object(self, endpoint, solr_query=None, extra_counters=[]):
-        qs = self.queryset_manager.get_solr_query(endpoint)
+        qs = self.queryset_manager.get_solr_query()
         if qs == '':
             qs = '*:*'
         if solr_query is not None:
@@ -183,7 +183,7 @@ class ElasticsearchController(SearchController):
         return response["aggregations"]
 
     def get_list_of_endpoint(self, endpoint, solr_query=None, rows=10, start=0):
-        qs = self.queryset_manager.get_solr_query(endpoint) if solr_query is None else solr_query
+        qs = self.queryset_manager.get_solr_query() if solr_query is None else solr_query
         if qs == '':
             qs = '*:*'
         facet = {

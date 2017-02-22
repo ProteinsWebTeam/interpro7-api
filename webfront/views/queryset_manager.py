@@ -80,17 +80,17 @@ class QuerysetManager:
                 # join_filters["proteinstructurefeature__structure_id"] = F('accession')
         return join_filters
 
-    def get_solr_query(self, endpoint=None):
-        if endpoint is None:
-            endpoint = self.main_endpoint
+    def get_solr_query(self):
         q = ""
         for ep in self.filters:
-            if ep == "search":
-                continue
-            else:
+            # if ep == "search":
+            #     q += " && text:{}".format(self.filters[ep])
+            # else:
                 for k, v in self.filters[ep].items():
                     if ep == "solr":
                         q += " && {}:{}".format(k, v)
+                    elif ep == "search":
+                        q += " && text:*{}*".format(v)
                     elif k == "source_database__isnull":
                         q += " && {}{}_db:*".format("!" if v else "", ep)
                     elif k == "accession" or k == "accession__iexact":

@@ -9,7 +9,7 @@ from webfront.search_controller import SearchController
 class SolrController(SearchController):
 
     def __init__(self, queryset_manager=None):
-        self.solr = pysolr.Solr(settings.HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
+        self.solr = pysolr.Solr(settings.SEARCHER_URL, timeout=10)
         self.queryset_manager = queryset_manager
 
     def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=0, start=0):

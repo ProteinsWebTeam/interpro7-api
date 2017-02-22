@@ -7,13 +7,11 @@ import time
 import os
 from selenium.common.exceptions import StaleElementReferenceException
 
-import haystack
-
 from webfront.tests.fixtures_reader import FixtureReader
-from interpro.settings import TEST_INDEX
+from interpro.settings import SEARCHER_TEST_URL
 
 
-@override_settings(HAYSTACK_CONNECTIONS=TEST_INDEX)
+@override_settings(SEARCHER_URL=SEARCHER_TEST_URL)
 class FunctionalTest(StaticLiveServerTestCase):
     fixtures = [
         'webfront/tests/fixtures.json',

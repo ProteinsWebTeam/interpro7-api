@@ -72,10 +72,11 @@ class SearchController(metaclass=abc.ABCMeta):
         q = re.sub(r'trembl', "t", q, flags=re.IGNORECASE)
         return q
 
+
 class ElasticsearchController(SearchController):
 
     def __init__(self, queryset_manager=None):
-        url = urllib.parse.urlparse(settings.HAYSTACK_CONNECTIONS['default']['URL'])
+        url = urllib.parse.urlparse(settings.SEARCHER_URL)
         self.server = url.hostname
         self.port = url.port
         parts = url.path.split("/")

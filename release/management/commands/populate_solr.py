@@ -6,11 +6,11 @@ from django.core.management.base import BaseCommand
 import cx_Oracle
 import pysolr
 from tqdm import tqdm
-from haystack.utils import get_model_ct
+
 from django.utils.encoding import force_text
 import json
 
-from interpro.settings import HAYSTACK_CONNECTIONS, DATABASES
+from interpro.settings import SEARCHER_URL, DATABASES
 
 import time
 
@@ -139,7 +139,7 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
     con = cx_Oracle.connect(ipro['USER'], ipro['PASSWORD'], cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']))
 
     try:
-        solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
+        solr = pysolr.Solr(SEARCHER_URL, timeout=10)
         where = ''
         if is_for_interpro_entries:
             where = conditions[subset]
@@ -175,7 +175,7 @@ def add_to_solr(solr, chunk, commit=True):
 
 
 def random_to_solr(n, bs, start=0):
-    solr = pysolr.Solr(HAYSTACK_CONNECTIONS['default']['URL'], timeout=10)
+    solr = pysolr.Solr(SEARCHER_URL, timeout=10)
     for step in tqdm(range(start, n, bs)):
         end = bs+step
         if end > n:

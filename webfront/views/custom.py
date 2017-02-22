@@ -210,7 +210,7 @@ class CustomView(GenericAPIView):
 
     @staticmethod
     def get_search_controller(queryset_manager=None):
-        if "solr" in settings.HAYSTACK_CONNECTIONS['default']['URL']:
+        if "solr" in settings.SEARCHER_URL:
             return SolrController(queryset_manager)
         else:
             return ElasticsearchController(queryset_manager)

@@ -14,7 +14,7 @@ chains = {
 }
 
 
-@override_settings(HAYSTACK_CONNECTIONS=settings.TEST_INDEX)
+@override_settings(SEARCHER_URL=settings.SEARCHER_TEST_URL)
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [
         'webfront/tests/fixtures.json',

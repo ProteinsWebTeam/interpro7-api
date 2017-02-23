@@ -79,7 +79,7 @@ class ProteinHandler(CustomView):
     serializer_class = ProteinSerializer
     many = False
     serializer_detail = SerializerDetail.PROTEIN_OVERVIEW
-    level_description = 'section level'
+    level_description = 'Protein level'
     from_model = False
     child_handlers = [
         (db_members, UniprotHandler),

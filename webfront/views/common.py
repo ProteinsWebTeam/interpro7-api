@@ -1,13 +1,14 @@
+import re
+
+from rest_framework import status
+from rest_framework.response import Response
+
 from interpro import settings
-from webfront.models import Entry
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
-from rest_framework import status
 from webfront.views.protein import ProteinHandler
 from webfront.views.queryset_manager import QuerysetManager
 from webfront.views.structure import StructureHandler
-from rest_framework.response import Response
-import re
 
 
 def map_url_to_levels(url):
@@ -24,7 +25,7 @@ def map_url_to_levels(url):
 
 
 def pagination_information(request):
-
+    # Extracts the pagination parameters out of the URL and returns a dictionary.
     return {
         'index': int(request.GET.get('page', 1)),
         'size':  int(request.GET.get('page_size', 10)),
@@ -41,30 +42,26 @@ class GeneralHandler(CustomView):
     # part on building the response, and therefore common functionality has been overloaded in it,
     # so it is accessible arounf the request procesing. (e.g. queryset management,
 
-    http_method_names = ['get']
+    # Human readable description for logging purposes
     level_description = 'home level'
+
+    # A valid URL on the API can only use an endpoint of this list *once*.
+    # This list contains the endpoint that haven't been used yet in this request.
+    # Been this view the root handler, all the endpoints are available.
     available_endpoint_handlers = [
         ('entry', EntryHandler),
         ('protein', ProteinHandler),
         ('structure', StructureHandler),
     ]
-    plurals = {
-        "entry": "entries",
-        "protein": "proteins",
-        "structure": "structures",
-    }
-    child_handlers = []
-    queryset = Entry.objects
-    last_endpoint_level = None
+    # The queryset manager for the current request.
     queryset_manager = QuerysetManager()
-    endpoint_levels = []
+    # Pagination information from the URL
     pagination = None
 
     def get(self, request, url='', *args, **kwargs):
-        # self.post_serializers = {}
         self.filter_serializers = {}
-        self.endpoint_levels = endpoint_levels = map_url_to_levels(url)
         self.pagination = pagination_information(request)
+        endpoint_levels = map_url_to_levels(url)
 
         try:
             return super(GeneralHandler, self).get(
@@ -85,28 +82,6 @@ class GeneralHandler(CustomView):
                 raise
             content = {'Error': e.args[0]}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
-
-    # post_serializers = {}
-    # current_endpoint = None
-    # main_endpoint = None
-    #
-    # def register_post_serializer(self, post_serializer, value):
-    #     if value in [e[0] for e in self.available_endpoint_handlers]:
-    #         self.current_endpoint = value
-    #         if len(self.post_serializers) == 0:
-    #             self.main_endpoint = value
-    #     if self.current_endpoint is not None:
-    #         self.post_serializers[self.current_endpoint] = {
-    #             "post_serializer": post_serializer,
-    #             "value": value
-    #         }
-    #
-    # def execute_post_serializers(self, data):
-    #     pss = list(self.post_serializers.items())
-    #     pss.sort(key=lambda e: self.endpoint_levels.index(e[0]))
-    #     for key, ps in pss:
-    #         data = ps["post_serializer"](data, ps["value"], self)
-    #     return data
 
     filter_serializers = {}
     current_filter_endpoint = None

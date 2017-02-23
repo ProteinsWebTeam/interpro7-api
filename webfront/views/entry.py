@@ -91,7 +91,7 @@ class AccessionHandler(CustomView):
 
 
 class UnintegratedHandler(CustomView):
-    level_description = 'interpro accession level'
+    level_description = 'unintegrated level'
     queryset = Entry.objects.all() \
         .exclude(source_database__iexact="interpro") \
         .filter(integrated__isnull=True)
@@ -149,7 +149,7 @@ class InterproHandler(CustomView):
 
 
 class EntryHandler(CustomView):
-    level_description = 'section level'
+    level_description = 'Entry level'
     from_model = False  # The object generated will be serialized as JSON, without checking the model
     child_handlers = [
         ('interpro', InterproHandler),

@@ -78,7 +78,7 @@ class PDBHandler(CustomView):
 
 
 class StructureHandler(CustomView):
-    level_description = 'section level'
+    level_description = 'Structure level'
     from_model = False
     child_handlers = [
         ("pdb", PDBHandler),

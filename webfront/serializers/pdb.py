@@ -34,6 +34,7 @@ class StructureSerializer(ModelContentSerializer):
         }
 
     def filter_representation(self, representation, instance):
+        s = self.searcher
         detail_filters = self.detail_filters
         if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
             representation["proteins"] = self.to_proteins_count_representation(representation)
@@ -42,13 +43,13 @@ class StructureSerializer(ModelContentSerializer):
 
         if self.detail != SerializerDetail.STRUCTURE_OVERVIEW:
             if SerializerDetail.PROTEIN_DB in detail_filters:
-                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, self.searcher)
+                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, s)
             if SerializerDetail.ENTRY_DB in detail_filters:
-                representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, self.searcher)
+                representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, s)
             if SerializerDetail.PROTEIN_DETAIL in detail_filters:
-                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, self.searcher, True)
+                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, s, True)
             if SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, self.searcher, True)
+                representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, s, True)
 
         return representation
 
@@ -135,8 +136,8 @@ class StructureSerializer(ModelContentSerializer):
             raise ReferenceError('There are not structures for this request')
         return response
 
-    # TODO: Missing the length
-    def to_chains_representation(self, chains):
+    @staticmethod
+    def to_chains_representation(chains):
         if len(chains) < 1:
             raise ReferenceError('Trying to display an empty list of chains')
         return {

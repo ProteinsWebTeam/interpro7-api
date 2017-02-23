@@ -2,8 +2,6 @@ from webfront.models import Entry, Protein, Structure
 from django.db.models import Q
 from functools import reduce
 from operator import or_
-from django.db.models import F
-from django.db.models import Count
 
 
 class QuerysetManager:
@@ -37,32 +35,29 @@ class QuerysetManager:
     def get_solr_query(self, include_search=False):
         q = ""
         for ep in self.filters:
-            # if ep == "search":
-            #     q += " && text:{}".format(self.filters[ep])
-            # else:
-                for k, v in self.filters[ep].items():
-                    if ep == "solr":
-                        q += " && {}:{}".format(k, v)
-                    elif include_search and ep == "search":
-                        q += " && text:*{}*".format(v)
-                    elif k == "source_database__isnull":
+            for k, v in self.filters[ep].items():
+                if ep == "solr":
+                    q += " && {}:{}".format(k, v)
+                elif include_search and ep == "search":
+                    q += " && text:*{}*".format(v)
+                elif k == "source_database__isnull":
+                    q += " && {}{}_db:*".format("!" if v else "", ep)
+                elif k == "accession" or k == "accession__iexact":
+                    q += " && {}_acc:{}".format(ep, v)
+                elif k == "accession__isnull":
+                    # elasticsearch perform better if the "give me all" query runs over a
+                    # low cardinality field such as the _db ones
+                    if ep == 'structure':
+                        q += " && {}{}_acc:*".format("!" if v else "", ep)
+                    else:
                         q += " && {}{}_db:*".format("!" if v else "", ep)
-                    elif k == "accession" or k == "accession__iexact":
-                        q += " && {}_acc:{}".format(ep, v)
-                    elif k == "accession__isnull":
-                        # elasticsearch perform better if the "give me all" query runs over a
-                        # low cardinality field such as the _db ones
-                        if ep == 'structure':
-                            q += " && {}{}_acc:*".format("!" if v else "", ep)
-                        else:
-                            q += " && {}{}_db:*".format("!" if v else "", ep)
-                    elif k == "integrated" or k == "integrated__iexact":
-                        q += " && integrated:{}".format(v)
-                    elif k == "integrated__isnull":
-                        q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
-                    elif ep != "structure":
-                        if k == "source_database" or k == "source_database__iexact":
-                            q += " && {}_db:{}".format(ep, v)
+                elif k == "integrated" or k == "integrated__iexact":
+                    q += " && integrated:{}".format(v)
+                elif k == "integrated__isnull":
+                    q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
+                elif ep != "structure":
+                    if k == "source_database" or k == "source_database__iexact":
+                        q += " && {}_db:{}".format(ep, v)
         return q[4:].lower()
 
     def get_base_queryset(self, endpoint):

@@ -3,7 +3,7 @@ import re
 from rest_framework import status
 from rest_framework.response import Response
 
-from interpro import settings
+from django.conf import settings
 from webfront.views.custom import CustomView
 from webfront.views.entry import EntryHandler
 from webfront.views.protein import ProteinHandler

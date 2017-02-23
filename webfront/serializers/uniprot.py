@@ -26,30 +26,20 @@ class ProteinSerializer(ModelContentSerializer):
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
-        # qs_type = get_queryset_type(instance)
+        s = self.searcher
         if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
             representation["entries"] = self.to_entries_count_representation(instance)
-
-        # if SerializerDetail.ENTRY_MATCH in detail_filters:
-        #     representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, False)
-        # if SerializerDetail.ENTRY_DETAIL in detail_filters:
-        #     representation["entries"] = ProteinSerializer.to_entries_overview_representation(instance, True)
-        # if SerializerDetail.STRUCTURE_HEADERS in detail_filters:
-        #     representation["structures"] = ProteinSerializer.to_structures_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = self.to_structures_count_representation(instance)
-        # if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-        #     if qs_type == QuerysetType.PROTEIN:
-        #         representation["structures"] = ProteinSerializer.to_structures_overview_representation(instance, True)
         if detail != SerializerDetail.PROTEIN_OVERVIEW:
             if SerializerDetail.ENTRY_DB in detail_filters:
-                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.searcher)
+                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, s)
             if SerializerDetail.STRUCTURE_DB in detail_filters:
-                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.searcher)
+                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, s)
             if SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, self.searcher)
+                representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, s)
             if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, self.searcher)
+                representation["structures"] = ProteinSerializer.to_structures_detail_representation(instance, s)
         return representation
 
     def to_full_representation(self, instance):
@@ -57,7 +47,6 @@ class ProteinSerializer(ModelContentSerializer):
             "metadata": self.to_metadata_representation(instance, self.searcher),
             "representation": instance.feature,
             "genomic_context": instance.genomic_context,
-            # "source_database": instance.source_database
         }
 
     @staticmethod
@@ -118,14 +107,14 @@ class ProteinSerializer(ModelContentSerializer):
                ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0):
                 raise ReferenceError('There are not entries for this request')
 
-            instance2 = {"proteins": {
-                            ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket)
-                            for bucket in instance["databases"]["buckets"]
-                        }}
-            instance2["proteins"]["uniprot"] = ProteinSerializer.serialize_counter_bucket(
+            ins2 = {"proteins": {
+                       ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket)
+                       for bucket in instance["databases"]["buckets"]
+                   }}
+            ins2["proteins"]["uniprot"] = ProteinSerializer.serialize_counter_bucket(
                 instance["uniprot"]
             )
-            instance =instance2
+            instance = ins2
         return instance
 
     @staticmethod
@@ -178,7 +167,6 @@ class ProteinSerializer(ModelContentSerializer):
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
         return response
-
 
     @staticmethod
     def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None):

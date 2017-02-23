@@ -11,21 +11,21 @@ from webfront.searcher.solr_controller import SolrController
 
 
 class CustomView(GenericAPIView):
+    # Parent class of all the view handlers on the API, including the GeneralHandler.
+
     # description of the level of the endpoint, for debug purposes
     level_description = 'level'
-    # dict of handlers for lower levels of the endpoint
-    # the key will be regex or string to which the endpoint will be matched
+    # List of tuples for the handlers for lower levels of the endpoint
+    # the firt item of each tuple will be regex or string to which the endpoint will be matched
+    # and the second item is the view handler that should proccess it.
     child_handlers = []
-    # dictionary with the high level endpoints that havent been used yet in the URL
-    available_endpoint_handlers = {}
-    # queryset upon which build new querysets
+    # Default queryset of this view
     queryset = Entry.objects
-    # will be used for the 'using()' part of the queries
-    # django_db = 'interpro_ro'
     # custom pagination class
     pagination_class = CustomPagination
-    # not used now
+    # Each View will be serialized different if it contains many or a single item (List, Object)
     many = True
+    # Some views Might not want to be serialized beyond its object  structure (i.e. from_model=False)
     from_model = True
     # A serializer can have different levels of details. e.g. we can use the same seializer for the list of proteins
     # and protein details showing only the accession in the first case
@@ -81,7 +81,6 @@ class CustomView(GenericAPIView):
                 serializer_detail_filters=general_handler.filter_serializers,
                 queryset_manager=general_handler.queryset_manager,
             )
-            # data_tmp = general_handler.execute_post_serializers(serialized.data)
 
             if self.many:
                 return self.get_paginated_response(serialized.data)
@@ -120,14 +119,13 @@ class CustomView(GenericAPIView):
                 endpoint_levels = endpoint_levels[level:]
                 level = 0
                 if handler is not None:
+                    # Which implies that another endpoint is to be procces and therefore is filtering time.
                     self.filter_entrypoint(handler_name, handler_class, endpoint_levels, endpoints, general_handler)
                     return super(handler, self).get(
                         request, endpoint_levels, endpoints, len(endpoint_levels),
                         parent_queryset, handler, general_handler,
                         *args, **kwargs
                     )
-
-            # general_handler.register_post_serializer(handler_class.post_serializer, level_name)
 
             # delegate to the lower level handler
             return handler_class.as_view()(
@@ -169,7 +167,6 @@ class CustomView(GenericAPIView):
         if self.is_single_endpoint(general_handler):
             self.queryset = general_handler.queryset_manager.get_queryset().distinct()
             obj = self.get_database_contributions(self.queryset)
-            # data_tmp = general_handler.execute_post_serializers(obj)
             return obj
         else:
             extra = [k
@@ -187,14 +184,11 @@ class CustomView(GenericAPIView):
     def filter(queryset, level_name="", general_handler=None):
         return queryset
 
-    # @staticmethod
-    # def post_serializer(obj, level_name="", general_handler=None):
-    #     return obj
-
     def expected_response_is_list(self):
         return self.many
 
-    def is_single_endpoint(self, general_handler):
+    @staticmethod
+    def is_single_endpoint(general_handler):
         return general_handler.filter_serializers == {}
 
     search_size = None

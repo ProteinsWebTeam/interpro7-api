@@ -127,7 +127,7 @@ class CustomView(GenericAPIView):
                         *args, **kwargs
                     )
 
-            general_handler.register_post_serializer(handler_class.post_serializer, level_name)
+            # general_handler.register_post_serializer(handler_class.post_serializer, level_name)
 
             # delegate to the lower level handler
             return handler_class.as_view()(
@@ -140,7 +140,7 @@ class CustomView(GenericAPIView):
         for level in range(len(endpoint_levels)):
             self.queryset = handler_class.filter(self.queryset, endpoint_levels[level], general_handler)
             general_handler.register_filter_serializer(handler_class.serializer_detail_filter, endpoint_levels[level])
-            general_handler.register_post_serializer(handler_class.post_serializer, endpoint_levels[level])
+            # general_handler.register_post_serializer(handler_class.post_serializer, endpoint_levels[level])
             handlers = endpoints + handler_class.child_handlers
 
             try:
@@ -169,8 +169,8 @@ class CustomView(GenericAPIView):
         if self.is_single_endpoint(general_handler):
             self.queryset = general_handler.queryset_manager.get_queryset().distinct()
             obj = self.get_database_contributions(self.queryset)
-            data_tmp = general_handler.execute_post_serializers(obj)
-            return data_tmp
+            # data_tmp = general_handler.execute_post_serializers(obj)
+            return obj
         else:
             extra = [k
                      for k, v in general_handler.filter_serializers.items()
@@ -187,9 +187,9 @@ class CustomView(GenericAPIView):
     def filter(queryset, level_name="", general_handler=None):
         return queryset
 
-    @staticmethod
-    def post_serializer(obj, level_name="", general_handler=None):
-        return obj
+    # @staticmethod
+    # def post_serializer(obj, level_name="", general_handler=None):
+    #     return obj
 
     def expected_response_is_list(self):
         return self.many

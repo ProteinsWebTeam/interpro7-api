@@ -32,6 +32,15 @@ def pagination_information(request):
 
 
 class GeneralHandler(CustomView):
+    # High level view for the API... all th request in the API start by instantiating this Handler
+    # The URL gets evaluated blobk by block in the path (e.g. [block1]/[block2/...])
+    # All the block handlers inherit from CustomView.
+    # A recursion chain gets started at the get method of the GeneralHandler.
+    #
+    # The instance of this class is the only shared object among the view handlers that take
+    # part on building the response, and therefore common functionality has been overloaded in it,
+    # so it is accessible arounf the request procesing. (e.g. queryset management,
+
     http_method_names = ['get']
     level_description = 'home level'
     available_endpoint_handlers = [
@@ -52,7 +61,7 @@ class GeneralHandler(CustomView):
     pagination = None
 
     def get(self, request, url='', *args, **kwargs):
-        self.post_serializers = {}
+        # self.post_serializers = {}
         self.filter_serializers = {}
         self.endpoint_levels = endpoint_levels = map_url_to_levels(url)
         self.pagination = pagination_information(request)
@@ -77,27 +86,27 @@ class GeneralHandler(CustomView):
             content = {'Error': e.args[0]}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
 
-    post_serializers = {}
-    current_endpoint = None
-    main_endpoint = None
-
-    def register_post_serializer(self, post_serializer, value):
-        if value in [e[0] for e in self.available_endpoint_handlers]:
-            self.current_endpoint = value
-            if len(self.post_serializers) == 0:
-                self.main_endpoint = value
-        if self.current_endpoint is not None:
-            self.post_serializers[self.current_endpoint] = {
-                "post_serializer": post_serializer,
-                "value": value
-            }
-
-    def execute_post_serializers(self, data):
-        pss = list(self.post_serializers.items())
-        pss.sort(key=lambda e: self.endpoint_levels.index(e[0]))
-        for key, ps in pss:
-            data = ps["post_serializer"](data, ps["value"], self)
-        return data
+    # post_serializers = {}
+    # current_endpoint = None
+    # main_endpoint = None
+    #
+    # def register_post_serializer(self, post_serializer, value):
+    #     if value in [e[0] for e in self.available_endpoint_handlers]:
+    #         self.current_endpoint = value
+    #         if len(self.post_serializers) == 0:
+    #             self.main_endpoint = value
+    #     if self.current_endpoint is not None:
+    #         self.post_serializers[self.current_endpoint] = {
+    #             "post_serializer": post_serializer,
+    #             "value": value
+    #         }
+    #
+    # def execute_post_serializers(self, data):
+    #     pss = list(self.post_serializers.items())
+    #     pss.sort(key=lambda e: self.endpoint_levels.index(e[0]))
+    #     for key, ps in pss:
+    #         data = ps["post_serializer"](data, ps["value"], self)
+    #     return data
 
     filter_serializers = {}
     current_filter_endpoint = None

@@ -49,6 +49,7 @@ class SearchController(metaclass=abc.ABCMeta):
     def clear_all_docs(self):
         raise NotImplementedError('users must define execute_query to use this base class')
 
+    # TODO: check if we can do that only once when building the data instead, to remove it here
     @staticmethod
     def to_dbcodes(q):
         re.sub(r'pfam', "p", "some pFam ", flags=re.IGNORECASE)

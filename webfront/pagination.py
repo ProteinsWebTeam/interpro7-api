@@ -19,7 +19,6 @@ class CustomPagination(PageNumberPagination):
     max_page_size = 200
     ordering = '-accession'
     django_paginator_class = CustomPaginator
-    search_size=0
 
     # def get_paginated_response(self, data):
     #     return Response(OrderedDict([

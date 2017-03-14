@@ -212,8 +212,6 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             for structure in response.data["results"]:
                 for match in structure["entries"]:
                     self._check_entry_structure_details(match)
-                    self._check_entry_details(match["entry"])
-                    self.assertIn(match["entry"]["accession"], urls[url])
 
     def test_can_get_entries_from_structure_id_interpro_ids(self):
         pdb_1 = "1JM7"
@@ -250,7 +248,6 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["entries"]), 1,
                              "The number of entries should be 1. URL: [{}]".format(url))
             self._check_entry_structure_details(response.data["entries"][0])
-            self._check_entry_details(response.data["entries"][0]["entry"])
 
     def test_urls_that_should_fail(self):
         pdb_2 = "2BKM"

@@ -16,7 +16,6 @@ import time
 
 # global array
 from release.management.commands.random_solr_documents import RandomDocumentGenerator
-from webfront.models import ProteinEntryFeature
 
 errors = []
 
@@ -29,7 +28,7 @@ def get_id(*args):
     return "-".join([a for a in args if a is not None])
 
 
-def attach_coordinates(con, obj, is_for_interpro_entries):
+def attach_coordinates(con, obj, protein_length, is_for_interpro_entries):
     cur = con.cursor()
     if is_for_interpro_entries:
         sql = """  SELECT *
@@ -42,13 +41,20 @@ def attach_coordinates(con, obj, is_for_interpro_entries):
 
     cur.execute(sql.format(obj["entry_acc"], obj["protein_acc"]))
     col = get_column_dict_from_cursor(cur)
-    obj["entry_protein_coordinates"] = json.dumps(
-        [{"protein": [row[col["POS_FROM"]], row[col["POS_TO"]]]} for row in cur]
-    )
-    return attach_structure_coordinates(con, obj)
+    obj["entry_protein_coordinates"] = {
+        "protein_length": protein_length,
+        "coordinates": [
+            [  # Included in a second array to support the future support of discontinuous domains
+               # see  https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=34998332
+                [row[col["POS_FROM"]], row[col["POS_TO"]]]
+                for row in cur
+            ]
+        ]
+    }
+    return attach_structure_coordinates(con, obj, protein_length)
 
 
-def attach_structure_coordinates(con, obj):
+def attach_structure_coordinates(con, obj, protein_length):
     if "structure_acc" in obj and obj["structure_acc"] is not None:
         cur = con.cursor()
         sql = """ SELECT *
@@ -57,27 +63,34 @@ def attach_structure_coordinates(con, obj):
             .format(obj["structure_acc"], obj["protein_acc"], obj["chain"])
         cur.execute(sql)
         col = get_column_dict_from_cursor(cur)
-        obj["protein_structure_coordinates"] = json.dumps(
-            [{"protein": [row[col["BEG_SEQ"]], row[col["END_SEQ"]]]} for row in cur]
-        )
+        obj["protein_structure_coordinates"] = {
+            "protein_length": protein_length,
+            "coordinates": [
+                [row[col["BEG_SEQ"]], row[col["END_SEQ"]]]
+                for row in cur
+            ]
+        }
 
     return obj
 
+
 def get_object_from_row(con, row, col, is_for_interpro_entries=True):
+    codes = get_dbcodes(con)
+    ep = get_entry_types(con)
     obj = attach_coordinates(con, {
-        "text": row[col["ENTRY_AC"]]+" "+row[col["PROTEIN_AC"]],
+        "text": " ".join([str(r) for r in row]),
         "entry_acc": row[col["ENTRY_AC"]],
-        "entry_type": row[col["ENTRY_TYPE"]],
-        "entry_db": "interpro" if is_for_interpro_entries else row[col["ENTRY_DB"]],
+        "entry_type": ep[row[col["ENTRY_TYPE"]]],
+        "entry_db": "interpro" if is_for_interpro_entries else codes[row[col["ENTRY_DB"]]],
         "integrated": None if is_for_interpro_entries else row[col["INTEGRATED"]],
         "protein_acc": row[col["PROTEIN_AC"]],
-        "protein_db": row[col["PROTEIN_DB"]],
+        "protein_db": codes[row[col["PROTEIN_DB"]]],
         "tax_id": row[col["TAX_ID"]],
         "structure_acc": row[col["STRUCTURE_AC"]] if row[col["STRUCTURE_AC"]] is not None else None,
         "chain": row[col["CHAIN"]] if row[col["CHAIN"]] is not None else None,
         "structure_chain": row[col["STRUCTURE_AC"]] + " - " + row[col["CHAIN"]] if row[col["STRUCTURE_AC"]] is not None else None,
         "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
-    }, is_for_interpro_entries)
+    }, row[col["LEN"]], is_for_interpro_entries)
     return {k: v.lower() if type(v) == str else v for k, v in obj.items()}
 
 
@@ -87,31 +100,46 @@ def chunks(iterable, max=1000):
         yield chain([first], islice(iterator, max - 1))
 
 query_for_interpro_entries = '''SELECT DISTINCT
-    e.ENTRY_AC, e.ENTRY_TYPE,
-    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID,
-    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN
+    e.ENTRY_AC, e.ENTRY_TYPE, e.NAME, e.SHORT_NAME,
+    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID, p.LEN as LEN,
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN, (
+      SELECT c.TEXT
+      FROM INTERPRO.ENTRY2COMMON ec JOIN INTERPRO.COMMON_ANNOTATION c ON c.ANN_ID=ec.ANN_ID
+      WHERE ENTRY_AC=e.ENTRY_AC AND ROWNUM <= 1
+    ) as DESCRIPTION,
+    ROWNUM as rnum
   FROM INTERPRO.ENTRY e
     JOIN  INTERPRO.SUPERMATCH pe ON e.ENTRY_AC=pe.ENTRY_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=p.PROTEIN_AC
   WHERE ROWNUM <= {} {}'''
 
-query_for_memberdb_entries = '''SELECT
-    e.METHOD_AC as ENTRY_AC, e.SIG_TYPE as ENTRY_TYPE, e.DBCODE as ENTRY_DB, em.ENTRY_AC as INTEGRATED,
-    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID,
-    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN
+query_for_memberdb_entries = '''SELECT DISTINCT
+    e.METHOD_AC as ENTRY_AC, e.SIG_TYPE as ENTRY_TYPE, e.DBCODE as ENTRY_DB,
+    e.NAME, e.DESCRIPTION, e.ABSTRACT as SHORT_NAME,
+    em.ENTRY_AC as INTEGRATED,
+    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID, p.LEN as LEN,
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN,
+    ROWNUM as rnum
   FROM INTERPRO.METHOD e
     JOIN INTERPRO.MATCH pe ON e.METHOD_AC=pe.METHOD_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
     LEFT JOIN INTERPRO.ENTRY2METHOD em ON em.METHOD_AC=e.METHOD_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=pe.PROTEIN_AC
-  WHERE ROWNUM <= {} {}'''
+  WHERE pe.DBCODE=e.DBCODE AND ROWNUM <= {} {}'''
+
+offset_query = "SELECT * FROM ({}) WHERE rnum>={}"
 
 
-def get_from_db(con, ends, where='', is_for_interpro_entries=True):
+def get_from_db(con, ends, where='', is_for_interpro_entries=True, offset=0):
     cur = con.cursor()
     sql = query_for_interpro_entries if is_for_interpro_entries else query_for_memberdb_entries
-    cur.execute(sql.format(ends, where))
+    sql = sql.format(ends, where)
+    if offset > 0:
+        sql = offset_query.format(sql, offset)
+    print(sql)
+    cur.execute(sql)
+    print("-- EXECUTED --")
     col = get_column_dict_from_cursor(cur)
     return tqdm(
         (get_object_from_row(con, row, col, is_for_interpro_entries) for row in cur),
@@ -130,24 +158,53 @@ conditions = [
     "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T'",
 ]
 
-dbcodes = ["H", "M", "R", "V", "g", "B", "P", "X", "N", "J", "Y", "U", "D", "Q", "F"]
+dbcodes = None
+entry_types = None
 
 
-def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr=True):
+def get_dbcodes(con):
+    global dbcodes
+    if dbcodes is not None:
+        return dbcodes
+    cur = con.cursor()
+    sql = "SELECT * FROM INTERPRO.CV_DATABASE"
+    cur.execute(sql)
+    dbcodes = {row[0]: row[3] for row in cur}
+    return dbcodes
+
+
+def get_entry_types(con):
+    global entry_types
+    if entry_types is not None:
+        return entry_types
+    cur = con.cursor()
+    sql = "SELECT * FROM INTERPRO.CV_ENTRY_TYPE"
+    cur.execute(sql)
+    entry_types = {row[0]: row[1] for row in cur}
+    return entry_types
+
+
+def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr=True, offset=0):
     t = time.time()
     ipro = DATABASES['interpro_ro']
     con = cx_Oracle.connect(ipro['USER'], ipro['PASSWORD'], cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']))
 
     try:
-        solr = pysolr.Solr(SEARCHER_URL, timeout=10)
+        solr = None
+        codes = get_dbcodes(con)
+        get_entry_types(con)
         where = ''
         if is_for_interpro_entries:
             where = conditions[subset]
-        elif subset in dbcodes:
-            where = "AND e.DBCODE='{}'".format(subset)
+        elif subset in codes.keys():
+            where = "AND pe.DBCODE='{}'".format(subset)
+        elif type(subset) == str:
+            print("Not a valid database. Options:", codes.keys())
         part = 0
-        for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries), bs):
+        for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries, offset), bs):
             if submit_to_solr:
+                if solr is None:
+                    solr = pysolr.Solr(SEARCHER_URL, timeout=10)
                 add_to_solr(solr, chunk, commit=False)
             else:
                 f = open("ipro_tst_{}_{}_{:06}.json".format(
@@ -160,7 +217,8 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
                 part += 1
     finally:
         con.close()
-        solr.commit()
+        if solr is not None:
+            solr.commit()
 
     t2 = time.time()
     print("TIME: :", t2-t)
@@ -298,5 +356,6 @@ class Command(BaseCommand):
                 bs,
                 subset=subset,
                 is_for_interpro_entries=(t == 0),
-                submit_to_solr=not options["files"]
+                submit_to_solr=not options["files"],
+                offset=options["resume_at"]
             )

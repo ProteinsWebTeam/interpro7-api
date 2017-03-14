@@ -12,8 +12,8 @@
         "entry_type": {"type":  "keyword"},
         "tax_id": {"type":  "long"},
         "structure_chain": {"type":  "keyword"},
-        "protein_structure_coordinates": {"type":  "text"},
-        "entry_protein_coordinates": {"type":  "text"},
+        "protein_structure_coordinates": { "type": "object", "enabled" : false},
+        "entry_protein_coordinates": { "type": "object", "enabled" : false},
         "text": {"type":  "text"},
         "id": {"type":  "keyword"}
       }

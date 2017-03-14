@@ -476,6 +476,15 @@ class Protein(models.Model):
         db_table = '"INTERPRO"."protein"'
 
 
+class ProteinIDA(models.Model):
+    protein_ac = models.ForeignKey(Protein, db_column='protein_ac', primary_key=True)
+    ida = models.CharField(max_length=70)
+
+    class Meta:
+        managed = False
+        db_table = '"INTERPRO"."protein_ida"'
+
+
 class StructClass(models.Model):
     domain_id = models.CharField(primary_key=True, max_length=14)
     fam_id = models.CharField(max_length=20, blank=True, null=True)

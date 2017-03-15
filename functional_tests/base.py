@@ -34,7 +34,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.fr.clear_search_engine()
+        # cls.fr.clear_search_engine()
         if cls.server_url == cls.live_server_url:
             super().tearDownClass()
 

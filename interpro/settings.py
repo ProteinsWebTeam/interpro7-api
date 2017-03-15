@@ -132,7 +132,7 @@ DATABASES = {
         'PORT': ORACLE_CONFIG.get('port', 1540),
     },
 }
-SEARCHER_URL = 'http://hmmer-prod-db01:9200/interpro/relationship'
+SEARCHER_URL = 'http://localhost:9200/test/relationship'
 SEARCHER_TEST_URL = INTERPRO_CONFIG.get('searcher_test', 'http://127.0.0.1:8983/solr/test')
 # HAYSTACK_CONNECTIONS = {
 #     'default': {

@@ -62,16 +62,20 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/structure/pdb/protein/uniprot")
         self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
         for result in response.data["results"]:
-            self.assertEqual(len(result["proteins"]), len(data_in_fixtures[result["metadata"]["accession"]]))
+            self.assertEqual(
+                len(result["proteins"]),
+                len(data_in_fixtures[result["metadata"]["accession"]]),
+                "different length while testing {}".format(result["metadata"]["accession"])
+            )
             for match in result["proteins"]:
-                self.assertIn(match["accession"], data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_swissprot_from_pdb_structures(self):
         response = self.client.get("/api/structure/pdb/protein/swissprot")
         for result in response.data["results"]:
             for match in result["proteins"]:
-                self.assertIn(match["accession"], data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_uniprot_matches_from_structures(self):
@@ -82,7 +86,7 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["proteins"]), len(tests[url]))
             for match in response.data["proteins"]:
                 self._check_structure_chain_details(match)
-            ids = [x["accession"] for x in response.data["proteins"]]
+            ids = [x["accession"].upper() for x in response.data["proteins"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_can_get_uniprot_matches_from_structures_chain(self):
@@ -92,7 +96,7 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
             for match in response.data["proteins"]:
                 self._check_structure_chain_details(match)
-                self.assertIn(match["accession"], tests[url])
+                self.assertIn(match["accession"].upper(), tests[url])
 
 
 class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
@@ -115,8 +119,7 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["proteins"]), len(tests[url]))
             for match in response.data["proteins"]:
                 self._check_structure_chain_details(match)
-                self._check_protein_details(match["protein"])
-            ids = [x["protein"]["accession"] for x in response.data["proteins"]]
+            ids = [x["accession"].upper() for x in response.data["proteins"]]
             self.assertEqual(tests[url], ids)
 
     def test_can_get_proteins_from_structure_db_protein_id(self):
@@ -136,7 +139,6 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
                 self.assertIn("proteins", structure, "'proteins' should be one of the keys in the response")
                 for match in structure["proteins"]:
                     self._check_structure_chain_details(match)
-                    self._check_protein_details(match["protein"])
             ids = [x["metadata"]["accession"] for x in response.data["results"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 

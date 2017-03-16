@@ -1,0 +1,376 @@
+[
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "protein": "A1CUJ5",
+      "coordinates": [{"protein":[27,80]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "PF02171",
+      "protein": "A1CUJ5",
+      "coordinates": [{"protein":[17,70]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "SM00950",
+      "protein": "A1CUJ5",
+      "coordinates": [{"protein":[37,90]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "protein": "P16582",
+      "coordinates": [{"protein":[48,101]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "PS50822",
+      "protein": "P16582",
+      "coordinates": [{"protein":[48,101]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "PF17180",
+      "protein": "M5ADK6",
+      "coordinates": [{"protein":[48,101]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "IPR001165",
+      "protein": "A1CUJ5",
+      "coordinates": [{"protein":[148,201]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "PF17176",
+      "protein": "A1CUJ5",
+      "coordinates": [{"protein":[48,101]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "A1CUJ5",
+      "structure": "1JM7",
+      "chain": "A",
+      "length": 112,
+      "organism": {
+        "name": "Homo sapiens (Human)",
+        "taxid": 9606
+      },
+      "coordinates": [{"protein":[27,80], "structure":[1,53]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "M5ADK6",
+      "structure": "1JM7",
+      "chain": "B",
+      "length": 117,
+      "organism": {
+        "name": "Homo sapiens (Human)",
+        "taxid": 9606
+      },
+      "coordinates": [{"protein":[26,140], "structure":[1, 114]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "M5ADK6",
+      "structure": "2BKM",
+      "chain": "B",
+      "length": 117,
+      "organism": {
+        "name": "Homo sapiens (Human)",
+        "taxid": 9606
+      },
+      "coordinates": [{"protein":[56,130], "structure":[1,74]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "A0A0A2L2G2",
+      "structure": "2BKM",
+      "chain": "A",
+      "length": 128,
+      "organism": {
+        "name": "Geobacillus kaustophilus (strain HTA426)",
+        "taxid": 235909
+      },
+      "coordinates": [{"protein":[3,130], "structure":[10,137]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "A",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "B",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "C",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "D",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "P16582",
+      "structure": "1T2V",
+      "chain": "E",
+      "length": 214,
+      "organism": {
+        "name": "Sus scrofa (Pig)",
+        "taxid": 9823
+      },
+      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "A0A0A2L2G2",
+      "structure": "1JZ8",
+      "chain": "A",
+      "length": 228,
+      "organism": {
+        "name": "Geobacillus kaustophilus (strain HTA426)",
+        "taxid": 235909
+      },
+      "coordinates": [{"protein":[50,130], "structure":[600,137]}]
+    }
+  },
+  {
+    "model": "webfront.ProteinStructureFeature",
+    "fields": {
+      "protein": "A0A0A2L2G2",
+      "structure": "1JZ8",
+      "chain": "B",
+      "length": 228,
+      "organism": {
+        "name": "Geobacillus kaustophilus (strain HTA426)",
+        "taxid": 235909
+      },
+      "coordinates": [{"protein":[50,130], "structure":[600,137]}]
+    }
+  },
+
+
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR001165",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[30,60], "structure":[1,53]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "A",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "B",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "C",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "D",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1T2V",
+      "chain": "E",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "IPR003165",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[20,50], "structure":[1,53]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "A",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "B",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "C",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "D",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PS50822",
+      "structure": "1T2V",
+      "chain": "E",
+      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PF02171",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[30,50], "structure":[20,40]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "SM00950",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[20,50], "structure":[20,50]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PF17180",
+      "structure": "2BKM",
+      "chain": "B",
+      "coordinates": [{"entry":[6,30], "structure":[46,70]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PF17180",
+      "structure": "1JM7",
+      "chain": "B",
+      "coordinates": [{"entry":[1,40], "structure":[21,60]}]
+    }
+  },
+  {
+    "model": "webfront.EntryStructureFeature",
+    "fields": {
+      "entry": "PF17176",
+      "structure": "1JM7",
+      "chain": "A",
+      "coordinates": [{"entry":[2,32], "structure":[22,52]}]
+    }
+  }
+
+]

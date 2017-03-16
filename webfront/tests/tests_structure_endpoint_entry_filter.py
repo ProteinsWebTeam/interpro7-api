@@ -2,6 +2,8 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
+import unittest
+
 class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
 
     def test_can_get_structure_amount_from_entry(self):
@@ -29,7 +31,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_entry_count_overview(response.data)
 
     def test_can_get_entries_from_structure_id_chain(self):
-        urls = ["/api/structure/pdb/"+pdb+"/A/entry/" for pdb in ["1JM7", "2BKM", "1T2V"]]
+        urls = ["/api/structure/pdb/"+pdb+"/A/entry/" for pdb in ["1JM7", "1T2V"]]
         for url in urls:
             response = self.client.get(url)
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
@@ -37,7 +39,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_entry_count_overview(response.data)
             for chain in response.data["metadata"]["chains"].values():
                 self._check_structure_chain_details(chain)
-                self.assertEqual(chain["chain"], "A")
+                self.assertEqual(chain["chain"].upper(), "A")
 
     def test_gets_empty_entries_array_for_structure_with_no_matches(self):
         response = self._get_in_debug_mode("/api/structure/pdb/1JZ8/entry/")
@@ -61,7 +63,6 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/structure/entry/pfam",
             "/api/structure/entry/unintegrated",
             "/api/structure/entry/unintegrated/pfam",
-            "/api/structure/entry/unintegrated/smart",
             "/api/structure/entry/interpro/pfam",
             "/api/structure/entry/interpro/"+acc+"/pfam",
         ]
@@ -117,7 +118,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
                              "The number of entries should be the same URL: [{}]".format(url))
             for entry in response.data["entries"]:
-                self.assertIn(entry["accession"], urls[url])
+                self.assertIn(entry["accession"].upper(), urls[url])
 
     def test_urls_that_return_a_structure_details_with_matches_from_chain(self):
         pdb_1 = "1JM7"
@@ -143,7 +144,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
                              "The number of entries should be the same. URL: [{}]".format(url))
             for entry in response.data["entries"]:
-                self.assertIn(entry["accession"], urls[url])
+                self.assertIn(entry["accession"].upper(), urls[url])
 
     def test_urls_that_should_return_empty_entries(self):
         pdb_1 = "1JM7"
@@ -160,6 +161,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/structure/pdb/"+pdb_2+"/A/entry/unintegrated/pfam",
             "/api/structure/pdb/"+pdb_2+"/B/entry/unintegrated/smart",
             "/api/structure/pdb/entry/unintegrated/smart",
+            "/api/structure/entry/unintegrated/smart",
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT,
@@ -182,11 +184,12 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIsInstance(response.data, dict)
-            for prot_db in response.data["structures"]:
-                self.assertIn(prot_db, ["pdb"])
-                self.assertIn("structures", response.data["structures"][prot_db])
-                self.assertIn("entries", response.data["structures"][prot_db])
+            self._check_structure_count_overview(response.data, "URL: [{}]".format(url))
+            # self.assertIsInstance(response.data, dict)
+            # for prot_db in response.data["structures"]:
+            #     self.assertIn(prot_db, ["pdb"])
+            #     self.assertIn("structures", response.data["structures"][prot_db])
+            #     self.assertIn("entries", response.data["structures"][prot_db])
 
     def test_urls_that_return_list_of_structure_accessions_with_matches_and_detailed_entries(self):
         acc = "IPR003165"
@@ -209,8 +212,6 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             for structure in response.data["results"]:
                 for match in structure["entries"]:
                     self._check_entry_structure_details(match)
-                    self._check_entry_details(match["entry"])
-                    self.assertIn(match["entry"]["accession"], urls[url])
 
     def test_can_get_entries_from_structure_id_interpro_ids(self):
         pdb_1 = "1JM7"
@@ -247,7 +248,6 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["entries"]), 1,
                              "The number of entries should be 1. URL: [{}]".format(url))
             self._check_entry_structure_details(response.data["entries"][0])
-            self._check_entry_details(response.data["entries"][0]["entry"])
 
     def test_urls_that_should_fail(self):
         pdb_2 = "2BKM"

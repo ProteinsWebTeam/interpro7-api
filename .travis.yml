@@ -1,7 +1,10 @@
+sudo: required
+dist: trusty
 language: python
 python:
   - "3.5"
 before_install:
+  - jdk_switcher use oraclejdk8
   - "wget https://www.ebi.ac.uk/~luciani/Oracle/oracle.zip && unzip oracle.zip -d oracle"
   - "sh -e /etc/init.d/xvfb start"
   - "export DISPLAY=:99.0"
@@ -9,9 +12,15 @@ before_install:
   - "export LD_LIBRARY_PATH=$(pwd)/oracle/"
   - "export DYLD_LIBRARY_PATH=$(pwd)/oracle/"
   - sleep 3
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb && sudo service elasticsearch restart
+services:
+  - elasticsearch
 install:
   - pip install -r requirements.txt
   - pip install -r dev_requirements.txt
+before_script:
+  - sleep 10
+  - curl -XPUT 'localhost:9200/test?pretty' -d @config/elastic_mapping.json
 script:
   - coverage run --source='.' manage.py test
 after_success:
@@ -20,3 +29,4 @@ branches:
   only:
     - master
     - new_datawarehouse
+    - elastic_exploration

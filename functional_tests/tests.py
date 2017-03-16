@@ -4,8 +4,6 @@ import re
 
 
 class RESTRequestsTest(FunctionalTest):
-    fixtures = ['webfront/tests/fixtures.json', 'webfront/tests/protein_fixtures.json']
-
     def test_request_entry_endpoint(self):
         self.browser.get(self.server_url + "/api/entry/?format=json")
         content = self.browser.find_element_by_tag_name('body').text

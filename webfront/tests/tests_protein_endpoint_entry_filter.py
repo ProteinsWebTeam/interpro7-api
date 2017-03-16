@@ -2,6 +2,9 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
+import unittest
+
+
 class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
 
     def test_can_get_protein_amount_from_entry(self):
@@ -65,7 +68,6 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/protein/entry/pfam",
             "/api/protein/entry/unintegrated",
             "/api/protein/entry/unintegrated/pfam",
-            "/api/protein/entry/unintegrated/smart",
             "/api/protein/entry/interpro/pfam",
             "/api/protein/entry/interpro/"+acc+"/pfam",
         ]
@@ -120,7 +122,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
             self.assertEqual(len(response.data["entries"]), len(urls[url]),
                              "The number of entries should be the same URL: [{}]".format(url))
-            self.assertIn(response.data["entries"][0]["accession"], urls[url])
+            self.assertIn(response.data["entries"][0]["accession"].upper(), urls[url])
 
     def test_urls_that_should_fails(self):
         tr_1 = "P16582"
@@ -135,6 +137,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
     def test_urls_that_should_fails_with_no_content(self):
         tr_1 = "P16582"
         tests = [
+            "/api/protein/entry/unintegrated/smart",
             "/api/protein/uniprot/entry/unintegrated/smart",
             "/api/protein/uniprot/"+tr_1+"/entry/unintegrated",
             ]
@@ -158,11 +161,7 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIsInstance(response.data, dict)
-            for prot_db in response.data["proteins"]:
-                self.assertIn(prot_db, ["uniprot", "swissprot", "trembl"])
-                self.assertIn("proteins", response.data["proteins"][prot_db])
-                self.assertIn("entries", response.data["proteins"][prot_db])
+            self._check_protein_count_overview(response.data)
 
     def test_can_get_entries_from_protein_id_interpro_ids(self):
         acc = "A1CUJ5"
@@ -194,7 +193,7 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             for protein in response.data["results"]:
                 for match in protein["entries"]:
                     self._check_match(match)
-                    self._check_entry_details(match["entry"])
+                    # self._check_entry_details(match["entry"])
 
     def test_urls_that_return_a_protein_details_with_matches(self):
         sp_1 = "M5ADK6"
@@ -219,15 +218,14 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             # self.assertEqual(len(response.data["entries"]), 1,
             #                  "The number of entries should be 1. URL: [{}]".format(url))
             self._check_match(response.data["entries"][0])
-            self._check_entry_details(response.data["entries"][0]["entry"])
+            # self._check_entry_details(response.data["entries"][0]["entry"])
 
     def test_can_get_entries_from_protein_id_pfam_id(self):
         acc = "A1CUJ5"
         pfam = "PF02171"
         response = self.client.get("/api/protein/uniprot/"+acc+"/entry/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # TODO: it is returning 2 entries. FIX!!
-        # self._check_single_entry_response(response)
+        self._check_single_entry_response(response)
 
     def test_urls_that_should_fails_with_no_content(self):
         tr_1 = "P16582"

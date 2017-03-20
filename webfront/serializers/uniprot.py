@@ -173,7 +173,7 @@ class ProteinSerializer(ModelContentSerializer):
         key_coord = "entry_protein_coordinates" if for_entry else "protein_structure_coordinates"
         header = {
             "accession": obj["protein_acc"],
-            "coordinates": obj[key_coord],
+            key_coord: obj[key_coord],
             # "name": "PTHP_BUCAI",
             # "length": 85,
             "source_database": obj["protein_db"],

@@ -201,7 +201,7 @@ class EntrySerializer(ModelContentSerializer):
     def get_entry_header_from_solr_object(obj, for_structure=False, include_entry=False, solr=None):
         header = {
             "accession": obj["entry_acc"],
-            "coordinates": obj["entry_protein_coordinates"],
+            "entry_protein_coordinates": obj["entry_protein_coordinates"],
             # "name": "PTHP_BUCAI",
             # "length": 85,
             "source_database": obj["entry_db"],
@@ -210,6 +210,7 @@ class EntrySerializer(ModelContentSerializer):
         if for_structure:
             header["chain"] = obj["chain"]
             header["protein"] = obj["protein_acc"]
+            header["protein_structure_coordinates"] = obj["protein_structure_coordinates"]
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(
                 Entry.objects.get(accession=obj["entry_acc"].upper()), solr

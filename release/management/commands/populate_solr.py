@@ -42,7 +42,7 @@ def attach_coordinates(con, obj, protein_length, is_for_interpro_entries):
     cur.execute(sql.format(obj["entry_acc"], obj["protein_acc"]))
     col = get_column_dict_from_cursor(cur)
     obj["entry_protein_coordinates"] = {
-        "protein_length": protein_length,
+        "length": protein_length,
         "coordinates": [
             [  # Included in a second array to support the future support of discontinuous domains
                # see  https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=34998332
@@ -64,7 +64,7 @@ def attach_structure_coordinates(con, obj, protein_length):
         cur.execute(sql)
         col = get_column_dict_from_cursor(cur)
         obj["protein_structure_coordinates"] = {
-            "protein_length": protein_length,
+            "length": protein_length,
             "coordinates": [
                 [row[col["BEG_SEQ"]], row[col["END_SEQ"]]]
                 for row in cur

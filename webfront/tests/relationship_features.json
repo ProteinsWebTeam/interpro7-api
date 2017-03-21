@@ -4,7 +4,7 @@
     "fields": {
       "entry": "IPR003165",
       "protein": "A1CUJ5",
-      "coordinates": [{"protein":[27,80]}]
+      "coordinates": {"length": 543, "coordinates": [[[27,80]]]}
     }
   },
   {
@@ -12,7 +12,7 @@
     "fields": {
       "entry": "PF02171",
       "protein": "A1CUJ5",
-      "coordinates": [{"protein":[17,70]}]
+      "coordinates": {"length": 543, "coordinates": [[[17,70], [92,110]]]}
     }
   },
   {
@@ -20,7 +20,7 @@
     "fields": {
       "entry": "SM00950",
       "protein": "A1CUJ5",
-      "coordinates": [{"protein":[37,90]}]
+      "coordinates": {"length": 543, "coordinates": [[[37,90]]]}
     }
   },
   {
@@ -28,7 +28,7 @@
     "fields": {
       "entry": "IPR003165",
       "protein": "P16582",
-      "coordinates": [{"protein":[48,101]}]
+      "coordinates": {"length": 696, "coordinates": [[[48,101]]]}
     }
   },
   {
@@ -36,7 +36,7 @@
     "fields": {
       "entry": "PS50822",
       "protein": "P16582",
-      "coordinates": [{"protein":[48,101]}]
+      "coordinates": {"length": 696, "coordinates": [[[48,91],[95,99]],[[148,191],[195,199]]]}
     }
   },
   {
@@ -44,7 +44,7 @@
     "fields": {
       "entry": "PF17180",
       "protein": "M5ADK6",
-      "coordinates": [{"protein":[48,101]}]
+      "coordinates": {"length": 297, "coordinates": [[[48,101]]]}
     }
   },
   {
@@ -52,7 +52,7 @@
     "fields": {
       "entry": "IPR001165",
       "protein": "A1CUJ5",
-      "coordinates": [{"protein":[148,201]}]
+      "coordinates": {"length": 543, "coordinates": [[[148,201]]]}
     }
   },
   {
@@ -60,7 +60,7 @@
     "fields": {
       "entry": "PF17176",
       "protein": "A1CUJ5",
-      "coordinates": [{"protein":[48,101]}]
+      "coordinates": {"length": 543, "coordinates": [[[48,101]]]}
     }
   },
   {
@@ -69,12 +69,12 @@
       "protein": "A1CUJ5",
       "structure": "1JM7",
       "chain": "A",
-      "length": 112,
+      "length": 53,
       "organism": {
         "name": "Homo sapiens (Human)",
         "taxid": 9606
       },
-      "coordinates": [{"protein":[27,80], "structure":[1,53]}]
+      "coordinates": {"length":543, "coordinates":[[[1,53]]]}
     }
   },
   {
@@ -88,7 +88,7 @@
         "name": "Homo sapiens (Human)",
         "taxid": 9606
       },
-      "coordinates": [{"protein":[26,140], "structure":[1, 114]}]
+      "coordinates": {"length":297, "coordinates":[[[1, 114]]]}
     }
   },
   {
@@ -102,7 +102,7 @@
         "name": "Homo sapiens (Human)",
         "taxid": 9606
       },
-      "coordinates": [{"protein":[56,130], "structure":[1,74]}]
+      "coordinates": {"length":297, "coordinates":[[[1,74]]]}
     }
   },
   {
@@ -116,7 +116,7 @@
         "name": "Geobacillus kaustophilus (strain HTA426)",
         "taxid": 235909
       },
-      "coordinates": [{"protein":[3,130], "structure":[10,137]}]
+      "coordinates": {"length":550, "coordinates":[[[10,137]]]}
     }
   },
   {
@@ -130,7 +130,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+      "coordinates": {"length":696, "coordinates":[[[146,359]]]}
     }
   },
   {
@@ -144,7 +144,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+      "coordinates": {"length":696, "coordinates":[[[146,359]]]}
     }
   },
   {
@@ -158,7 +158,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+      "coordinates": {"length":696, "coordinates":[[[146,359]]]}
     }
   },
   {
@@ -172,7 +172,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+      "coordinates": {"length":696, "coordinates":[[[146,359]]]}
     }
   },
   {
@@ -186,7 +186,7 @@
         "name": "Sus scrofa (Pig)",
         "taxid": 9823
       },
-      "coordinates": [{"protein":[646,859], "structure":[146,359]}]
+      "coordinates": {"length":696, "coordinates":[[[146,359]]]}
     }
   },
   {
@@ -200,7 +200,7 @@
         "name": "Geobacillus kaustophilus (strain HTA426)",
         "taxid": 235909
       },
-      "coordinates": [{"protein":[50,130], "structure":[600,137]}]
+      "coordinates": {"length":550, "coordinates":[[[600,137]]]}
     }
   },
   {
@@ -214,7 +214,7 @@
         "name": "Geobacillus kaustophilus (strain HTA426)",
         "taxid": 235909
       },
-      "coordinates": [{"protein":[50,130], "structure":[600,137]}]
+      "coordinates": {"length":550, "coordinates":[[[600,137]]]}
     }
   },
 

@@ -105,7 +105,11 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("counters", obj)
 
     def _check_match(self, obj, msg=""):
-        self.assertIn("coordinates", obj, msg)
+        try:
+            self.assertIn("entry_protein_coordinates", obj, msg)
+        except Exception:
+            self.assertIn("protein_structure_coordinates", obj, msg)
+
         # self.assertIsInstance(obj["coordinates"], list, msg)
         # TODO: Find a way to check JSON from elasticsearch
         self.assertIn("accession", obj, msg)
@@ -127,13 +131,12 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("counters", obj)
 
     def _check_structure_chain_details(self, obj):
-        self.assertIn("coordinates", obj)
-        # TODO: add structure length to Solr
-        # self.assertIn("length", obj)
+        self.assertIn("protein_structure_coordinates", obj)
         self.assertIn("organism", obj)
 
     def _check_entry_structure_details(self, obj):
-        self.assertIn("coordinates", obj)
+        self.assertIn("protein_structure_coordinates", obj)
+        self.assertIn("entry_protein_coordinates", obj)
         self.assertIn("chain", obj)
 
     def _check_counter_by_endpoint(self, endpoint, obj, msg=""):

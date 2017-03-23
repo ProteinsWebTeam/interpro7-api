@@ -65,7 +65,7 @@ class FixtureReader:
                     c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["chain"] = sp["chain"]
                     c["id"] = get_id(e, p, sp["structure"], sp["chain"])
-                    c["protein_structure_coordinates"] = sp["coordinates"],
+                    c["protein_structure_coordinates"] = sp["coordinates"]
                     to_add.append(c)
             else:
                 to_add.append(obj)

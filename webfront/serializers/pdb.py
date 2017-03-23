@@ -159,7 +159,7 @@ class StructureSerializer(ModelContentSerializer):
             "source_database": obj["protein_db"]
         }
         if "entry_protein_coordinates" in obj:
-            output["entry_protein_coordinates"]= obj["entry_protein_coordinates"],
+            output["entry_protein_coordinates"] = obj["entry_protein_coordinates"]
         return output
 
     @staticmethod

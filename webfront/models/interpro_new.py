@@ -51,3 +51,4 @@ class Structure(models.Model):
     authors = JSONField()
     chains = JSONField()
     source_database = models.CharField(max_length=20, default="pdb", db_index=True)
+    #TODO add description

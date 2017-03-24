@@ -32,7 +32,7 @@ class QuerysetManager:
     def remove_filter(self, endpoint, f):
         del self.filters[endpoint][f]
 
-    def get_solr_query(self, include_search=False):
+    def get_searcher_query(self, include_search=False):
         q = ""
         for ep in self.filters:
             for k, v in self.filters[ep].items():

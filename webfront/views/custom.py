@@ -10,6 +10,10 @@ from webfront.searcher.elastic_controller import ElasticsearchController
 from webfront.searcher.solr_controller import SolrController
 
 
+def is_single_endpoint(general_handler):
+    return general_handler.filter_serializers == {}
+
+
 class CustomView(GenericAPIView):
     # Parent class of all the view handlers on the API, including the GeneralHandler.
 
@@ -37,16 +41,15 @@ class CustomView(GenericAPIView):
         # if this is the last level
         if len(endpoint_levels) == level:
             searcher = self.get_search_controller(general_handler.queryset_manager)
-            if self.from_model:
-                # search filter, from request parameters
-                search = request.query_params.get("search")
-                if search:
-                    general_handler.queryset_manager.add_filter(
-                        "search",
-                        accession__icontains=search,
-                        name__icontains=search
-                    )
-                if self.is_single_endpoint(general_handler) or not self.expected_response_is_list():
+            has_payload = general_handler.modifiers.execute(request)
+            if has_payload:
+                self.queryset = general_handler.modifiers.payload
+                self.serializer_detail = general_handler.modifiers.serializer
+                general_handler.filter_serializers = []
+                self.many = False
+            elif self.from_model:
+
+                if is_single_endpoint(general_handler) or not self.expected_response_is_list():
                     self.queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True)
                 else:
                     self.update_queryset_from_search(searcher, general_handler)
@@ -163,8 +166,8 @@ class CustomView(GenericAPIView):
             except ValueError:
                 pass
 
-    def get_counter_response(self, general_handler, solr):
-        if self.is_single_endpoint(general_handler):
+    def get_counter_response(self, general_handler, searcher):
+        if is_single_endpoint(general_handler):
             self.queryset = general_handler.queryset_manager.get_queryset().distinct()
             obj = self.get_database_contributions(self.queryset)
             return obj
@@ -175,7 +178,7 @@ class CustomView(GenericAPIView):
                                                    SerializerDetail.ENTRY_DB,
                                                    SerializerDetail.STRUCTURE_DB]
                      ]
-            return solr.get_counter_object(general_handler.queryset_manager.main_endpoint, extra_counters=extra)
+            return searcher.get_counter_object(general_handler.queryset_manager.main_endpoint, extra_counters=extra)
 
     def get_database_contributions(self, queryset):
         return
@@ -187,10 +190,6 @@ class CustomView(GenericAPIView):
     def expected_response_is_list(self):
         return self.many
 
-    @staticmethod
-    def is_single_endpoint(general_handler):
-        return general_handler.filter_serializers == {}
-
     search_size = None
 
     def update_queryset_from_search(self, searcher, general_handler):
@@ -199,7 +198,7 @@ class CustomView(GenericAPIView):
         i = general_handler.pagination["index"]
         r = 100 if s <= 100 else s
         st = r*((s*i)//r)
-        qs = general_handler.queryset_manager.get_solr_query(include_search=True)
+        qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
         res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st, solr_query=qs)
         self.queryset = general_handler.queryset_manager\
             .get_base_queryset(ep)\

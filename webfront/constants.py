@@ -25,6 +25,7 @@ class SerializerDetail(Enum):
     STRUCTURE_PROTEIN_DETAIL = 305
     STRUCTURE_DB = 306
 
+    GROUP_BY = 800
 
 class QuerysetType(Enum):
     ENTRY = 100

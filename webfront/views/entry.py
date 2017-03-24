@@ -1,8 +1,10 @@
+from urllib.error import URLError
+
 from django.db.models import Count
 
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
-from .custom import CustomView, SerializerDetail
+from .custom import CustomView, SerializerDetail, is_single_endpoint
 from django.conf import settings
 
 db_members = '|'.join(settings.DB_MEMBERS)
@@ -184,10 +186,36 @@ class EntryHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
+        general_handler.modifiers.register("group_by", self.group_by,
+                                           use_model_as_payload=True,
+                                           serializer=SerializerDetail.GROUP_BY
+                                           )
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
         )
+
+    def group_by(self, field, general_handler):
+        wl = {
+            "type": "entry_type",
+            "integrated": "integrated",
+            "source_database": "entry_db"
+        }
+        if field not in wl:
+            raise URLError("{} is not a valid field to group entries by. Allowed fields : {}".format(
+                field, ", ".join(wl.keys())
+            ))
+        if is_single_endpoint(general_handler):
+            queryset = general_handler.queryset_manager.get_queryset().distinct()
+            qs = Entry.objects.filter(accession__in=queryset)
+            return qs.values_list(field).annotate(total=Count(field))
+        else:
+            searcher = CustomView.get_search_controller(general_handler.queryset_manager)
+            result = searcher.get_grouped_object(
+                general_handler.queryset_manager.main_endpoint, wl[field]
+            )
+            return result
+
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):

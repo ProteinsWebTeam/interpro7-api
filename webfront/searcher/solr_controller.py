@@ -13,7 +13,7 @@ class SolrController(SearchController):
         self.queryset_manager = queryset_manager
 
     def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=0, start=0):
-        query = self.queryset_manager.get_solr_query() if query is None else query.lower()
+        query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
         parameters = {
             'group': 'true',
             'group.field': field,
@@ -29,13 +29,13 @@ class SolrController(SearchController):
         return res.grouped[field]
 
     def get_chain(self):
-        res = self.solr.search(self.queryset_manager.get_solr_query(), **{
+        res = self.solr.search(self.queryset_manager.get_searcher_query(), **{
             'fl': 'chain, structure_acc, protein_acc, protein_db, tax_id, protein_structure_coordinates:[json]',
         })
         return res.raw_response["response"]["docs"]
 
     def get_counter_object(self, endpoint, solr_query=None, extra_counters=[]):
-        qs = self.queryset_manager.get_solr_query()
+        qs = self.queryset_manager.get_searcher_query()
         if qs == '':
             qs = '*:*'
         if solr_query is not None:
@@ -77,7 +77,7 @@ class SolrController(SearchController):
         return res.raw_response["facets"]
 
     def get_list_of_endpoint(self, endpoint, solr_query=None):
-        qs = self.queryset_manager.get_solr_query() if solr_query is None else solr_query
+        qs = self.queryset_manager.get_searcher_query() if solr_query is None else solr_query
         if qs == '':
             qs = '*:*'
         res = self.solr.search(qs, **{
@@ -89,7 +89,7 @@ class SolrController(SearchController):
         return [x['value'].upper() for x in res.facets["facet_pivot"]['{}_acc'.format(endpoint)]]
 
     def execute_query(self, query, fq=None, rows=0, start=0):
-        query = self.queryset_manager.get_solr_query() if query is None else query.lower()
+        query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
         parameters = {
             'rows': rows,
             'start': start,

@@ -22,6 +22,8 @@ class EntrySerializer(ModelContentSerializer):
             representation = self.to_counter_representation(instance)
         elif detail == SerializerDetail.ENTRY_HEADERS:
             representation = self.to_headers_representation(instance)
+        elif detail == SerializerDetail.GROUP_BY:
+            representation = self.to_group_representation(instance)
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -126,6 +128,18 @@ class EntrySerializer(ModelContentSerializer):
         return output
 
     @staticmethod
+    def to_group_representation(instance):
+        if "groups" in instance:
+            if EntrySerializer.grouper_is_empty(instance):
+                raise ReferenceError('There are not entries for this request')
+            return {
+                        EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket)
+                        for bucket in instance["groups"]["buckets"]
+                    }
+        else:
+            return {field_value: total for field_value, total in instance}
+
+    @staticmethod
     def to_counter_representation(instance):
         if "entries" not in instance:
             if EntrySerializer.counter_is_empty(instance):
@@ -177,11 +191,15 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def counter_is_empty(instance):
+        return EntrySerializer.grouper_is_empty(instance, "databases")
+
+    @staticmethod
+    def grouper_is_empty(instance, field="groups"):
         if ("count" in instance and instance["count"] == 0) or \
-           (len(instance["databases"]["buckets"]) == 0 and instance["unintegrated"]["unique"] == 0):
+           (len(instance[field]["buckets"]) == 0 and instance["unintegrated"]["unique"] == 0):
             return True
-        if ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
-           (len(instance["databases"]["buckets"]) == 0 and instance["unintegrated"]["unique"]["value"] == 0):
+        if ("doc_count" in instance[field] and instance[field]["doc_count"] == 0) or \
+           (len(instance[field]["buckets"]) == 0 and instance["unintegrated"]["unique"]["value"] == 0):
             return True
         return False
 

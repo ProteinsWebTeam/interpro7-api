@@ -34,6 +34,10 @@ class SearchController(metaclass=abc.ABCMeta):
         raise NotImplementedError('users must define get_counter_object to use this base class')
 
     @abc.abstractmethod
+    def get_grouped_object(self, endpoint, field, solr_query=None, extra_counters=[]):
+        raise NotImplementedError('users must define get_counter_object to use this base class')
+
+    @abc.abstractmethod
     def get_list_of_endpoint(self, endpoint, solr_query=None, rows=1, start=0):
         raise NotImplementedError('users must define get_list_of_endpoint to use this base class')
 

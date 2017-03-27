@@ -1,10 +1,9 @@
 class ModifierManager:
-    modifiers = {}
-    payload = None
-    serializer = None
-
     def __init__(self, general_handler=None):
         self.general_handler = general_handler
+        self.modifiers = {}
+        self.payload = None
+        self.serializer = None
 
     def register(self, parameter, action,
                  use_model_as_payload=False,

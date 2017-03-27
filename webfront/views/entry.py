@@ -190,6 +190,7 @@ class EntryHandler(CustomView):
                                            use_model_as_payload=True,
                                            serializer=SerializerDetail.GROUP_BY
                                            )
+        general_handler.modifiers.register("type", self.filter_by_type)
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
@@ -215,6 +216,12 @@ class EntryHandler(CustomView):
                 general_handler.queryset_manager.main_endpoint, wl[field]
             )
             return result
+
+    def filter_by_type(self, field, general_handler):
+        general_handler.queryset_manager.add_filter(
+            "entry",
+            type__iexact=field
+        )
 
 
     @staticmethod

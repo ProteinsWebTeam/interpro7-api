@@ -9,6 +9,7 @@ from django.db.utils import IntegrityError
 
 from release.models import iprel
 from webfront.models import Entry, Protein, Structure
+import json
 
 # global array
 errors = []
@@ -102,18 +103,7 @@ def _extract_integration(member_db_entry):
 
 
 def _extract_go(joins):
-    output = {
-        "biological_process": [],
-        "molecular_function": [],
-        "cellular_component": [],
-    }
-    for join in joins:
-        # TODO: check which kind of GO they are to assign to the right one
-        output['biological_process'].append({
-            "id": join.go_id,
-            "name": "",  # TODO
-        })
-    return output
+    return [join.go_id for join in joins]
 
 
 def _get_tax_name_from_id(acc):
@@ -146,8 +136,8 @@ def set_member_db_entries(qs):
     )):
         bulk_insert(chunk, Entry)
 
-
 def get_n_interpro_entries(n):
+    _preFillTrees()
     qs = queryset_from_model(iprel.Entry)
     n = n_or_all(n, qs)
     set_interpro_entries(subset_iterator_from_queryset(qs, n))
@@ -176,7 +166,6 @@ def create_entry_from_member_db(row):
         other_names=[],    # TODO
         description=[row.abstract] if row.abstract else [],
         literature=_extract_pubs(row.method2pub_set.all()),
-        domain_architectures=[]    # TODO
     )
 
 
@@ -186,7 +175,7 @@ def create_entry_from_interpro(row):
         accession=row.entry_ac,
         entry_id="",  # TODO
         type=row.entry_type.abbrev,
-        go_terms=_extract_go(row.interpro2go_set.all()),  # TODO
+        go_terms=_extract_go(row.interpro2go_set.all()),
         source_database="InterPro",
         member_databases=_extract_member_db(row.entry_ac),
         integrated=None,
@@ -195,7 +184,7 @@ def create_entry_from_interpro(row):
         other_names=[],  # TODO
         description=[join.ann.text for join in row.entry2common_set.all()],
         literature=_extract_pubs(row.entry2pub_set.all()),
-        domain_architectures=[]  # TODO
+        hierarchy=json.dumps(nodes[roots[row.entry_ac]]) if row.entry_ac in roots and roots[row.entry_ac] is not None else None
     )
 
 
@@ -311,6 +300,47 @@ def fillModelWith(model, n):
     print('Filling table for {}'.format(model))
     _modelFillers[model](n)
 
+
+nodes = {}
+roots = {}
+
+
+def _updateChildrenRootsOld(p, c):
+    global nodes
+    nodes[c]["root"] = p
+    if nodes[p]["root"] is not None:
+        nodes[c]["root"] = nodes[p]["root"]
+    for gc in nodes[c]["children"]:
+        _updateChildrenRoots(c, gc["ac"])
+
+def _updateChildrenRoots(p, c):
+    global nodes, roots
+    roots[c] = roots[p]
+    for gc in nodes[c]["children"]:
+        _updateChildrenRoots(c, gc["accession"])
+
+def _preFillTrees():
+    print('Precalculating entry trees')
+    global nodes, roots
+    nodes = {}
+    roots = {}
+    for ee in tqdm(iprel.Entry2Entry.objects.using("interpro_ro").all()):
+        p = ee.parent_ac.entry_ac
+        c = ee.entry_ac.entry_ac
+        if p not in nodes:
+            nodes[p] = {
+                "accession": p,
+                "children": [],
+            }
+            roots[p] = p
+        if c not in nodes:
+            nodes[c] = {
+                "accession": c,
+                "children": [],
+            }
+            roots[c] = c
+        nodes[p]["children"].append(nodes[c])
+        _updateChildrenRoots(p, c)
 
 class Command(BaseCommand):
     help = "populate db"

@@ -35,8 +35,7 @@ class RESTRequestsTest(FunctionalTest):
         self.assertEqual(acc, jsonp["metadata"]["accession"],
                          "The accession in the response object should be the same as reequested")
         self.assertIn("metadata", jsonp.keys(), "'metadata' should be one of the keys in the response")
-        self.assertIn("molecular_function", jsonp["metadata"]["go_terms"],
-                      "the key is part of the go_terms and has been parsed OK")
+        self.assertTrue(isinstance(jsonp["metadata"]["go_terms"], list), "go_terms should be a list")
 
         self.assertEqual(jsonp["metadata"]["counters"]["proteins"], 2)
 

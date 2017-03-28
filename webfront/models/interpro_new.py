@@ -17,7 +17,7 @@ class Entry(models.Model):
     wikipedia = models.TextField(null=True)
     literature = JSONField()
     # Array of the string representing the domain architecture
-    domain_architectures = JSONField(null=True)
+    hierarchy = JSONField(null=True)
 
 
 class Protein(models.Model):
@@ -38,7 +38,7 @@ class Protein(models.Model):
     genomic_context = JSONField()
     source_database = models.CharField(max_length=20, default="uniprot", db_index=True)
     # Domain arch string e.g. 275/UPI0004FEB881#29021:2-66~20422&29021&340&387:103-266#
-    domain_architectures = models.TextField(null=True)
+    # domain_architectures = models.TextField(null=True)
 
 
 class Structure(models.Model):

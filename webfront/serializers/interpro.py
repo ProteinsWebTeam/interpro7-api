@@ -54,6 +54,7 @@ class EntrySerializer(ModelContentSerializer):
             "source_database": instance.source_database,
             "member_databases": instance.member_databases,
             "integrated": instance.integrated,
+            "hierarchy": instance.hierarchy,
             "name": {
                 "name": instance.name,
                 "short": instance.short_name,

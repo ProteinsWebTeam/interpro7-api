@@ -206,6 +206,7 @@ class EntrySerializer(ModelContentSerializer):
             # "length": 85,
             "source_database": obj["entry_db"],
             "entry_type": obj["entry_type"],
+            "entry_integrated": obj["integrated"],
         }
         if for_structure:
             header["chain"] = obj["chain"]

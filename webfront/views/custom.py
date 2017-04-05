@@ -6,8 +6,6 @@ from rest_framework.response import Response
 from webfront.constants import SerializerDetail
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
-from webfront.searcher.elastic_controller import ElasticsearchController
-from webfront.searcher.solr_controller import SolrController
 
 
 def is_single_endpoint(general_handler):
@@ -40,7 +38,7 @@ class CustomView(GenericAPIView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         # if this is the last level
         if len(endpoint_levels) == level:
-            searcher = self.get_search_controller(general_handler.queryset_manager)
+            searcher = general_handler.searcher
             has_payload = general_handler.modifiers.execute(request)
             if has_payload:
                 self.queryset = general_handler.modifiers.payload
@@ -80,6 +78,7 @@ class CustomView(GenericAPIView):
                 # extracted out in the custom view
                 content=request.GET.getlist('content'),
                 context={"request": request},
+                searcher=searcher,
                 serializer_detail=self.serializer_detail,
                 serializer_detail_filters=general_handler.filter_serializers,
                 queryset_manager=general_handler.queryset_manager,
@@ -205,9 +204,3 @@ class CustomView(GenericAPIView):
             .filter(accession__in=res)
         self.search_size = length
 
-    @staticmethod
-    def get_search_controller(queryset_manager=None):
-        if "solr" in settings.SEARCHER_URL:
-            return SolrController(queryset_manager)
-        else:
-            return ElasticsearchController(queryset_manager)

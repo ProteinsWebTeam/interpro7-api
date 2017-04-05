@@ -4,6 +4,7 @@ import copy
 
 from webfront.searcher.search_controller import SearchController
 from webfront.views.custom import CustomView
+from webfront.searcher.elastic_controller import ElasticsearchController
 
 
 def get_id(*args):
@@ -93,7 +94,7 @@ class FixtureReader:
         return lower
 
     def add_to_search_engine(self, docs):
-        self.search = CustomView.get_search_controller()
+        self.search = ElasticsearchController()
         self.search.add(docs)
 
     def clear_search_engine(self):

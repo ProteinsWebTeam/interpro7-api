@@ -211,7 +211,7 @@ class EntryHandler(CustomView):
             qs = Entry.objects.filter(accession__in=queryset)
             return qs.values_list(field).annotate(total=Count(field))
         else:
-            searcher = CustomView.get_search_controller(general_handler.queryset_manager)
+            searcher = general_handler.searcher
             result = searcher.get_grouped_object(
                 general_handler.queryset_manager.main_endpoint, wl[field]
             )

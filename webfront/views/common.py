@@ -10,6 +10,8 @@ from webfront.views.modifier_manager import ModifierManager
 from webfront.views.protein import ProteinHandler
 from webfront.views.queryset_manager import QuerysetManager
 from webfront.views.structure import StructureHandler
+from webfront.searcher.elastic_controller import ElasticsearchController
+from webfront.searcher.solr_controller import SolrController
 
 
 def map_url_to_levels(url):
@@ -60,6 +62,7 @@ class GeneralHandler(CustomView):
     pagination = None
     # The modifier manager for the current request
     modifiers = ModifierManager()
+    searcher = None
 
     def get(self, request, url='', *args, **kwargs):
         self.filter_serializers = {}
@@ -67,6 +70,8 @@ class GeneralHandler(CustomView):
         endpoint_levels = map_url_to_levels(url)
         self.modifiers = ModifierManager(self)
         self.modifiers.register("search", self.search_modifier)
+        self.queryset_manager = QuerysetManager()
+        self.searcher = self.get_search_controller(self.queryset_manager)
         try:
             return super(GeneralHandler, self).get(
                 request, endpoint_levels,
@@ -105,3 +110,10 @@ class GeneralHandler(CustomView):
             accession__icontains=search,
             name__icontains=search
         )
+
+    @staticmethod
+    def get_search_controller(queryset_manager=None):
+        if "solr" in settings.SEARCHER_URL:
+            return SolrController(queryset_manager)
+        else:
+            return ElasticsearchController(queryset_manager)

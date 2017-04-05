@@ -7,7 +7,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         content = kwargs.pop('content', [])
         self.queryset_manager = kwargs.pop('queryset_manager', None)
-        self.searcher = CustomView.get_search_controller(self.queryset_manager)
+        self.searcher = kwargs.pop('searcher', None)
+        # self.searcher = CustomView.get_search_controller(self.queryset_manager)
         self.detail = kwargs.pop('serializer_detail', SerializerDetail.ALL)
         self.detail_filters = kwargs.pop('serializer_detail_filters', SerializerDetail.ALL)
 

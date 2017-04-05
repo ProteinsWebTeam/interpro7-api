@@ -330,17 +330,24 @@ def _preFillTrees():
         if p not in nodes:
             nodes[p] = {
                 "accession": p,
+                "name": ee.parent_ac.name,
+                "type": ee.parent_ac.entry_type.abbrev,
                 "children": [],
             }
             roots[p] = p
         if c not in nodes:
             nodes[c] = {
                 "accession": c,
+                "name": ee.entry_ac.name,
+                "type": ee.entry_ac.entry_type.abbrev,
                 "children": [],
             }
             roots[c] = c
         nodes[p]["children"].append(nodes[c])
         _updateChildrenRoots(p, c)
+    for k, v in nodes.items():
+        if len(v["children"]) == 0:
+            del v["children"]
 
 class Command(BaseCommand):
     help = "populate db"

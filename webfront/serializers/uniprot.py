@@ -77,8 +77,9 @@ class ProteinSerializer(ModelContentSerializer):
             "proteome": instance.proteome,
             "gene": instance.gene,
             "go_terms": instance.go_terms,
-            "protein_evidence": 4,
+            "protein_evidence": 4, #TODO
             "source_database": instance.source_database,
+            "residues": instance.residues,
             "counters": {
                 "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
                 "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),

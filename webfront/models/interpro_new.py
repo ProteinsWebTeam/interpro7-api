@@ -37,6 +37,7 @@ class Protein(models.Model):
     feature = JSONField()
     genomic_context = JSONField()
     source_database = models.CharField(max_length=20, default="uniprot", db_index=True)
+    residues = JSONField()
     # Domain arch string e.g. 275/UPI0004FEB881#29021:2-66~20422&29021&340&387:103-266#
     # domain_architectures = models.TextField(null=True)
 

@@ -155,7 +155,8 @@ conditions = [
     "AND e.ENTRY_TYPE='F' AND p.DBCODE='S'",
     "AND e.ENTRY_TYPE='F' AND p.DBCODE='T'",
     "AND e.ENTRY_TYPE!='F' AND p.DBCODE='S'",
-    "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T'",
+    "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T' AND pe.POS_FROM<50",
+    "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T' AND pe.POS_FROM>49",
 ]
 
 dbcodes = None

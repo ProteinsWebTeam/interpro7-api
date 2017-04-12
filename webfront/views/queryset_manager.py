@@ -55,6 +55,8 @@ class QuerysetManager:
                     q += " && integrated:{}".format(v)
                 elif k == "integrated__isnull":
                     q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
+                elif k == "type" or k == "type__iexact":
+                    q += " && {}_type:{}".format(ep, v)
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
                         q += " && {}_db:{}".format(ep, v)

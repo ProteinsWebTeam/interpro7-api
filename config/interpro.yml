@@ -88,3 +88,9 @@ members:
     accession: '(?:c|s)d[0-9]{5}$'
     options: []
     options_per_family: []
+  mobidblt:
+    filter: "mobidblt"
+    label: "mobidblt"
+    accession: 'mobidb-lite'
+    options: []
+    options_per_family: []

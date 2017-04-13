@@ -1,10 +1,9 @@
-from urllib.error import URLError
-
 from django.db.models import Count
 
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
-from .custom import CustomView, SerializerDetail, is_single_endpoint
+from webfront.views.modifiers import group_by, sort_by, filter_by_field
+from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
 db_members = '|'.join(settings.DB_MEMBERS)
@@ -186,65 +185,29 @@ class EntryHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
-        general_handler.modifiers.register("group_by", self.group_by,
-                                           use_model_as_payload=True,
-                                           serializer=SerializerDetail.GROUP_BY
-                                           )
-        general_handler.modifiers.register("sort_by", self.sort_by)
-        general_handler.modifiers.register("type", self.filter_by_type)
+        general_handler.modifiers.register(
+            "group_by",
+            group_by(Entry, {
+                "type": "entry_type",
+                "integrated": "integrated",
+                "source_database": "entry_db"
+            }),
+            use_model_as_payload=True,
+            serializer=SerializerDetail.GROUP_BY
+        )
+        general_handler.modifiers.register("sort_by", sort_by({
+            "accession": "entry_acc",
+            "integrated": "integrated",
+            "name": None
+        }))
+        general_handler.modifiers.register("type", filter_by_field("entry", "type"))
+        general_handler.modifiers.register("integrated", filter_by_field("entry", "integrated__accession"))
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    def group_by(self, field, general_handler):
-        wl = {
-            "type": "entry_type",
-            "integrated": "integrated",
-            "source_database": "entry_db"
-        }
-        if field not in wl:
-            raise URLError("{} is not a valid field to group entries by. Allowed fields : {}".format(
-                field, ", ".join(wl.keys())
-            ))
-        if is_single_endpoint(general_handler):
-            queryset = general_handler.queryset_manager.get_queryset().distinct()
-            qs = Entry.objects.filter(accession__in=queryset)
-            return qs.values_list(field).annotate(total=Count(field))
-        else:
-            searcher = general_handler.searcher
-            result = searcher.get_grouped_object(
-                general_handler.queryset_manager.main_endpoint, wl[field]
-            )
-            return result
-
-    def sort_by(self, field, general_handler):
-        wl = {
-            "accession": "entry_acc",
-            "integrated": "integrated",
-            "name": None
-        }
-        if not is_single_endpoint(general_handler):
-            # wl = {k: v for k, v in wl.items() if v is not None}
-            raise URLError("Sorting is not currently supported for multi-domains queries")
-
-        if field not in wl:
-            raise URLError("This query can't be be sorted by {}. The supported fields are {}".format(
-                field, ", ".join(wl.keys())
-            ))
-        general_handler.queryset_manager.order_by(field)
-
-
-    def filter_by_type(self, field, general_handler):
-        general_handler.queryset_manager.add_filter(
-            "entry",
-            type__iexact=field
-        )
-
-
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        # TODO: Support for the case /api/entry/pfam/protein/ were the QS can have thousands of entries
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
-
         return queryset

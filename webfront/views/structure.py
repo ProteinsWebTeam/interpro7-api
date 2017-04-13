@@ -2,6 +2,7 @@ from django.db.models import Count
 from webfront.models import Structure
 from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
+from webfront.views.modifiers import group_by, sort_by, filter_by_field
 
 
 class ChainPDBAccessionHandler(CustomView):
@@ -101,6 +102,21 @@ class StructureHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.reset_filters("structure", endpoint_levels)
         general_handler.queryset_manager.add_filter("structure", accession__isnull=False)
+        general_handler.modifiers.register(
+            "group_by",
+            group_by(Structure, {
+                "experiment_type": "experiment_type",
+            }),
+            use_model_as_payload=True,
+            serializer=SerializerDetail.GROUP_BY
+        )
+        general_handler.modifiers.register("sort_by", sort_by({
+            "accession": "structure_acc",
+            "experiment_type": "experiment_type",
+            "name": "name"
+        }))
+        general_handler.modifiers.register("experiment_type", filter_by_field("structure", "experiment_type"))
+
         return super(StructureHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

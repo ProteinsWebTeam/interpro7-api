@@ -26,6 +26,8 @@ class StructureSerializer(ModelContentSerializer):
             representation["metadata"]["chains"] = self.to_chains_representation(
                 self.searcher.get_chain()
             )
+        elif detail == SerializerDetail.GROUP_BY:
+            representation = self.to_group_representation(instance)
         return representation
 
     def to_full_representation(self, instance):
@@ -173,6 +175,23 @@ class StructureSerializer(ModelContentSerializer):
                 Structure.objects.get(accession__iexact=obj["structure_acc"]), search
             )
         return output
+
+    @staticmethod
+    def to_group_representation(instance):
+        if "groups" in instance:
+            if StructureSerializer.grouper_is_empty(instance):
+                raise ReferenceError('There are not entries for this request')
+            return {
+                StructureSerializer.get_key_from_bucket(bucket): StructureSerializer.serialize_counter_bucket(bucket)
+                for bucket in instance["groups"]["buckets"]
+            }
+        else:
+            return {field_value: total for field_value, total in instance}
+
+    @staticmethod
+    def grouper_is_empty(instance, field="groups"):
+        return ("count" in instance and instance["count"] == 0) or \
+               ("buckets" in instance[field] and len(instance[field]["buckets"]) == 0)
 
     @staticmethod
     def to_counter_representation(instance):

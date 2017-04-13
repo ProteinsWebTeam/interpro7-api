@@ -23,6 +23,8 @@ class ProteinSerializer(ModelContentSerializer):
             representation = self.to_counter_representation(instance)
         elif detail == SerializerDetail.PROTEIN_HEADERS:
             representation = self.to_headers_representation(instance)
+        elif detail == SerializerDetail.GROUP_BY:
+            representation = self.to_group_representation(instance)
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -101,10 +103,21 @@ class ProteinSerializer(ModelContentSerializer):
         return output
 
     @staticmethod
+    def to_group_representation(instance):
+        if "groups" in instance:
+            if ProteinSerializer.grouper_is_empty(instance):
+                raise ReferenceError('There are not entries for this request')
+            return {
+                ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket)
+                for bucket in instance["groups"]["buckets"]
+            }
+        else:
+            return {field_value: total for field_value, total in instance}
+
+    @staticmethod
     def to_counter_representation(instance):
         if "proteins" not in instance:
-            if ("count" in instance and instance["count"] == 0) or \
-               ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0):
+            if ProteinSerializer.grouper_is_empty(instance, "databases"):
                 raise ReferenceError('There are not entries for this request')
 
             ins2 = {"proteins": {
@@ -118,8 +131,13 @@ class ProteinSerializer(ModelContentSerializer):
         return instance
 
     @staticmethod
+    def grouper_is_empty(instance, field="groups"):
+        return ("count" in instance and instance["count"] == 0) or \
+               ("buckets" in instance[field] and len(instance[field]["buckets"]) == 0)
+
+    @staticmethod
     def get_key_from_bucket(bucket):
-        key = (bucket["val"] if "val" in bucket else bucket["key"]).lower()
+        key = str(bucket["val"] if "val" in bucket else bucket["key"]).lower()
         return key
 
     def to_entries_count_representation(self, instance):

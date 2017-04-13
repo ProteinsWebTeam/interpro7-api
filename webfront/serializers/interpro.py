@@ -104,7 +104,7 @@ class EntrySerializer(ModelContentSerializer):
         return response
 
     def to_headers_representation(self, instance):
-        return {
+        headers = {
             "metadata": {
                 "accession": instance.accession,
                 "name": instance.name,
@@ -112,6 +112,9 @@ class EntrySerializer(ModelContentSerializer):
                 "type": instance.type
             }
         }
+        if instance.integrated is not None:
+            headers['integrated'] = instance.integrated.accession
+        return headers
 
     @staticmethod
     def serialize_counter_bucket(bucket):

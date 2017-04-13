@@ -190,6 +190,7 @@ class EntryHandler(CustomView):
                                            use_model_as_payload=True,
                                            serializer=SerializerDetail.GROUP_BY
                                            )
+        general_handler.modifiers.register("sort_by", self.sort_by)
         general_handler.modifiers.register("type", self.filter_by_type)
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
@@ -216,6 +217,23 @@ class EntryHandler(CustomView):
                 general_handler.queryset_manager.main_endpoint, wl[field]
             )
             return result
+
+    def sort_by(self, field, general_handler):
+        wl = {
+            "accession": "entry_acc",
+            "integrated": "integrated",
+            "name": None
+        }
+        if not is_single_endpoint(general_handler):
+            # wl = {k: v for k, v in wl.items() if v is not None}
+            raise URLError("Sorting is not currently supported for multi-domains queries")
+
+        if field not in wl:
+            raise URLError("This query can't be be sorted by {}. The supported fields are {}".format(
+                field, ", ".join(wl.keys())
+            ))
+        general_handler.queryset_manager.order_by(field)
+
 
     def filter_by_type(self, field, general_handler):
         general_handler.queryset_manager.add_filter(

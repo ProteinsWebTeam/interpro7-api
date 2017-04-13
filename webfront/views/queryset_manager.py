@@ -14,6 +14,7 @@ class QuerysetManager:
         "protein": {},
     }
     endpoints = []
+    order_field =None;
 
     def reset_filters(self, endpoint, endpoint_levels=[]):
         self.main_endpoint = endpoint
@@ -25,12 +26,16 @@ class QuerysetManager:
             "structure": {},
             "protein": {},
         }
+        self.order_field = None;
 
     def add_filter(self, endpoint,  **kwargs):
         self.filters[endpoint] = {**self.filters[endpoint], **kwargs}
 
     def remove_filter(self, endpoint, f):
         del self.filters[endpoint][f]
+
+    def order_by(self,field):
+        self.order_field = field
 
     def get_searcher_query(self, include_search=False):
         q = ""
@@ -60,7 +65,10 @@ class QuerysetManager:
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
                         q += " && {}_db:{}".format(ep, v)
-        return q[4:].lower()
+        q = q[4:].lower()
+        if self.order_field is not None:
+            q += "&sort="+self.order_field
+        return q
 
     def get_base_queryset(self, endpoint):
         queryset = Entry.objects.all()
@@ -99,8 +107,11 @@ class QuerysetManager:
                                    }
 
         if search_filters:
-            return queryset.filter(or_filter, **current_filters)
-        return queryset.filter(**current_filters)
+            queryset = queryset.filter(or_filter, **current_filters)
+        queryset = queryset.filter(**current_filters)
+        if self.order_field is not None:
+            queryset = queryset.order_by(self.order_field)
+        return queryset
 
     def update_interpro_filter(self):
         for k, f in self.filters["entry"].items():

@@ -166,6 +166,20 @@ class ElasticsearchController(SearchController):
             },
             "size": 0
         }
+        # if self.queryset_manager.order_field is not None:
+        #     facet['aggs']['rscount']['aggs'] = {
+        #         "tops": {
+        #             "top_hits": {"size": 1}
+        #         },
+        #         "topSort": {
+        #             "max": {
+        #                 "field": self.queryset_manager.order_field
+        #             }
+        #         }
+        #     }
+        #     facet['aggs']['rscount']['terms']['order'] = {
+        #         "topSort": "asc"
+        #     }
         response = self._elastic_json_query(qs, facet)
         return [x['key'].upper() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
 

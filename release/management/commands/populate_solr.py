@@ -215,7 +215,7 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
                     "ipro" if is_for_interpro_entries else "DB",
                     subset,
                     part,
-                    '' if match_pos is None else '_'+match_pos
+                    '' if match_pos is None else '_'+str(match_pos)
                 ), "w")
                 f.write(json.dumps(list(chunk)))
                 f.close()

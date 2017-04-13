@@ -196,7 +196,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     for db3 in api_test_map[endpoint3]:
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
                         response = self.client.get(url)
-                        self.assertEqual(response.status_code, status.HTTP_200_OK)
+                        self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                         "the url {} got the HTTP error {}".format(url, response.status_code))
                         expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3)
                         self.assertEqual(response.data, expected,
                                          "The URL {} wasn't equal to the expected response.\nRESPONSE: {}\nEXPECTED: {}"

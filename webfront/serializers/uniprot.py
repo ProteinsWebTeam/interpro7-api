@@ -119,11 +119,7 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def get_key_from_bucket(bucket):
-        key = (bucket["val"] if "val" in bucket else bucket["key"]).upper()
-        if key == "S":
-            return "swissprot"
-        if key == "T":
-            return "trembl"
+        key = (bucket["val"] if "val" in bucket else bucket["key"]).lower()
         return key
 
     def to_entries_count_representation(self, instance):

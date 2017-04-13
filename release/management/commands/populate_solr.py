@@ -202,7 +202,7 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
             print("Not a valid database. Options:", codes.keys())
 
         if match_pos is not None:
-            where += " AND pe.POS_FROM="+match_pos
+            where += " AND pe.POS_FROM="+str(match_pos)
 
         part = 0
         for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries, offset), bs):

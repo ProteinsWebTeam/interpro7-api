@@ -152,13 +152,10 @@ class ProteinSerializer(ModelContentSerializer):
             ]
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
-        if len(instance.residues):
-            #TODO store residues in different data structure
-            residueMap = {}
-            for residue in instance.residues:
-                pass
-            for entry in response:
-                pass
+
+        for entry in response:
+            if (entry['accession'] in instance.residues):
+                entry['residues'] = instance.residues
         return response
 
     @staticmethod

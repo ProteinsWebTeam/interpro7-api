@@ -79,7 +79,7 @@ class ProteinSerializer(ModelContentSerializer):
             "go_terms": instance.go_terms,
             "protein_evidence": 4, #TODO
             "source_database": instance.source_database,
-            "residues": instance.residues,
+            'fragment': instance.fragment,
             "counters": {
                 "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
                 "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
@@ -152,6 +152,13 @@ class ProteinSerializer(ModelContentSerializer):
             ]
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
+        if len(instance.residues):
+            #TODO store residues in different data structure
+            residueMap = {}
+            for residue in instance.residues:
+                pass
+            for entry in response:
+                pass
         return response
 
     @staticmethod

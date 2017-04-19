@@ -122,6 +122,37 @@ class UnintegratedHandler(CustomView):
         return queryset
 
 
+class IntegratedHandler(CustomView):
+    level_description = 'integrated level'
+    queryset = Entry.objects.all() \
+        .exclude(source_database__iexact="interpro") \
+        .filter(integrated__isnull=False)
+    serializer_class = EntrySerializer
+    serializer_detail = SerializerDetail.ENTRY_HEADERS
+    serializer_detail_filter = SerializerDetail.ENTRY_DB
+    child_handlers = [
+        (db_members, MemberHandler)
+    ]
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+        general_handler.queryset_manager.add_filter("entry",
+                                                    integrated__isnull=False,
+                                                    source_database__iregex=db_members)
+        return super(IntegratedHandler, self).get(
+            request, endpoint_levels, available_endpoint_handlers, level,
+            self.queryset, handler, general_handler, *args, **kwargs
+        )
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter(
+            "entry",
+            integrated__isnull=False,
+            source_database__iregex=db_members)
+        return queryset
+
+
 class InterproHandler(CustomView):
     level_description = 'interpro level'
     queryset = Entry.objects.filter(source_database__iexact="interpro")
@@ -155,6 +186,7 @@ class EntryHandler(CustomView):
     child_handlers = [
         ('interpro', InterproHandler),
         ('unintegrated', UnintegratedHandler),
+        ('integrated', IntegratedHandler),
         (db_members, MemberHandler),
     ]
     many = False

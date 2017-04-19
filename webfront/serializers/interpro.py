@@ -154,6 +154,7 @@ class EntrySerializer(ModelContentSerializer):
                         EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket)
                         for bucket in instance["databases"]["buckets"]
                     },
+                    "integrated": 0,
                     "unintegrated": 0,
                     "interpro": 0,
                 }
@@ -165,6 +166,7 @@ class EntrySerializer(ModelContentSerializer):
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]
+            result["entries"]["integrated"] = sum(result["entries"]["member_databases"].values()) - result["entries"]["unintegrated"]
             return result
         return instance
 
@@ -228,6 +230,7 @@ class EntrySerializer(ModelContentSerializer):
             # "length": 85,
             "source_database": obj["entry_db"],
             "entry_type": obj["entry_type"],
+            "entry_integrated": obj["integrated"],
         }
         if for_structure:
             header["chain"] = obj["chain"]

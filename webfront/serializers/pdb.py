@@ -105,7 +105,8 @@ class StructureSerializer(ModelContentSerializer):
     def to_entries_count_representation(self, representation):
         query = StructureSerializer.get_search_query_from_representation(representation)
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
-            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count()),
+            self.detail_filters
         )["entries"]
 
     @staticmethod

@@ -28,6 +28,11 @@ api_test_map = {
             "PF17176",
             "SM00002",
             "PS01031",
+        ],
+        "integrated": [
+            "PF02171",
+            "SM00950",
+            "PS50822",
         ]
     },
     "protein": {
@@ -223,7 +228,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         for acc3 in api_test_map[endpoint3][db3]:
                             ep3 = "structure" if endpoint3 == "chain" else endpoint3
                             unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                if db3 == "unintegrated" else ""
+                                if db3 == "integrated" or db3 == "unintegrated" else ""
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, ep3, db3 + unintegrated, acc3)
                             response = self._get_in_debug_mode(url)
                             if response.status_code == status.HTTP_200_OK:
@@ -283,7 +288,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         for db3 in api_test_map[endpoint3]:
                             for acc3 in api_test_map[endpoint3][db3]:
                                 unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                    if db3 == "unintegrated" else ""
+                                    if db3 == "integrated" or db3 == "unintegrated" else ""
                                 # endpoint1 = "entry"
                                 # endpoint2 = "structure"
                                 # db2 = "pdb"
@@ -324,9 +329,9 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             for acc2 in api_test_map[endpoint2][db2]:
                                 for acc3 in api_test_map[endpoint3][db3]:
                                     un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                        if db3 == "unintegrated" else ""
+                                        if db3 == "integrated" or db3 == "unintegrated" else ""
                                     un2 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc2[:2]] \
-                                        if db2 == "unintegrated" else ""
+                                        if db2 == "integrated" or db2 == "unintegrated" else ""
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}".format(endpoint1,
                                                                              ep2, db2 + un2, acc2,
                                                                              ep3, db3 + un3, acc3)
@@ -428,7 +433,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             if response2.status_code == status.HTTP_200_OK:
                                 self.compare_db_db_endpoint_expected_vs_response(expected, response2, endpoint1)
                             else:
-                                self.assertEqual(response2.status_code, status.HTTP_204_NO_CONTENT)
+                                self.assertEqual(response2.status_code, status.HTTP_204_NO_CONTENT,
+                                                 "HTTP error {}: {}".format(response.status_code, url))
 
     def test_db_db_db(self):
         for endpoint1 in api_test_map:
@@ -450,7 +456,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 if response.status_code == status.HTTP_200_OK:
                                     self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
                                 else:
-                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                     "HTTP error {}: {}".format(response.status_code, url))
 
     def test_db_endpoint_acc(self):
         for endpoint1 in api_test_map:
@@ -467,7 +474,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         for db3 in api_test_map[endpoint3]:
                             for acc3 in api_test_map[endpoint3][db3]:
                                 un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                    if db3 == "unintegrated" else ""
+                                    if db3 == "integrated" or db3 == "unintegrated" else ""
                                 expected = self.get_expected_list_payload(endpoint1, db1, endpoint2, endpoint3,
                                                                           db3=db3, acc3=acc3)
                                 url = "/api/{}/{}/{}/{}/{}/{}" \
@@ -476,7 +483,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 if response.status_code == status.HTTP_200_OK:
                                     self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
                                 else:
-                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                     "HTTP error {}: {}".format(response.status_code, url))
 
     def test_db_db_acc(self):
         for endpoint1 in api_test_map:
@@ -494,7 +502,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             for db3 in api_test_map[endpoint3]:
                                 for acc3 in api_test_map[endpoint3][db3]:
                                     un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                        if db3 == "unintegrated" else ""
+                                        if db3 == "integrated" or db3 == "unintegrated" else ""
                                     expected = self.get_expected_list_payload(endpoint1, db1, endpoint2, endpoint3,
                                                                               db2=db2, db3=db3, acc3=acc3)
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
@@ -511,7 +519,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     if response.status_code == status.HTTP_200_OK:
                                         self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
                                     else:
-                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                         "HTTP error {}: {}".format(response.status_code, url))
 
     def test_db_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -531,9 +540,9 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 for acc3 in api_test_map[endpoint3][db3]:
                                     for acc2 in api_test_map[endpoint2][db2]:
                                         un2 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc2[:2]] \
-                                            if db2 == "unintegrated" else ""
+                                            if db2 == "integrated" or db2 == "unintegrated" else ""
                                         un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                            if db3 == "unintegrated" else ""
+                                            if db3 == "integrated" or db3 == "unintegrated" else ""
                                         expected = self.get_expected_list_payload(
                                             endpoint1, db1, endpoint2, endpoint3,
                                             db2=db2, db3=db3, acc2=acc2, acc3=acc3)
@@ -545,7 +554,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                             self.compare_db_db_endpoint_expected_vs_response(
                                                 expected, response, endpoint1)
                                         else:
-                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                             "HTTP error {}: {}".format(response.status_code, url))
 
     def test_acc_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
@@ -561,7 +571,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     for db1 in api_test_map[endpoint1]:
                         for acc1 in api_test_map[endpoint1][db1]:
                             un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
-                                if db1 == "unintegrated" else ""
+                                if db1 == "integrated" or db1 == "unintegrated" else ""
                             url = "/api/{}/{}/{}/{}/{}" \
                                 .format(ep1, db1 + un1, acc1, endpoint2, endpoint3)
                             response = self._get_in_debug_mode(url)
@@ -570,7 +580,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 self.compare_objects_expected_vs_response(
                                     expected, response.data, endpoint1)
                             else:
-                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                 "HTTP error {}: {}".format(response.status_code, url))
 
     def test_acc_endpoint_acc(self):
         for endpoint1 in api_test_map:
@@ -586,10 +597,10 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         for db1 in api_test_map[endpoint1]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
-                                    if db1 == "unintegrated" else ""
+                                    if db1 == "integrated" or db1 == "unintegrated" else ""
                                 for acc3 in api_test_map[endpoint3][db3]:
                                     un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                        if db3 == "unintegrated" else ""
+                                        if db3 == "integrated" or db3 == "unintegrated" else ""
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
                                         .format(ep1, db1 + un1, acc1, endpoint2, ep3, db3 + un3, acc3)
                                     response = self._get_in_debug_mode(url)
@@ -600,7 +611,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                         self.compare_objects_expected_vs_response(
                                             expected, response.data, endpoint1)
                                     else:
-                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                         "HTTP error {}: {}".format(response.status_code, url))
 
     def test_acc_db_endpoint(self):
         for endpoint1 in api_test_map:
@@ -617,7 +629,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         for db1 in api_test_map[endpoint1]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
-                                    if db1 == "unintegrated" else ""
+                                    if db1 == "integrated" or db1 == "unintegrated" else ""
                                 url = "/api/{}/{}/{}/{}/{}/{}" \
                                     .format(ep1, db1 + un1, acc1, endpoint2, db2, endpoint3)
                                 response = self._get_in_debug_mode(url)
@@ -627,7 +639,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     self.compare_objects_expected_vs_response(
                                         expected, response.data, endpoint1)
                                 else:
-                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                     "HTTP code error{}: {}".format(response.status_code, url))
 
                                 url = "/api/{}/{}/{}/{}/{}/{}" \
                                     .format(ep1, db1 + un1, acc1, endpoint3, endpoint2, db2)
@@ -636,7 +649,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     self.compare_objects_expected_vs_response(
                                         expected, response.data, endpoint1)
                                 else:
-                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                     "HTTP error {}: {}".format(response.status_code, url))
 
     def test_acc_db_db(self):
         for endpoint1 in api_test_map:
@@ -654,7 +668,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             for db1 in api_test_map[endpoint1]:
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
-                                        if db1 == "unintegrated" else ""
+                                        if db1 == "integrated" or db1 == "unintegrated" else ""
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
                                         .format(ep1, db1 + un1, acc1, endpoint2, db2, endpoint3, db3)
                                     response = self._get_in_debug_mode(url)
@@ -665,7 +679,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                         self.compare_objects_expected_vs_response(
                                             expected, response.data, endpoint1)
                                     else:
-                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                         "HTTP error {}: {}".format(response.status_code, url))
 
     def test_acc_db_acc(self):
         for endpoint1 in api_test_map:
@@ -682,10 +697,10 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             for db1 in api_test_map[endpoint1]:
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
-                                        if db1 == "unintegrated" else ""
+                                        if db1 == "integrated" or db1 == "unintegrated" else ""
                                     for acc3 in api_test_map[endpoint3][db3]:
                                         un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
-                                            if db3 == "unintegrated" else ""
+                                            if db3 == "integrated" or db3 == "unintegrated" else ""
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}/{}" \
                                             .format(ep1, db1 + un1, acc1, endpoint2, db2, ep3, db3 + un3,
                                                     acc3)
@@ -697,7 +712,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                             self.compare_objects_expected_vs_response(
                                                 expected, response.data, endpoint1)
                                         else:
-                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                             "HTTP error {}: {}".format(response.status_code, url))
 
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}/{}" \
                                             .format(ep1, db1 + un1, acc1, ep3, db3 + un3, acc3, endpoint2,
@@ -725,13 +741,13 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             for db1 in api_test_map[endpoint1]:
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles"}[acc1[:2]] \
-                                        if db1 == "unintegrated" else ""
+                                        if db1 == "integrated" or db1 == "unintegrated" else ""
                                     for acc2 in api_test_map[endpoint2][db2]:
                                         un2 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles"}[acc2[:2]] \
-                                            if db2 == "unintegrated" else ""
+                                            if db2 == "integrated" or db2 == "unintegrated" else ""
                                         for acc3 in api_test_map[endpoint3][db3]:
                                             un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles"}[acc3[:2]] \
-                                                if db3 == "unintegrated" else ""
+                                                if db3 == "integrated" or db3 == "unintegrated" else ""
                                             url = "/api/{}/{}/{}/{}/{}/{}/{}/{}/{}" \
                                                 .format(ep1, db1 + un1, acc1,
                                                         ep2, db2 + un2, acc2,
@@ -745,7 +761,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                                 self.compare_objects_expected_vs_response(
                                                     expected, response.data, endpoint1)
                                             else:
-                                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                                 "HTTP error {}: {}".format(response.status_code, url))
 
     def get_expected_object_payload(self, endpoint1, db1, acc1, endpoint2, endpoint3, db2=None, db3=None,
                                     acc2=None, acc3=None):
@@ -860,7 +877,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
         eps = plurals[endpoint1]
         for db in api_test_map[endpoint1]:
             accs = api_test_map[endpoint1][db]
-            if endpoint1 != "entry" or db == "interpro" or db == "unintegrated":
+            if endpoint1 != "entry" or db == "interpro" or db == "integrated" or db == "unintegrated":
                 obj = _obj
             else:
                 if "member_databases" not in _obj:
@@ -878,6 +895,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                 obj[db] = obj[db][eps]
             if db != "unintegrated" and \
                     db != "pdb" and \
+                    db != "integrated" and \
                     db != "interpro" and \
                     db != "uniprot" and \
                     ((display_object and sum(obj[db].values()) < 1) or (not display_object and obj[db]<1)):
@@ -894,9 +912,9 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         eps: obj[db],
                         plurals[endpoint2]: third
                     }
-            if (db == "unintegrated" or db == "interpro") and type(obj[db]) != int :
-                if reduce(lambda y,x: y if not y else x == 0, obj[db].values(), True):
-                    obj[db] = 0
+            # if (db == "integrated" or db == "unintegrated" or db == "interpro") and type(obj[db]) != int:
+            #     if reduce(lambda y, x: y if not y else x == 0, obj[db].values(), True):
+            #         obj[db] = 0
         return _obj
 
     def get_set_of_shared_ids(self, endpoint1, accs1,

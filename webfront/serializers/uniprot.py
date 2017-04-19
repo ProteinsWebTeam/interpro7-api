@@ -144,7 +144,8 @@ class ProteinSerializer(ModelContentSerializer):
     def to_entries_count_representation(self, instance):
         query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
-            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count()),
+            self.detail_filters
         )["entries"]
 
     def to_structures_count_representation(self, instance):

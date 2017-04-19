@@ -19,7 +19,7 @@ class EntrySerializer(ModelContentSerializer):
         if detail == SerializerDetail.ALL or detail == SerializerDetail.ENTRY_DETAIL:
             representation["metadata"] = self.to_metadata_representation(instance, self.searcher)
         elif detail == SerializerDetail.ENTRY_OVERVIEW:
-            representation = self.to_counter_representation(instance)
+            representation = self.to_counter_representation(instance, self.detail_filters)
         elif detail == SerializerDetail.ENTRY_HEADERS:
             representation = self.to_headers_representation(instance)
         elif detail == SerializerDetail.GROUP_BY:
@@ -144,7 +144,7 @@ class EntrySerializer(ModelContentSerializer):
             return {field_value: total for field_value, total in instance}
 
     @staticmethod
-    def to_counter_representation(instance):
+    def to_counter_representation(instance, filters=[]):
         if "entries" not in instance:
             if EntrySerializer.counter_is_empty(instance):
                 raise ReferenceError('There are not entries for this request')
@@ -159,6 +159,19 @@ class EntrySerializer(ModelContentSerializer):
                     "interpro": 0,
                 }
             }
+            if SerializerDetail.PROTEIN_DB in filters or SerializerDetail.STRUCTURE_DB in filters :
+                result["entries"]["integrated"] = {"entries": 0}
+                result["entries"]["unintegrated"] = {"entries": 0}
+                result["entries"]["interpro"] = {"entries": 0}
+            if SerializerDetail.PROTEIN_DB in filters:
+                result["entries"]["integrated"]["proteins"] = 0
+                result["entries"]["unintegrated"]["proteins"] = 0
+                result["entries"]["interpro"]["proteins"] = 0
+            if SerializerDetail.STRUCTURE_DB in filters:
+                result["entries"]["integrated"]["structures"] = 0
+                result["entries"]["unintegrated"]["structures"] = 0
+                result["entries"]["interpro"]["structures"] = 0
+
             if "unintegrated" in instance and (
                     ("count" in instance["unintegrated"] and instance["unintegrated"]["count"]) or
                     ("doc_count" in instance["unintegrated"] and instance["unintegrated"]["doc_count"]) > 0):
@@ -166,7 +179,18 @@ class EntrySerializer(ModelContentSerializer):
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]
-            result["entries"]["integrated"] = sum(result["entries"]["member_databases"].values()) - result["entries"]["unintegrated"]
+            vals = list(result["entries"]["member_databases"].values())
+            if type(vals[0]) == int:
+                result["entries"]["integrated"] = sum(vals) - result["entries"]["unintegrated"]
+            else:
+                result["entries"]["integrated"] = {
+                    "entries": sum([v["entries"] for v in vals]) - result["entries"]["unintegrated"]["entries"]
+                }
+                if "proteins" in result["entries"]["interpro"]:
+                    result["entries"]["integrated"]["proteins"] = result["entries"]["interpro"]["proteins"]
+                if "structures" in result["entries"]["interpro"]:
+                    result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
+
             return result
         return instance
 

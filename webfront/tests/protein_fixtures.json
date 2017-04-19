@@ -54,7 +54,9 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "swissprot"
+      "source_database": "swissprot",
+      "fragment": "N",
+      "residues": {}
     }
   },
   {
@@ -97,7 +99,9 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "swissprot"
+      "source_database": "swissprot",
+      "fragment": "N",
+      "residues": {}
     }
   },
   {
@@ -155,7 +159,9 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "trembl"
+      "source_database": "trembl",
+      "fragment": "N",
+      "residues": {}
     }
   },
   {
@@ -216,7 +222,9 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "trembl"
+      "source_database": "trembl",
+      "fragment": "N",
+      "residues": {}
     }
   }
 ]

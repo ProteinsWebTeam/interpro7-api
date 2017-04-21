@@ -29,7 +29,7 @@ def sort_by(fields):
             # wl = {k: v for k, v in wl.items() if v is not None}
             raise URLError("Sorting is not currently supported for multi-domains queries")
 
-        if field not in fields:
+        if field not in fields and field[1:] not in fields:
             raise URLError("This query can't be be sorted by {}. The supported fields are {}".format(
                 field, ", ".join(fields.keys())
             ))

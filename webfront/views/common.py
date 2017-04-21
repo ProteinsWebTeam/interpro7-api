@@ -65,6 +65,8 @@ class GeneralHandler(CustomView):
     searcher = None
 
     def get(self, request, url='', *args, **kwargs):
+        if url.strip() == '' or url.strip() == '/':
+            return Response({"endpoints": [x[0] for x in self.available_endpoint_handlers]})
         self.filter_serializers = {}
         self.pagination = pagination_information(request)
         endpoint_levels = map_url_to_levels(url)

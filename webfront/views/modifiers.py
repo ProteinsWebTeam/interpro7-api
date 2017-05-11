@@ -44,3 +44,11 @@ def filter_by_field(endpoint, field):
             **{"{}__iexact".format(field): value}
         )
     return x
+
+
+def get_single_value(field):
+    def x(value, general_handler):
+        queryset = general_handler.queryset_manager.get_queryset()
+        first = queryset.first()
+        return first.__getattribute__(field)
+    return x

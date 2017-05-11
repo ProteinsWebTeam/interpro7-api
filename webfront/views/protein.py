@@ -3,7 +3,8 @@ from django.shortcuts import redirect
 
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.views.modifiers import group_by, sort_by, filter_by_field
+from webfront.views.modifiers import \
+    group_by, sort_by, filter_by_field, get_single_value
 from webfront.models import Protein
 from django.conf import settings
 
@@ -23,6 +24,11 @@ class UniprotAccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("protein", accession=endpoint_levels[level - 1].upper())
+        general_handler.modifiers.register(
+            "residues",
+            get_single_value("residues"),
+            use_model_as_payload=True
+        )
         return super(UniprotAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

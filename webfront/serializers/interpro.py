@@ -180,16 +180,17 @@ class EntrySerializer(ModelContentSerializer):
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]
             vals = list(result["entries"]["member_databases"].values())
-            if type(vals[0]) == int:
-                result["entries"]["integrated"] = sum(vals) - result["entries"]["unintegrated"]
-            else:
-                result["entries"]["integrated"] = {
-                    "entries": sum([v["entries"] for v in vals]) - result["entries"]["unintegrated"]["entries"]
-                }
-                if "proteins" in result["entries"]["interpro"]:
-                    result["entries"]["integrated"]["proteins"] = result["entries"]["interpro"]["proteins"]
-                if "structures" in result["entries"]["interpro"]:
-                    result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
+            if len(vals) > 0:
+                if type(vals[0]) == int:
+                    result["entries"]["integrated"] = sum(vals) - result["entries"]["unintegrated"]
+                else:
+                    result["entries"]["integrated"] = {
+                        "entries": sum([v["entries"] for v in vals]) - result["entries"]["unintegrated"]["entries"]
+                    }
+                    if "proteins" in result["entries"]["interpro"]:
+                        result["entries"]["integrated"]["proteins"] = result["entries"]["interpro"]["proteins"]
+                    if "structures" in result["entries"]["interpro"]:
+                        result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
 
             return result
         return instance

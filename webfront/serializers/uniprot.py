@@ -25,6 +25,8 @@ class ProteinSerializer(ModelContentSerializer):
             representation = self.to_headers_representation(instance)
         elif detail == SerializerDetail.GROUP_BY:
             representation = self.to_group_representation(instance)
+        else:
+            representation = instance
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):

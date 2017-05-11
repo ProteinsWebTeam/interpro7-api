@@ -67,7 +67,7 @@ class RESTRequestsTest(FunctionalTest):
         jsonp = json.loads(content)
         self.assertEqual(acc, jsonp["metadata"]["accession"],
                          "The accession in the response object should be the same as reequested")
-        self.assertIn("molecular_function", jsonp["metadata"]["go_terms"],
+        self.assertIn("category", jsonp["metadata"]["go_terms"][0],
                       "the key is part of the go_terms and has been parsed OK")
 
         self.browser.get(self.server_url + "/api/protein/uniprot/"+jsonp["metadata"]["id"]+"?format=json")

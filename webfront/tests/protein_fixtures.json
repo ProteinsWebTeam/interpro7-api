@@ -16,26 +16,7 @@
       "length" : "543",
       "proteome": "UP000006701",
       "gene": "cpyA",
-      "go_terms": {
-        "biological_process": [
-          {
-            "id": "GO:0006508",
-            "name": "proteolysis"
-          }
-        ],
-        "molecular_function": [
-          {
-            "id": "GO:0004185",
-            "name": "serine-type carboxypeptidase activity"
-          }
-        ],
-        "cellular_component": [
-          {
-            "id": "GO:0005773",
-            "name": "vacuole"
-          }
-        ]
-      },
+      "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category": "F"}],
       "evidence_code": 3,
       "feature": {
         "signal_peptide": [],
@@ -76,16 +57,53 @@
       "length" : 297,
       "proteome": "UP000012042",
       "gene": "LVISKB_0797",
-      "go_terms": {
-        "biological_process": [],
-        "molecular_function": [],
-        "cellular_component": [
-          {
-            "id": "GO:0016020",
-            "name": "membrane"
-          }
-        ]
-      },
+      "go_terms": [
+        {
+          "identifier": "GO:0016740",
+          "name": "transferase activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        },
+        {
+          "identifier": "GO:0016787",
+          "name": "hydrolase activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        },
+        {
+          "identifier": "GO:0003824",
+          "name": "catalytic activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        },
+        {
+          "identifier": "GO:0003824",
+          "name": "catalytic activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        }
+      ],
       "evidence_code": 1,
       "feature": {
         "signal_peptide": [],
@@ -121,26 +139,7 @@
       "length" : "550",
       "proteome": "UP000030104",
       "gene": "PITC_084940",
-      "go_terms": {
-        "biological_process": [
-          {
-            "id": "GO:0006508",
-            "name": "proteolysis"
-          }
-        ],
-        "molecular_function": [
-          {
-            "id": "GO:0004185",
-            "name": "serine-type carboxypeptidase activity"
-          }
-        ],
-        "cellular_component": [
-          {
-            "id": "GO:0005773",
-            "name": "vacuole"
-          }
-        ]
-      },
+      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": "F"}],
       "evidence_code": 1,
       "feature": {
         "signal_peptide": [],
@@ -181,34 +180,7 @@
       "length" : 696,
       "proteome": "UP000008227",
       "gene": "LHCGR",
-      "go_terms": {
-        "biological_process": [
-          {
-            "id": "GO:0007186",
-            "name": "G-protein coupled receptor signaling pathway"
-          }
-        ],
-        "molecular_function": [
-          {
-            "id": "GO:0004930",
-            "name": "G-protein coupled receptor activity"
-          },
-          {
-            "id": "GO:0004964",
-            "name": "luteinizing hormone receptor activity"
-          },
-          {
-            "id": "GO:0016500",
-            "name": "protein-hormone receptor activity"
-          }
-        ],
-        "cellular_component": [
-          {
-            "id": "GO:0016021",
-            "name": "integral component of membrane"
-          }
-        ]
-      },
+      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": "F"}],
       "evidence_code": 4,
       "feature": {
         "signal_peptide": [],

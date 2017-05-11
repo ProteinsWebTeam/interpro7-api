@@ -66,7 +66,17 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance, searcher):
-        return {
+        for term in instance.go_terms:
+            if term['category'] == "F":
+                term['category'] = "Molecular Function"
+            elif term['category'] == "C":
+                term['category'] = "Cellular Component"
+            elif term['category'] == "P":
+                term['category'] = "Biological Process"
+            else:
+                raise Exception("Unkown Go Term category '{0}'".format(term['category']))
+
+        protein = {
             "accession": instance.accession,
             "id": instance.identifier,
             "source_organism": instance.organism,
@@ -89,6 +99,7 @@ class ProteinSerializer(ModelContentSerializer):
                 "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
             }
         }
+        return protein
 
     @staticmethod
     def serialize_counter_bucket(bucket):

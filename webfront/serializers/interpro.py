@@ -3,7 +3,7 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
-
+from webfront.serializers.utils import recategorise_go_terms
 
 class EntrySerializer(ModelContentSerializer):
 
@@ -46,6 +46,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance, solr):
+        recategorise_go_terms(instance.go_terms)
         obj = {
             "accession": instance.accession,
             "entry_id": instance.entry_id,

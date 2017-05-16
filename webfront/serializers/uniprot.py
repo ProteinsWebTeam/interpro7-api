@@ -4,7 +4,7 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 import webfront.serializers.interpro
 import webfront.serializers.pdb
 from webfront.views.custom import SerializerDetail
-
+from webfront.serializers.utils import recategorise_go_terms
 
 class ProteinSerializer(ModelContentSerializer):
 
@@ -66,16 +66,8 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance, searcher):
-        for term in instance.go_terms:
-            if term['category'] == "F":
-                term['category'] = "Molecular Function"
-            elif term['category'] == "C":
-                term['category'] = "Cellular Component"
-            elif term['category'] == "P":
-                term['category'] = "Biological Process"
-            else:
-                raise Exception("Unkown Go Term category '{0}'".format(term['category']))
-
+        recategorise_go_terms(instance.go_terms)
+        
         protein = {
             "accession": instance.accession,
             "id": instance.identifier,

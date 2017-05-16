@@ -118,7 +118,33 @@
           ],
           "accession": "IPR003165"
       },
-      "go_terms" : ["GO:0003676"],
+      "go_terms" : [
+        {
+          "identifier": "GO:0005634",
+          "name": "nucleus",
+          "category": "C"
+        },
+        {
+          "identifier": "GO:0003677",
+          "name": "DNA binding",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0003707",
+          "name": "steroid hormone receptor activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008270",
+          "name": "zinc ion binding",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0006355",
+          "name": "regulation of transcription, DNA-templated",
+          "category": "P"
+        }
+      ],
       "description" : ["The qiwi domain "],
       "wikipedia" : "",
       "literature": {}

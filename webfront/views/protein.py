@@ -29,6 +29,11 @@ class UniprotAccessionHandler(CustomView):
             get_single_value("residues"),
             use_model_as_payload=True
         )
+        general_handler.modifiers.register(
+            "structureinfo",
+            get_single_value("structure"),
+            use_model_as_payload=True
+        )
         return super(UniprotAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

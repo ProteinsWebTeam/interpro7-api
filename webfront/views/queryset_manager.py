@@ -2,6 +2,11 @@ from webfront.models import Entry, Protein, Structure
 from django.db.models import Q
 from functools import reduce
 from operator import or_
+import re
+
+
+def escape(text):
+    return re.sub(r'([-+!(){}[\]^"~*?:\\\/])', r"\\\1", text)
 
 
 class QuerysetManager:
@@ -37,18 +42,19 @@ class QuerysetManager:
     def order_by(self,field):
         self.order_field = field
 
+
     def get_searcher_query(self, include_search=False):
         q = ""
         for ep in self.filters:
             for k, v in self.filters[ep].items():
                 if ep == "solr":
-                    q += " && {}:{}".format(k, v)
+                    q += " && {}:{}".format(k, escape(v))
                 elif include_search and ep == "search":
-                    q += " && text:*{}*".format(v)
+                    q += " && text:*{}*".format(escape(v))
                 elif k == "source_database__isnull":
                     q += " && {}{}_db:*".format("!" if v else "", ep)
                 elif k == "accession" or k == "accession__iexact":
-                    q += " && {}_acc:{}".format(ep, v)
+                    q += " && {}_acc:{}".format(ep, escape(v))
                 elif k == "accession__isnull":
                     # elasticsearch perform better if the "give me all" query runs over a
                     # low cardinality field such as the _db ones
@@ -57,14 +63,14 @@ class QuerysetManager:
                     else:
                         q += " && {}{}_db:*".format("!" if v else "", ep)
                 elif k == "integrated" or k == "integrated__iexact":
-                    q += " && integrated:{}".format(v)
+                    q += " && integrated:{}".format(escape(v))
                 elif k == "integrated__isnull":
                     q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
                 elif k == "type" or k == "type__iexact":
-                    q += " && {}_type:{}".format(ep, v)
+                    q += " && {}_type:{}".format(ep, escape(v))
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
-                        q += " && {}_db:{}".format(ep, v)
+                        q += " && {}_db:{}".format(ep, escape(v))
         q = q[4:].lower()
         if self.order_field is not None:
             q += "&sort="+self.order_field

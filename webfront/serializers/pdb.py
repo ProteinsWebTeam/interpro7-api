@@ -3,6 +3,7 @@ from webfront.views.custom import SerializerDetail
 from webfront.models import Structure
 import webfront.serializers.uniprot
 import webfront.serializers.interpro
+from webfront.views.queryset_manager import escape
 
 
 class StructureSerializer(ModelContentSerializer):
@@ -89,7 +90,7 @@ class StructureSerializer(ModelContentSerializer):
     def get_search_query_from_representation(representation):
         query = None
         if "metadata" in representation:
-            query = "structure_acc:" + representation["metadata"]["accession"]
+            query = "structure_acc:" + escape(representation["metadata"]["accession"])
             if "chains" in representation["metadata"] and len(representation["metadata"]["chains"]) == 1:
                 query += " && ({})".format(" OR ".join(
                     ["chain:"+x for x in representation["metadata"]["chains"]]
@@ -111,7 +112,7 @@ class StructureSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_proteins_detail_representation(instance, searcher, is_full=False):
-        query = "structure_acc:" + instance.accession.lower()
+        query = "structure_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
                 r,
@@ -127,7 +128,7 @@ class StructureSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_entries_detail_representation(instance, searcher, is_full=False):
-        query = "structure_acc:" + instance.accession.lower()
+        query = "structure_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
                 r,

@@ -24,7 +24,33 @@
           ],
           "accession": "IPR003165"
       },
-      "go_terms" : ["GO:0003676"],
+      "go_terms" : [
+        {
+          "identifier": "GO:0005634",
+          "name": "nucleus",
+          "category": "C"
+        },
+        {
+          "identifier": "GO:0003677",
+          "name": "DNA binding",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0003707",
+          "name": "steroid hormone receptor activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008270",
+          "name": "zinc ion binding",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0006355",
+          "name": "regulation of transcription, DNA-templated",
+          "category": "P"
+        }
+      ],
       "description" : ["The piwi domain [PUB00020128] is a protein domain found in piwi proteins and a large number of related nucleic acid-binding proteins, especially those that bind and cleave RNA. The function of the domain is double stranded-RNA-guided hydrolysis of single stranded-RNA, as has been determined in the argonaute family of related proteins [PUB00018283]."],
       "wikipedia" : "",
       "literature": {
@@ -159,7 +185,13 @@
       "name": "Piwi domain",
       "short_name": "Piwi",
       "other_names": [],
-      "go_terms": ["GO:0003676"],
+      "go_terms": [
+        {
+        "identifier": "GO:0005634",
+        "name": "nucleus",
+        "category": "C"
+        }
+      ],
       "source_database": "pfam",
       "member_databases": null,
       "integrated": "IPR003165",
@@ -208,7 +240,13 @@
       "name": "Piwi domain",
       "short_name": "Piwi",
       "other_names": [],
-      "go_terms": ["GO:0003676"],
+      "go_terms": [
+        {
+          "identifier": "GO:0005634",
+          "name": "nucleus",
+          "category": "C"
+        }
+      ],
       "source_database": "smart",
       "member_databases": null,
       "integrated": "IPR003165",
@@ -281,7 +319,13 @@
       "name": "Myelin family",
       "short_name": "Myelin",
       "other_names": [],
-      "go_terms": ["GO:0016021"],
+      "go_terms": [
+        {
+          "identifier": "GO:0005634",
+          "name": "nucleus",
+          "category": "C"
+        }
+      ],
       "source_database": "smart",
       "member_databases": null,
       "integrated": null,

@@ -2,7 +2,6 @@ from functional_tests.base import FunctionalTest
 import json
 import re
 
-
 class RESTRequestsTest(FunctionalTest):
     def test_request_entry_endpoint(self):
         self.browser.get(self.server_url + "/api/entry/?format=json")
@@ -28,6 +27,7 @@ class RESTRequestsTest(FunctionalTest):
                          "The response should have as many entries as reported in /entry ")
 
         acc = jsonp["results"][0]["metadata"]["accession"]
+        self.assertEqual(acc, "IPR001165")
         self.browser.get(self.server_url + "/api/entry/interpro/"+acc+"?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
@@ -37,7 +37,7 @@ class RESTRequestsTest(FunctionalTest):
         self.assertIn("metadata", jsonp.keys(), "'metadata' should be one of the keys in the response")
         self.assertTrue(isinstance(jsonp["metadata"]["go_terms"], list), "go_terms should be a list")
 
-        self.assertEqual(jsonp["metadata"]["counters"]["proteins"], 2)
+        self.assertEqual(jsonp["metadata"]["counters"]["proteins"], 1)
 
     def test_request_protein_endpoint(self):
         self.browser.get(self.server_url + "/api/protein/?format=json")

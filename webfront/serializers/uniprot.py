@@ -5,6 +5,7 @@ import webfront.serializers.interpro
 import webfront.serializers.pdb
 from webfront.views.custom import SerializerDetail
 from webfront.serializers.utils import recategorise_go_terms
+from webfront.views.queryset_manager import escape
 
 class ProteinSerializer(ModelContentSerializer):
 
@@ -147,21 +148,21 @@ class ProteinSerializer(ModelContentSerializer):
         return key
 
     def to_entries_count_representation(self, instance):
-        query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
             self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count()),
             self.detail_filters
         )["entries"]
 
     def to_structures_count_representation(self, instance):
-        query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
             self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
         )["structures"]
 
     @staticmethod
     def to_entries_detail_representation(instance, searcher, is_full=False):
-        solr_query = "protein_acc:" + instance.accession.lower()
+        solr_query = "protein_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
                 r,
@@ -180,7 +181,7 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_structures_detail_representation(instance, searcher, is_full=False):
-        query = "protein_acc:" + instance.accession.lower()
+        query = "protein_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r,

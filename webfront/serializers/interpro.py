@@ -4,6 +4,8 @@ from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
 from webfront.serializers.utils import recategorise_go_terms
+from webfront.views.queryset_manager import escape
+
 
 class EntrySerializer(ModelContentSerializer):
 
@@ -76,7 +78,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_proteins_detail_representation(instance, solr, is_full=False):
-        solr_query = "entry_acc:" + instance.accession.lower()
+        solr_query = "entry_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
                 r,
@@ -91,7 +93,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_structures_detail_representation(instance, solr, is_full=False):
-        solr_query = "entry_acc:" + instance.accession.lower()
+        solr_query = "entry_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r,
@@ -236,13 +238,13 @@ class EntrySerializer(ModelContentSerializer):
         return False
 
     def to_proteins_count_representation(self, instance):
-        solr_query = "entry_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.uniprot.ProteinSerializer.to_counter_representation(
             self.searcher.get_counter_object("protein", solr_query, self.get_extra_endpoints_to_count())
         )["proteins"]
 
     def to_structures_count_representation(self, instance):
-        solr_query = "entry_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
             self.searcher.get_counter_object("structure", solr_query, self.get_extra_endpoints_to_count())
         )["structures"]

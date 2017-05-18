@@ -1,9 +1,6 @@
 import abc
-import http.client
-import json
 import re
-import urllib.parse
-from django.conf import settings
+from webfront.views.queryset_manager import escape
 
 
 class SearchController(metaclass=abc.ABCMeta):
@@ -19,7 +16,7 @@ class SearchController(metaclass=abc.ABCMeta):
         elif field.startswith("protein"):
             db = "protein_db"
         ngroups = self.get_group_obj_of_field_by_query(
-             "{}:* && {}_acc:{}".format(db, endpoint, accession), field
+             "{}:* && {}_acc:{}".format(db, endpoint, escape(accession)), field
         )["ngroups"]
         if isinstance(ngroups, dict):
             ngroups = ngroups["value"]

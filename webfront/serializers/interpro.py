@@ -26,6 +26,8 @@ class EntrySerializer(ModelContentSerializer):
             representation = self.to_headers_representation(instance)
         elif detail == SerializerDetail.GROUP_BY:
             representation = self.to_group_representation(instance)
+        else:
+            representation = instance
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -56,7 +58,7 @@ class EntrySerializer(ModelContentSerializer):
             "go_terms": instance.go_terms,
             "source_database": instance.source_database,
             "member_databases": instance.member_databases,
-            "integrated": instance.integrated,
+            "integrated": instance.integrated.accession if instance.integrated else None,
             "hierarchy": instance.hierarchy,
             "name": {
                 "name": instance.name,
@@ -71,9 +73,6 @@ class EntrySerializer(ModelContentSerializer):
                 "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
             }
         }
-        # Just showing the accesion number instead of recursively show the entry to which has been integrated
-        if instance.integrated:
-            obj["integrated"] = instance.integrated.accession
         return obj
 
     @staticmethod
@@ -112,11 +111,11 @@ class EntrySerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.name,
                 "source_database": instance.source_database,
-                "type": instance.type
+                "type": instance.type,
+                "integrated": instance.integrated.accession if instance.integrated else None,
+                "member_databases": instance.member_databases,
             }
         }
-        if instance.integrated is not None:
-            headers['integrated'] = instance.integrated.accession
         return headers
 
     @staticmethod

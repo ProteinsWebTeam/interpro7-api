@@ -26,6 +26,7 @@ class SerializerDetail(Enum):
     STRUCTURE_DB = 306
 
     GROUP_BY = 800
+    GROUP_BY_MEMBER_DATABASES = 801
 
 class QuerysetType(Enum):
     ENTRY = 100

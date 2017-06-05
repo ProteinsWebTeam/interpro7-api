@@ -2,7 +2,7 @@ from django.db.models import Count
 
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
-from webfront.views.modifiers import group_by, sort_by, filter_by_field
+from webfront.views.modifiers import group_by, sort_by, filter_by_field, get_interpro_status_counter, filter_by_contains_field
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
@@ -53,6 +53,12 @@ class MemberHandler(CustomView):
         if level - 3 >= 0 and endpoint_levels[level - 3] == "interpro":
             general_handler.queryset_manager.add_filter("entry", integrated=endpoint_levels[level - 2])
             general_handler.queryset_manager.remove_filter("entry", "accession")
+
+        general_handler.modifiers.register(
+            "interpro_status",
+            get_interpro_status_counter,
+            use_model_as_payload=True
+        )
 
         return super(MemberHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler,
@@ -169,6 +175,18 @@ class InterproHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry",
                                                     source_database__iexact=endpoint_levels[level - 1])
 
+        general_handler.modifiers.register(
+            "group_by",
+            group_by(Entry, {
+                "type": "entry_type",
+                "integrated": "integrated",
+                "source_database": "entry_db",
+                "member_databases": ""
+            }),
+            use_model_as_payload=True,
+            # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
+        )
+        general_handler.modifiers.register("signature_in", filter_by_contains_field("entry", "member_databases"))
         return super(InterproHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -222,7 +240,7 @@ class EntryHandler(CustomView):
             group_by(Entry, {
                 "type": "entry_type",
                 "integrated": "integrated",
-                "source_database": "entry_db"
+                "source_database": "entry_db",
             }),
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY

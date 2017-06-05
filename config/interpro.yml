@@ -40,8 +40,8 @@ members:
     accession: 'PS[0-9]{5}$'
     options: []
     options_per_family: []
-  prosite_profiles:
-    filter: "prosite_profiles"
+  profile:
+    filter: "profile"
     label: "PROSITE profiles"
     accession: 'PS[0-9]{5}$'
     options: []
@@ -92,5 +92,11 @@ members:
     filter: "mobidblt"
     label: "mobidblt"
     accession: 'mobidb-lite'
+    options: []
+    options_per_family: []
+  sfld:
+    filter: "sfld"
+    label: "sfld"
+    accession: 'SFLD[FGS][0-9]{5}$'
     options: []
     options_per_family: []

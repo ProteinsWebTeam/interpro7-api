@@ -37,7 +37,9 @@ class QuerysetManager:
         self.filters[endpoint] = {**self.filters[endpoint], **kwargs}
 
     def remove_filter(self, endpoint, f):
+        tmp = self.filters[endpoint][f]
         del self.filters[endpoint][f]
+        return tmp
 
     def order_by(self,field):
         self.order_field = field

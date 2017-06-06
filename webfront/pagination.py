@@ -31,6 +31,8 @@ class CustomPagination(PageNumberPagination):
 
     def paginate_queryset(self, queryset, request, **kwargs):
         if "search_size" in kwargs and kwargs["search_size"] is not None:
+            if not queryset.ordered:
+                queryset = queryset.order_by('accession')
             queryset._count = kwargs["search_size"]
         return super(CustomPagination, self).paginate_queryset(queryset, request, kwargs["view"])
     #

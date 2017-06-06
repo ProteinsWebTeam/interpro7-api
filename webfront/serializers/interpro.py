@@ -114,6 +114,7 @@ class EntrySerializer(ModelContentSerializer):
                 "type": instance.type,
                 "integrated": instance.integrated.accession if instance.integrated else None,
                 "member_databases": instance.member_databases,
+                "go_terms": instance.go_terms,
             }
         }
         return headers

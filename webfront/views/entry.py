@@ -53,6 +53,18 @@ class MemberHandler(CustomView):
         if level - 3 >= 0 and endpoint_levels[level - 3] == "interpro":
             general_handler.queryset_manager.add_filter("entry", integrated=endpoint_levels[level - 2])
             general_handler.queryset_manager.remove_filter("entry", "accession")
+        general_handler.modifiers.register(
+            "group_by",
+            group_by(Entry, {
+                "type": "entry_type",
+                "integrated": "integrated",
+                "source_database": "entry_db",
+                "member_databases": "",
+                "go_terms": "go_terms",
+        }),
+            use_model_as_payload=True,
+            # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
+        )
 
         general_handler.modifiers.register(
             "interpro_status",
@@ -181,8 +193,9 @@ class InterproHandler(CustomView):
                 "type": "entry_type",
                 "integrated": "integrated",
                 "source_database": "entry_db",
-                "member_databases": ""
-            }),
+                "member_databases": "",
+                "go_terms": "go_terms",
+        }),
             use_model_as_payload=True,
             # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
@@ -252,6 +265,7 @@ class EntryHandler(CustomView):
         }))
         general_handler.modifiers.register("type", filter_by_field("entry", "type"))
         general_handler.modifiers.register("integrated", filter_by_field("entry", "integrated__accession"))
+        general_handler.modifiers.register("go_term", filter_by_contains_field("entry", "go_terms", '"category": "{}"'))
         return super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs

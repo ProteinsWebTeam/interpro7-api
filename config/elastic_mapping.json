@@ -7,7 +7,7 @@
         "structure_acc": {"type":  "keyword"},
         "entry_db": {"type":  "keyword"},
         "protein_db": {"type":  "keyword"},
-        "chain": {"type":  "keyword"},
+        "chain": {"type":  "text", "analyzer": "keyword"},
         "integrated": {"type":  "keyword"},
         "entry_type": {"type":  "keyword"},
         "tax_id": {"type":  "long"},

@@ -70,6 +70,8 @@ class QuerysetManager:
                     q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
                 elif k == "type" or k == "type__iexact":
                     q += " && {}_type:{}".format(ep, escape(v))
+                elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":
+                    q += " && tax_id:{}".format(escape(v))
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
                         q += " && {}_db:{}".format(ep, escape(v))

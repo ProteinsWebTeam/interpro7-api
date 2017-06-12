@@ -92,7 +92,7 @@ def get_object_from_row(con, row, col, is_for_interpro_entries=True):
         "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
     }, row[col["LEN"]], is_for_interpro_entries)
     return {k: v.lower() if type(v) == str else v for k, v in obj.items()}
-
+#TODO:
 
 def chunks(iterable, max=1000):
     iterator = iter(iterable)

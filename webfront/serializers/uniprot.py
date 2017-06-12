@@ -61,7 +61,8 @@ class ProteinSerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.name,
                 "source_database": instance.source_database,
-                "length": instance.length
+                "length": instance.length,
+                "source_organism": instance.organism,
             }
         }
 

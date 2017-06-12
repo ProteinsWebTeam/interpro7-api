@@ -32,6 +32,13 @@ def group_by_go_terms(general_handler):
         return qs
 
 
+def group_by_organism(general_handler,endpoint_queryset):
+        queryset = general_handler.queryset_manager.get_queryset().distinct()
+        qs = endpoint_queryset.objects.filter(accession__in=queryset)
+        return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:20]
+
+
+
 def group_by(endpoint_queryset, fields):
     def inner(field, general_handler):
         if field not in fields:
@@ -43,6 +50,8 @@ def group_by(endpoint_queryset, fields):
         if "go_terms" == field:
             return group_by_go_terms(general_handler)
         if is_single_endpoint(general_handler):
+            if "tax_id" == field:
+                return group_by_organism(general_handler, endpoint_queryset)
             queryset = general_handler.queryset_manager.get_queryset().distinct()
             qs = endpoint_queryset.objects.filter(accession__in=queryset)
             return qs.values_list(field).annotate(total=Count(field))
@@ -86,6 +95,17 @@ def filter_by_contains_field(endpoint, field, value_template='{}'):
         )
     return x
 
+def filter_by_field_range(endpoint, field, value_template='{}'):
+    def x(value, general_handler):
+        pos = value.split('-')
+        general_handler.queryset_manager.add_filter(
+            endpoint,
+            **{
+                "{}__gte".format(field): value_template.format(pos[0]),
+                "{}__lte".format(field): value_template.format(pos[1]),
+            }
+        )
+    return x
 
 def get_single_value(field):
     def x(value, general_handler):

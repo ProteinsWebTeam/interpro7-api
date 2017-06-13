@@ -4,6 +4,7 @@
     "fields": {
       "identifier": "CBPYA_ASPCL",
       "accession": "A1CUJ5",
+      "tax_id": 344612,
       "organism": {
         "name": "Aspergillus clavatus (strain ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1)",
         "taxid": 344612
@@ -45,6 +46,7 @@
     "fields": {
       "identifier": "M5ADK6_LACBR",
       "accession": "M5ADK6",
+      "tax_id": 1001583,
       "organism": {
         "name": "Lactobacillus brevis KB290",
         "taxid": 1001583
@@ -127,6 +129,7 @@
     "fields": {
       "identifier": "A0A0A2L2G2_PENIT",
       "accession": "A0A0A2L2G2",
+      "tax_id": 40296,
       "organism": {
         "name": "Penicillium italicum",
         "taxid": 40296
@@ -168,9 +171,10 @@
     "fields": {
       "identifier": "LSHR_PIG",
       "accession": "P16582",
+      "tax_id": 40296,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxid": 40296
       },
       "name": "Lutropin-choriogonadotropic hormone receptor",
       "short_name": "LH/CG-R",

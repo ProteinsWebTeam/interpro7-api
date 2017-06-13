@@ -35,7 +35,7 @@ def group_by_go_terms(general_handler):
 def group_by_organism(general_handler,endpoint_queryset):
         queryset = general_handler.queryset_manager.get_queryset().distinct()
         qs = endpoint_queryset.objects.filter(accession__in=queryset)
-        return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:20]
+        return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:30]
 
 
 

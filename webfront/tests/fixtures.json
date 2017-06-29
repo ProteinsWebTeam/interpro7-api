@@ -120,6 +120,14 @@
         "PUB00038628": {
           "PMID": 15800629
         }
+      },
+      "cross_references": {
+        "ENZYME": [
+          "6.4.1.1"
+        ],
+        "PRIAM": [
+          "PRI003248"
+        ]
       }
     }
   },
@@ -173,7 +181,8 @@
       ],
       "description" : ["The qiwi domain "],
       "wikipedia" : "",
-      "literature": {}
+      "literature": {},
+      "cross_references": {}
     }
   },
   {
@@ -228,6 +237,14 @@
           "authors": "Cerutti L, Mian N, Bateman A.",
           "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
         }
+      },
+      "cross_references": {
+        "ENZYME": [
+          "6.4.1.1"
+        ],
+        "PRIAM": [
+          "PRI003248"
+        ]
       }
     }
   },
@@ -252,7 +269,8 @@
       "integrated": "IPR003165",
       "description": ["This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."],
       "wikipedia": "Piwi",
-      "literature": {}
+      "literature": {},
+      "cross_references": {}
     }
   },
   {
@@ -270,7 +288,8 @@
       "integrated": "IPR003165",
       "description": ["The Piwi box (or Sting domain) is an about 40 to 80 amino-acid conserved region, which was first identified in the C-terminal part of Drosophila Piwi and Sting proteins, and of related proteins from human, Caenorhabditis elegans, Arabidopsis thaliana, fission yeast and Dictyostelium discoideum."],
       "wikipedia": "Piwi",
-      "literature": {}
+      "literature": {},
+      "cross_references": {}
     }
   },
   {
@@ -288,7 +307,8 @@
       "other_names": [],
       "description": [],
       "wikipedia": "",
-      "literature": {}
+      "literature": {},
+      "cross_references": {}
     }
   },
   {
@@ -306,7 +326,8 @@
       "other_names": [],
       "description": [],
       "wikipedia": "",
-      "literature": {}
+      "literature": {},
+      "cross_references": {}
     }
 
   },
@@ -331,7 +352,8 @@
       "integrated": null,
       "description": ["The myelin sheath is a multi-layered membrane, unique to the nervous system, that functions as an insulator to greatly increase the velocity of axonal impulse conduction."],
       "wikipedia": null,
-      "literature": {}
+      "literature": {},
+      "cross_references": {}
     }
   },
   {
@@ -349,7 +371,8 @@
       "integrated": null,
       "description": ["Heat shock hsp20 proteins family profile."],
       "wikipedia": null,
-      "literature": {}
+      "literature": {},
+      "cross_references": {}
     }
   }
 ]

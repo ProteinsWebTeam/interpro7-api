@@ -71,7 +71,8 @@ class EntrySerializer(ModelContentSerializer):
             "counters": {
                 "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
                 "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
-            }
+            },
+            "cross_references": instance.cross_references
         }
         return obj
 

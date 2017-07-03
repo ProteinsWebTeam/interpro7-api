@@ -3,7 +3,7 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
-from webfront.serializers.utils import recategorise_go_terms
+from webfront.serializers.utils import recategorise_go_terms, reformat_cross_references
 from webfront.views.queryset_manager import escape
 
 
@@ -72,7 +72,7 @@ class EntrySerializer(ModelContentSerializer):
                 "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
                 "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
             },
-            "cross_references": instance.cross_references
+            "cross_references": reformat_cross_references(instance.cross_references)
         }
         return obj
 

@@ -39,10 +39,3 @@ def recategorise_go_terms(go_terms):
         else:
             raise Exception("Unknown Go Term category '{0}'".format(term['category']))
 
-def reformat_cross_references(cross_references):
-    for database in cross_references:
-        accessions = cross_references[database]
-        cross_references[database] = {}
-        cross_references[database]['description'] = "Description of data source (to be defined in API)"
-        cross_references[database]['accessions'] = accessions
-    return cross_references

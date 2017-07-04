@@ -3,9 +3,8 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
-from webfront.serializers.utils import recategorise_go_terms, reformat_cross_references
+from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
-
 
 class EntrySerializer(ModelContentSerializer):
 
@@ -49,6 +48,35 @@ class EntrySerializer(ModelContentSerializer):
         return representation
 
     @staticmethod
+    def reformat_cross_references(cross_references):
+        DEFAULT_DESCRIPTION = "Description of data source (to be defined in API)"
+        DEFAULT_URL_PATTERN = "https://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query={accession}"
+
+        reformattedCrossReferences = {}
+        for database in cross_references.keys():
+            accessions = cross_references[database]
+            #formattedDatabase = EntrySerializer.get_key_from_bucket(database)
+            reformattedCrossReferences[database] = {}
+
+            if database in EntrySerializer.dbData and 'description' in EntrySerializer.dbData[database]:
+                reformattedCrossReferences[database]['description'] =  EntrySerializer.dbData[database]['description']
+            else:
+                reformattedCrossReferences[database]['description'] = DEFAULT_DESCRIPTION
+
+            reformattedCrossReferences[database]['accessions'] = []
+            for accession in accessions:
+                accessionObj = {}
+                accessionObj['accession'] = accession
+
+                if database in EntrySerializer.dbData and 'urlPattern' in EntrySerializer.dbData[database]:
+                    accessionObj['url'] =  EntrySerializer.dbData[database]['urlPattern']
+                else:
+                    accessionObj['url'] = DEFAULT_URL_PATTERN
+                accessionObj['url'] = accessionObj['url'].replace('{accession}', accession)
+                reformattedCrossReferences[database]['accessions'].append(accessionObj)
+        return reformattedCrossReferences
+
+    @staticmethod
     def to_metadata_representation(instance, solr):
         recategorise_go_terms(instance.go_terms)
         obj = {
@@ -72,7 +100,7 @@ class EntrySerializer(ModelContentSerializer):
                 "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
                 "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
             },
-            "cross_references": reformat_cross_references(instance.cross_references)
+            "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)
         }
         return obj
 
@@ -199,6 +227,7 @@ class EntrySerializer(ModelContentSerializer):
             return result
         return instance
 
+
     dbcode = {
         "H": "Pfam",
         "M": "prosite_profiles",
@@ -216,6 +245,65 @@ class EntrySerializer(ModelContentSerializer):
         "Q": "HAMAP",
         "F": "Prints",
     }
+
+
+    dbData = {
+        'MODBASE': {
+
+        },
+        'SFLD': {},
+        'PANDIT': {
+            'description': 'The Protein and Associated NucleotideDomains with Inferred Trees (PANDIT) database is a collection of multiple sequence alignments and phylogenetic trees covering many common protein domains.',
+            'urlPattern': 'http://www.ebi.ac.uk/goldman-srv/pandit/pandit.cgi?action=browse&fam={accession}'
+        },
+        'ProDom': {},
+        'MSDsite': {},
+        'PRINTS': {},
+        'GO Classification': {},
+        'Pfam': {},
+        'InterPro': {},
+        'CDD': {},
+        'COMe': {},
+        'Blocks': {},
+        'PROSITE profiles': {},
+        'TIGRFAMs': {},
+        'COG': {},
+        'PROSITE patterns': {},
+        'HAMAP': {},
+        'SMART': {},
+        'UniProt/Swiss-Prot': {},
+        'UniProt/TrEMBL': {},
+        'PIRSF': {},
+        'PANTHER': {},
+        'SWISS-MODEL': {},
+        'GENE3D': {},
+        'SUPERFAMILY': {},
+        'IUPHAR receptor code': {},
+        'ADAN': {},
+        'PDB': {},
+        'CAZy': {},
+        'DBD': {},
+        'ENZYME': {
+            'description': 'ENZYME is a repository of information relative to the nomenclature of enzymes. It is primarily based on the recommendations of the Nomenclature Committee of the International Union of Biochemistry and Molecular Biology (IUBMB) and it describes each type of characterized enzyme for which an EC (Enzyme Commission) number has been provided.',
+            'urlPattern': 'http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec={accession}'
+        },
+        'MobiDB Lite': {},
+        'CATH': {},
+        'PRIAM': {
+            'description': "ENZYME-SPECIFIC PROFILES for metabolic pathway prediction.",
+            'urlPattern': 'http://priam.prabi.fr/cgi-bin/ReqPRIAM_png.pl?priam_ac={accession}'
+        },
+        'KEGG': {},
+        'PfamClan': {},
+        'MEROPS': {},
+        'OMIM': {},
+        'PROSITE doc': {},
+        'Reactome': {},
+        'MetaCyc': {},
+        'UniProt': {},
+        'UniPathway': {},
+        'SCOP': {}
+    };
 
     @staticmethod
     def get_key_from_bucket(bucket):

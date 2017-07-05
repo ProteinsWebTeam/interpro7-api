@@ -197,12 +197,12 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None):
-        key_coord = "entry_protein_coordinates" if for_entry else "protein_structure_coordinates"
+        key_coord = "entry_protein_locations" if for_entry else "protein_structure_locations"
         header = {
             "accession": obj["protein_acc"],
             key_coord: obj[key_coord],
             # "name": "PTHP_BUCAI",
-            # "length": 85,
+            "protein_length": obj["protein_length"],
             "source_database": obj["protein_db"],
             "organism": obj["tax_id"],
         }

@@ -15,7 +15,9 @@
         "protein_structure_coordinates": { "type": "object", "enabled" : false},
         "entry_protein_coordinates": { "type": "object", "enabled" : false},
         "text": {"type":  "text"},
-        "id": {"type":  "keyword"}
+        "id": {"type":  "keyword"},
+        "IDA_FK": {"type":  "keyword"},
+        "IDA": {"type":  "text"}
       }
     }
   }

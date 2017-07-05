@@ -53,7 +53,8 @@ class FixtureReader:
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
                 "tax_id": self.proteins[p]["organism"]["taxid"],
-                "entry_protein_coordinates": ep["coordinates"],
+                "entry_protein_locations": ep["coordinates"],
+                "protein_length": self.proteins[p]["length"],
                 # "django_ct": get_model_ct(ProteinEntryFeature),
                 # "django_id": 0,
                 "id": get_id(e, p)
@@ -66,7 +67,7 @@ class FixtureReader:
                     c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["chain"] = sp["chain"]
                     c["id"] = get_id(e, p, sp["structure"], sp["chain"])
-                    c["protein_structure_coordinates"] = sp["coordinates"]
+                    c["protein_structure_locations"] = sp["coordinates"]
                     to_add.append(c)
             else:
                 to_add.append(obj)
@@ -81,11 +82,12 @@ class FixtureReader:
                         "tax_id": self.proteins[p]["organism"]["taxid"],
                         # "django_ct": get_model_ct(ProteinEntryFeature),
                         # "django_id": 0,
+                        "protein_length": self.proteins[p]["length"],
                         "id": get_id(None, p, sp["structure"], sp["chain"]),
                         "structure_acc": sp["structure"],
                         "structure_chain": sp["structure"] + " - " + sp["chain"],
                         "chain": sp["chain"],
-                        "protein_structure_coordinates": sp["coordinates"],
+                        "protein_structure_locations": sp["coordinates"],
                     })
 
         lower = []

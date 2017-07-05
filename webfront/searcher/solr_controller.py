@@ -20,7 +20,7 @@ class SolrController(SearchController):
             'group.ngroups': 'true',
             'rows': rows,
             'start': start,
-            'fl': '*, entry_protein_coordinates:[json], protein_structure_coordinates:[json]',
+            'fl': '*, entry_protein_locations:[json], protein_structure_coordinates:[json]',
         }
         if fq is not None:
             parameters['fq'] = fq.lower()
@@ -30,7 +30,7 @@ class SolrController(SearchController):
 
     def get_chain(self):
         res = self.solr.search(self.queryset_manager.get_searcher_query(), **{
-            'fl': 'chain, structure_acc, protein_acc, protein_db, tax_id, protein_structure_coordinates:[json]',
+            'fl': 'chain, structure_acc, protein_acc, protein_db, tax_id, protein_structure_locations:[json]',
         })
         return res.raw_response["response"]["docs"]
 
@@ -93,7 +93,7 @@ class SolrController(SearchController):
         parameters = {
             'rows': rows,
             'start': start,
-            'fl': '*, entry_protein_coordinates:[json], protein_structure_coordinates:[json]',
+            'fl': '*, entry_protein_locations:[json], protein_structure_locations:[json]',
         }
         if fq is not None:
             parameters['fq'] = fq.lower()

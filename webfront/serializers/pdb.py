@@ -154,16 +154,17 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def get_chain_from_search_object(obj):
         output = {
-            "protein_structure_coordinates": obj["protein_structure_coordinates"],
+            "protein_structure_locations": obj["protein_structure_locations"],
             "organism": {
                 "taxid": obj["tax_id"]
             },
             "accession": obj["protein_acc"],
             "chain": obj["chain"],
+            "protein_length": obj["protein_length"],
             "source_database": obj["protein_db"]
         }
-        if "entry_protein_coordinates" in obj:
-            output["entry_protein_coordinates"] = obj["entry_protein_coordinates"]
+        if "entry_protein_locations" in obj:
+            output["entry_protein_locations"] = obj["entry_protein_locations"]
         return output
 
     @staticmethod

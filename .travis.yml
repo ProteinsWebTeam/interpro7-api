@@ -5,8 +5,6 @@ python:
   - "3.5"
 addons:
   chrome: stable
-before_cache:  - "rm -f $HOME/selenium/geckodriver-v0.11.1-linux32.tar.gz"
-
 before_install:
   - jdk_switcher use oraclejdk8
   - "wget https://www.ebi.ac.uk/~luciani/Oracle/oracle.zip && unzip oracle.zip -d oracle"

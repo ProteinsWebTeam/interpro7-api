@@ -38,3 +38,4 @@ def recategorise_go_terms(go_terms):
             term['category'] = "Biological Process"
         else:
             raise Exception("Unknown Go Term category '{0}'".format(term['category']))
+

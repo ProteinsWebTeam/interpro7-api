@@ -1,3 +1,4 @@
+from django.conf import settings
 from webfront.models import Entry
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
@@ -5,7 +6,6 @@ import webfront.serializers.uniprot
 import webfront.serializers.pdb
 from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
-
 
 class EntrySerializer(ModelContentSerializer):
 
@@ -49,6 +49,43 @@ class EntrySerializer(ModelContentSerializer):
         return representation
 
     @staticmethod
+    def reformat_cross_references(cross_references):
+        DEFAULT_DESCRIPTION = "Description of data source (to be defined in API)"
+        DEFAULT_URL_PATTERN = "https://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query={accession}"
+        #fetches values from interpro.yml
+        xrefSettings = settings.CROSS_REFERENCES
+
+        reformattedCrossReferences = {}
+        for database in cross_references.keys():
+            accessions = cross_references[database]
+            reformattedCrossReferences[database] = {}
+
+            if database in xrefSettings and 'displayName' in xrefSettings[database]:
+                reformattedCrossReferences[database]['displayName'] =  xrefSettings[database]['displayName']
+            else:
+                reformattedCrossReferences[database]['displayName'] = database
+
+            if database in xrefSettings and 'description' in xrefSettings[database]:
+                reformattedCrossReferences[database]['description'] =  xrefSettings[database]['description']
+            else:
+                reformattedCrossReferences[database]['description'] = DEFAULT_DESCRIPTION
+
+            reformattedCrossReferences[database]['rank'] =  xrefSettings[database]['rank']
+
+            reformattedCrossReferences[database]['accessions'] = []
+            for accession in accessions:
+                accessionObj = {}
+                accessionObj['accession'] = accession
+
+                if database in xrefSettings and 'urlPattern' in xrefSettings[database]:
+                    accessionObj['url'] =  xrefSettings[database]['urlPattern']
+                else:
+                    accessionObj['url'] = DEFAULT_URL_PATTERN
+                accessionObj['url'] = accessionObj['url'].replace('{accession}', accession)
+                reformattedCrossReferences[database]['accessions'].append(accessionObj)
+        return reformattedCrossReferences
+
+    @staticmethod
     def to_metadata_representation(instance, solr):
         recategorise_go_terms(instance.go_terms)
         obj = {
@@ -71,7 +108,8 @@ class EntrySerializer(ModelContentSerializer):
             "counters": {
                 "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
                 "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
-            }
+            },
+            "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)
         }
         return obj
 
@@ -197,6 +235,7 @@ class EntrySerializer(ModelContentSerializer):
 
             return result
         return instance
+
 
     dbcode = {
         "H": "Pfam",

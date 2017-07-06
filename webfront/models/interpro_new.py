@@ -18,6 +18,7 @@ class Entry(models.Model):
     literature = JSONField()
     # Array of the string representing the domain architecture
     hierarchy = JSONField(null=True)
+    cross_references = JSONField()
 
 
 class Protein(models.Model):

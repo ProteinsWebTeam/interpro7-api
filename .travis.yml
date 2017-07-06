@@ -14,7 +14,9 @@ before_install:
   - "export LD_LIBRARY_PATH=$(pwd)/oracle/"
   - "export DYLD_LIBRARY_PATH=$(pwd)/oracle/"
   - "export BROWSER_TEST=chrome"
-  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+  - wget http://chromedriver.storage.googleapis.com/2.30/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip
+  - sudo cp chromedriver /usr/local/bin/.
   - sleep 3
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb && sudo service elasticsearch restart
 services:

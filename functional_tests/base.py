@@ -6,9 +6,12 @@ import sys
 import time
 import os
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
 
 from webfront.tests.fixtures_reader import FixtureReader
 from interpro.settings import SEARCHER_TEST_URL
+
 
 
 @override_settings(SEARCHER_URL=SEARCHER_TEST_URL)
@@ -41,7 +44,9 @@ class FunctionalTest(StaticLiveServerTestCase):
     def setUp(self):
         try:
             if os.environ['BROWSER_TEST'] == "chrome":
-                self.browser = webdriver.Chrome()
+                chrome_options = Options()
+                chrome_options.add_argument("--headless")
+                self.browser = webdriver.Chrome(chrome_options=chrome_options)
             else:
                 raise KeyError
         except KeyError:

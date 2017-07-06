@@ -7,14 +7,9 @@ class RESTRequestsTest(FunctionalTest):
     def test_request_entry_endpoint(self):
         self.browser.get(self.server_url + "/api/entry/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
-        print(content)
-
         jsonp = json.loads(content)
-        print(jsonp)
-        time.sleep(10)
 
         self.assertEqual(len(jsonp["entries"]), 3, "the output has exactly 3 keys")
-
         self.assertIn('"member_databases"', content)
         self.assertIn('"interpro"', content)
         self.assertIn('"unintegrated"', content)

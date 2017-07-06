@@ -100,3 +100,110 @@ members:
     accession: 'SFLD[FGS][0-9]{5}$'
     options: []
     options_per_family: []
+
+cross_references: 
+    'MODBASE': 
+        'rank': 32
+    'SFLD': 
+        'rank': 16
+    'PANDIT': 
+        'displayName': 'PANDIT'
+        'rank': 28
+        'description': 'The Protein and Associated NucleotideDomains with Inferred Trees (PANDIT) database is a collection of multiple sequence alignments and phylogenetic trees covering many common protein domains.'
+        'urlPattern': 'http://www.ebi.ac.uk/goldman-srv/pandit/pandit.cgi?action=browse&fam={accession}'
+    'ProDom': 
+        'rank': 5
+    'MSDsite': 
+        'displayName': 'PDBeMotif'
+        'rank': 29
+        'description': 'PDBeMotif is an extremely fast and powerful search tool that facilitates exploration of the Protein Data Bank (PDB) by combining protein sequence, chemical structure and 3D data in a single search.'
+        'urlPattern': 'http://www.ebi.ac.uk/pdbe-site/pdbemotif/barChartPattern?pattern1={accession}'
+    'PRINTS': 
+        'rank': 4
+    'GO Classification': 
+        'rank': 15
+    'Pfam': 
+        'rank': 2
+    'InterPro': 
+        'rank': 14
+    'CDD': 
+        'rank': 43
+    'COMe': 
+        'rank': 27
+        'description': 'OMe is an attempt to classify metalloproteins and some other complex proteins using the concept of bioinorganic motif (a common structural feature of a class of functionally related, but not necessarily homologous, proteins, that includes the metal atom(s) and first coordination shell ligands).'
+        'url': 'http://www.flymine.org/come/entry?gn={accession}'
+    'Blocks': 
+        'rank': 17
+    'PROSITE profiles': 
+        'rank': 7
+    'TIGRFAMs': 
+        'rank': 9
+    'COG': 
+        'rank': 23
+    'PROSITE patterns': 
+        'rank': 6
+    'HAMAP': 
+        'rank': 36
+    'SMART': 
+        'rank': 8
+    'UniProt/Swiss-Prot': 
+        'rank': 12
+    'UniProt/TrEMBL': 
+        'rank': 13
+    'PIRSF': 
+        'rank': 3
+    'PANTHER':
+        'rank': 1
+    'SWISS-MODEL':
+        'rank': 30
+    'GENE3D':
+        'rank': 10
+    'SUPERFAMILY':
+        'rank': 11
+    'IUPHAR receptor code':
+        'rank': 22
+        'description': 'The IUPHAR database incorporates detailed pharmacological, functional and pathophysiological information on G Protein-Coupled Receptors, Voltage-Gated Ion Channels, Ligand-Gated Ion Channels and Nuclear Hormone Receptors.'
+        'urlPattern': 'http://www.iuphar-db.org/GPCR/ReceptorDisplayForward?receptorID={accession}'
+    'ADAN':
+        'rank': 33
+    'PDB':
+        'rank': 26
+    'CAZy':
+        'rank': 20
+    'DBD':
+        'rank': 34
+    'ENZYME':
+        'rank': 19
+        'description': 'ENZYME is a repository of information relative to the nomenclature of enzymes. It is primarily based on the recommendations of the Nomenclature Committee of the International Union of Biochemistry and Molecular Biology (IUBMB) and it describes each type of characterized enzyme for which an EC (Enzyme Commission) number has been provided.'
+        'urlPattern': 'http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec={accession}'
+    'MobiDB Lite':
+        'rank': 44
+    'CATH':
+        'rank': 25
+    'PRIAM':
+        'rank': 38
+        'description': "ENZYME-SPECIFIC PROFILES for metabolic pathway prediction."
+        'urlPattern': 'http://priam.prabi.fr/cgi-bin/ReqPRIAM_png.pl?priam_ac={accession}'
+    'KEGG':
+        'rank': 39
+    'PfamClan':
+        'rank': 97
+    'MEROPS':
+        'rank': 21
+    'OMIM':
+        'rank': 31
+    'PROSITE doc':
+        'rank': 18
+        'description': 'PROSITE is a database of protein families and domains.'
+        'url': 'http://prosite.expasy.org/{accession}'
+    'Reactome':
+        'rank': 42
+    'MetaCyc':
+        'rank': 41
+    'UniProt':
+        'rank': 35
+    'UniPathway':
+        'rank': 40
+    'SCOP':
+        'rank': 24
+

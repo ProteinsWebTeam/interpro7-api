@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from webfront.views.modifiers import \
-    group_by, sort_by, filter_by_field, get_single_value, filter_by_field_range, filter_by_contains_field
+    group_by, sort_by, filter_by_field, get_single_value, filter_by_field_range, get_domain_architectures
 from webfront.models import Protein
 from django.conf import settings
 
@@ -73,6 +73,8 @@ class UniprotHandler(CustomView):
         ds = endpoint_levels[level - 1].lower()
         if ds != "uniprot":
             general_handler.queryset_manager.add_filter("protein", source_database__iexact=ds)
+        general_handler.modifiers.register("ida", get_domain_architectures,
+            use_model_as_payload=True, serializer=SerializerDetail.PROTEIN_HEADERS, many=True)
         return super(UniprotHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -124,6 +126,9 @@ class ProteinHandler(CustomView):
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY
         )
+        general_handler.modifiers.register("ida", get_domain_architectures,
+            use_model_as_payload=True, serializer=SerializerDetail.PROTEIN_OVERVIEW)
+
         general_handler.modifiers.register("sort_by", sort_by({
             "accession": "protein_acc",
             "length": "length",

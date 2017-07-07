@@ -60,6 +60,9 @@ class FixtureReader:
                 "id": get_id(e, p)
 
             }
+            if "IDA" in ep:
+                obj["IDA"] = ep["IDA"]
+                obj["IDA_FK"] = ep["IDA_FK"]
             if p in self.protein_structure_list:
                 for sp in self.protein_structure_list[p]:
                     c = copy.copy(obj)

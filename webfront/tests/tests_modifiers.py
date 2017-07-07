@@ -105,13 +105,42 @@ class InterProStatusModifierTest(InterproRESTTestCase):
             response = self.client.get("/api/entry/"+db)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIn("results", response.data)
-            unintegrated = len([r["metadata"]["integrated"]
-                            for r in response.data["results"]
-                            if r["metadata"]["integrated"] is None
-                            ])
+            unintegrated = len([
+                r["metadata"]["integrated"]
+                for r in response.data["results"]
+                if r["metadata"]["integrated"] is None
+            ])
             response2 = self.client.get("/api/entry/"+db+"?interpro_status")
             self.assertEqual(response2.status_code, status.HTTP_200_OK)
             self.assertEqual(response2.data["unintegrated"], unintegrated)
             self.assertEqual(response2.data["integrated"],
                              len(response.data["results"]) - unintegrated)
 
+
+class IDAModifiersTest(InterproRESTTestCase):
+
+    def test_ida_modifier(self):
+        response = self.client.get("/api/entry/interpro/IPR001165?ida")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("results", response.data)
+        self.assertIn("count", response.data)
+        self.assertEqual(response.data["count"], len(response.data["results"]))
+
+    def test_ida_modifier_paginated(self):
+        response = self.client.get("/api/entry/interpro/IPR003165?ida&page_size=1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("results", response.data)
+        self.assertIn("count", response.data)
+        self.assertGreater(response.data["count"], len(response.data["results"]))
+        first_ida_fk = response.data["results"][0]["IDA_FK"]
+        response = self.client.get("/api/entry/interpro/IPR003165?ida&page_size=1&page=2")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(first_ida_fk, response.data["results"][0]["IDA_FK"])
+
+    def test_filter_by_ida_modifier(self):
+        response = self.client.get("/api/protein/uniprot?ida=50134")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("results", response.data)
+        self.assertIn("count", response.data)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual("A1CUJ5", response.data["results"][0]["metadata"]["accession"])

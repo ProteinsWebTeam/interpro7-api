@@ -25,6 +25,8 @@ class SerializerDetail(Enum):
     STRUCTURE_PROTEIN_DETAIL = 305
     STRUCTURE_DB = 306
 
+    IDA_LIST = 400
+
     GROUP_BY = 800
     GROUP_BY_MEMBER_DATABASES = 801
 

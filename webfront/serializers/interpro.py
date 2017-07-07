@@ -26,6 +26,8 @@ class EntrySerializer(ModelContentSerializer):
             representation = self.to_headers_representation(instance)
         elif detail == SerializerDetail.GROUP_BY:
             representation = self.to_group_representation(instance)
+        elif detail == SerializerDetail.IDA_LIST:
+            representation = self.to_ida_list_representation(instance)
         else:
             representation = instance
         return representation
@@ -309,6 +311,17 @@ class EntrySerializer(ModelContentSerializer):
             )
 
         return header
+
+    @staticmethod
+    def to_ida_list_representation(obj):
+        # return obj
+        return {
+            "count": obj["ngroups"]["value"],
+            "results": [
+                {"IDA": o["IDA"], "IDA_FK": o["IDA_FK"], "unique_proteins": o["unique"]["value"]}
+                for o in obj['groups']
+            ]
+        }
 
     class Meta:
         model = Entry

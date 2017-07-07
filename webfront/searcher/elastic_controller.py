@@ -113,7 +113,7 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]
 
-    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=1, start=0):
+    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=1, start=0, inner_field_to_count=None):
         query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
         facet = {
             "aggs": {
@@ -125,7 +125,7 @@ class ElasticsearchController(SearchController):
                 "groups": {
                     "terms": {
                         "field": field,
-                        "size": rows,
+                        "size": start+rows,
                         "execution_hint": "map",
                     },
                     "aggs": {
@@ -135,14 +135,25 @@ class ElasticsearchController(SearchController):
             },
             "size": 1
         }
+        if inner_field_to_count is not None:
+            facet["aggs"]["groups"]["aggs"]["unique"] = {"cardinality": {"field": inner_field_to_count}}
         if fq is not None:
             query += " && "+fq
         response = self._elastic_json_query(query, facet)
-        response["aggregations"]["groups"] = [
-            bucket["tops"]["hits"]["hits"][0]["_source"]
-            for bucket in response["aggregations"]["groups"]["buckets"]
-        ]
-        return response["aggregations"]
+        output = {
+            "groups":  [
+                bucket["tops"]["hits"]["hits"][0]["_source"]
+                for bucket in response["aggregations"]["groups"]["buckets"][start:start+rows]
+            ],
+            "ngroups": response["aggregations"]["ngroups"]
+        }
+        if inner_field_to_count is not None:
+            i = 0
+            for bucket in response["aggregations"]["groups"]["buckets"][start:start+rows]:
+                output["groups"][i]["unique"] = bucket["unique"]
+                i += 1
+
+        return output
 
     def get_list_of_endpoint(self, endpoint, solr_query=None, rows=10, start=0):
         qs = self.queryset_manager.get_searcher_query() if solr_query is None else solr_query

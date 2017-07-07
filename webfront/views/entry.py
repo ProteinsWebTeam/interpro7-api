@@ -2,7 +2,7 @@ from django.db.models import Count
 
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
-from webfront.views.modifiers import group_by, sort_by, filter_by_field, get_interpro_status_counter, filter_by_contains_field
+from webfront.views.modifiers import group_by, sort_by, filter_by_field, get_interpro_status_counter, filter_by_contains_field, get_domain_architectures
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
@@ -99,6 +99,11 @@ class AccessionHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
         general_handler.queryset_manager.add_filter("entry", accession=endpoint_levels[level - 1].upper())
+        general_handler.modifiers.register(
+            "ida", get_domain_architectures,
+            use_model_as_payload=True,
+            serializer=SerializerDetail.IDA_LIST
+        )
         return super(AccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, parent_queryset,
             handler, general_handler, *args, **kwargs

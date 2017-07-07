@@ -44,7 +44,14 @@ class CustomView(GenericAPIView):
                 self.queryset = general_handler.modifiers.payload
                 self.serializer_detail = general_handler.modifiers.serializer
                 general_handler.filter_serializers = []
-                self.many = False
+                self.many = general_handler.modifiers.many
+                if self.many:
+                    self.queryset = self.paginator.paginate_queryset(
+                        self.get_queryset(),
+                        request, view=self,
+                        search_size=self.search_size
+                    )
+
             elif self.from_model:
 
                 if is_single_endpoint(general_handler) or not self.expected_response_is_list():

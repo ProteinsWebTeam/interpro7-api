@@ -4,16 +4,19 @@ class ModifierManager:
         self.modifiers = {}
         self.payload = None
         self.serializer = None
+        self.many = False
 
     def register(self, parameter, action,
                  use_model_as_payload=False,
-                 serializer=None
+                 serializer=None,
+                 many=False
                  ):
         self.modifiers[parameter] = {
             "action": action,
             "use_model_as_payload": use_model_as_payload,
             "serializer":serializer
         }
+        self.many = many
 
     def execute(self, request):
         payload_modifiers = {}

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='entry',
             name='cross_references',
-            field=jsonfield.fields.JSONField(default='{}'),
+            field=jsonfield.fields.JSONField(default={}),
             preserve_default=False,
         ),
     ]

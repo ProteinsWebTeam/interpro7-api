@@ -14,9 +14,9 @@ class ModifierManager:
         self.modifiers[parameter] = {
             "action": action,
             "use_model_as_payload": use_model_as_payload,
-            "serializer":serializer
+            "serializer": serializer,
+            "many": many,
         }
-        self.many = many
 
     def execute(self, request):
         payload_modifiers = {}
@@ -31,11 +31,13 @@ class ModifierManager:
             if param is not None:
                 self.payload = self.modifiers[modifier]["action"](param, self.general_handler)
                 self.serializer = self.modifiers[modifier]["serializer"]
+                self.many = self.many or self.modifiers[modifier]["many"]
         use_model_as_payload = False
         for modifier in payload_modifiers:
             param = request.query_params.get(modifier)
             if param is not None:
                 self.payload = self.modifiers[modifier]["action"](param, self.general_handler)
+                self.many = self.many or self.modifiers[modifier]["many"]
                 if self.serializer is None:
                     self.serializer = self.modifiers[modifier]["serializer"]
                 else:

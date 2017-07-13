@@ -31,12 +31,10 @@ dbcode = {
 query_for_interpro_entries = '''SELECT DISTINCT
     e.ENTRY_AC, e.ENTRY_TYPE, e.NAME, e.SHORT_NAME, DBMS_LOB.substr(e.ANNOTATION, 3000) as DESCRIPTION,
     p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID, p.LEN as LEN,
-    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN,
-    DBMS_LOB.substr(ida.IDA, 12000) as IDA, ida.IDA_FK
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN
   FROM INTERPRODW.DW_ENTRY e
     JOIN  INTERPRODW.UPI_SUPERMATCH_STG pe ON e.ENTRY_AC=pe.ENTRY_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
-    LEFT JOIN INTERPRODW.PROTEIN_IDA_NEW ida ON ida.PROTEIN_AC=p.PROTEIN_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=p.PROTEIN_AC
   WHERE ROWNUM <= {} AND {}'''
 
@@ -45,14 +43,12 @@ query_for_memberdb_entries = '''SELECT DISTINCT
     e.NAME, e.DESCRIPTION, e.ABSTRACT as SHORT_NAME,
     em.ENTRY_AC as INTEGRATED,
     p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID, p.LEN as LEN,
-    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN,
-    DBMS_LOB.substr(ida.IDA, 12000) as IDA, ida.IDA_FK
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN
   FROM INTERPRO.METHOD e
     JOIN INTERPRO.MATCH pe ON e.METHOD_AC=pe.METHOD_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
     LEFT JOIN INTERPRO.ENTRY2METHOD em ON em.METHOD_AC=e.METHOD_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=pe.PROTEIN_AC
-    LEFT JOIN INTERPRODW.PROTEIN_IDA_NEW ida ON ida.PROTEIN_AC=p.PROTEIN_AC
   WHERE pe.DBCODE=e.DBCODE AND ROWNUM <= {} AND {}'''
 
 def get_id(*args):
@@ -109,10 +105,10 @@ def attach_coordinates(con, obj, protein_length, is_for_interpro_entries):
     # Included in a second array to support discontinuous domains in the future
     # see  https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=34998332
 
-    return attach_structure_coordinates(con, obj, protein_length)
+    return attach_structure_coordinates(con, obj)
 
 
-def attach_structure_coordinates(con, obj, protein_length):
+def attach_structure_coordinates(con, obj):
     if "structure_acc" in obj and obj["structure_acc"] is not None:
         cur = con.cursor()
         sql = """ SELECT *
@@ -130,7 +126,26 @@ def attach_structure_coordinates(con, obj, protein_length):
             }
             for row in cur
         ]
+    return attach_ida_data(con, obj)
+
+
+def attach_ida_data(con, obj):
+    cur = con.cursor()
+    sql = """  SELECT DBMS_LOB.substr(ida.IDA, 12000) as IDA, ida.IDA_FK
+               FROM PROTEIN_IDA_NEW ida
+               WHERE PROTEIN_AC='{}'"""\
+        .format(obj["protein_acc"])
+    try:
+        cur.execute(sql)
+        col = get_column_dict_from_cursor(cur)
+        if cur.rowcount > 0:
+            row = cur.fetchone()
+            obj["IDA"] = row[col["IDA"]]
+            obj["IDA_FK"] = row[col["IDA_FK"]]
+    except:
+        print(sql)
     return obj
+
 
 def get_object_from_row(con, row, col, is_for_interpro_entries=True):
     codes = get_dbcodes(con)
@@ -147,8 +162,6 @@ def get_object_from_row(con, row, col, is_for_interpro_entries=True):
         "tax_id": row[col["TAX_ID"]],
         "structure_acc": row[col["STRUCTURE_AC"]] if row[col["STRUCTURE_AC"]] is not None else None,
         "chain": row[col["CHAIN"]] if row[col["CHAIN"]] is not None else None,
-        "IDA": row[col["IDA"]],
-        "IDA_FK": row[col["IDA_FK"]],
         "structure_chain": row[col["STRUCTURE_AC"]] + " - " + row[col["CHAIN"]] if row[col["STRUCTURE_AC"]] is not None else None,
         "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
     }, row[col["LEN"]], is_for_interpro_entries)

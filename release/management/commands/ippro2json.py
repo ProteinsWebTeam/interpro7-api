@@ -197,7 +197,7 @@ def oracle2json(interpro_db, protein_db, block_size, match_pos, compare_sym, end
     print('connecting to '+ipro['NAME'])
     con = cx_Oracle.connect(
         ipro['USER'], ipro['PASSWORD'],
-        cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME'])
+        cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']) if ipro['PORT'] else ipro['NAME']
     )
     is_for_interpro_entries = interpro_db == "interpro"
     where = []

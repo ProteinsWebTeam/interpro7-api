@@ -23,7 +23,7 @@ except FileNotFoundError:
 try:
     ORACLE_CONFIG = yaml.safe_load(open('{}/config/oracle.yml'.format(BASE_DIR)))
 except FileNotFoundError:
-    ORACLE_CONFIG = {}
+    ORACLE_CONFIG = None
 try:
     MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
 except FileNotFoundError:
@@ -101,13 +101,6 @@ WSGI_APPLICATION = 'interpro.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': ,
-    #     'TEST': {
-    #         'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
-    #     },
-    # },
     'default': {
         'ENGINE': MYSQL_CONFIG.get('engine', 'django.db.backends.sqlite3'),
         'NAME': MYSQL_CONFIG.get(
@@ -123,15 +116,28 @@ DATABASES = {
             'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
         },
     },
-    'interpro_ro': {
+}
+if ORACLE_CONFIG is not None:
+    DATABASES['interpro_ro'] = {
         'ENGINE': ORACLE_CONFIG.get('engine', 'django.db.backends.oracle'),
-        'NAME': ORACLE_CONFIG.get('sid', 'INTERPRO_DB'),
         'USER': ORACLE_CONFIG.get('user', 'USER'),
         'PASSWORD': ORACLE_CONFIG.get('password'),
-        'HOST': ORACLE_CONFIG.get('host', 'HOST'),
-        'PORT': ORACLE_CONFIG.get('port', 1540),
-    },
-}
+    }
+    if ORACLE_CONFIG.get('sid', None) is not None:
+        DATABASES['interpro_ro']['NAME'] = ORACLE_CONFIG.get('sid')
+        DATABASES['interpro_ro']['HOST'] = ORACLE_CONFIG.get('host', 'localhost')
+        DATABASES['interpro_ro']['PORT'] = ORACLE_CONFIG.get('port', 1540)
+    elif ORACLE_CONFIG.get('name', None) is not None:
+        DATABASES['interpro_ro']['NAME'] = "{}:{}/{}".format(
+            ORACLE_CONFIG.get('host', 'localhost'),
+            ORACLE_CONFIG.get('port', 1540),
+            ORACLE_CONFIG.get('name')
+        )
+    else:
+        del DATABASES['interpro_ro']
+    print(DATABASES['interpro_ro'])
+
+
 SEARCHER_URL = 'http://hmmer-prod-db01:9200/interpro_sp/relationship'
 SEARCHER_TEST_URL = INTERPRO_CONFIG.get('searcher_test', 'http://127.0.0.1:8983/solr/test')
 # HAYSTACK_CONNECTIONS = {

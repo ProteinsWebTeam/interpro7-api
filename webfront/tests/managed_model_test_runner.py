@@ -28,7 +28,7 @@ class UnManagedModelTestRunner(DiscoverRunner):
         for m in self.unmanaged_models:
             m._meta.managed = False
 
-if 'test' in sys.argv or 'test_coverage' in sys.argv:  # Covers regular testing and django-coverage
+if 'interpro_ro' in settings.DATABASES and ('test' in sys.argv or 'test_coverage' in sys.argv):  # Covers regular testing and django-coverage
     settings.DATABASES['interpro_ro']['ENGINE'] = 'django.db.backends.sqlite3'
     settings.DATABASES['interpro_ro']['NAME'] = os.path.join(settings.BASE_DIR, '../database/db3.sqlite3')
     settings.DATABASES['interpro_ro']['TEST'] = {'MIRROR': 'default'}

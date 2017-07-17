@@ -62,7 +62,8 @@ class StructureSerializer(ModelContentSerializer):
             "metadata": {
                 "accession": instance.accession,
                 "name": instance.name,
-                "source_database": instance.source_database
+                "source_database": instance.source_database,
+                "experiment_type": instance.experiment_type
             }
         }
 

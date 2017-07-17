@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import yaml
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -99,7 +100,6 @@ WSGI_APPLICATION = 'interpro.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': MYSQL_CONFIG.get('engine', 'django.db.backends.sqlite3'),
@@ -117,6 +117,11 @@ DATABASES = {
         },
     },
 }
+if sys.argv[1:2] == ['test']:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '../database/db.sqlite3',
+    }
 if ORACLE_CONFIG is not None:
     DATABASES['interpro_ro'] = {
         'ENGINE': ORACLE_CONFIG.get('engine', 'django.db.backends.oracle'),
@@ -135,25 +140,10 @@ if ORACLE_CONFIG is not None:
         )
     else:
         del DATABASES['interpro_ro']
-    print(DATABASES['interpro_ro'])
 
 
-SEARCHER_URL = 'http://hmmer-prod-db01:9200/interpro_sp/relationship'
-SEARCHER_TEST_URL = INTERPRO_CONFIG.get('searcher_test', 'http://127.0.0.1:8983/solr/test')
-# HAYSTACK_CONNECTIONS = {
-#     'default': {
-#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-#         'URL': 'http://hmmer-prod-db01:9200/interpro/relationship'
-#         # ...or for multicore...
-#         # 'URL': 'http://127.0.0.1:8983/solr/interpro7',
-#     },
-# }
-# TEST_INDEX = {
-#     'default': {
-#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-#         'URL': INTERPRO_CONFIG.get('solr_test', 'http://127.0.0.1:8983/solr/test'),
-#     },
-# }
+SEARCHER_URL = INTERPRO_CONFIG.get('searcher_path', 'http://127.0.0.1:9200/interpro_sp/relationship')
+SEARCHER_TEST_URL = INTERPRO_CONFIG.get('searcher_test_path', 'http://127.0.0.1:9200/interpro_sp/relationship')
 
 TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
 

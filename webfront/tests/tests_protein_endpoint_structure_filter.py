@@ -7,7 +7,7 @@ data_in_fixtures = {
     "P16582": ["1T2V", "1T2V", "1T2V", "1T2V", "1T2V"],
     "A1CUJ5": ["1JM7"],
 }
-data_swissprot = ["A1CUJ5", "M5ADK6"]
+data_reviewed = ["A1CUJ5", "M5ADK6"]
 
 
 import unittest
@@ -25,8 +25,8 @@ class ProteinWithFilterStructureRESTTest(InterproRESTTestCase):
     def test_urls_that_return_list_of_accessions_and_structures(self):
         urls = [
             "/api/protein/uniprot/structure/",
-            "/api/protein/swissprot/structure/",
-            "/api/protein/trembl/structure/",
+            "/api/protein/reviewed/structure/",
+            "/api/protein/unreviewed/structure/",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -37,10 +37,10 @@ class ProteinWithFilterStructureRESTTest(InterproRESTTestCase):
     def test_urls_that_return_protein_with_structure_count(self):
         for prot in data_in_fixtures:
             urls = ["/api/protein/uniprot/"+prot+"/structure"]
-            if prot in data_swissprot:
-                urls.append("/api/protein/swissprot/"+prot+"/structure")
+            if prot in data_reviewed:
+                urls.append("/api/protein/reviewed/"+prot+"/structure")
             else:
-                urls.append("/api/protein/trembl/"+prot+"/structure")
+                urls.append("/api/protein/unreviewed/"+prot+"/structure")
             for url in urls:
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -68,14 +68,14 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
                 self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
-    def test_can_get_swissprot_from_pdb_structures(self):
-        response = self.client.get("/api/protein/swissprot/structure/pdb")
-        self.assertEqual(len(response.data["results"]), len(data_swissprot))
+    def test_can_get_reviewed_from_pdb_structures(self):
+        response = self.client.get("/api/protein/reviewed/structure/pdb")
+        self.assertEqual(len(response.data["results"]), len(data_reviewed))
         for result in response.data["results"]:
             self.assertEqual(len(result["structures"]),
                              len(data_in_fixtures[result["metadata"]["accession"]]),
                              "failing for "+result["metadata"]["accession"])
-            self.assertIn(result["metadata"]["accession"], data_swissprot)
+            self.assertIn(result["metadata"]["accession"], data_reviewed)
             for match in result["structures"]:
                 self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
@@ -95,9 +95,9 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         prot_s = "M5ADK6"
         prot_t = "P16582"
         tests = [
-            "/api/protein/swissprot/"+prot_t+"/structure/pdb",
-            "/api/protein/trembl/"+prot_s+"/structure/pdb",
-            "/api/protein/trembl/BADP/structure/pdb",
+            "/api/protein/reviewed/"+prot_t+"/structure/pdb",
+            "/api/protein/unreviewed/"+prot_s+"/structure/pdb",
+            "/api/protein/unreviewed/BADP/structure/pdb",
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
@@ -132,8 +132,8 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
         tests = {
             "/api/protein/uniprot/structure/pdb/"+pdb_1: ["P16582", "P16582", "P16582", "P16582", "P16582"],
             "/api/protein/uniprot/structure/pdb/"+pdb_2: ["M5ADK6", "A0A0A2L2G2"],
-            "/api/protein/trembl/structure/pdb/"+pdb_2: ["A0A0A2L2G2"],
-            "/api/protein/swissprot/structure/pdb/"+pdb_2: ["M5ADK6"],
+            "/api/protein/unreviewed/structure/pdb/"+pdb_2: ["A0A0A2L2G2"],
+            "/api/protein/reviewed/structure/pdb/"+pdb_2: ["M5ADK6"],
             "/api/protein/uniprot/structure/pdb/"+pdb_1+"/A": ["P16582"],
             "/api/protein/uniprot/structure/pdb/"+pdb_2+"/B": ["M5ADK6", "A0A0A2L2G2"],
         }
@@ -166,8 +166,8 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
         tests = [
             "/api/protein/uniprot/"+prot_s1+"/structure/pdb/"+pdb_1+"/B",
             "/api/protein/uniprot/"+prot_s2+"/structure/pdb/"+pdb_1+"/A",
-            "/api/protein/trembl/structure/pdb/"+pdb_1,
-            # "/api/protein/trembl/structure/pdb/"+pdb_2+"/B",
+            "/api/protein/unreviewed/structure/pdb/"+pdb_1,
+            # "/api/protein/unreviewed/structure/pdb/"+pdb_2+"/B",
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
@@ -180,9 +180,9 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
         prot_s1 = "A1CUJ5"
         prot_s2 = "M5ADK6"
         tests = [
-            "/api/protein/trembl/BAD_PROTEIN/structure/pdb/"+pdb_1,
+            "/api/protein/unreviewed/BAD_PROTEIN/structure/pdb/"+pdb_1,
             "/api/protein/structure/pdb/BAD_PDB"
-            "/api/protein/trembl/"+prot_s2+"/structure/pdb/"+pdb_1,
+            "/api/protein/unreviewed/"+prot_s2+"/structure/pdb/"+pdb_1,
         ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

@@ -16,8 +16,8 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
     def test_urls_that_return_list_of_accessions_and_entries(self):
         urls = [
             "/api/protein/uniprot/entry/",
-            "/api/protein/swissprot/entry/",
-            "/api/protein/trembl/entry/",
+            "/api/protein/reviewed/entry/",
+            "/api/protein/unreviewed/entry/",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -26,13 +26,13 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
 
     def test_can_get_entries_from_protein_id(self):
-        swissprot = "A1CUJ5"
-        trembl = "P16582"
+        reviewed = "A1CUJ5"
+        unreviewed = "P16582"
         urls = [
-            "/api/protein/uniprot/"+swissprot+"/entry/",
-            "/api/protein/uniprot/"+trembl+"/entry/",
-            "/api/protein/swissprot/"+swissprot+"/entry/",
-            "/api/protein/trembl/"+trembl+"/entry/",
+            "/api/protein/uniprot/"+reviewed+"/entry/",
+            "/api/protein/uniprot/"+unreviewed+"/entry/",
+            "/api/protein/reviewed/"+reviewed+"/entry/",
+            "/api/protein/unreviewed/"+unreviewed+"/entry/",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -48,11 +48,11 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
     def test_urls_that_should_fails(self):
-        swissprot = "A1CUJ5"
-        trembl = "P16582"
+        reviewed = "A1CUJ5"
+        unreviewed = "P16582"
         tests = [
-            "/api/protein/swissprot/"+trembl+"/entry/",
-            "/api/protein/trembl/"+swissprot+"/entry/",
+            "/api/protein/reviewed/"+unreviewed+"/entry/",
+            "/api/protein/unreviewed/"+reviewed+"/entry/",
             "/api/protein/bad_db/entry/",
             ]
         for url in tests:
@@ -76,7 +76,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIsInstance(response.data, dict)
             for prot_db in response.data["proteins"]:
-                self.assertIn(prot_db, ["uniprot", "swissprot", "trembl"])
+                self.assertIn(prot_db, ["uniprot", "reviewed", "unreviewed"])
                 self.assertIn("proteins", response.data["proteins"][prot_db])
                 self.assertIn("entries", response.data["proteins"][prot_db])
 
@@ -84,8 +84,8 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         acc = "IPR003165"
         urls = [
             "/api/protein/uniprot/entry/interpro",
-            "/api/protein/swissprot/entry/interpro",
-            "/api/protein/trembl/entry/interpro",
+            "/api/protein/reviewed/entry/interpro",
+            "/api/protein/unreviewed/entry/interpro",
             "/api/protein/uniprot/entry/pfam",
             "/api/protein/uniprot/entry/unintegrated",
             "/api/protein/uniprot/entry/unintegrated/pfam",
@@ -128,8 +128,8 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         tr_1 = "P16582"
         sp_1 = "M5ADK6"
         tests = [
-            "/api/protein/swissprot/"+tr_1+"/entry/unintegrated",
-            "/api/protein/trembl/"+sp_1+"/entry/unintegrated",
+            "/api/protein/reviewed/"+tr_1+"/entry/unintegrated",
+            "/api/protein/unreviewed/"+sp_1+"/entry/unintegrated",
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
@@ -177,8 +177,8 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         smart = "SM00950"
         urls = [
             "/api/protein/uniprot/entry/interpro/"+acc,
-            "/api/protein/swissprot/entry/interpro/"+acc,
-            "/api/protein/trembl/entry/interpro/"+acc,
+            "/api/protein/reviewed/entry/interpro/"+acc,
+            "/api/protein/unreviewed/entry/interpro/"+acc,
             "/api/protein/uniprot/entry/pfam/"+pfam,
             "/api/protein/uniprot/entry/interpro/smart/"+smart,
             "/api/protein/uniprot/entry/interpro/pfam/"+pfam,
@@ -249,8 +249,8 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_u = "PF17180"
         tests = [
-            "/api/protein/swissprot/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
-            "/api/protein/trembl/"+sp_1+"/entry/unintegrated/pfam/"+pfam_u,
+            "/api/protein/reviewed/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
+            "/api/protein/unreviewed/"+sp_1+"/entry/unintegrated/pfam/"+pfam_u,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

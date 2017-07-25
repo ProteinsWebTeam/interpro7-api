@@ -21,7 +21,7 @@ class RandomDocumentGenerator:
         "HAMAP",
         "Prints"
     ]
-    protein_dbs = ["swissprot", "trembl"]
+    protein_dbs = ["reviewed", "unreviewed"]
     entry_types = ["family", "domain", "site", "repeat"]
 
     def __init__(self,
@@ -63,7 +63,7 @@ class RandomDocumentGenerator:
                 integrated = "interpro_{}".format(int(hashed[1:6], 16) % self.number_of_interpro_entries)
 
         protein_acc = "protein_{}".format(int(hashed[8:16], 16) % self.number_of_proteins)
-        protein_db = "swissprot" if int(hashed[8], 16) % 10 > 6 else "trembl"
+        protein_db = "reviewed" if int(hashed[8], 16) % 10 > 6 else "unreviewed"
         start = random.randint(1, 100)
 
         structure_acc = "protein_{}".format(int(hashed[16:20], 16) % self.number_of_structures)

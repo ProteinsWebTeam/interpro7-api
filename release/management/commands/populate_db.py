@@ -212,6 +212,11 @@ def create_protein_from_protein(row):
     tax = {"taxid": row.tax_id}
     if tax_name:
         tax["name"] = tax_name
+    source_db = row.dbcode
+    if source_db == 'S':
+        source_db = 'reviewed'
+    else:
+        source_db = 'unreviewed'
     return Protein(
         accession=row.protein_ac,
         identifier=row.name,
@@ -229,7 +234,7 @@ def create_protein_from_protein(row):
         feature={},  # TODO
         # structure={},  # TODO
         genomic_context={},  # TODO
-        source_database=row.dbcode.dbshort,
+        source_database=source_db,
         domain_architectures = _get_protein_domain_architecture(row.protein_ac)
     )
 

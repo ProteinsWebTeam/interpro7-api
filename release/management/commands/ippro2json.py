@@ -65,6 +65,8 @@ def get_dbcodes(con):
     sql = "SELECT * FROM INTERPRO.CV_DATABASE"
     cur.execute(sql)
     dbcodes = {row[0]: row[3] for row in cur}
+    dbcodes["S"]: "reviewed"# Swiss-Prot
+    dbcodes["T"]: "unreviewed"# TrEMBL
     return dbcodes
 
 
@@ -201,9 +203,9 @@ def oracle2json(interpro_db, protein_db, block_size, match_pos, compare_sym, end
     )
     is_for_interpro_entries = interpro_db == "interpro"
     where = []
-    if protein_db == "swissprot":
+    if protein_db == "reviewed":
         where.append("p.DBCODE='S'")
-    elif protein_db == "trembl":
+    elif protein_db == "unreviewed":
         where.append("p.DBCODE='T'")
     if not is_for_interpro_entries:
         where.append("pe.DBCODE='{}'".format(dbcode[interpro_db]))
@@ -255,13 +257,13 @@ class Command(BaseCommand):
             "--db_code", "-db",
             default='interpro',
             choices=dbcode.keys(),
-            help="Database to be procces (default to interpro)."
+            help="Database to be process (default to interpro)."
 
         )
         parser.add_argument(
             "--protein_db", "-pr",
-            choices=['swissprot', 'trembl', 'uniprot'],
-            help="Database to be procces (default to uniprot)." +
+            choices=['reviewed', 'unreviewed', 'uniprot'],
+            help="Database to be process (default to uniprot)." +
                  "If none specified, the query will not be filter by POS_FROM"
 
         )
@@ -277,7 +279,7 @@ class Command(BaseCommand):
             "--match_pos_compare", "-c",
             default='=',
             choices=['>', '<', '='],
-            help="Database to be procces (default to uniprot)." +
+            help="Database to be process (default to uniprot)." +
                  "If none specified, the query will not be filter by POS_FROM"
 
         )

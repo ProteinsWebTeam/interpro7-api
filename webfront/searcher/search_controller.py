@@ -70,6 +70,6 @@ class SearchController(metaclass=abc.ABCMeta):
         q = re.sub(r'ProDom', "d", q, flags=re.IGNORECASE)
         q = re.sub(r'HAMAP', "q", q, flags=re.IGNORECASE)
         q = re.sub(r'Prints', "f", q, flags=re.IGNORECASE)
-        q = re.sub(r'swissprot', "s", q, flags=re.IGNORECASE)
-        q = re.sub(r'trembl', "t", q, flags=re.IGNORECASE)
+        q = re.sub(r'reviewed', "s", q, flags=re.IGNORECASE)
+        q = re.sub(r'unreviewed', "t", q, flags=re.IGNORECASE)
         return q

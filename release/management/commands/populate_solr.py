@@ -171,6 +171,8 @@ def get_dbcodes(con):
     sql = "SELECT * FROM INTERPRO.CV_DATABASE"
     cur.execute(sql)
     dbcodes = {row[0]: row[3] for row in cur}
+    dbcodes["S"]: "reviewed"# Swiss-Prot
+    dbcodes["T"]: "unreviewed"# TrEMBL
     return dbcodes
 
 
@@ -274,10 +276,10 @@ class Command(BaseCommand):
             help=(
                 "Usef the query needs to be partitioned" +
                 "\n0: No partition (default)" +
-                "\n1: Entry type is Family and proteins are swissprot" +
-                "\n2: Entry type is Family and proteins are trembl" +
-                "\n3: Entry type is NOT a Family and proteins are swissprot" +
-                "\n4: Entry type is NOT a Family and proteins are trembl"
+                "\n1: Entry type is Family and proteins are reviewed" +
+                "\n2: Entry type is Family and proteins are unreviewed" +
+                "\n3: Entry type is NOT a Family and proteins are reviewed" +
+                "\n4: Entry type is NOT a Family and proteins are unreviewed"
             )
         )
         parser.add_argument(

@@ -18,3 +18,15 @@ class OrganismFixturesTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("taxonomy", response.data)
         # self.assertIn("proteome", response.data)
+
+    def test_can_read_taxonomy_root(self):
+        response = self.client.get("/api/organism/taxonomy")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        self.assertEqual(len(response.data["results"]), 6)
+
+    def test_can_read_taxonomy_id(self):
+        acc = "2"
+        response = self.client.get("/api/organism/taxonomy/"+acc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_taxonomy_details(response.data["metadata"])

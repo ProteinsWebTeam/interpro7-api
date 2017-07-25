@@ -35,3 +35,4 @@ branches:
   only:
     - master
     - dev
+    - adding_organism

@@ -236,3 +236,12 @@ class InterproRESTTestCase(APITransactionTestCase):
                 superset,
                 "Element {} in subset but not in set".format(element)
             )
+
+    def _check_taxonomy_details(self, obj, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("scientific_name", obj, msg)
+        self.assertIn("full_name", obj, msg)
+        self.assertIn("lineage", obj, msg)
+        self.assertIn("parent", obj, msg)
+        self.assertIn("rank", obj, msg)
+        self.assertIn("children", obj, msg)

@@ -86,5 +86,41 @@
       "left": 1,
       "right": 2
     }
+  },
+  {
+    "model": "webfront.Proteome",
+    "fields": {
+      "accession": "UP000006701",
+      "name": "Aspergillus clavatus NRRL 1 ",
+      "is_reference": true,
+      "number_of_proteins": 9140,
+      "strain": "ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1",
+      "assembly": "GCA_000002715.1 from ENA/EMBL",
+      "taxonomy": 344612
+    }
+  },
+  {
+    "model": "webfront.Proteome",
+    "fields": {
+      "accession": "UP000030104",
+      "name": "Penicillium italicum Blue mold",
+      "is_reference": true,
+      "number_of_proteins": 9993,
+      "strain": "PHI-1",
+      "assembly": "GCA_000769765.1 from ENA/EMBL",
+      "taxonomy": 40296
+    }
+  },
+  {
+    "model": "webfront.Proteome",
+    "fields": {
+      "accession": "UP000012042",
+      "name": "Lactobacillus brevis KB290",
+      "is_reference": false,
+      "number_of_proteins": 2552,
+      "strain": "KB290",
+      "assembly": "GCA_000359625.1 from ENA/EMBL",
+      "taxonomy": 1001583
+    }
   }
 ]

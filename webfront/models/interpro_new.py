@@ -70,12 +70,12 @@ class Taxonomy(models.Model):
     left = models.IntegerField()
     right = models.IntegerField()
 
-#
-# class Proteome(models.Model):
-#     id = models.CharField(max_length=20, primary_key=True)
-#     name = models.CharField(max_length=512)
-#     is_reference = models.BooleanField()
-#     number_of_proteins = models.IntegerField()
-#     strain = models.CharField(max_length=512)
-#     assembly = models.CharField(max_length=512)
-#     taxonomy = models.ForeignKey("Taxon", null=True, blank=True)
+
+class Proteome(models.Model):
+    accession = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=512)
+    is_reference = models.BooleanField()
+    number_of_proteins = models.IntegerField()
+    strain = models.CharField(max_length=512)
+    assembly = models.CharField(max_length=512)
+    taxonomy = models.ForeignKey("Taxonomy", null=True, blank=True)

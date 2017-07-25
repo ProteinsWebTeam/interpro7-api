@@ -245,3 +245,12 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("parent", obj, msg)
         self.assertIn("rank", obj, msg)
         self.assertIn("children", obj, msg)
+
+    def _check_proteome_details(self, obj, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("assembly", obj, msg)
+        self.assertIn("taxonomy", obj, msg)
+        self.assertIn("is_reference", obj, msg)
+        self.assertIn("strain", obj, msg)
+        self.assertIn("number_of_proteins", obj, msg)
+        self.assertIn("name", obj, msg)

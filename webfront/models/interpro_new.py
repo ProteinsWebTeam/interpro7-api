@@ -57,3 +57,25 @@ class Structure(models.Model):
     chains = JSONField()
     source_database = models.CharField(max_length=20, default="pdb", db_index=True)
     #TODO add description
+
+
+class Taxonomy(models.Model):
+    accession = models.IntegerField(primary_key=True)
+    scientific_name = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=512)
+    lineage = models.CharField(max_length=512)
+    parent = models.ForeignKey("Taxonomy", null=True, blank=True)
+    rank = models.CharField(max_length=20)
+    children = JSONField()
+    left = models.IntegerField()
+    right = models.IntegerField()
+
+#
+# class Proteome(models.Model):
+#     id = models.CharField(max_length=20, primary_key=True)
+#     name = models.CharField(max_length=512)
+#     is_reference = models.BooleanField()
+#     number_of_proteins = models.IntegerField()
+#     strain = models.CharField(max_length=512)
+#     assembly = models.CharField(max_length=512)
+#     taxonomy = models.ForeignKey("Taxon", null=True, blank=True)

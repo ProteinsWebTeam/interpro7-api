@@ -12,6 +12,7 @@ from webfront.views.queryset_manager import QuerysetManager
 from webfront.views.structure import StructureHandler
 from webfront.searcher.elastic_controller import ElasticsearchController
 from webfront.searcher.solr_controller import SolrController
+from webfront.views.organism import OrganismHandler
 
 
 def map_url_to_levels(url):
@@ -55,6 +56,7 @@ class GeneralHandler(CustomView):
         ('entry', EntryHandler),
         ('protein', ProteinHandler),
         ('structure', StructureHandler),
+        ('organism', OrganismHandler),
     ]
     # The queryset manager for the current request.
     queryset_manager = QuerysetManager()

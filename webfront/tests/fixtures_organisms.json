@@ -1,0 +1,90 @@
+[
+  {
+    "model": "webfront.Taxonomy",
+    "fields": {
+      "accession": 1,
+      "scientific_name": "ROOT",
+      "full_name": "ROOT",
+      "lineage": "1",
+      "rank": "no rank",
+      "children": [2579, 2],
+      "left": 0,
+      "right": 6
+    }
+  },
+  {
+    "model": "webfront.Taxonomy",
+    "fields": {
+      "accession": 2579,
+      "scientific_name": "Eukaryota",
+      "full_name": "Eucaryotae",
+      "lineage": "1 2579",
+      "parent": 1,
+      "rank": "SUPERKINGDOM",
+      "children": [
+        344612,
+        40296
+      ],
+      "left": 1,
+      "right": 4
+    }
+  },
+  {
+    "model": "webfront.Taxonomy",
+    "fields": {
+      "accession": 2,
+      "scientific_name": "Bacteria",
+      "full_name": "Prokaryota",
+      "lineage": "1 2",
+      "parent": 1,
+      "rank": "SUPERKINGDOM",
+      "children": [
+        1001583
+      ],
+      "left": 5,
+      "right": 6
+    }
+  },
+  {
+    "model": "webfront.Taxonomy",
+    "fields": {
+      "accession": 40296,
+      "scientific_name": "Penicillium italicum",
+      "full_name": "Blue mold",
+      "lineage": "1 2 40296",
+      "parent": 2,
+      "rank": "SPECIES",
+      "children": [],
+      "left": 3,
+      "right": 4
+    }
+  },
+  {
+    "model": "webfront.Taxonomy",
+    "fields": {
+      "accession": 1001583,
+      "scientific_name": "Lactobacillus brevis KB290",
+      "full_name": "Lactobacillus brevis str. KB290",
+      "lineage": "1 2579 1001583",
+      "parent": 2579,
+      "rank": "SPECIES",
+      "children": [],
+      "left": 5,
+      "right": 6
+    }
+  },
+  {
+    "model": "webfront.Taxonomy",
+    "fields": {
+      "accession": 344612,
+      "scientific_name": "Aspergillus clavatus",
+      "full_name": "Aspergillus clavatus (strain ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1)",
+      "lineage": "1 2579 344612",
+      "parent": 2579,
+      "rank": "SPECIES",
+      "children": [],
+      "left": 1,
+      "right": 2
+    }
+  }
+]

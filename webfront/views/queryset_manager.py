@@ -1,4 +1,4 @@
-from webfront.models import Entry, Protein, Structure
+from webfront.models import Entry, Protein, Structure, Taxonomy
 from django.db.models import Q
 from functools import reduce
 from operator import or_
@@ -30,6 +30,7 @@ class QuerysetManager:
             "entry": {},
             "structure": {},
             "protein": {},
+            "organism": {},
         }
         self.order_field = None;
 
@@ -88,6 +89,8 @@ class QuerysetManager:
             queryset = Structure.objects.all()
         elif endpoint == "protein":
             queryset = Protein.objects.all()
+        elif endpoint == "organism":
+            queryset = Taxonomy.objects.all()
         return queryset
 
     def get_queryset(self, endpoint=None, only_main_endpoint=False):

@@ -147,9 +147,9 @@ cross_references:
         'rank': 36
     'SMART': 
         'rank': 8
-    'UniProt/reviewed':
+    'UniProtKB/Swiss-Prot':
         'rank': 12
-    'UniProt/unreviewed':
+    'UniProtKB/TrEMBL':
         'rank': 13
     'PIRSF': 
         'rank': 3

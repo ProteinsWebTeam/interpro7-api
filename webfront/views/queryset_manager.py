@@ -64,6 +64,8 @@ class QuerysetManager:
                     # low cardinality field such as the _db ones
                     if ep == 'structure':
                         q += " && {}{}_acc:*".format("!" if v else "", ep)
+                    elif ep == 'taxonomy':
+                        pass
                     else:
                         q += " && {}{}_db:*".format("!" if v else "", ep)
                 elif k == "integrated" or k == "integrated__iexact":

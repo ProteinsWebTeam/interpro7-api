@@ -4,6 +4,7 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
+import webfront.serializers.taxonomy
 from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
 
@@ -37,6 +38,8 @@ class EntrySerializer(ModelContentSerializer):
             representation["proteins"] = self.to_proteins_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = self.to_structures_count_representation(instance)
+        if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
+            representation["organisms"] = self.to_organism_count_representation(instance)
 
         if detail != SerializerDetail.ENTRY_OVERVIEW:
             if SerializerDetail.PROTEIN_DB in detail_filters:
@@ -289,6 +292,12 @@ class EntrySerializer(ModelContentSerializer):
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
             self.searcher.get_counter_object("structure", solr_query, self.get_extra_endpoints_to_count())
         )["structures"]
+
+    def to_organism_count_representation(self, instance):
+        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        return webfront.serializers.taxonomy.OrganismSerializer.to_counter_representation(
+            self.searcher.get_counter_object("organism", solr_query, self.get_extra_endpoints_to_count())
+        )["organisms"]
 
     @staticmethod
     def get_entry_header_from_solr_object(obj, for_structure=False, include_entry=False, solr=None):

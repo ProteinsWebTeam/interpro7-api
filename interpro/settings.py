@@ -144,7 +144,8 @@ if ORACLE_CONFIG is not None:
 
 SEARCHER_URL = INTERPRO_CONFIG.get('searcher_path', 'http://127.0.0.1:9200/interpro_sp/relationship')
 SEARCHER_TEST_URL = INTERPRO_CONFIG.get('searcher_test_path', 'http://127.0.0.1:9200/interpro_sp/relationship')
-
+if INTERPRO_CONFIG.get('use_test_db', True):
+    SEARCHER_URL = SEARCHER_TEST_URL
 TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
 
 # Internationalization

@@ -238,7 +238,7 @@ class EntryXref(models.Model):
 
 
 class Etaxi(models.Model):
-    tax_id = models.IntegerField()
+    tax_id = models.IntegerField(primary_key=True)
     parent_id = models.IntegerField(blank=True, null=True)
     scientific_name = models.CharField(max_length=255, blank=True, null=True)
     complete_genome_flag = models.CharField(max_length=1, blank=True, null=True)

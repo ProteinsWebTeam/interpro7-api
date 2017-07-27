@@ -14,6 +14,8 @@ class OrganismSerializer(ModelContentSerializer):
         detail = self.detail
         if detail == SerializerDetail.ALL:
             representation = self.to_full_representation(instance)
+        elif detail == SerializerDetail.ORGANISM_TAXONOMY_PROTEOME:
+            representation = self.to_full_representation(instance, True)
         elif detail == SerializerDetail.ORGANISM_PROTEOME:
             representation = self.to_full_proteome_representation(instance)
         elif detail == SerializerDetail.ORGANISM_OVERVIEW:
@@ -22,14 +24,16 @@ class OrganismSerializer(ModelContentSerializer):
             representation = self.to_headers_representation(instance)
         elif detail == SerializerDetail.ORGANISM_PROTEOME_HEADERS:
             representation = self.to_headers_proteome_representation(instance)
+        elif detail == SerializerDetail.ORGANISM_TAXONOMY_PROTEOME_HEADERS:
+            representation = self.to_headers_representation(instance, True)
         return representation
 
     def filter_representation(self, representation, instance):
         return representation
 
     @staticmethod
-    def to_full_representation(instance):
-        return {
+    def to_full_representation(instance, include_proteomes=False):
+        obj = {
             "metadata": {
                 "accession": instance.accession,
                 "scientific_name": instance.scientific_name,
@@ -40,6 +44,12 @@ class OrganismSerializer(ModelContentSerializer):
                 "parent": instance.parent.accession if instance.parent is not None else None
             }
         }
+        if include_proteomes:
+            obj["proteomes"] = [OrganismSerializer.to_full_proteome_representation(p)
+                                for p in instance.proteome_set.all()
+                                ]
+        return obj
+
     @staticmethod
     def to_full_proteome_representation(instance):
         return {
@@ -56,20 +66,38 @@ class OrganismSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_counter_representation(instance):
-        if "taxonomy" not in instance:
+        if "organisms" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
                 raise ReferenceError('There are not structures for this request')
-            # instance = {
-            #     "structures": {
-            #         "pdb": StructureSerializer.serialize_counter_bucket(instance["databases"])
-            #     }
-            # }
+            instance = {
+                "organisms": OrganismSerializer.serialize_counter_bucket(instance["databases"])
+            }
         return instance
 
+
     @staticmethod
-    def to_headers_representation(instance):
-        return {
+    def serialize_counter_bucket(bucket):
+        output = {
+            "taxonomy": bucket["unique"],
+            "proteomes": bucket["proteomes"]
+        }
+        is_searcher = True
+        if isinstance(output["taxonomy"], dict):
+            output["taxonomy"] = output["taxonomy"]["value"]
+            output["proteomes"] = output["proteomes"]["value"]
+            is_searcher = False
+        if "entry" in bucket or "protein" in bucket or "structure" in bucket:
+            output = {"organisms": output}
+            if "entry" in bucket:
+                output["entries"] = bucket["entry"] if is_searcher else bucket["entry"]["value"]
+            if "structure" in bucket:
+                output["structures"] = bucket["structure"] if is_searcher else bucket["structure"]["value"]
+        return output
+
+    @staticmethod
+    def to_headers_representation(instance, include_proteomes=False):
+        obj = {
             "metadata": {
                 "accession": instance.accession,
                 "full_name": instance.full_name,
@@ -77,6 +105,9 @@ class OrganismSerializer(ModelContentSerializer):
                 "parent": instance.parent.accession if instance.parent is not None else None
             }
         }
+        if include_proteomes:
+            obj["proteomes"] = [p.accession for p in instance.proteome_set.all()]
+        return obj
 
     @staticmethod
     def to_headers_proteome_representation(instance):

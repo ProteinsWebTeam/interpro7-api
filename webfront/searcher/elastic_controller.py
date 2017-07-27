@@ -81,37 +81,62 @@ class ElasticsearchController(SearchController):
             },
             "size": 0
         }
+        self.add_extra_counters(facet, "databases", extra_counters)
+
+        self.tune_counter_facet_for_entry(facet, endpoint, extra_counters)
+        self.tune_counter_facet_for_protein(facet, endpoint, extra_counters)
+        self.tune_counter_facet_for_structure(facet, endpoint, extra_counters)
+        self.tune_counter_facet_for_organism(facet, endpoint, extra_counters)
+
+        response = self._elastic_json_query(qs, facet)
+        return response["aggregations"]
+
+    @staticmethod
+    def add_extra_counters(facet, agg_name, extra_counters):
         for ec in extra_counters:
-            facet["aggs"]["databases"]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
+            facet["aggs"][agg_name]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
+
+    def tune_counter_facet_for_entry(self, facet, endpoint, extra_counters):
         if endpoint == "entry":
             facet["aggs"]["unintegrated"] = {
-              "filter": {
-                  "bool": {
-                      "must_not": [
-                          {"term": {"entry_db": "interpro"}},
-                          {"exists": {"field": "integrated"}}
-                      ]
-                  }
-              },
-              "aggs": {"unique": {"cardinality": {"field": "entry_acc"}}}
+                "filter": {
+                    "bool": {
+                        "must_not": [
+                            {"term": {"entry_db": "interpro"}},
+                            {"exists": {"field": "integrated"}}
+                        ]
+                    }
+                },
+                "aggs": {"unique": {"cardinality": {"field": "entry_acc"}}}
             }
-            for ec in extra_counters:
-                facet["aggs"]["unintegrated"]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
-        elif endpoint == "protein":
+            self.add_extra_counters(facet, "databases", extra_counters)
+
+    def tune_counter_facet_for_protein(self, facet, endpoint, extra_counters):
+        if endpoint == "protein":
             facet["aggs"]["uniprot"] = {
               "filter": {"exists": {"field": "protein_acc"}},
               "aggs": {"unique": {"cardinality": {"field": "protein_acc"}}}
             }
-            for ec in extra_counters:
-                facet["aggs"]["uniprot"]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
-        elif endpoint == "structure":
+            self.add_extra_counters(facet, "uniprot", extra_counters)
+
+    def tune_counter_facet_for_structure(self, facet, endpoint, extra_counters):
+        if endpoint == "structure":
             facet["aggs"]["databases"]["filter"] = {"exists": {"field": "structure_acc"}}
             del facet["aggs"]["databases"]["terms"]
-            for ec in extra_counters:
-                facet["aggs"]["databases"]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
+            self.add_extra_counters(facet, "databases", extra_counters)
 
-        response = self._elastic_json_query(qs, facet)
-        return response["aggregations"]
+    def tune_counter_facet_for_organism(self, facet, endpoint, extra_counters):
+        if endpoint == "organism":
+            facet["aggs"]["databases"]["filter"] = {"exists": {"field": "tax_id"}}
+            facet["aggs"]["databases"]["aggs"]["unique"] = {
+                "cardinality": {"field": "tax_id"}
+            }
+            facet["aggs"]["databases"]["aggs"]["proteomes"] = {
+                "cardinality": {"field": "tax_id"}
+            #     TODO: count proteomes insted
+            }
+            del facet["aggs"]["databases"]["terms"]
+            self.add_extra_counters(facet, "databases", extra_counters)
 
     def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=1, start=0, inner_field_to_count=None):
         query = self.queryset_manager.get_searcher_query() if query is None else query.lower()

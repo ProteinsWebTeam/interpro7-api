@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from django.db.utils import IntegrityError
 
 from release.models import iprel
-from webfront.models import Entry, Protein, Structure
+from webfront.models import Entry, Protein, Structure, Taxonomy
 import json
 
 # global array
@@ -39,7 +39,7 @@ def subset_iterator_from_queryset(qs, n, n_skip=0, position=0):
 
 def bulk_insert(chunk, model):
     try:
-        model.objects.bulk_create((e for e in chunk), batch_size=1000)
+        model.objects.bulk_create((e for e in chunk), batch_size=100)
     except IntegrityError as err:
         # Might just be duplicate, so already there
         if 'Duplicate' not in str(err):
@@ -270,6 +270,61 @@ def create_structure_from_uniprot_pdbe(acc):
         output.chains.append(row.chain)
     return output
 
+# taxonomy
+def get_n_taxonomy(n):
+    qs = queryset_from_model(iprel.Etaxi)
+    n = n_or_all(n, qs)
+    set_taxonomy(subset_iterator_from_queryset(qs, n))
+
+def set_taxonomy(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_taxonomy_from_etaxi,
+        'taxonomy'
+    )):
+        bulk_insert(chunk, Taxonomy)
+
+taxonomy_nodes = {}
+def create_taxonomy_from_etaxi(row):
+    taxonomy_nodes[row.tax_id] = {
+        "accession": row.tax_id,
+        "parent": row.parent_id,
+        "rank": row.rank,
+        "children": [],
+    }
+    return Taxonomy(
+        accession=row.tax_id,
+        scientific_name=row.scientific_name,
+        full_name=row.full_name,
+        lineage="",
+        parent=None,
+        rank=row.rank,
+        children=[],
+        left_number=row.left_number,
+        right_number=row.right_number
+    )
+
+def update_hierarchy_fields():
+    for tax_id in taxonomy_nodes:
+        node = taxonomy_nodes[tax_id]
+        if node["parent"] is not None and node["parent"] in taxonomy_nodes:
+            taxonomy_nodes[node["parent"]]["children"].append(tax_id)
+    if 1 in taxonomy_nodes:
+        set_lineage(taxonomy_nodes[1])
+    for tax_id in tqdm(taxonomy_nodes):
+        node = taxonomy_nodes[tax_id]
+        ipro7 = Taxonomy.objects.get(accession=tax_id)
+        ipro7.children = node["children"]
+        if node["parent"] is not None and node["parent"] in taxonomy_nodes:
+            ipro7.parent = Taxonomy.objects.get(accession=node["parent"])
+        if "lineage" in node:
+            ipro7.lineage = node["lineage"]
+        ipro7.save()
+
+def set_lineage(node, lineage=" "):
+    node["lineage"] = lineage + str(node["accession"]) + " "
+    for child in node["children"]:
+        set_lineage(taxonomy_nodes[child], node["lineage"])
 
 def _fillEntries(n):
     print('Step 1 of 2 running')
@@ -289,10 +344,18 @@ def _fillStructures(n):
     print('Step 1 of 1 running')
     get_n_structures(n)
 
+def _fillTaxonomy(n):
+    print('Step 1 of 2 running')
+    get_n_taxonomy(n)
+    print('Step 2 of 2 running')
+    update_hierarchy_fields()
+
+
 _modelFillers = {
     'Entry': _fillEntries,
     'Protein': _fillProteins,
     'Structure': _fillStructures,
+    'Taxonomy': _fillTaxonomy,
 }
 
 

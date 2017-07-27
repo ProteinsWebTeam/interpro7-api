@@ -67,8 +67,8 @@ class Taxonomy(models.Model):
     parent = models.ForeignKey("Taxonomy", null=True, blank=True)
     rank = models.CharField(max_length=20)
     children = JSONField()
-    left = models.IntegerField()
-    right = models.IntegerField()
+    left_number = models.IntegerField()
+    right_number = models.IntegerField()
 
 
 class Proteome(models.Model):

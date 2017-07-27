@@ -20,15 +20,19 @@ class StructureRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self._check_structure_details(response.data["metadata"])
+        self.assertIn("proteins", response.data["metadata"]["counters"])
+        self.assertIn("entries", response.data["metadata"]["counters"])
+        self.assertEqual(2, response.data["metadata"]["counters"]["proteins"])
+        self.assertEqual(1, response.data["metadata"]["counters"]["entries"])
 
     def test_can_read_structure_pdb_accession_chain(self):
-        response = self.client.get("/api/structure/pdb/2bkm/A")
+        response = self.client.get("/api/structure/pdb/2bkm/B")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self._check_structure_details(response.data["metadata"])
         for chain in response.data["metadata"]["chains"].values():
             self._check_structure_chain_details(chain)
-            self.assertEqual(chain["chain"], "A")
+            self.assertEqual(chain["chain"].upper(), "B")
 
 
     # TODO:
@@ -36,4 +40,4 @@ class StructureRESTTest(InterproRESTTestCase):
         self._check_HTTP_response_code("/api/structure/bad_db", code=status.HTTP_404_NOT_FOUND)
 
     def test_cant_read_structure_pdb_bad_chain(self):
-        self._check_HTTP_response_code("/api/structure/pdb/2bkm/C", code=status.HTTP_404_NOT_FOUND)
+        self._check_HTTP_response_code("/api/structure/pdb/2bkm/C")

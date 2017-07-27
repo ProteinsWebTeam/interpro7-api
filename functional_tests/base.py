@@ -1,4 +1,5 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import override_settings
 # from rest_framework.test import APIRequestFactory, APIClient
 from selenium import webdriver
 import sys
@@ -6,7 +7,19 @@ import time
 import os
 from selenium.common.exceptions import StaleElementReferenceException
 
-class FunctionalTest(StaticLiveServerTestCase):  #1
+from webfront.tests.fixtures_reader import FixtureReader
+from interpro.settings import SEARCHER_TEST_URL
+
+
+@override_settings(SEARCHER_URL=SEARCHER_TEST_URL)
+class FunctionalTest(StaticLiveServerTestCase):
+    fixtures = [
+        'webfront/tests/fixtures.json',
+        'webfront/tests/protein_fixtures.json',
+        'webfront/tests/structure_fixtures.json'
+    ]
+    links_fixtures = 'webfront/tests/relationship_features.json'
+
     @classmethod
     def setUpClass(cls):
         for arg in sys.argv:
@@ -15,9 +28,13 @@ class FunctionalTest(StaticLiveServerTestCase):  #1
                 return
         super().setUpClass()
         cls.server_url = cls.live_server_url
+        cls.fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
+        docs = cls.fr.get_fixtures()
+        cls.fr.add_to_search_engine(docs)
 
     @classmethod
     def tearDownClass(cls):
+        # cls.fr.clear_search_engine()
         if cls.server_url == cls.live_server_url:
             super().tearDownClass()
 

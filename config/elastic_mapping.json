@@ -1,0 +1,22 @@
+{
+  "mappings": {
+    "relationship": {
+      "properties": {
+        "entry_acc": {"type":  "keyword"},
+        "protein_acc": {"type":  "keyword"},
+        "structure_acc": {"type":  "keyword"},
+        "entry_db": {"type":  "keyword"},
+        "protein_db": {"type":  "keyword"},
+        "chain": {"type":  "keyword"},
+        "integrated": {"type":  "keyword"},
+        "entry_type": {"type":  "keyword"},
+        "tax_id": {"type":  "long"},
+        "structure_chain": {"type":  "keyword"},
+        "protein_structure_coordinates": { "type": "object", "enabled" : false},
+        "entry_protein_coordinates": { "type": "object", "enabled" : false},
+        "text": {"type":  "text"},
+        "id": {"type":  "keyword"}
+      }
+    }
+  }
+}

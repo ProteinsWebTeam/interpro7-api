@@ -16,8 +16,8 @@ class Entry(models.Model):
     description = JSONField()
     wikipedia = models.TextField(null=True)
     literature = JSONField()
-    proteins = models.ManyToManyField('Protein', through='ProteinEntryFeature')
-    structures = models.ManyToManyField('Structure', through='EntryStructureFeature')
+    # Array of the string representing the domain architecture
+    domain_architectures = JSONField(null=True)
 
 
 class Protein(models.Model):
@@ -34,23 +34,11 @@ class Protein(models.Model):
     gene = models.CharField(max_length=20, null=False)
     go_terms = JSONField()
     evidence_code = models.IntegerField()
-    feature = JSONField() #signalpeptide, transmembrane, coiledCoil, lowComplexityDisorder, activeSites. PerResidue, diSulphideBridges
-    # structure = JSONField()
+    feature = JSONField()
     genomic_context = JSONField()
     source_database = models.CharField(max_length=20, default="uniprot", db_index=True)
-    structures = models.ManyToManyField('Structure', through='ProteinStructureFeature')
-    entries = models.ManyToManyField('Entry', through='ProteinEntryFeature')
-
-
-class ProteinEntryFeature(models.Model):
-    protein = models.ForeignKey("Protein", null=False)
-    entry = models.ForeignKey("Entry", null=False)
-    coordinates = JSONField()
-    # match_start = models.IntegerField(null=True)
-    # match_end = models.IntegerField(null=True)
-
-    class Meta:
-        unique_together = (('protein', 'entry'), )
+    # Domain arch string e.g. 275/UPI0004FEB881#29021:2-66~20422&29021&340&387:103-266#
+    domain_architectures = models.TextField(null=True)
 
 
 class Structure(models.Model):
@@ -63,27 +51,3 @@ class Structure(models.Model):
     authors = JSONField()
     chains = JSONField()
     source_database = models.CharField(max_length=20, default="pdb", db_index=True)
-    proteins = models.ManyToManyField('Protein', through='ProteinStructureFeature')
-    entries = models.ManyToManyField('Entry', through='EntryStructureFeature')
-
-
-class ProteinStructureFeature(models.Model):
-    protein = models.ForeignKey("Protein", null=False)
-    structure = models.ForeignKey("Structure", null=False)
-    chain = models.CharField(max_length=4, null=False)
-    length = models.IntegerField(null=True)
-    organism = JSONField()
-    coordinates = JSONField()
-
-    class Meta:
-        unique_together = (('protein', 'structure', 'chain'), )
-
-
-class EntryStructureFeature(models.Model):
-    entry = models.ForeignKey("Entry", null=False)
-    structure = models.ForeignKey("Structure", null=False)
-    chain = models.CharField(max_length=1)
-    coordinates = JSONField()
-
-    class Meta:
-        unique_together = (('entry', 'structure', 'chain'), )

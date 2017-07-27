@@ -1,6 +1,8 @@
+from functools import reduce
 from rest_framework import status
 
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
+
 
 api_test_map = {
     "entry": {
@@ -158,6 +160,8 @@ plurals = {
 singular = {v: k for k, v in plurals.items()}
 plurals["chain"] = "structures"
 
+import unittest
+
 
 class ThreeEndpointsContentTest(InterproRESTTestCase):
     def test_endpoint_endpoint_endpoint(self):
@@ -176,7 +180,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     url = "/api/{}/{}/{}".format(endpoint1, endpoint2, endpoint3)
                     response2 = self.client.get(url)
                     self.assertEqual(response2.status_code, status.HTTP_200_OK)
-                    self.assertEqual(response1.data, response2.data)
+                    for ep, counter in response1.data.items():
+                        self.assertEqual(counter, response2.data[ep])
 
     def test_endpoint_endpoint_db(self):
         for endpoint1 in api_test_map:
@@ -219,19 +224,22 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                 if db3 == "unintegrated" else ""
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, ep3, db3 + unintegrated, acc3)
-                            response = self.client.get(url)
-                            self.assertEqual(response.status_code, status.HTTP_200_OK)
-                            expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
-                                                                         acc3=acc3)
-                            self.assertEqual(
-                                response.data, expected,
-                                "The URL {} wasn't equal to the expected response.\nRESPONSE: {}\nEXPECTED: {}"
-                                .format(url, response.data, expected))
+                            response = self._get_in_debug_mode(url)
+                            if response.status_code == status.HTTP_200_OK:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
+                                                                             acc3=acc3)
+                                self.assertEqual(
+                                    response.data, expected,
+                                    "The URL {} wasn't equal to the expected response.\nRESPONSE: {}\nEXPECTED: {}"
+                                    .format(url, response.data, expected))
 
-                            url = "/api/{}/{}/{}/{}/{}".format(endpoint1, ep3, db3 + unintegrated, acc3, endpoint2)
-                            response = self.client.get(url)
-                            self.assertEqual(response.status_code, status.HTTP_200_OK)
-                            self.assertEqual(response.data, expected)
+                                url = "/api/{}/{}/{}/{}/{}".format(endpoint1, ep3, db3 + unintegrated, acc3, endpoint2)
+                                response = self.client.get(url)
+                                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                self.assertEqual(response.data, expected)
+                            elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_endpoint_db_db(self):
         for endpoint1 in api_test_map:
@@ -246,15 +254,18 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             continue
                         for db3 in api_test_map[endpoint3]:
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2, endpoint3, db3)
-                            response = self.client.get(url)
-                            self.assertEqual(response.status_code, status.HTTP_200_OK)
-                            expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3, db2=db2)
-                            self.assertEqual(response.data, expected)
+                            response = self._get_in_debug_mode(url)
+                            if response.status_code == status.HTTP_200_OK:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3, db2=db2)
+                                self.assertEqual(response.data, expected)
 
-                            url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, endpoint2, db2)
-                            response = self.client.get(url)
-                            self.assertEqual(response.status_code, status.HTTP_200_OK)
-                            self.assertEqual(response.data, expected)
+                                url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, endpoint2, db2)
+                                response = self.client.get(url)
+                                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                self.assertEqual(response.data, expected)
+                            elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_endpoint_db_acc(self):
         for endpoint1 in api_test_map:
@@ -272,19 +283,28 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             for acc3 in api_test_map[endpoint3][db3]:
                                 unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                     if db3 == "unintegrated" else ""
+                                # endpoint1 = "entry"
+                                # endpoint2 = "structure"
+                                # db2 = "pdb"
+                                # endpoint3 = ep3 = "protein"
+                                # db3 = "trembl"
+                                # acc3 = "P16582"
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2,
                                                                       ep3, db3 + unintegrated, acc3)
-                                response = self.client.get(url)
-                                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                                expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
-                                                                             db2=db2, acc3=acc3)
-                                self.assertEqual(response.data, expected)
+                                response = self._get_in_debug_mode(url)
+                                if response.status_code == status.HTTP_200_OK:
+                                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                    expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
+                                                                                 db2=db2, acc3=acc3)
+                                    self.assertEqual(response.data, expected)
 
-                                url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, ep3, db3 + unintegrated, acc3,
-                                                                      endpoint2, db2)
-                                response = self.client.get(url)
-                                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                                self.assertEqual(response.data, expected)
+                                    url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, ep3, db3 + unintegrated, acc3,
+                                                                          endpoint2, db2)
+                                    response = self.client.get(url)
+                                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                    self.assertEqual(response.data, expected)
+                                elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                    self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_endpoint_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -309,11 +329,14 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}".format(endpoint1,
                                                                              ep2, db2 + un2, acc2,
                                                                              ep3, db3 + un3, acc3)
-                                    response = self.client.get(url)
-                                    self.assertEqual(response.status_code, status.HTTP_200_OK)
-                                    expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
-                                                                                 db2=db2, acc2=acc2, acc3=acc3)
-                                    self.assertEqual(response.data, expected)
+                                    response = self._get_in_debug_mode(url)
+                                    if response.status_code == status.HTTP_200_OK:
+                                        self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                        expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3,
+                                                                                     db2=db2, acc2=acc2, acc3=acc3)
+                                        self.assertEqual(response.data, expected)
+                                    elif response.status_code != status.HTTP_204_NO_CONTENT:
+                                        self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_db_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
@@ -820,16 +843,18 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                 payload[eps] = self.get_counter_object(ep,
                                                        endpoint2, accs2,
                                                        endpoint3, accs3,
-                                                       include_3rd_endpoint=not(db2 is None))
+                                                       include_3rd_endpoint=not(db2 is None) and acc2 is None,
+                                                       display_object=acc3 is None)
             elif db2 is None and eps == plurals[endpoint2]:
                 payload[plurals[endpoint2]] = self.get_counter_object(endpoint2,
                                                                       endpoint1, accs1,
                                                                       endpoint3, accs3,
-                                                                      include_3rd_endpoint=not(db2 is None))
+                                                                      include_3rd_endpoint=not(db2 is None) and acc2 is None,
+                                                                      display_object=acc3 is None)
         return payload
 
     def get_counter_object(self, endpoint1, endpoint2, accs2, endpoint3, accs3,
-                           include_3rd_endpoint=False):
+                           display_object=True, include_3rd_endpoint=False):
         _obj = {}
         eps = plurals[endpoint1]
         for db in api_test_map[endpoint1]:
@@ -848,17 +873,29 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                                     endpoint1, accs,
                                                     endpoint2, accs2)),
             }
+            if not display_object:
+                obj[db] = obj[db][eps]
             if db != "unintegrated" and \
                     db != "pdb" and \
                     db != "interpro" and \
                     db != "uniprot" and \
-                    sum(obj[db].values()) < 1:
+                    ((display_object and sum(obj[db].values()) < 1) or (not display_object and obj[db]<1)):
                 del obj[db]
 
             if include_3rd_endpoint and db in obj:
-                obj[db][plurals[endpoint2]] = len(self.get_set_of_shared_ids(endpoint1, accs,
-                                                                             endpoint2, accs2,
-                                                                             endpoint3, accs3))
+                third = len(self.get_set_of_shared_ids(endpoint1, accs,
+                                                       endpoint2, accs2,
+                                                       endpoint3, accs3))
+                if display_object:
+                    obj[db][plurals[endpoint2]] = third
+                else:
+                    obj[db] = {
+                        eps: obj[db],
+                        plurals[endpoint2]: third
+                    }
+            if (db == "unintegrated" or db == "interpro") and type(obj[db]) != int :
+                if reduce(lambda y,x: y if not y else x == 0, obj[db].values(), True):
+                    obj[db] = 0
         return _obj
 
     def get_set_of_shared_ids(self, endpoint1, accs1,
@@ -886,7 +923,12 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                            endpoint2, accs2)
         accs = self.get_set_of_shared_ids(endpoint1, [acc], endpoint2, accs2, endpoint3, accs3)
         if db2 is None:
-            obj[plurals[endpoint2]] = len(accs)
+            obj[plurals[endpoint2]] = self.get_counter_object(endpoint2,
+                                                              endpoint1, [acc],
+                                                              endpoint3, accs3,
+                                                              include_3rd_endpoint=False,
+                                                              display_object=False)
+            #len(accs)
         else:
             obj[plurals[endpoint2]] = [{"accession": x[1], "source_database": db2, "coordinates": [], "name": ""}
                                        for x in relationships[endpoint1, endpoint2]

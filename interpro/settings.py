@@ -54,7 +54,7 @@ INSTALLED_APPS = (
     'webfront',
     'release',
     # third-party added libraries
-    'rest_framework',
+    'rest_framework'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -81,7 +81,7 @@ ROOT_URLCONF = 'interpro.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,6 +132,23 @@ DATABASES = {
         'PORT': ORACLE_CONFIG.get('port', 1540),
     },
 }
+SEARCHER_URL = 'http://localhost:9200/test/relationship'
+SEARCHER_TEST_URL = INTERPRO_CONFIG.get('searcher_test', 'http://127.0.0.1:8983/solr/test')
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+#         'URL': 'http://hmmer-prod-db01:9200/interpro/relationship'
+#         # ...or for multicore...
+#         # 'URL': 'http://127.0.0.1:8983/solr/interpro7',
+#     },
+# }
+# TEST_INDEX = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+#         'URL': INTERPRO_CONFIG.get('solr_test', 'http://127.0.0.1:8983/solr/test'),
+#     },
+# }
+
 TEST_RUNNER = 'webfront.tests.managed_model_test_runner.UnManagedModelTestRunner'
 
 # Internationalization

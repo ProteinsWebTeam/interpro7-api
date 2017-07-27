@@ -1,17 +1,15 @@
 from functional_tests.base import FunctionalTest
 import json
 import re
-
+import time
 
 class RESTRequestsTest(FunctionalTest):
     def test_request_entry_endpoint(self):
         self.browser.get(self.server_url + "/api/entry/?format=json")
         content = self.browser.find_element_by_tag_name('body').text
-
         jsonp = json.loads(content)
 
         self.assertEqual(len(jsonp["entries"]), 3, "the output has exactly 3 keys")
-
         self.assertIn('"member_databases"', content)
         self.assertIn('"interpro"', content)
         self.assertIn('"unintegrated"', content)
@@ -28,6 +26,7 @@ class RESTRequestsTest(FunctionalTest):
                          "The response should have as many entries as reported in /entry ")
 
         acc = jsonp["results"][0]["metadata"]["accession"]
+        self.assertEqual(acc, "IPR001165")
         self.browser.get(self.server_url + "/api/entry/interpro/"+acc+"?format=json")
         content = self.browser.find_element_by_tag_name('body').text
 
@@ -35,13 +34,13 @@ class RESTRequestsTest(FunctionalTest):
         self.assertEqual(acc, jsonp["metadata"]["accession"],
                          "The accession in the response object should be the same as reequested")
         self.assertIn("metadata", jsonp.keys(), "'metadata' should be one of the keys in the response")
-        self.assertIn("molecular_function", jsonp["metadata"]["go_terms"],
-                      "the key is part of the go_terms and has been parsed OK")
+        self.assertTrue(isinstance(jsonp["metadata"]["go_terms"], list), "go_terms should be a list")
 
-        self.assertEqual(jsonp["metadata"]["counters"]["proteins"], 2)
+        self.assertEqual(jsonp["metadata"]["counters"]["proteins"], 1)
 
     def test_request_protein_endpoint(self):
         self.browser.get(self.server_url + "/api/protein/?format=json")
+        time.sleep(10)
         content = self.browser.find_element_by_tag_name('body').text
 
         jsonp = json.loads(content)
@@ -68,7 +67,7 @@ class RESTRequestsTest(FunctionalTest):
         jsonp = json.loads(content)
         self.assertEqual(acc, jsonp["metadata"]["accession"],
                          "The accession in the response object should be the same as reequested")
-        self.assertIn("molecular_function", jsonp["metadata"]["go_terms"],
+        self.assertIn("category", jsonp["metadata"]["go_terms"][0],
                       "the key is part of the go_terms and has been parsed OK")
 
         self.browser.get(self.server_url + "/api/protein/uniprot/"+jsonp["metadata"]["id"]+"?format=json")
@@ -82,6 +81,7 @@ class RESTRequestsTest(FunctionalTest):
     def test_request_to_api_frontend(self):
         url = "/api/entry/"
         self.browser.get(self.server_url + url)
+        time.sleep(10)
 
         req_info = self.browser.find_element_by_css_selector(".request-info").text
 

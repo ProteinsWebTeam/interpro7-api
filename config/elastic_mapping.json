@@ -7,7 +7,7 @@
         "structure_acc": {"type":  "keyword"},
         "entry_db": {"type":  "keyword"},
         "protein_db": {"type":  "keyword"},
-        "chain": {"type":  "keyword"},
+        "chain": {"type":  "text", "analyzer": "keyword"},
         "integrated": {"type":  "keyword"},
         "entry_type": {"type":  "keyword"},
         "tax_id": {"type":  "long"},
@@ -15,7 +15,9 @@
         "protein_structure_coordinates": { "type": "object", "enabled" : false},
         "entry_protein_coordinates": { "type": "object", "enabled" : false},
         "text": {"type":  "text"},
-        "id": {"type":  "keyword"}
+        "id": {"type":  "keyword"},
+        "IDA_FK": {"type":  "keyword"},
+        "IDA": {"type":  "text"}
       }
     }
   }

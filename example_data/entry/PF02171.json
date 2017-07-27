@@ -54,6 +54,14 @@
         "authors": "Cerutti L, Mian N, Bateman A.",
         "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8",
       }
+    },
+    "cross_references": {
+      "ENZYME": [
+        "6.4.1.1"
+      ],
+      "PRIAM": [
+        "PRI003248"
+      ]
     }
   }
 }

@@ -4,6 +4,7 @@ import copy
 
 from webfront.searcher.search_controller import SearchController
 from webfront.views.custom import CustomView
+from webfront.searcher.elastic_controller import ElasticsearchController
 
 
 def get_id(*args):
@@ -47,17 +48,21 @@ class FixtureReader:
                 "text": e + " " + p,
                 "entry_acc": e,
                 "entry_type": self.entries[e]["type"],
-                "entry_db": SearchController.to_dbcodes(self.entries[e]["source_database"]),
+                "entry_db": self.entries[e]["source_database"],
                 "integrated": self.entries[e]["integrated"],
                 "protein_acc": p,
-                "protein_db": SearchController.to_dbcodes(self.proteins[p]["source_database"]),
+                "protein_db": self.proteins[p]["source_database"],
                 "tax_id": self.proteins[p]["organism"]["taxid"],
-                "entry_protein_coordinates": ep["coordinates"],
+                "entry_protein_locations": ep["coordinates"],
+                "protein_length": self.proteins[p]["length"],
                 # "django_ct": get_model_ct(ProteinEntryFeature),
                 # "django_id": 0,
                 "id": get_id(e, p)
 
             }
+            if "IDA" in ep:
+                obj["IDA"] = ep["IDA"]
+                obj["IDA_FK"] = ep["IDA_FK"]
             if p in self.protein_structure_list:
                 for sp in self.protein_structure_list[p]:
                     c = copy.copy(obj)
@@ -65,7 +70,7 @@ class FixtureReader:
                     c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["chain"] = sp["chain"]
                     c["id"] = get_id(e, p, sp["structure"], sp["chain"])
-                    c["protein_structure_coordinates"] = sp["coordinates"],
+                    c["protein_structure_locations"] = sp["coordinates"]
                     to_add.append(c)
             else:
                 to_add.append(obj)
@@ -76,15 +81,16 @@ class FixtureReader:
                     to_add.append({
                         "text": p + " " + sp["structure"],
                         "protein_acc": p,
-                        "protein_db": SearchController.to_dbcodes(self.proteins[p]["source_database"]),
+                        "protein_db": self.proteins[p]["source_database"],
                         "tax_id": self.proteins[p]["organism"]["taxid"],
                         # "django_ct": get_model_ct(ProteinEntryFeature),
                         # "django_id": 0,
+                        "protein_length": self.proteins[p]["length"],
                         "id": get_id(None, p, sp["structure"], sp["chain"]),
                         "structure_acc": sp["structure"],
                         "structure_chain": sp["structure"] + " - " + sp["chain"],
                         "chain": sp["chain"],
-                        "protein_structure_coordinates": sp["coordinates"],
+                        "protein_structure_locations": sp["coordinates"],
                     })
 
         lower = []
@@ -93,7 +99,7 @@ class FixtureReader:
         return lower
 
     def add_to_search_engine(self, docs):
-        self.search = CustomView.get_search_controller()
+        self.search = ElasticsearchController()
         self.search.add(docs)
 
     def clear_search_engine(self):

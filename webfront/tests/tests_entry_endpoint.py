@@ -89,8 +89,10 @@ class EntryRESTTest(InterproRESTTestCase):
     def test_can_read_entry_interpro_id_member(self):
         acc = "IPR003165"
         for member in self.db_members:
-            response = self.client.get("/api/entry/interpro/"+acc+"/"+member)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            current = "/api/entry/interpro/"+acc+"/"+member
+            response = self.client.get(current)
+            self.assertEqual(response.status_code, status.HTTP_200_OK,
+                             "OK NOT OK: {}".format(current))
             self.assertEqual(len(response.data["results"]), 1)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
 

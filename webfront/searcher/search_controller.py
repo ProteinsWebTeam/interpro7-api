@@ -1,15 +1,12 @@
 import abc
-import http.client
-import json
 import re
-import urllib.parse
-from django.conf import settings
+from webfront.views.queryset_manager import escape
 
 
 class SearchController(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=0, start=0):
+    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=0, start=0, inner_field_to_count=None):
         raise NotImplementedError('users must define get_group_obj_of_field_by_query to use this base class')
 
     def get_number_of_field_by_endpoint(self, endpoint, field, accession):
@@ -19,7 +16,7 @@ class SearchController(metaclass=abc.ABCMeta):
         elif field.startswith("protein"):
             db = "protein_db"
         ngroups = self.get_group_obj_of_field_by_query(
-             "{}:* && {}_acc:{}".format(db, endpoint, accession), field
+             "{}:* && {}_acc:{}".format(db, endpoint, escape(accession)), field
         )["ngroups"]
         if isinstance(ngroups, dict):
             ngroups = ngroups["value"]
@@ -31,6 +28,10 @@ class SearchController(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_counter_object(self, endpoint, solr_query=None, extra_counters=[]):
+        raise NotImplementedError('users must define get_counter_object to use this base class')
+
+    @abc.abstractmethod
+    def get_grouped_object(self, endpoint, field, solr_query=None, extra_counters=[]):
         raise NotImplementedError('users must define get_counter_object to use this base class')
 
     @abc.abstractmethod

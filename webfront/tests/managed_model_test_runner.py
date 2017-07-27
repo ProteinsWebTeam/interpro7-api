@@ -12,6 +12,11 @@ class UnManagedModelTestRunner(DiscoverRunner):
     Many thanks to the Caktus Group: http://bit.ly/1N8TcHW
     """
 
+    def __init__(self, *args, **kwargs):
+        settings.IN_TEST_MODE = True
+        self.unmanaged_models = []
+        super(UnManagedModelTestRunner, self).__init__(*args, **kwargs)
+
     def setup_test_environment(self, *args, **kwargs):
         from django.apps import apps
         myapp = apps.get_app_config('webfront')
@@ -28,13 +33,7 @@ class UnManagedModelTestRunner(DiscoverRunner):
         for m in self.unmanaged_models:
             m._meta.managed = False
 
-if 'test' in sys.argv or 'test_coverage' in sys.argv:  # Covers regular testing and django-coverage
+if 'interpro_ro' in settings.DATABASES and ('test' in sys.argv or 'test_coverage' in sys.argv):  # Covers regular testing and django-coverage
     settings.DATABASES['interpro_ro']['ENGINE'] = 'django.db.backends.sqlite3'
     settings.DATABASES['interpro_ro']['NAME'] = os.path.join(settings.BASE_DIR, '../database/db3.sqlite3')
     settings.DATABASES['interpro_ro']['TEST'] = {'MIRROR': 'default'}
-    # DATABASES['pfam_ro']['ENGINE'] = 'django.db.backends.sqlite3'
-    # DATABASES['pfam_ro']['NAME'] = os.path.join(BASE_DIR, '../database/db2.sqlite3')
-    # DATABASES['pfam_ro']['TEST'] = {'MIRROR': 'default'}
-    # DATABASES['interpro_dw']['ENGINE'] = 'django.db.backends.sqlite3'
-    # DATABASES['interpro_dw']['NAME'] = os.path.join(BASE_DIR, '../database/db4.sqlite3')
-    # DATABASES['interpro_dw']['TEST'] = {'MIRROR': 'default'}

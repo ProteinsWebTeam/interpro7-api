@@ -1,9 +1,11 @@
+from django.conf import settings
 from webfront.models import Entry
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
-
+from webfront.serializers.utils import recategorise_go_terms
+from webfront.views.queryset_manager import escape
 
 class EntrySerializer(ModelContentSerializer):
 
@@ -19,9 +21,15 @@ class EntrySerializer(ModelContentSerializer):
         if detail == SerializerDetail.ALL or detail == SerializerDetail.ENTRY_DETAIL:
             representation["metadata"] = self.to_metadata_representation(instance, self.searcher)
         elif detail == SerializerDetail.ENTRY_OVERVIEW:
-            representation = self.to_counter_representation(instance)
+            representation = self.to_counter_representation(instance, self.detail_filters)
         elif detail == SerializerDetail.ENTRY_HEADERS:
             representation = self.to_headers_representation(instance)
+        elif detail == SerializerDetail.GROUP_BY:
+            representation = self.to_group_representation(instance)
+        elif detail == SerializerDetail.IDA_LIST:
+            representation = self.to_ida_list_representation(instance)
+        else:
+            representation = instance
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -43,7 +51,45 @@ class EntrySerializer(ModelContentSerializer):
         return representation
 
     @staticmethod
+    def reformat_cross_references(cross_references):
+        DEFAULT_DESCRIPTION = "Description of data source (to be defined in API)"
+        DEFAULT_URL_PATTERN = "https://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query={accession}"
+        #fetches values from interpro.yml
+        xrefSettings = settings.CROSS_REFERENCES
+
+        reformattedCrossReferences = {}
+        for database in cross_references.keys():
+            accessions = cross_references[database]
+            reformattedCrossReferences[database] = {}
+
+            if database in xrefSettings and 'displayName' in xrefSettings[database]:
+                reformattedCrossReferences[database]['displayName'] =  xrefSettings[database]['displayName']
+            else:
+                reformattedCrossReferences[database]['displayName'] = database
+
+            if database in xrefSettings and 'description' in xrefSettings[database]:
+                reformattedCrossReferences[database]['description'] =  xrefSettings[database]['description']
+            else:
+                reformattedCrossReferences[database]['description'] = DEFAULT_DESCRIPTION
+
+            reformattedCrossReferences[database]['rank'] =  xrefSettings[database]['rank']
+
+            reformattedCrossReferences[database]['accessions'] = []
+            for accession in accessions:
+                accessionObj = {}
+                accessionObj['accession'] = accession
+
+                if database in xrefSettings and 'urlPattern' in xrefSettings[database]:
+                    accessionObj['url'] =  xrefSettings[database]['urlPattern']
+                else:
+                    accessionObj['url'] = DEFAULT_URL_PATTERN
+                accessionObj['url'] = accessionObj['url'].replace('{accession}', accession)
+                reformattedCrossReferences[database]['accessions'].append(accessionObj)
+        return reformattedCrossReferences
+
+    @staticmethod
     def to_metadata_representation(instance, solr):
+        recategorise_go_terms(instance.go_terms)
         obj = {
             "accession": instance.accession,
             "entry_id": instance.entry_id,
@@ -51,7 +97,8 @@ class EntrySerializer(ModelContentSerializer):
             "go_terms": instance.go_terms,
             "source_database": instance.source_database,
             "member_databases": instance.member_databases,
-            "integrated": instance.integrated,
+            "integrated": instance.integrated.accession if instance.integrated else None,
+            "hierarchy": instance.hierarchy,
             "name": {
                 "name": instance.name,
                 "short": instance.short_name,
@@ -63,16 +110,14 @@ class EntrySerializer(ModelContentSerializer):
             "counters": {
                 "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
                 "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
-            }
+            },
+            "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)
         }
-        # Just showing the accesion number instead of recursively show the entry to which has been integrated
-        if instance.integrated:
-            obj["integrated"] = instance.integrated.accession
         return obj
 
     @staticmethod
     def to_proteins_detail_representation(instance, solr, is_full=False):
-        solr_query = "entry_acc:" + instance.accession.lower()
+        solr_query = "entry_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
                 r,
@@ -87,7 +132,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_structures_detail_representation(instance, solr, is_full=False):
-        solr_query = "entry_acc:" + instance.accession.lower()
+        solr_query = "entry_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r,
@@ -101,14 +146,18 @@ class EntrySerializer(ModelContentSerializer):
         return response
 
     def to_headers_representation(self, instance):
-        return {
+        headers = {
             "metadata": {
                 "accession": instance.accession,
                 "name": instance.name,
                 "source_database": instance.source_database,
-                "type": instance.type
+                "type": instance.type,
+                "integrated": instance.integrated.accession if instance.integrated else None,
+                "member_databases": instance.member_databases,
+                "go_terms": instance.go_terms,
             }
         }
+        return headers
 
     @staticmethod
     def serialize_counter_bucket(bucket):
@@ -126,7 +175,19 @@ class EntrySerializer(ModelContentSerializer):
         return output
 
     @staticmethod
-    def to_counter_representation(instance):
+    def to_group_representation(instance):
+        if "groups" in instance:
+            if EntrySerializer.grouper_is_empty(instance):
+                raise ReferenceError('There are not entries for this request')
+            return {
+                        EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket)
+                        for bucket in instance["groups"]["buckets"]
+                    }
+        else:
+            return {field_value: total for field_value, total in instance}
+
+    @staticmethod
+    def to_counter_representation(instance, filters=[]):
         if "entries" not in instance:
             if EntrySerializer.counter_is_empty(instance):
                 raise ReferenceError('There are not entries for this request')
@@ -136,10 +197,24 @@ class EntrySerializer(ModelContentSerializer):
                         EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket)
                         for bucket in instance["databases"]["buckets"]
                     },
+                    "integrated": 0,
                     "unintegrated": 0,
                     "interpro": 0,
                 }
             }
+            if SerializerDetail.PROTEIN_DB in filters or SerializerDetail.STRUCTURE_DB in filters :
+                result["entries"]["integrated"] = {"entries": 0}
+                result["entries"]["unintegrated"] = {"entries": 0}
+                result["entries"]["interpro"] = {"entries": 0}
+            if SerializerDetail.PROTEIN_DB in filters:
+                result["entries"]["integrated"]["proteins"] = 0
+                result["entries"]["unintegrated"]["proteins"] = 0
+                result["entries"]["interpro"]["proteins"] = 0
+            if SerializerDetail.STRUCTURE_DB in filters:
+                result["entries"]["integrated"]["structures"] = 0
+                result["entries"]["unintegrated"]["structures"] = 0
+                result["entries"]["interpro"]["structures"] = 0
+
             if "unintegrated" in instance and (
                     ("count" in instance["unintegrated"] and instance["unintegrated"]["count"]) or
                     ("doc_count" in instance["unintegrated"] and instance["unintegrated"]["doc_count"]) > 0):
@@ -147,8 +222,22 @@ class EntrySerializer(ModelContentSerializer):
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]
+            vals = list(result["entries"]["member_databases"].values())
+            if len(vals) > 0:
+                if type(vals[0]) == int:
+                    result["entries"]["integrated"] = sum(vals) - result["entries"]["unintegrated"]
+                else:
+                    result["entries"]["integrated"] = {
+                        "entries": sum([v["entries"] for v in vals]) - result["entries"]["unintegrated"]["entries"]
+                    }
+                    if "proteins" in result["entries"]["interpro"]:
+                        result["entries"]["integrated"]["proteins"] = result["entries"]["interpro"]["proteins"]
+                    if "structures" in result["entries"]["interpro"]:
+                        result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
+
             return result
         return instance
+
 
     dbcode = {
         "H": "Pfam",
@@ -177,22 +266,26 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def counter_is_empty(instance):
+        return EntrySerializer.grouper_is_empty(instance, "databases")
+
+    @staticmethod
+    def grouper_is_empty(instance, field="groups"):
         if ("count" in instance and instance["count"] == 0) or \
-           (len(instance["databases"]["buckets"]) == 0 and instance["unintegrated"]["unique"] == 0):
+           (len(instance[field]["buckets"]) == 0 and instance["unintegrated"]["unique"] == 0):
             return True
-        if ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
-           (len(instance["databases"]["buckets"]) == 0 and instance["unintegrated"]["unique"]["value"] == 0):
+        if ("doc_count" in instance[field] and instance[field]["doc_count"] == 0) or \
+           (len(instance[field]["buckets"]) == 0 and instance["unintegrated"]["unique"]["value"] == 0):
             return True
         return False
 
     def to_proteins_count_representation(self, instance):
-        solr_query = "entry_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.uniprot.ProteinSerializer.to_counter_representation(
             self.searcher.get_counter_object("protein", solr_query, self.get_extra_endpoints_to_count())
         )["proteins"]
 
     def to_structures_count_representation(self, instance):
-        solr_query = "entry_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
             self.searcher.get_counter_object("structure", solr_query, self.get_extra_endpoints_to_count())
         )["structures"]
@@ -201,22 +294,34 @@ class EntrySerializer(ModelContentSerializer):
     def get_entry_header_from_solr_object(obj, for_structure=False, include_entry=False, solr=None):
         header = {
             "accession": obj["entry_acc"],
-            "entry_protein_coordinates": obj["entry_protein_coordinates"],
+            "entry_protein_locations": obj["entry_protein_locations"],
             # "name": "PTHP_BUCAI",
-            # "length": 85,
+            "protein_length": obj["protein_length"],
             "source_database": obj["entry_db"],
             "entry_type": obj["entry_type"],
+            "entry_integrated": obj["integrated"],
         }
         if for_structure:
             header["chain"] = obj["chain"]
             header["protein"] = obj["protein_acc"]
-            header["protein_structure_coordinates"] = obj["protein_structure_coordinates"]
+            header["protein_structure_locations"] = obj["protein_structure_locations"]
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(
                 Entry.objects.get(accession=obj["entry_acc"].upper()), solr
             )
 
         return header
+
+    @staticmethod
+    def to_ida_list_representation(obj):
+        # return obj
+        return {
+            "count": obj["ngroups"]["value"],
+            "results": [
+                {"IDA": o["IDA"], "IDA_FK": o["IDA_FK"], "unique_proteins": o["unique"]["value"]}
+                for o in obj['groups']
+            ]
+        }
 
     class Meta:
         model = Entry

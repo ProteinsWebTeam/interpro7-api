@@ -92,7 +92,7 @@ def get_object_from_row(con, row, col, is_for_interpro_entries=True):
         "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
     }, row[col["LEN"]], is_for_interpro_entries)
     return {k: v.lower() if type(v) == str else v for k, v in obj.items()}
-
+#TODO:
 
 def chunks(iterable, max=1000):
     iterator = iter(iterable)
@@ -155,7 +155,8 @@ conditions = [
     "AND e.ENTRY_TYPE='F' AND p.DBCODE='S'",
     "AND e.ENTRY_TYPE='F' AND p.DBCODE='T'",
     "AND e.ENTRY_TYPE!='F' AND p.DBCODE='S'",
-    "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T'",
+    "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T' AND pe.POS_FROM<50",
+    "AND e.ENTRY_TYPE!='F' AND p.DBCODE='T' AND pe.POS_FROM>49",
 ]
 
 dbcodes = None
@@ -184,7 +185,7 @@ def get_entry_types(con):
     return entry_types
 
 
-def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr=True, offset=0):
+def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr=True, offset=0, match_pos=None):
     t = time.time()
     ipro = DATABASES['interpro_ro']
     con = cx_Oracle.connect(ipro['USER'], ipro['PASSWORD'], cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']))
@@ -200,6 +201,10 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
             where = "AND pe.DBCODE='{}'".format(subset)
         elif type(subset) == str:
             print("Not a valid database. Options:", codes.keys())
+
+        if match_pos is not None:
+            where += " AND pe.POS_FROM="+str(match_pos)
+
         part = 0
         for chunk in chunks(get_from_db(con, n, where, is_for_interpro_entries, offset), bs):
             if submit_to_solr:
@@ -207,10 +212,11 @@ def upload_to_solr(n, bs, subset=0, is_for_interpro_entries=True, submit_to_solr
                     solr = pysolr.Solr(SEARCHER_URL, timeout=10)
                 add_to_solr(solr, chunk, commit=False)
             else:
-                f = open("ipro_tst_{}_{}_{:06}.json".format(
+                f = open("ipro_tst_{}_{}_{:06}{}.json".format(
                     "ipro" if is_for_interpro_entries else "DB",
                     subset,
-                    part
+                    part,
+                    '' if match_pos is None else '_'+str(match_pos)
                 ), "w")
                 f.write(json.dumps(list(chunk)))
                 f.close()
@@ -307,6 +313,14 @@ class Command(BaseCommand):
             )
         )
         parser.add_argument(
+            "--match_pos", "-p",
+            type=int,
+            help=(
+                "Filtering the query by an specific start position of the match" +
+                "If none specified, the qury will not be filter by POS_FROM"
+            )
+        )
+        parser.add_argument(
             "--logs", "-l",
             action='store_true',
             help="Activates Django logs"
@@ -357,5 +371,6 @@ class Command(BaseCommand):
                 subset=subset,
                 is_for_interpro_entries=(t == 0),
                 submit_to_solr=not options["files"],
-                offset=options["resume_at"]
+                offset=options["resume_at"],
+                match_pos=options["match_pos"],
             )

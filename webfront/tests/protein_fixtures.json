@@ -4,6 +4,7 @@
     "fields": {
       "identifier": "CBPYA_ASPCL",
       "accession": "A1CUJ5",
+      "tax_id": 344612,
       "organism": {
         "name": "Aspergillus clavatus (strain ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1)",
         "taxid": 344612
@@ -16,26 +17,7 @@
       "length" : "543",
       "proteome": "UP000006701",
       "gene": "cpyA",
-      "go_terms": {
-        "biological_process": [
-          {
-            "id": "GO:0006508",
-            "name": "proteolysis"
-          }
-        ],
-        "molecular_function": [
-          {
-            "id": "GO:0004185",
-            "name": "serine-type carboxypeptidase activity"
-          }
-        ],
-        "cellular_component": [
-          {
-            "id": "GO:0005773",
-            "name": "vacuole"
-          }
-        ]
-      },
+      "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category": "F"}],
       "evidence_code": 3,
       "feature": {
         "signal_peptide": [],
@@ -54,7 +36,9 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "swissprot"
+      "source_database": "swissprot",
+      "fragment": "N",
+      "residues": {}
     }
   },
   {
@@ -62,6 +46,7 @@
     "fields": {
       "identifier": "M5ADK6_LACBR",
       "accession": "M5ADK6",
+      "tax_id": 1001583,
       "organism": {
         "name": "Lactobacillus brevis KB290",
         "taxid": 1001583
@@ -74,16 +59,53 @@
       "length" : 297,
       "proteome": "UP000012042",
       "gene": "LVISKB_0797",
-      "go_terms": {
-        "biological_process": [],
-        "molecular_function": [],
-        "cellular_component": [
-          {
-            "id": "GO:0016020",
-            "name": "membrane"
-          }
-        ]
-      },
+      "go_terms": [
+        {
+          "identifier": "GO:0016740",
+          "name": "transferase activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        },
+        {
+          "identifier": "GO:0016787",
+          "name": "hydrolase activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        },
+        {
+          "identifier": "GO:0003824",
+          "name": "catalytic activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        },
+        {
+          "identifier": "GO:0003824",
+          "name": "catalytic activity",
+          "category": "F"
+        },
+        {
+          "identifier": "GO:0008152",
+          "name": "metabolic process",
+          "category": "P"
+        }
+      ],
       "evidence_code": 1,
       "feature": {
         "signal_peptide": [],
@@ -97,7 +119,9 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "swissprot"
+      "source_database": "swissprot",
+      "fragment": "N",
+      "residues": {}
     }
   },
   {
@@ -105,6 +129,7 @@
     "fields": {
       "identifier": "A0A0A2L2G2_PENIT",
       "accession": "A0A0A2L2G2",
+      "tax_id": 40296,
       "organism": {
         "name": "Penicillium italicum",
         "taxid": 40296
@@ -117,26 +142,7 @@
       "length" : "550",
       "proteome": "UP000030104",
       "gene": "PITC_084940",
-      "go_terms": {
-        "biological_process": [
-          {
-            "id": "GO:0006508",
-            "name": "proteolysis"
-          }
-        ],
-        "molecular_function": [
-          {
-            "id": "GO:0004185",
-            "name": "serine-type carboxypeptidase activity"
-          }
-        ],
-        "cellular_component": [
-          {
-            "id": "GO:0005773",
-            "name": "vacuole"
-          }
-        ]
-      },
+      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": "F"}],
       "evidence_code": 1,
       "feature": {
         "signal_peptide": [],
@@ -155,7 +161,9 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "trembl"
+      "source_database": "trembl",
+      "fragment": "N",
+      "residues": {}
     }
   },
   {
@@ -163,9 +171,10 @@
     "fields": {
       "identifier": "LSHR_PIG",
       "accession": "P16582",
+      "tax_id": 40296,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxid": 40296
       },
       "name": "Lutropin-choriogonadotropic hormone receptor",
       "short_name": "LH/CG-R",
@@ -175,34 +184,7 @@
       "length" : 696,
       "proteome": "UP000008227",
       "gene": "LHCGR",
-      "go_terms": {
-        "biological_process": [
-          {
-            "id": "GO:0007186",
-            "name": "G-protein coupled receptor signaling pathway"
-          }
-        ],
-        "molecular_function": [
-          {
-            "id": "GO:0004930",
-            "name": "G-protein coupled receptor activity"
-          },
-          {
-            "id": "GO:0004964",
-            "name": "luteinizing hormone receptor activity"
-          },
-          {
-            "id": "GO:0016500",
-            "name": "protein-hormone receptor activity"
-          }
-        ],
-        "cellular_component": [
-          {
-            "id": "GO:0016021",
-            "name": "integral component of membrane"
-          }
-        ]
-      },
+      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": "F"}],
       "evidence_code": 4,
       "feature": {
         "signal_peptide": [],
@@ -216,7 +198,9 @@
       "genomic_context": {
         "DNA": ""
       },
-      "source_database": "trembl"
+      "source_database": "trembl",
+      "fragment": "N",
+      "residues": {}
     }
   }
 ]

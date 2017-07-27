@@ -7,9 +7,10 @@ from rest_framework.utils.urls import replace_query_param
 from django.core.paginator import Paginator as DjangoPaginator
 
 class CustomPaginator(DjangoPaginator):
-    def __init__(self, object_list, per_page, orphans=0,
-                 allow_empty_first_page=True):
-        super(CustomPaginator, self).__init__(object_list, per_page, orphans,allow_empty_first_page)
+    def __init__(self, object_list, per_page, orphans=0, allow_empty_first_page=True):
+        if not object_list.ordered:
+            object_list = object_list.order_by('accession')
+        super(CustomPaginator, self).__init__(object_list, per_page, orphans, allow_empty_first_page)
         if hasattr(object_list, "_count"):
             self._count = object_list._count
 
@@ -30,6 +31,8 @@ class CustomPagination(PageNumberPagination):
 
     def paginate_queryset(self, queryset, request, **kwargs):
         if "search_size" in kwargs and kwargs["search_size"] is not None:
+            if not queryset.ordered:
+                queryset = queryset.order_by('accession')
             queryset._count = kwargs["search_size"]
         return super(CustomPagination, self).paginate_queryset(queryset, request, kwargs["view"])
     #

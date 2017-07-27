@@ -4,7 +4,8 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 import webfront.serializers.interpro
 import webfront.serializers.pdb
 from webfront.views.custom import SerializerDetail
-
+from webfront.serializers.utils import recategorise_go_terms
+from webfront.views.queryset_manager import escape
 
 class ProteinSerializer(ModelContentSerializer):
 
@@ -23,6 +24,10 @@ class ProteinSerializer(ModelContentSerializer):
             representation = self.to_counter_representation(instance)
         elif detail == SerializerDetail.PROTEIN_HEADERS:
             representation = self.to_headers_representation(instance)
+        elif detail == SerializerDetail.GROUP_BY:
+            representation = self.to_group_representation(instance)
+        else:
+            representation = instance
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -56,13 +61,16 @@ class ProteinSerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.name,
                 "source_database": instance.source_database,
-                "length": instance.length
+                "length": instance.length,
+                "source_organism": instance.organism,
             }
         }
 
     @staticmethod
     def to_metadata_representation(instance, searcher):
-        return {
+        recategorise_go_terms(instance.go_terms)
+        
+        protein = {
             "accession": instance.accession,
             "id": instance.identifier,
             "source_organism": instance.organism,
@@ -77,13 +85,15 @@ class ProteinSerializer(ModelContentSerializer):
             "proteome": instance.proteome,
             "gene": instance.gene,
             "go_terms": instance.go_terms,
-            "protein_evidence": 4,
+            "protein_evidence": 4, #TODO
             "source_database": instance.source_database,
+            'fragment': instance.fragment,
             "counters": {
                 "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
                 "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
             }
         }
+        return protein
 
     @staticmethod
     def serialize_counter_bucket(bucket):
@@ -101,10 +111,21 @@ class ProteinSerializer(ModelContentSerializer):
         return output
 
     @staticmethod
+    def to_group_representation(instance):
+        if "groups" in instance:
+            if ProteinSerializer.grouper_is_empty(instance):
+                raise ReferenceError('There are not entries for this request')
+            return {
+                ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket)
+                for bucket in instance["groups"]["buckets"]
+            }
+        else:
+            return {field_value: total for field_value, total in instance}
+
+    @staticmethod
     def to_counter_representation(instance):
         if "proteins" not in instance:
-            if ("count" in instance and instance["count"] == 0) or \
-               ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0):
+            if ProteinSerializer.grouper_is_empty(instance, "databases"):
                 raise ReferenceError('There are not entries for this request')
 
             ins2 = {"proteins": {
@@ -118,29 +139,31 @@ class ProteinSerializer(ModelContentSerializer):
         return instance
 
     @staticmethod
+    def grouper_is_empty(instance, field="groups"):
+        return ("count" in instance and instance["count"] == 0) or \
+               ("buckets" in instance[field] and len(instance[field]["buckets"]) == 0)
+
+    @staticmethod
     def get_key_from_bucket(bucket):
-        key = (bucket["val"] if "val" in bucket else bucket["key"]).upper()
-        if key == "S":
-            return "swissprot"
-        if key == "T":
-            return "trembl"
+        key = str(bucket["val"] if "val" in bucket else bucket["key"]).lower()
         return key
 
     def to_entries_count_representation(self, instance):
-        query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
-            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count()),
+            self.detail_filters
         )["entries"]
 
     def to_structures_count_representation(self, instance):
-        query = "protein_acc:"+instance.accession if hasattr(instance, 'accession') else None
+        query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
             self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
         )["structures"]
 
     @staticmethod
     def to_entries_detail_representation(instance, searcher, is_full=False):
-        solr_query = "protein_acc:" + instance.accession.lower()
+        solr_query = "protein_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
                 r,
@@ -151,11 +174,15 @@ class ProteinSerializer(ModelContentSerializer):
             ]
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
+
+        for entry in response:
+            if (entry['accession'] in instance.residues):
+                entry['residues'] = instance.residues
         return response
 
     @staticmethod
     def to_structures_detail_representation(instance, searcher, is_full=False):
-        query = "protein_acc:" + instance.accession.lower()
+        query = "protein_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r,
@@ -170,12 +197,12 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None):
-        key_coord = "entry_protein_coordinates" if for_entry else "protein_structure_coordinates"
+        key_coord = "entry_protein_locations" if for_entry else "protein_structure_locations"
         header = {
             "accession": obj["protein_acc"],
             key_coord: obj[key_coord],
             # "name": "PTHP_BUCAI",
-            # "length": 85,
+            "protein_length": obj["protein_length"],
             "source_database": obj["protein_db"],
             "organism": obj["tax_id"],
         }

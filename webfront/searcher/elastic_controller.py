@@ -32,8 +32,35 @@ class ElasticsearchController(SearchController):
         conn.request("POST", "/"+self.index+"/"+self.type+"/_delete_by_query?conflicts=proceed", body)
         return conn.getresponse()
 
+    def get_grouped_object(self, endpoint, field, solr_query=None, extra_counters=[]):
+        qs = self.queryset_manager.get_searcher_query()
+        if qs == '':
+            qs = '*:*'
+        if solr_query is not None:
+            qs += ' && ' + solr_query.lower()
+        facet = {
+            "aggs": {
+                "groups": {
+                    "terms": {
+                        "field": field,
+                        "execution_hint": "map",
+                    },
+                    "aggs": {
+                        "unique": {
+                            "cardinality": {"field": "{}_acc".format(endpoint)}
+                        },
+                    }
+                }
+            },
+            "size": 0
+        }
+        for ec in extra_counters:
+            facet["aggs"]["groups"]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
+        response = self._elastic_json_query(qs, facet)
+        return response["aggregations"]
+
     def get_counter_object(self, endpoint, solr_query=None, extra_counters=[]):
-        qs = self.queryset_manager.get_solr_query()
+        qs = self.queryset_manager.get_searcher_query()
         if qs == '':
             qs = '*:*'
         if solr_query is not None:
@@ -86,8 +113,8 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]
 
-    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=1, start=0):
-        query = self.queryset_manager.get_solr_query() if query is None else query.lower()
+    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=1, start=0, inner_field_to_count=None):
+        query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
         facet = {
             "aggs": {
                 "ngroups": {
@@ -98,7 +125,7 @@ class ElasticsearchController(SearchController):
                 "groups": {
                     "terms": {
                         "field": field,
-                        "size": rows,
+                        "size": start+rows,
                         "execution_hint": "map",
                     },
                     "aggs": {
@@ -108,17 +135,28 @@ class ElasticsearchController(SearchController):
             },
             "size": 1
         }
+        if inner_field_to_count is not None:
+            facet["aggs"]["groups"]["aggs"]["unique"] = {"cardinality": {"field": inner_field_to_count}}
         if fq is not None:
             query += " && "+fq
         response = self._elastic_json_query(query, facet)
-        response["aggregations"]["groups"] = [
-            bucket["tops"]["hits"]["hits"][0]["_source"]
-            for bucket in response["aggregations"]["groups"]["buckets"]
-        ]
-        return response["aggregations"]
+        output = {
+            "groups":  [
+                bucket["tops"]["hits"]["hits"][0]["_source"]
+                for bucket in response["aggregations"]["groups"]["buckets"][start:start+rows]
+            ],
+            "ngroups": response["aggregations"]["ngroups"]
+        }
+        if inner_field_to_count is not None:
+            i = 0
+            for bucket in response["aggregations"]["groups"]["buckets"][start:start+rows]:
+                output["groups"][i]["unique"] = bucket["unique"]
+                i += 1
+
+        return output
 
     def get_list_of_endpoint(self, endpoint, solr_query=None, rows=10, start=0):
-        qs = self.queryset_manager.get_solr_query() if solr_query is None else solr_query
+        qs = self.queryset_manager.get_searcher_query() if solr_query is None else solr_query
         if qs == '':
             qs = '*:*'
         facet = {
@@ -139,20 +177,34 @@ class ElasticsearchController(SearchController):
             },
             "size": 0
         }
+        # if self.queryset_manager.order_field is not None:
+        #     facet['aggs']['rscount']['aggs'] = {
+        #         "tops": {
+        #             "top_hits": {"size": 1}
+        #         },
+        #         "topSort": {
+        #             "max": {
+        #                 "field": self.queryset_manager.order_field
+        #             }
+        #         }
+        #     }
+        #     facet['aggs']['rscount']['terms']['order'] = {
+        #         "topSort": "asc"
+        #     }
         response = self._elastic_json_query(qs, facet)
         return [x['key'].upper() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
 
     def get_chain(self):
-        qs = self.queryset_manager.get_solr_query()
+        qs = self.queryset_manager.get_searcher_query()
         response = self._elastic_json_query(qs)
         return [ch["_source"] for ch in response["hits"]["hits"]]
 
     def execute_query(self, query, fq=None, rows=0, start=0):
-        query = self.queryset_manager.get_solr_query() if query is None else query.lower()
+        query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
         conn = http.client.HTTPConnection(self.server, self.port)
         if fq is not None:
             q = query+" && "+fq.lower()
-        q = self.to_dbcodes(q.replace(" && ", "%20AND%20"))
+        q = q.replace(" && ", "%20AND%20")
         conn.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,
@@ -166,7 +218,7 @@ class ElasticsearchController(SearchController):
         if query_obj is None:
             query_obj = {"from": 0}
         conn = http.client.HTTPConnection(self.server, self.port)
-        q = self.to_dbcodes(q.replace(" && ", "%20AND%20"))
+        q = q.replace(" && ", "%20AND%20")
         conn.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,

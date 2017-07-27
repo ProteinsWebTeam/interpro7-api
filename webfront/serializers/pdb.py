@@ -3,6 +3,7 @@ from webfront.views.custom import SerializerDetail
 from webfront.models import Structure
 import webfront.serializers.uniprot
 import webfront.serializers.interpro
+from webfront.views.queryset_manager import escape
 
 
 class StructureSerializer(ModelContentSerializer):
@@ -26,6 +27,8 @@ class StructureSerializer(ModelContentSerializer):
             representation["metadata"]["chains"] = self.to_chains_representation(
                 self.searcher.get_chain()
             )
+        elif detail == SerializerDetail.GROUP_BY:
+            representation = self.to_group_representation(instance)
         return representation
 
     def to_full_representation(self, instance):
@@ -59,7 +62,8 @@ class StructureSerializer(ModelContentSerializer):
             "metadata": {
                 "accession": instance.accession,
                 "name": instance.name,
-                "source_database": instance.source_database
+                "source_database": instance.source_database,
+                "experiment_type": instance.experiment_type
             }
         }
 
@@ -87,7 +91,7 @@ class StructureSerializer(ModelContentSerializer):
     def get_search_query_from_representation(representation):
         query = None
         if "metadata" in representation:
-            query = "structure_acc:" + representation["metadata"]["accession"]
+            query = "structure_acc:" + escape(representation["metadata"]["accession"])
             if "chains" in representation["metadata"] and len(representation["metadata"]["chains"]) == 1:
                 query += " && ({})".format(" OR ".join(
                     ["chain:"+x for x in representation["metadata"]["chains"]]
@@ -103,12 +107,13 @@ class StructureSerializer(ModelContentSerializer):
     def to_entries_count_representation(self, representation):
         query = StructureSerializer.get_search_query_from_representation(representation)
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
-            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count()),
+            self.detail_filters
         )["entries"]
 
     @staticmethod
     def to_proteins_detail_representation(instance, searcher, is_full=False):
-        query = "structure_acc:" + instance.accession.lower()
+        query = "structure_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
                 r,
@@ -124,7 +129,7 @@ class StructureSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_entries_detail_representation(instance, searcher, is_full=False):
-        query = "structure_acc:" + instance.accession.lower()
+        query = "structure_acc:" + escape(instance.accession.lower())
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
                 r,
@@ -150,16 +155,17 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def get_chain_from_search_object(obj):
         output = {
-            "protein_structure_coordinates": obj["protein_structure_coordinates"],
+            "protein_structure_locations": obj["protein_structure_locations"],
             "organism": {
                 "taxid": obj["tax_id"]
             },
             "accession": obj["protein_acc"],
             "chain": obj["chain"],
+            "protein_length": obj["protein_length"],
             "source_database": obj["protein_db"]
         }
-        if "entry_protein_coordinates" in obj:
-            output["entry_protein_coordinates"]= obj["entry_protein_coordinates"],
+        if "entry_protein_locations" in obj:
+            output["entry_protein_locations"] = obj["entry_protein_locations"]
         return output
 
     @staticmethod
@@ -173,6 +179,23 @@ class StructureSerializer(ModelContentSerializer):
                 Structure.objects.get(accession__iexact=obj["structure_acc"]), search
             )
         return output
+
+    @staticmethod
+    def to_group_representation(instance):
+        if "groups" in instance:
+            if StructureSerializer.grouper_is_empty(instance):
+                raise ReferenceError('There are not entries for this request')
+            return {
+                StructureSerializer.get_key_from_bucket(bucket): StructureSerializer.serialize_counter_bucket(bucket)
+                for bucket in instance["groups"]["buckets"]
+            }
+        else:
+            return {field_value: total for field_value, total in instance}
+
+    @staticmethod
+    def grouper_is_empty(instance, field="groups"):
+        return ("count" in instance and instance["count"] == 0) or \
+               ("buckets" in instance[field] and len(instance[field]["buckets"]) == 0)
 
     @staticmethod
     def to_counter_representation(instance):

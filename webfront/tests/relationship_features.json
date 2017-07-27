@@ -4,7 +4,9 @@
     "fields": {
       "entry": "IPR003165",
       "protein": "A1CUJ5",
-      "coordinates": {"length": 543, "coordinates": [[[27,80]]]}
+      "coordinates": {"length": 543, "coordinates": [[[27,80]]]},
+      "IDA" : "274/upi00014fb1c3#12340&22666:124-270~14726:197-273#",
+      "IDA_FK" : 50134
     }
   },
   {
@@ -28,7 +30,9 @@
     "fields": {
       "entry": "IPR003165",
       "protein": "P16582",
-      "coordinates": {"length": 696, "coordinates": [[[48,101]]]}
+      "coordinates": {"length": 696, "coordinates": [[[48,101]]]},
+      "IDA" : "274/upi00014fb1c3#12340&22666:2-125~14722:119-195~22669&8991:124-270~14726:197-273#",
+      "IDA_FK" : 590134
     }
   },
   {
@@ -52,7 +56,9 @@
     "fields": {
       "entry": "IPR001165",
       "protein": "A1CUJ5",
-      "coordinates": {"length": 543, "coordinates": [[[148,201]]]}
+      "coordinates": {"length": 543, "coordinates": [[[148,201]]]},
+      "IDA" : "274/upi00014fb1c3#12340&1165:2-125#",
+      "IDA_FK" : 59013
     }
   },
   {

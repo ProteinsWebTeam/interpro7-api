@@ -1,6 +1,0 @@
-engine: django.db.backends.mysql
-host: mysql-interpro-unifam-test.ebi.ac.uk
-sid: test
-port: 4504
-user: admin
-password: DqyAhX64

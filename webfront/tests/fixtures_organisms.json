@@ -8,8 +8,8 @@
       "lineage": " 1 ",
       "rank": "no rank",
       "children": [2579, 2],
-      "left": 0,
-      "right": 6
+      "left_number": 0,
+      "right_number": 6
     }
   },
   {
@@ -25,8 +25,8 @@
         344612,
         40296
       ],
-      "left": 1,
-      "right": 4
+      "left_number": 1,
+      "right_number": 4
     }
   },
   {
@@ -41,8 +41,8 @@
       "children": [
         1001583
       ],
-      "left": 5,
-      "right": 6
+      "left_number": 5,
+      "right_number": 6
     }
   },
   {
@@ -55,8 +55,8 @@
       "parent": 2,
       "rank": "SPECIES",
       "children": [],
-      "left": 3,
-      "right": 4
+      "left_number": 3,
+      "right_number": 4
     }
   },
   {
@@ -69,8 +69,8 @@
       "parent": 2579,
       "rank": "SPECIES",
       "children": [],
-      "left": 5,
-      "right": 6
+      "left_number": 5,
+      "right_number": 6
     }
   },
   {
@@ -83,8 +83,8 @@
       "parent": 2579,
       "rank": "SPECIES",
       "children": [],
-      "left": 1,
-      "right": 2
+      "left_number": 1,
+      "right_number": 2
     }
   },
   {

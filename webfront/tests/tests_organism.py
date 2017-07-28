@@ -16,7 +16,9 @@ class OrganismFixturesTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
         response = self.client.get("/api/organism")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("taxonomy", response.data)
+        self.assertIn("organisms", response.data)
+        self.assertIn("taxonomy", response.data["organisms"])
+        self.assertIn("proteome", response.data["organisms"])
         # self.assertIn("proteome", response.data)
 
     def test_can_read_taxonomy_list(self):

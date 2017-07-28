@@ -8,8 +8,9 @@ from django.core.management.base import BaseCommand
 from django.db.utils import IntegrityError
 
 from release.models import iprel
-from webfront.models import Entry, Protein, Structure, Taxonomy
+from webfront.models import Entry, Protein, Structure, Taxonomy, Proteome
 import json
+import urllib.request, math
 
 # global array
 errors = []
@@ -55,7 +56,7 @@ def create_multiple_x(qs, instantiator, type_info):
         except Exception as err:
             errors.append((
                 type_info,
-                '-'.join(row) if type(row) is tuple else row.pk,
+                '-'.join(row) if type(row) is tuple or dict else row.pk,
                 err,
             ))
 
@@ -326,6 +327,59 @@ def set_lineage(node, lineage=" "):
     for child in node["children"]:
         set_lineage(taxonomy_nodes[child], node["lineage"])
 
+
+# proteomes
+def get_n_proteomes(n):
+    offset = 0
+    size = -1 if not n else n
+    is_reference = True
+    url = "http://www.ebi.ac.uk/proteins/api/proteomes?offset={}&size={}&is_ref_proteome={}".format(
+        offset, size, is_reference
+    )
+    with urllib.request.urlopen(url) as response:
+        data = json.loads(response.read().decode())
+        set_proteome(tqdm(
+            data,
+            mininterval=1,
+            dynamic_ncols=True
+        ))
+
+
+def set_proteome(qs):
+    for chunk in chunks(create_multiple_x(
+        qs,
+        create_proteome_from_json,
+        'proteome'
+    )):
+        bulk_insert(chunk, Taxonomy)
+
+
+tax2proteome = {}
+
+def create_proteome_from_json(obj):
+    tax, up = obj["taxonomy"], obj["upid"]
+    if tax not in tax2proteome:
+        tax2proteome[tax] = []
+    tax2proteome[tax].append(up)
+
+    assembly = [db["id"] for db in obj["dbReference"] if db["type"] == "GCSetAcc"]
+    return Proteome(
+        accession=up,
+        name=obj["name"],
+        is_reference=obj["isReferenceProteome"],
+        number_of_proteins=obj["upid"],
+        strain=obj["strain"],
+        assembly=assembly[0] if len(assembly) else None,
+        taxonomy=Taxonomy.objects.get(accession=tax)
+    )
+
+
+def save_proteome2taxonomy():
+    file = open("proteome2taxonomy.json", "w")
+    file.write(json.dump(tax2proteome))
+    file.close()
+
+
 def _fillEntries(n):
     print('Step 1 of 2 running')
     # This needs to be done first
@@ -350,12 +404,19 @@ def _fillTaxonomy(n):
     print('Step 2 of 2 running')
     update_hierarchy_fields()
 
+def _fillProteome(n):
+    print('Step 1 of 2 running')
+    get_n_proteomes(n)
+    print('Step 2 of 2 running')
+    save_proteome2taxonomy()
+
 
 _modelFillers = {
     'Entry': _fillEntries,
     'Protein': _fillProteins,
     'Structure': _fillStructures,
     'Taxonomy': _fillTaxonomy,
+    'Proteome': _fillProteome,
 }
 
 

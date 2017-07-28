@@ -109,7 +109,7 @@ class ElasticsearchController(SearchController):
                 },
                 "aggs": {"unique": {"cardinality": {"field": "entry_acc"}}}
             }
-            self.add_extra_counters(facet, "databases", extra_counters)
+            self.add_extra_counters(facet, "unintegrated", extra_counters)
 
     def tune_counter_facet_for_protein(self, facet, endpoint, extra_counters):
         if endpoint == "protein":

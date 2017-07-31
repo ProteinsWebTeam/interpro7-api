@@ -11,7 +11,7 @@ from django.conf import settings
 
 entry_db_members = '|'.join(settings.DB_MEMBERS)
 
-db_members = r'(uniprot)|(trembl)|(swissprot)'
+db_members = r'((un)?reviewed)|(uniprot)'
 
 
 class UniprotAccessionHandler(CustomView):

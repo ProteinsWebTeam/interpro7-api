@@ -95,7 +95,7 @@ class InterproRESTTestCase(APITransactionTestCase):
             (isinstance(obj["uniprot"], dict) and
              isinstance(obj["uniprot"]["proteins"], int) and
              obj["uniprot"]["proteins"] > 0):
-            self.assertTrue("trembl" in obj or "swissprot" in obj, msg)
+            self.assertTrue("unreviewed" in obj or "reviewed" in obj, msg)
 
     def _check_protein_details(self, obj):
         self.assertIn("description", obj)
@@ -158,7 +158,7 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     def _check_count_overview_per_endpoints(self, obj, endpoints1, endpoints2, msg=""):
         for inner_obj in obj[endpoints2]:
-            if inner_obj in ["interpro", "unintegrated", "uniprot", "swissprot", "trembl", "pdb"] and not (
+            if inner_obj in ["interpro", "unintegrated", "uniprot", "reviewed", "unreviewed", "pdb"] and not (
                         inner_obj in ["unintegrated", "interpro"] and obj[endpoints2][inner_obj] == 0):
                     self.assertIn(endpoints1,
                                   obj[endpoints2][inner_obj],

@@ -2,8 +2,8 @@
   "entries":{
     "IPR003165":{
       "proteins": {
-        "swissprot": ["A1CUJ5"],
-        "trembl":["P16582"]
+        "reviewed": ["A1CUJ5"],
+        "unreviewed":["P16582"]
       },
       "structures":["1T2V","1JM7"],
       "member_databases" : {
@@ -15,15 +15,15 @@
     },
     "IPR001165":{
       "proteins": {
-        "swissprot": ["A1CUJ5"],
-        "trembl":[]
+        "reviewed": ["A1CUJ5"],
+        "unreviewed":[]
       },
       "structures":["1JM7"],
       "source_database" : "interpro"
     },
     "PF02171":{
       "proteins": {
-        "swissprot": ["A1CUJ5"]
+        "reviewed": ["A1CUJ5"]
       },
       "structures":["1JM7"],
       "integrated" : "IPR003165",
@@ -31,7 +31,7 @@
     },
     "SM00950":{
       "proteins": {
-        "swissprot": ["A1CUJ5"]
+        "reviewed": ["A1CUJ5"]
       },
       "structures":["1JM7"],
       "integrated" : "IPR003165",
@@ -39,7 +39,7 @@
     },
     "PS50822":{
       "proteins": {
-        "trembl":["P16582"]
+        "unreviewed":["P16582"]
       },
       "structures":["1T2V"],
       "integrated" : "IPR003165",
@@ -47,15 +47,15 @@
     },
     "PF17180":{
       "proteins": {
-        "swissprot": ["M5ADK6"],
-        "trembl":["P16582"]
+        "reviewed": ["M5ADK6"],
+        "unreviewed":["P16582"]
       },
       "structures":["2BKM","1JM7"],
       "source_database" : "pfam"
     },
     "PF17176":{
       "proteins": {
-        "swissprot": ["A1CUJ5"]
+        "reviewed": ["A1CUJ5"]
       },
       "structures":["1JM7"],
       "source_database" : "pfam"

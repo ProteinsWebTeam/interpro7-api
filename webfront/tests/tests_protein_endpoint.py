@@ -31,14 +31,14 @@ class ProteinRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("A1CUJ5", response.url)
 
-    def test_can_read_protein_swissprot(self):
-        response = self.client.get("/api/protein/swissprot")
+    def test_can_read_protein_reviewed(self):
+        response = self.client.get("/api/protein/reviewed")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
         self.assertEqual(len(response.data["results"]), 2)
 
-    def test_can_read_protein_swissprot_accession(self):
-        response = self.client.get("/api/protein/swissprot/A1CUJ5")
+    def test_can_read_protein_reviewed_accession(self):
+        response = self.client.get("/api/protein/reviewed/A1CUJ5")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self._check_protein_details(response.data["metadata"])

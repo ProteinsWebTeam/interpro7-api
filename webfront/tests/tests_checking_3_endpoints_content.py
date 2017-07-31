@@ -42,11 +42,11 @@ api_test_map = {
             "A0A0A2L2G2",
             "P16582",
         ],
-        "swissprot": [
+        "reviewed": [
             "A1CUJ5",
             "M5ADK6",
         ],
-        "trembl": [
+        "unreviewed": [
             "A0A0A2L2G2",
             "P16582",
         ],
@@ -293,7 +293,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 # endpoint2 = "structure"
                                 # db2 = "pdb"
                                 # endpoint3 = ep3 = "protein"
-                                # db3 = "trembl"
+                                # db3 = "unreviewed"
                                 # acc3 = "P16582"
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2,
                                                                       ep3, db3 + unintegrated, acc3)

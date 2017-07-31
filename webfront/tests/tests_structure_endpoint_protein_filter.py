@@ -50,13 +50,13 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("proteins", response.data["structures"]["pdb"], "'proteins' should be one of the keys in the response")
         # uniprots = response.data["proteins"]
-        # response = self.client.get("/api/structure/protein/swissprot")
+        # response = self.client.get("/api/structure/protein/reviewed")
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # swissprots = response.data["proteins"]
-        # response = self.client.get("/api/structure/protein/trembl")
+        # reviewed = response.data["proteins"]
+        # response = self.client.get("/api/structure/protein/unreviewed")
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # trembls = response.data["proteins"]
-        # self.assertEqual(uniprots, swissprots+trembls, "uniprot proteins should be equal to swissprot + trembl")
+        # unreviewed = response.data["proteins"]
+        # self.assertEqual(uniprots, reviewed+unreviewed, "uniprot proteins should be equal to reviewed + unreviewed")
 
     def test_can_get_proteins_from_pdb_structures(self):
         response = self.client.get("/api/structure/pdb/protein/uniprot")
@@ -71,8 +71,8 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
                 self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
-    def test_can_get_swissprot_from_pdb_structures(self):
-        response = self.client.get("/api/structure/pdb/protein/swissprot")
+    def test_can_get_reviewed_from_pdb_structures(self):
+        response = self.client.get("/api/structure/pdb/protein/reviewed")
         for result in response.data["results"]:
             for match in result["proteins"]:
                 self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
@@ -109,9 +109,9 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
             "/api/structure/pdb/"+pdb+"/protein/uniprot/"+prot_a: [prot_a],
             "/api/structure/pdb/"+pdb+"/protein/uniprot/"+prot_b: [prot_b],
             "/api/structure/pdb/"+pdb+"/A/protein/uniprot/"+prot_a: [prot_a],
-            "/api/structure/pdb/"+pdb+"/A/protein/swissprot/"+prot_a: [prot_a],
+            "/api/structure/pdb/"+pdb+"/A/protein/reviewed/"+prot_a: [prot_a],
             "/api/structure/pdb/"+pdb+"/B/protein/uniprot/"+prot_b: [prot_b],
-            "/api/structure/pdb/"+pdb+"/B/protein/swissprot/"+prot_b: [prot_b],
+            "/api/structure/pdb/"+pdb+"/B/protein/reviewed/"+prot_b: [prot_b],
         }
         for url in tests:
             response = self.client.get(url)
@@ -128,8 +128,8 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
 
         tests = {
             "/api/structure/pdb/protein/uniprot/"+prot_s: ["2BKM", "1JM7"],
-            "/api/structure/pdb/protein/swissprot/"+prot_s: ["2BKM", "1JM7"],
-            "/api/structure/pdb/protein/trembl/"+prot_t: ["1T2V", "1T2V", "1T2V", "1T2V", "1T2V"],
+            "/api/structure/pdb/protein/reviewed/"+prot_s: ["2BKM", "1JM7"],
+            "/api/structure/pdb/protein/unreviewed/"+prot_t: ["1T2V", "1T2V", "1T2V", "1T2V", "1T2V"],
         }
         for url in tests:
             response = self.client.get(url)
@@ -155,9 +155,9 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_t = "P16582"
         tests = [
             "/api/structure/pdb/"+pdb+"/protein/uniprot/bad_uniprot",
-            "/api/structure/pdb/"+pdb+"/protein/trembl/"+prot_s,
-            "/api/structure/pdb/protein/trembl/"+prot_s,
-            "/api/structure/pdb/protein/swissprot/"+prot_t,
+            "/api/structure/pdb/"+pdb+"/protein/unreviewed/"+prot_s,
+            "/api/structure/pdb/protein/unreviewed/"+prot_s,
+            "/api/structure/pdb/protein/reviewed/"+prot_t,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")

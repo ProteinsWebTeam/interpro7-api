@@ -56,13 +56,13 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         self.assertIn("proteins", response.data["entries"]["unintegrated"], "'proteins' should be one of the keys in the response")
         # TODO: Improve this test
         # uniprots = response.data["proteins"]
-        # response = self.client.get("/api/entry/protein/swissprot")
+        # response = self.client.get("/api/entry/protein/reviewed")
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # swissprots = response.data["proteins"]
-        # response = self.client.get("/api/entry/protein/trembl")
+        # reviewed = response.data["proteins"]
+        # response = self.client.get("/api/entry/protein/unreviewed")
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # trembls = response.data["proteins"]
-        # self.assertEqual(uniprots, swissprots+trembls, "uniprot proteins should be equal to swissprot + trembl")
+        # unreviewed = response.data["proteins"]
+        # self.assertEqual(uniprots, reviewed+unreviewed, "uniprot proteins should be equal to reviewed + unreviewed")
 
     def test_can_get_proteins_from_interpro_protein(self):
         response = self.client.get("/api/entry/interpro/protein/uniprot")
@@ -80,8 +80,8 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         self.assertTrue(has_one and has_two,
                         "One of the entries should have one protein and the other one should have two")
 
-    def test_can_get_swissprot_from_interpro_protein(self):
-        response = self.client.get("/api/entry/interpro/protein/swissprot")
+    def test_can_get_reviewed_from_interpro_protein(self):
+        response = self.client.get("/api/entry/interpro/protein/reviewed")
         self.assertEqual(len(response.data["results"]), 2)
         has_one = False
         has_two = False
@@ -101,7 +101,7 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         pfam_u = "PF17180"
         tests = {
             "/api/entry/interpro/"+acc+"/protein/uniprot": ["A1CUJ5", "P16582"],
-            "/api/entry/interpro/"+acc+"/protein/swissprot": ["A1CUJ5"],
+            "/api/entry/interpro/"+acc+"/protein/reviewed": ["A1CUJ5"],
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/uniprot": ["A1CUJ5"],
             "/api/entry/pfam/"+pfam+"/protein/uniprot": ["A1CUJ5"],
             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot": ["M5ADK6"],
@@ -136,7 +136,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
 
         tests = {
             "/api/entry/interpro/"+acc+"/protein/uniprot/"+prot: ["A1CUJ5"],
-            "/api/entry/interpro/"+acc+"/protein/swissprot/"+prot: ["A1CUJ5"],
+            "/api/entry/interpro/"+acc+"/protein/reviewed/"+prot: ["A1CUJ5"],
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/uniprot/"+prot: ["A1CUJ5"],
             "/api/entry/pfam/"+pfam+"/protein/uniprot/"+prot: ["A1CUJ5"],
             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot/"+prot_u: ["M5ADK6"],
@@ -158,7 +158,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
 
         tests = {
             "/api/entry/interpro/protein/uniprot/"+prot: ["A1CUJ5"],
-            "/api/entry/interpro/protein/swissprot/"+prot: ["A1CUJ5"],
+            "/api/entry/interpro/protein/reviewed/"+prot: ["A1CUJ5"],
             "/api/entry/interpro/"+acc+"/pfam//protein/uniprot/"+prot: ["A1CUJ5"],
             "/api/entry/pfam/protein/uniprot/"+prot: ["A1CUJ5"],
             "/api/entry/unintegrated/pfam/protein/uniprot/"+prot_u: ["M5ADK6"],
@@ -182,10 +182,10 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         smart = "SM00002"
         tests = [
             "/api/entry/interpro/protein/uniprot/"+prot_u,
-            "/api/entry/interpro/"+acc+"/protein/trembl/"+prot,
-            "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/trembl/"+prot,
+            "/api/entry/interpro/"+acc+"/protein/unreviewed/"+prot,
+            "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/unreviewed/"+prot,
             "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot/"+prot,
-            "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/trembl/"+prot_u,
+            "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/unreviewed/"+prot_u,
             "/api/entry/unintegrated/smart/"+smart+"/protein/uniprot",
         ]
         for url in tests:
@@ -196,8 +196,8 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         pfam = "PF02171"
         prot = "A1CUJ5"
         tests = [
-            "/api/entry/interpro/"+acc+"/smart/"+pfam+"/protein/trembl/"+prot,
-            "/api/entry/unintegrated/pfam/"+pfam+"/protein/trembl/"+prot,
+            "/api/entry/interpro/"+acc+"/smart/"+pfam+"/protein/unreviewed/"+prot,
+            "/api/entry/unintegrated/pfam/"+pfam+"/protein/unreviewed/"+prot,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

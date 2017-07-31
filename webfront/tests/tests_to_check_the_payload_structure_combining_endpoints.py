@@ -47,11 +47,11 @@ api_test_map = {
             "A0A0A2L2G2",
             "P16582",
         ],
-        "swissprot": [
+        "reviewed": [
             "A1CUJ5",
             "M5ADK6",
         ],
-        "trembl": [
+        "unreviewed": [
             "A0A0A2L2G2",
             "P16582",
         ],

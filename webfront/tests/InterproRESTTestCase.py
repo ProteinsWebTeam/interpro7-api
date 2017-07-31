@@ -254,3 +254,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("is_reference", obj, msg)
         self.assertIn("strain", obj, msg)
         self.assertIn("name", obj, msg)
+
+    def _check_organism_count_overview(self, main_obj, msg=""):
+        self.assertIn("organisms", main_obj, msg)
+        self.assertIn("taxa", main_obj["organisms"], msg)
+        self.assertIn("proteomes", main_obj["organisms"], msg)

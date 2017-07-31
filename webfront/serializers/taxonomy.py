@@ -1,13 +1,17 @@
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 from webfront.models import Taxonomy
+import webfront.serializers.interpro
+import webfront.serializers.uniprot
+import webfront.serializers.pdb
+from webfront.views.queryset_manager import escape
 
 class OrganismSerializer(ModelContentSerializer):
 
     def to_representation(self, instance):
         representation = {}
         representation = self.endpoint_representation(representation, instance)
-        representation = self.filter_representation(representation, instance)
+        representation = self.filter_representation(representation, instance, self.detail_filters, self.detail)
         return representation
 
     def endpoint_representation(self, representation, instance):
@@ -28,7 +32,16 @@ class OrganismSerializer(ModelContentSerializer):
             representation = self.to_headers_representation(instance, True)
         return representation
 
-    def filter_representation(self, representation, instance):
+    def filter_representation(self, representation, instance, detail_filters, detail):
+        if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
+            representation["entries"] = self.to_entries_count_representation(instance)
+        if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
+            representation["proteins"] = self.to_proteins_count_representation(instance)
+        if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
+            representation["structures"] = self.to_structures_count_representation(instance)
+        # if detail != SerializerDetail.ORGANISM_OVERVIEW:
+        #     if SerializerDetail.ENTRY_DB in detail_filters:
+        #         representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, s)
         return representation
 
     @staticmethod
@@ -118,3 +131,21 @@ class OrganismSerializer(ModelContentSerializer):
                 "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None
             }
         }
+    def to_entries_count_representation(self, instance):
+        query = "tax_id:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
+            self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count()),
+            self.detail_filters
+        )["entries"]
+
+    def to_proteins_count_representation(self, instance):
+        query = "tax_id:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        return webfront.serializers.uniprot.ProteinSerializer.to_counter_representation(
+            self.searcher.get_counter_object("protein", query, self.get_extra_endpoints_to_count())
+        )["proteins"]
+
+    def to_structures_count_representation(self, instance):
+        query = "tax_id:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
+            self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
+        )["structures"]

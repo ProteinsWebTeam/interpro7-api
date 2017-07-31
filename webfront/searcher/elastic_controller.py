@@ -126,7 +126,7 @@ class ElasticsearchController(SearchController):
             self.add_extra_counters(facet, "databases", extra_counters)
 
     def tune_counter_facet_for_organism(self, facet, endpoint, extra_counters):
-        if endpoint == "organism":
+        if endpoint == "organism" or endpoint == "taxonomy":
             facet["aggs"]["databases"]["filter"] = {"exists": {"field": "tax_id"}}
             facet["aggs"]["databases"]["aggs"]["unique"] = {
                 "cardinality": {"field": "tax_id"}
@@ -216,8 +216,11 @@ class ElasticsearchController(SearchController):
         #     facet['aggs']['rscount']['terms']['order'] = {
         #         "topSort": "asc"
         #     }
+        if endpoint == "organism" or endpoint == "taxonomy":
+            facet["aggs"]["ngroups"]["cardinality"]["field"] = "tax_id"
+            facet["aggs"]["rscount"]["terms"]["field"] = "tax_id"
         response = self._elastic_json_query(qs, facet)
-        return [x['key'].upper() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
+        return [str(x['key']).upper() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()

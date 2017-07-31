@@ -6,7 +6,7 @@ import re
 
 
 def escape(text):
-    return re.sub(r'([-+!(){}[\]^"~*?:\\\/])', r"\\\1", text)
+    return re.sub(r'([-+!(){}[\]^"~*?:\\\/])', r"\\\1", str(text))
 
 
 class QuerysetManager:

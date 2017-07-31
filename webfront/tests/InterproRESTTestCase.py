@@ -253,5 +253,4 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("taxonomy", obj, msg)
         self.assertIn("is_reference", obj, msg)
         self.assertIn("strain", obj, msg)
-        self.assertIn("number_of_proteins", obj, msg)
         self.assertIn("name", obj, msg)

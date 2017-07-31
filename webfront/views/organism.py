@@ -108,7 +108,7 @@ class OrganismHandler(CustomView):
     def get_database_contributions(self, queryset):
         qs = Taxonomy.objects.filter(accession__in=queryset)
         qs2 = Proteome.objects.filter(taxonomy__in=qs)
-        return {"organisms": {"taxonomy": qs.count(), "proteome": qs2.count()}}
+        return {"organisms": {"taxa": qs.count(), "proteomes": qs2.count()}}
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):

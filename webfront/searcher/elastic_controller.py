@@ -132,7 +132,7 @@ class ElasticsearchController(SearchController):
                 "cardinality": {"field": "tax_id"}
             }
             facet["aggs"]["databases"]["aggs"]["proteomes"] = {
-                "cardinality": {"field": "tax_id"}
+                "cardinality": {"field": "proteomes"}
             #     TODO: count proteomes insted
             }
             del facet["aggs"]["databases"]["terms"]

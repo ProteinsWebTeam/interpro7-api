@@ -53,6 +53,7 @@ class FixtureReader:
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
                 "tax_id": self.proteins[p]["organism"]["taxid"],
+                "proteomes": self.proteins[p]["proteomes"],
                 "entry_protein_locations": ep["coordinates"],
                 "protein_length": self.proteins[p]["length"],
                 # "django_ct": get_model_ct(ProteinEntryFeature),

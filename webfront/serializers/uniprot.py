@@ -82,7 +82,7 @@ class ProteinSerializer(ModelContentSerializer):
             "description": instance.description,
             "length": instance.length,
             "sequence": instance.sequence,
-            "proteome": instance.proteome,
+            "proteomes": instance.proteomes,
             "gene": instance.gene,
             "go_terms": instance.go_terms,
             "protein_evidence": 4, #TODO

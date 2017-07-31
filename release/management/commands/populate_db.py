@@ -351,13 +351,13 @@ def set_proteome(qs):
         create_proteome_from_json,
         'proteome'
     )):
-        bulk_insert(chunk, Taxonomy)
+        bulk_insert(chunk, Proteome)
 
 
 tax2proteome = {}
 
 def create_proteome_from_json(obj):
-    tax, up = obj["taxonomy"], obj["upid"]
+    tax, up = int(obj["taxonomy"]), obj["upid"]
     if tax not in tax2proteome:
         tax2proteome[tax] = []
     tax2proteome[tax].append(up)
@@ -367,16 +367,15 @@ def create_proteome_from_json(obj):
         accession=up,
         name=obj["name"],
         is_reference=obj["isReferenceProteome"],
-        number_of_proteins=obj["upid"],
-        strain=obj["strain"],
-        assembly=assembly[0] if len(assembly) else None,
+        strain=obj["strain"] if obj["strain"] else "",
+        assembly=assembly[0] if len(assembly) else "",
         taxonomy=Taxonomy.objects.get(accession=tax)
     )
 
 
 def save_proteome2taxonomy():
     file = open("proteome2taxonomy.json", "w")
-    file.write(json.dump(tax2proteome))
+    json.dump(tax2proteome, file)
     file.close()
 
 

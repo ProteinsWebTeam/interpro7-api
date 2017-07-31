@@ -17,8 +17,8 @@ class OrganismFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/organism")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("organisms", response.data)
-        self.assertIn("taxonomy", response.data["organisms"])
-        self.assertIn("proteome", response.data["organisms"])
+        self.assertIn("taxa", response.data["organisms"])
+        self.assertIn("proteomes", response.data["organisms"])
         # self.assertIn("proteome", response.data)
 
     def test_can_read_taxonomy_list(self):
@@ -67,3 +67,29 @@ class OrganismFixturesTest(InterproRESTTestCase):
             response = self.client.get("/api/organism/taxonomy/{}/proteome/UP000030104".format(taxon))
             self.assertEqual(response.status_code, status.HTTP_200_OK, "failed at "+str(taxon))
             self._check_proteome_details(response.data["metadata"])
+
+
+class EntryOrganismTest(InterproRESTTestCase):
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/entry/organism")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("organisms", response.data)
+        self.assertIn("taxa", response.data["organisms"])
+        self.assertIn("proteomes", response.data["organisms"])
+
+    def test_can_get_the_taxonomy_count_on_a_list(self):
+        acc = "IPR003165"
+        urls = [
+            "/api/entry/interpro/organism/",
+            "/api/entry/pfam/organism/",
+            "/api/entry/unintegrated/organism/",
+            "/api/entry/interpro/pfam/organism/",
+            "/api/entry/unintegrated/pfam/organism/",
+            "/api/entry/interpro/"+acc+"/pfam/organism",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "organisms")
+            print(response.data)

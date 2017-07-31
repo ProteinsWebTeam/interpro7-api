@@ -10,6 +10,7 @@
         "chain": {"type":  "text", "analyzer": "keyword"},
         "integrated": {"type":  "keyword"},
         "entry_type": {"type":  "keyword"},
+        "proteomes": {"type":  "keyword"},
         "tax_id": {"type":  "long"},
         "structure_chain": {"type":  "keyword"},
         "protein_structure_coordinates": { "type": "object", "enabled" : false},

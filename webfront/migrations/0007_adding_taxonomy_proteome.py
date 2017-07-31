@@ -20,7 +20,6 @@ class Migration(migrations.Migration):
                 ('accession', models.CharField(max_length=20, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=512)),
                 ('is_reference', models.BooleanField()),
-                ('number_of_proteins', models.IntegerField()),
                 ('strain', models.CharField(max_length=512)),
                 ('assembly', models.CharField(max_length=512)),
             ],

@@ -57,7 +57,6 @@ class OrganismSerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.name,
                 "is_reference": instance.is_reference,
-                "number_of_proteins": instance.number_of_proteins,
                 "strain": instance.strain,
                 "assembly": instance.assembly,
                 "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None
@@ -79,12 +78,12 @@ class OrganismSerializer(ModelContentSerializer):
     @staticmethod
     def serialize_counter_bucket(bucket):
         output = {
-            "taxonomy": bucket["unique"],
+            "taxa": bucket["unique"],
             "proteomes": bucket["proteomes"]
         }
         is_searcher = True
-        if isinstance(output["taxonomy"], dict):
-            output["taxonomy"] = output["taxonomy"]["value"]
+        if isinstance(output["taxa"], dict):
+            output["taxa"] = output["taxa"]["value"]
             output["proteomes"] = output["proteomes"]["value"]
             is_searcher = False
         if "entry" in bucket or "protein" in bucket or "structure" in bucket:

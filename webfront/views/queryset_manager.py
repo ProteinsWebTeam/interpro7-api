@@ -58,7 +58,12 @@ class QuerysetManager:
                 elif k == "source_database__isnull":
                     q += " && {}{}_db:*".format("!" if v else "", ep)
                 elif k == "accession" or k == "accession__iexact":
-                    q += " && {}_acc:{}".format(ep, escape(v))
+                    if ep == 'taxonomy':
+                        q += " && lineage:{}".format(escape(v))
+                    elif ep == 'proteome':
+                        q += " && proteomes:{}".format(escape(v))
+                    else:
+                        q += " && {}_acc:{}".format(ep, escape(v))
                 elif k == "accession__isnull":
                     # elasticsearch perform better if the "give me all" query runs over a
                     # low cardinality field such as the _db ones

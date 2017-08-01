@@ -135,7 +135,7 @@ class OrganismSerializer(ModelContentSerializer):
     @staticmethod
     def get_searcher_query(instance):
         if isinstance(instance, Taxonomy):
-            return "tax_id:" + escape(instance.accession) if hasattr(instance, 'accession') else None
+            return "lineage:" + escape(instance.accession) if hasattr(instance, 'accession') else None
         if isinstance(instance, Proteome):
             return "proteomes:" + escape(instance.accession) if hasattr(instance, 'accession') else None
         return None

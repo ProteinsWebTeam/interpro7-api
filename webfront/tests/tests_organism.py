@@ -210,26 +210,32 @@ class OrganismEntryTest(InterproRESTTestCase):
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))
 
-    #
-    # def test_urls_that_return_entry_with_organism_count(self):
-    #     acc = "IPR003165"
-    #     pfam = "PF02171"
-    #     pfam_un = "PF17176"
-    #     urls = [
-    #         "/api/entry/interpro/"+acc+"/organism",
-    #         "/api/entry/pfam/"+pfam+"/organism",
-    #         "/api/entry/pfam/"+pfam_un+"/organism",
-    #         "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/organism",
-    #         "/api/entry/interpro/pfam/"+pfam+"/organism",
-    #         "/api/entry/unintegrated/pfam/"+pfam_un+"/organism",
-    #         ]
-    #     for url in urls:
-    #         response = self.client.get(url)
-    #         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #         self._check_entry_details(response.data["metadata"])
-    #         self.assertIn("organisms", response.data, "'organisms' should be one of the keys in the response")
-    #         self._check_organism_count_overview(response.data)
-    #
+    def test_urls_that_return_taxonomy_with_entry_count(self):
+        urls = [
+            "/api/organism/taxonomy/40296/entry",
+            "/api/organism/taxonomy/2/entry",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_taxonomy_details(response.data["metadata"])
+            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self._check_entry_count_overview(response.data)
+
+    def test_urls_that_return_proteome_with_entry_count(self):
+        urls = [
+            "/api/organism/proteome/UP000012042/entry",
+            "/api/organism/taxonomy/proteome/UP000006701/entry",
+            "/api/organism/taxonomy/2/proteome/UP000030104/entry",
+            "/api/organism/taxonomy/40296/proteome/UP000030104/entry",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self._check_entry_count_overview(response.data)
+
 
 class OrganismProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -260,6 +266,32 @@ class OrganismProteinTest(InterproRESTTestCase):
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))
 
+    def test_urls_that_return_taxonomy_with_entry_count(self):
+        urls = [
+            "/api/organism/taxonomy/40296/protein",
+            "/api/organism/taxonomy/2/protein",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_taxonomy_details(response.data["metadata"])
+            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+            self._check_protein_count_overview(response.data)
+
+    def test_urls_that_return_proteome_with_entry_count(self):
+        urls = [
+            "/api/organism/proteome/UP000012042/protein",
+            "/api/organism/taxonomy/proteome/UP000006701/protein",
+            "/api/organism/taxonomy/2/proteome/UP000030104/protein",
+            "/api/organism/taxonomy/40296/proteome/UP000030104/protein",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+            self._check_protein_count_overview(response.data)
+
 
 class OrganismStructureTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -289,3 +321,29 @@ class OrganismStructureTest(InterproRESTTestCase):
         self.assertEqual(response1.status_code, status.HTTP_200_OK)
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))
+
+    def test_urls_that_return_taxonomy_with_entry_count(self):
+        urls = [
+            "/api/organism/taxonomy/40296/structure",
+            "/api/organism/taxonomy/2/structure",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_taxonomy_details(response.data["metadata"])
+            self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
+            self._check_structure_count_overview(response.data)
+
+    def test_urls_that_return_proteome_with_entry_count(self):
+        urls = [
+            "/api/organism/proteome/UP000012042/structure",
+            "/api/organism/taxonomy/proteome/UP000006701/structure",
+            "/api/organism/taxonomy/2/proteome/UP000030104/structure",
+            "/api/organism/taxonomy/40296/proteome/UP000030104/structure",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
+            self._check_structure_count_overview(response.data)

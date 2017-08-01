@@ -219,6 +219,9 @@ class ElasticsearchController(SearchController):
         if endpoint == "organism" or endpoint == "taxonomy":
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "tax_id"
             facet["aggs"]["rscount"]["terms"]["field"] = "tax_id"
+        elif endpoint == "proteome":
+            facet["aggs"]["ngroups"]["cardinality"]["field"] = "proteomes"
+            facet["aggs"]["rscount"]["terms"]["field"] = "proteomes"
         response = self._elastic_json_query(qs, facet)
         return [str(x['key']).upper() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
 

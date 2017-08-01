@@ -191,8 +191,8 @@ class OrganismEntryTest(InterproRESTTestCase):
     def test_can_get_the_entry_count_on_a_list(self):
         urls = [
             "/api/organism/taxonomy/entry",
-            # "/api/organism/proteome/entry",
-            # "/api/organism/taxonomy/2/proteome/entry",
+            "/api/organism/proteome/entry",
+            "/api/organism/taxonomy/2/proteome/entry",
             ]
         for url in urls:
             response = self.client.get(url)

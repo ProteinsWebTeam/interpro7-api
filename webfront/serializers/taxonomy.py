@@ -1,10 +1,11 @@
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
-from webfront.models import Taxonomy
+from webfront.models import Taxonomy, Proteome
 import webfront.serializers.interpro
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
 from webfront.views.queryset_manager import escape
+
 
 class OrganismSerializer(ModelContentSerializer):
 
@@ -87,7 +88,6 @@ class OrganismSerializer(ModelContentSerializer):
             }
         return instance
 
-
     @staticmethod
     def serialize_counter_bucket(bucket):
         output = {
@@ -131,21 +131,30 @@ class OrganismSerializer(ModelContentSerializer):
                 "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None
             }
         }
+
+    @staticmethod
+    def get_searcher_query(instance):
+        if isinstance(instance, Taxonomy):
+            return "tax_id:" + escape(instance.accession) if hasattr(instance, 'accession') else None
+        if isinstance(instance, Proteome):
+            return "proteomes:" + escape(instance.accession) if hasattr(instance, 'accession') else None
+        return None
+
     def to_entries_count_representation(self, instance):
-        query = "tax_id:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        query = self.get_searcher_query(instance)
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(
             self.searcher.get_counter_object("entry", query, self.get_extra_endpoints_to_count()),
             self.detail_filters
         )["entries"]
 
     def to_proteins_count_representation(self, instance):
-        query = "tax_id:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        query = self.get_searcher_query(instance)
         return webfront.serializers.uniprot.ProteinSerializer.to_counter_representation(
             self.searcher.get_counter_object("protein", query, self.get_extra_endpoints_to_count())
         )["proteins"]
 
     def to_structures_count_representation(self, instance):
-        query = "tax_id:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        query = self.get_searcher_query(instance)
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
             self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
         )["structures"]

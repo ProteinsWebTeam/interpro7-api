@@ -17,6 +17,7 @@ class FixtureReader:
     structures = {}
     entry_protein_list = []
     protein_structure_list = {}
+    tax2lineage = {}
     search = None
 
     def __init__(self, fixture_paths):
@@ -38,6 +39,8 @@ class FixtureReader:
                 self.entry_protein_list.append(fixture['fields'])
             elif fixture['model'] == "webfront.ProteinStructureFeature":
                 self.protein_structure_list[fixture['fields']["protein"]].append(fixture['fields'])
+            elif fixture['model'] == "webfront.Taxonomy":
+                self.tax2lineage[fixture['fields']["accession"]] = fixture['fields']['lineage'].split()
 
     def get_fixtures(self):
         to_add = []
@@ -53,6 +56,7 @@ class FixtureReader:
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
                 "tax_id": self.proteins[p]["organism"]["taxid"],
+                "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxid"]],
                 "proteomes": [pm.lower() for pm in self.proteins[p]["proteomes"]],
                 "entry_protein_locations": ep["coordinates"],
                 "protein_length": self.proteins[p]["length"],

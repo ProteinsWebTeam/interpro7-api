@@ -65,7 +65,9 @@ class QuerysetManager:
                     if ep == 'structure':
                         q += " && {}{}_acc:*".format("!" if v else "", ep)
                     elif ep == 'taxonomy':
-                        pass
+                        q += " && {}tax_id:[1 to *]".format("!" if v else "")
+                    elif ep == 'proteome':
+                        q += " && {}proteomes:*".format("!" if v else "")
                     else:
                         q += " && {}{}_db:*".format("!" if v else "", ep)
                 elif k == "integrated" or k == "integrated__iexact":
@@ -76,6 +78,8 @@ class QuerysetManager:
                     q += " && {}_type:{}".format(ep, escape(v))
                 elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":
                     q += " && tax_id:{}".format(escape(v))
+                elif "lineage__contains" in k:
+                    q += " && lineage:{}".format(escape(v).strip())
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
                         q += " && {}_db:{}".format(ep, escape(v))

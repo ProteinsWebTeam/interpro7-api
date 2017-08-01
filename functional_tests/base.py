@@ -19,7 +19,8 @@ class FunctionalTest(StaticLiveServerTestCase):
     fixtures = [
         'webfront/tests/fixtures.json',
         'webfront/tests/protein_fixtures.json',
-        'webfront/tests/structure_fixtures.json'
+        'webfront/tests/structure_fixtures.json',
+        'webfront/tests/fixtures_organisms.json'
     ]
     links_fixtures = 'webfront/tests/relationship_features.json'
 

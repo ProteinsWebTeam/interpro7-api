@@ -34,6 +34,8 @@ class ProteomeHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.main_endpoint = "proteome"
         self.serializer_detail = SerializerDetail.ORGANISM_PROTEOME_HEADERS
+        general_handler.queryset_manager.add_filter("proteome", accession__isnull=False)
+
         if "accession" in general_handler.queryset_manager.filters["taxonomy"]:
             tax_id = general_handler.queryset_manager.remove_filter("taxonomy", "accession")
             general_handler.queryset_manager.add_filter(
@@ -86,7 +88,7 @@ class TaxonomyHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
-        # general_handler.queryset_manager.add_filter("organism", source_database="pdb")
+        general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
         return super(TaxonomyHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

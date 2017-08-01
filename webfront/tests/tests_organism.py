@@ -192,6 +192,7 @@ class OrganismEntryTest(InterproRESTTestCase):
         urls = [
             "/api/organism/taxonomy/entry",
             "/api/organism/proteome/entry",
+            "/api/organism/taxonomy/proteome/entry",
             "/api/organism/taxonomy/2/proteome/entry",
             ]
         for url in urls:
@@ -201,6 +202,14 @@ class OrganismEntryTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
             for result in response.data["results"]:
                 self._check_entry_count_overview(result)
+
+    def test_a_more_inclusive_taxon_has_more_items(self):
+        response1 = self.client.get("/api/organism/taxonomy/2579/proteome/entry")
+        response2 = self.client.get("/api/organism/taxonomy/1001583/proteome/entry")
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))
+
     #
     # def test_urls_that_return_entry_with_organism_count(self):
     #     acc = "IPR003165"
@@ -229,9 +238,54 @@ class OrganismProteinTest(InterproRESTTestCase):
         self._check_organism_count_overview(response.data)
         self._check_protein_count_overview(response.data)
 
+    def test_can_get_the_protein_count_on_a_list(self):
+        urls = [
+            "/api/organism/taxonomy/protein",
+            "/api/organism/proteome/protein",
+            "/api/organism/taxonomy/proteome/protein",
+            "/api/organism/taxonomy/2/proteome/protein",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            for result in response.data["results"]:
+                self._check_protein_count_overview(result)
+
+    def test_a_more_inclusive_taxon_has_more_items(self):
+        response1 = self.client.get("/api/organism/taxonomy/2579/proteome/protein")
+        response2 = self.client.get("/api/organism/taxonomy/1001583/proteome/protein")
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))
+
+
 class OrganismStructureTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
         response = self.client.get("/api/organism/structure")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_organism_count_overview(response.data)
         self._check_structure_count_overview(response.data)
+
+    def test_can_get_the_protein_count_on_a_list(self):
+        urls = [
+            "/api/organism/taxonomy/structure",
+            "/api/organism/proteome/structure",
+            "/api/organism/taxonomy/proteome/structure",
+            "/api/organism/taxonomy/2/proteome/structure",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            for result in response.data["results"]:
+                self._check_structure_count_overview(result)
+
+    def test_a_more_inclusive_taxon_has_more_items(self):
+        response1 = self.client.get("/api/organism/taxonomy/2579/proteome/structure")
+        response2 = self.client.get("/api/organism/taxonomy/1001583/proteome/structure")
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))

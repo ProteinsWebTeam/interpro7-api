@@ -100,9 +100,11 @@ class OrganismSerializer(ModelContentSerializer):
             output["proteomes"] = output["proteomes"]["value"]
             is_searcher = False
         if "entry" in bucket or "protein" in bucket or "structure" in bucket:
-            output = {"organisms": output}
+            # output = {"organisms": output}
             if "entry" in bucket:
                 output["entries"] = bucket["entry"] if is_searcher else bucket["entry"]["value"]
+            if "protein" in bucket:
+                output["proteins"] = bucket["protein"] if is_searcher else bucket["protein"]["value"]
             if "structure" in bucket:
                 output["structures"] = bucket["structure"] if is_searcher else bucket["structure"]["value"]
         return output

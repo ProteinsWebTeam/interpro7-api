@@ -19,7 +19,6 @@ class OrganismFixturesTest(InterproRESTTestCase):
         self.assertIn("organisms", response.data)
         self.assertIn("taxa", response.data["organisms"])
         self.assertIn("proteomes", response.data["organisms"])
-        # self.assertIn("proteome", response.data)
 
     def test_can_read_taxonomy_list(self):
         response = self.client.get("/api/organism/taxonomy")
@@ -113,6 +112,23 @@ class EntryOrganismTest(InterproRESTTestCase):
             self.assertIn("organisms", response.data, "'organisms' should be one of the keys in the response")
             self._check_organism_count_overview(response.data)
 
+    def test_can_filter_entry_counter_with_organism_db(self):
+        urls = [
+            "/api/entry/organism/taxonomy",
+            "/api/entry/organism/proteome",
+            "/api/entry/organism/taxonomy/proteome",
+            "/api/entry/organism/taxonomy/2579/proteome",
+            "/api/entry/organism/taxonomy/40296/proteome",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("organisms", response.data["entries"]["integrated"],
+                          "'organisms' should be one of the keys in the response")
+            if response.data["entries"]["unintegrated"] != 0:
+                self.assertIn("organisms", response.data["entries"]["unintegrated"],
+                              "'organisms' should be one of the keys in the response")
+
 
 class ProteinOrganismTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -151,6 +167,26 @@ class ProteinOrganismTest(InterproRESTTestCase):
             self.assertIn("organisms", response.data, "'organisms' should be one of the keys in the response")
             self._check_organism_count_overview(response.data)
 
+    def test_can_filter_protein_counter_with_organism_db(self):
+        urls = [
+            "/api/protein/organism/taxonomy",
+            "/api/protein/organism/proteome",
+            "/api/protein/organism/taxonomy/proteome",
+            "/api/protein/organism/taxonomy/2579/proteome",
+            "/api/protein/organism/taxonomy/40296/proteome",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("proteins", response.data["proteins"]["uniprot"],
+                          "'proteins' should be one of the keys in the response")
+            if "reviewed" in response.data["proteins"]:
+                self.assertIn("proteins", response.data["proteins"]["reviewed"],
+                              "'proteins' should be one of the keys in the response")
+            if "unreviewed" in response.data["proteins"]:
+                self.assertIn("proteins", response.data["proteins"]["unreviewed"],
+                              "'proteins' should be one of the keys in the response")
+
 
 class StructureOrganismTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -179,6 +215,20 @@ class StructureOrganismTest(InterproRESTTestCase):
             self._check_structure_details(response.data["metadata"])
             self.assertIn("organisms", response.data, "'organisms' should be one of the keys in the response")
             self._check_organism_count_overview(response.data)
+
+    def test_can_filter_structure_counter_with_organism_db(self):
+        urls = [
+            "/api/structure/organism/taxonomy",
+            "/api/structure/organism/proteome",
+            "/api/structure/organism/taxonomy/proteome",
+            "/api/structure/organism/taxonomy/2579/proteome",
+            "/api/structure/organism/taxonomy/40296/proteome",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("structures", response.data["structures"]["pdb"],
+                          "'structures' should be one of the keys in the response")
 
 
 class OrganismEntryTest(InterproRESTTestCase):

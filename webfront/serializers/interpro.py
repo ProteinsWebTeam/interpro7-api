@@ -163,27 +163,12 @@ class EntrySerializer(ModelContentSerializer):
         return headers
 
     @staticmethod
-    def serialize_counter_bucket(bucket):
-        output = bucket["unique"]
-        is_solr = True
-        if isinstance(output, dict):
-            output = output["value"]
-            is_solr = False
-        if "protein" in bucket or "structure" in bucket:
-            output = {"entries": output}
-            if "protein" in bucket:
-                output["proteins"] = bucket["protein"] if is_solr else bucket["protein"]["value"]
-            if "structure" in bucket:
-                output["structures"] = bucket["structure"] if is_solr else bucket["structure"]["value"]
-        return output
-
-    @staticmethod
     def to_group_representation(instance):
         if "groups" in instance:
             if EntrySerializer.grouper_is_empty(instance):
                 raise ReferenceError('There are not entries for this request')
             return {
-                        EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket)
+                        EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket, "entries")
                         for bucket in instance["groups"]["buckets"]
                     }
         else:
@@ -197,7 +182,7 @@ class EntrySerializer(ModelContentSerializer):
             result = {
                 "entries": {
                     "member_databases": {
-                        EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket)
+                        EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket, "entries")
                         for bucket in instance["databases"]["buckets"]
                     },
                     "integrated": 0,
@@ -221,22 +206,28 @@ class EntrySerializer(ModelContentSerializer):
             if "unintegrated" in instance and (
                     ("count" in instance["unintegrated"] and instance["unintegrated"]["count"]) or
                     ("doc_count" in instance["unintegrated"] and instance["unintegrated"]["doc_count"]) > 0):
-                result["entries"]["unintegrated"] = EntrySerializer.serialize_counter_bucket(instance["unintegrated"])
+                result["entries"]["unintegrated"] = EntrySerializer.serialize_counter_bucket(instance["unintegrated"], "entries")
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]
             vals = list(result["entries"]["member_databases"].values())
             if len(vals) > 0:
+                unintegrated = result["entries"]["unintegrated"]
+                if type(unintegrated) != int and "entries" in unintegrated:
+                    unintegrated = unintegrated["entries"]
+
                 if type(vals[0]) == int:
-                    result["entries"]["integrated"] = sum(vals) - result["entries"]["unintegrated"]
+                    result["entries"]["integrated"] = sum(vals) - unintegrated
                 else:
                     result["entries"]["integrated"] = {
-                        "entries": sum([v["entries"] for v in vals]) - result["entries"]["unintegrated"]["entries"]
+                        "entries": sum([v["entries"] for v in vals]) - unintegrated
                     }
                     if "proteins" in result["entries"]["interpro"]:
                         result["entries"]["integrated"]["proteins"] = result["entries"]["interpro"]["proteins"]
                     if "structures" in result["entries"]["interpro"]:
                         result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
+                    if "organisms" in result["entries"]["interpro"]:
+                        result["entries"]["integrated"]["organisms"] = result["entries"]["interpro"]["organisms"]
 
             return result
         return instance

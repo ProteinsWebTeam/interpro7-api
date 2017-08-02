@@ -84,12 +84,12 @@ class OrganismSerializer(ModelContentSerializer):
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
                 raise ReferenceError('There are not structures for this request')
             instance = {
-                "organisms": OrganismSerializer.serialize_counter_bucket(instance["databases"])
+                "organisms": OrganismSerializer.serialize_counter_bucket(instance["databases"], "organisms")
             }
         return instance
 
     @staticmethod
-    def serialize_counter_bucket(bucket):
+    def serialize_counter_bucket(bucket, plural):
         output = {
             "taxa": bucket["unique"],
             "proteomes": bucket["proteomes"]

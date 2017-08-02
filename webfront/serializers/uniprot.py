@@ -97,20 +97,22 @@ class ProteinSerializer(ModelContentSerializer):
         }
         return protein
 
-    @staticmethod
-    def serialize_counter_bucket(bucket):
-        output = bucket["unique"]
-        is_solr = True
-        if isinstance(output, dict):
-            output = output["value"]
-            is_solr = False
-        if "entry" in bucket or "structure" in bucket:
-            output = {"proteins": output}
-            if "entry" in bucket:
-                output["entries"] = bucket["entry"] if is_solr else bucket["entry"]["value"]
-            if "structure" in bucket:
-                output["structures"] = bucket["structure"] if is_solr else bucket["structure"]["value"]
-        return output
+    # @staticmethod
+    # def serialize_counter_bucket(bucket):
+    #     output = bucket["unique"]
+    #     is_solr = True
+    #     if isinstance(output, dict):
+    #         output = output["value"]
+    #         is_solr = False
+    #     if "entry" in bucket or "structure" in bucket:
+    #         output = {"proteins": output}
+    #         if "entry" in bucket:
+    #             output["entries"] = bucket["entry"] if is_solr else bucket["entry"]["value"]
+    #         if "structure" in bucket:
+    #             output["structures"] = bucket["structure"] if is_solr else bucket["structure"]["value"]
+    #         if "organism" in bucket:
+    #             output["organisms"] = bucket["organism"] if is_solr else bucket["organism"]["value"]
+    #     return output
 
     @staticmethod
     def to_group_representation(instance):
@@ -118,7 +120,7 @@ class ProteinSerializer(ModelContentSerializer):
             if ProteinSerializer.grouper_is_empty(instance):
                 raise ReferenceError('There are not entries for this request')
             return {
-                ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket)
+                ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket, "proteins")
                 for bucket in instance["groups"]["buckets"]
             }
         else:
@@ -131,11 +133,11 @@ class ProteinSerializer(ModelContentSerializer):
                 raise ReferenceError('There are not entries for this request')
 
             ins2 = {"proteins": {
-                       ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket)
+                       ProteinSerializer.get_key_from_bucket(bucket): ProteinSerializer.serialize_counter_bucket(bucket, "proteins")
                        for bucket in instance["databases"]["buckets"]
                    }}
             ins2["proteins"]["uniprot"] = ProteinSerializer.serialize_counter_bucket(
-                instance["uniprot"]
+                instance["uniprot"], "proteins"
             )
             instance = ins2
         return instance

@@ -195,7 +195,7 @@ class StructureSerializer(ModelContentSerializer):
             if StructureSerializer.grouper_is_empty(instance):
                 raise ReferenceError('There are not entries for this request')
             return {
-                StructureSerializer.get_key_from_bucket(bucket): StructureSerializer.serialize_counter_bucket(bucket)
+                StructureSerializer.get_key_from_bucket(bucket): StructureSerializer.serialize_counter_bucket(bucket, "structures")
                 for bucket in instance["groups"]["buckets"]
             }
         else:
@@ -214,26 +214,26 @@ class StructureSerializer(ModelContentSerializer):
                 raise ReferenceError('There are not structures for this request')
             instance = {
                 "structures": {
-                    "pdb": StructureSerializer.serialize_counter_bucket(instance["databases"])
+                    "pdb": StructureSerializer.serialize_counter_bucket(instance["databases"], "structures")
                 }
             }
 
         return instance
 
-    @staticmethod
-    def serialize_counter_bucket(bucket):
-        output = bucket["unique"]
-        is_solr = True
-        if isinstance(output, dict):
-            output = output["value"]
-            is_solr = False
-        if "entry" in bucket or "protein" in bucket:
-            output = {"structures": output}
-            if "entry" in bucket:
-                output["entries"] = bucket["entry"] if is_solr else bucket["entry"]["value"]
-            if "protein" in bucket:
-                output["proteins"] = bucket["protein"] if is_solr else bucket["protein"]["value"]
-        return output
+    # @staticmethod
+    # def serialize_counter_bucket(bucket):
+    #     output = bucket["unique"]
+    #     is_solr = True
+    #     if isinstance(output, dict):
+    #         output = output["value"]
+    #         is_solr = False
+    #     if "entry" in bucket or "protein" in bucket:
+    #         output = {"structures": output}
+    #         if "entry" in bucket:
+    #             output["entries"] = bucket["entry"] if is_solr else bucket["entry"]["value"]
+    #         if "protein" in bucket:
+    #             output["proteins"] = bucket["protein"] if is_solr else bucket["protein"]["value"]
+    #     return output
 
     class Meta:
         model = Structure

@@ -28,4 +28,25 @@ class ModelContentSerializer(serializers.ModelSerializer):
             extra.append("protein")
         if SerializerDetail.STRUCTURE_DB in self.detail_filters:
             extra.append("structure")
+        if SerializerDetail.ORGANISM_DB in self.detail_filters:
+            extra.append("organism")
         return extra
+
+    @staticmethod
+    def serialize_counter_bucket(bucket, plural):
+        output = bucket["unique"]
+        is_search_payload = True
+        if isinstance(output, dict):
+            output = output["value"]
+            is_search_payload = False
+        if "entry" in bucket or "protein" in bucket or "structure" in bucket or "organism" in bucket:
+            output = {plural: output}
+            if "entry" in bucket:
+                output["entries"] = bucket["entry"] if is_search_payload else bucket["entry"]["value"]
+            if "protein" in bucket:
+                output["proteins"] = bucket["protein"] if is_search_payload else bucket["protein"]["value"]
+            if "structure" in bucket:
+                output["structures"] = bucket["structure"] if is_search_payload else bucket["structure"]["value"]
+            if "organism" in bucket:
+                output["organisms"] = bucket["organism"] if is_search_payload else bucket["organism"]["value"]
+        return output

@@ -23,7 +23,7 @@
       "rank": "SUPERKINGDOM",
       "children": [
         344612,
-        40296
+        1001583
       ],
       "left_number": 1,
       "right_number": 4
@@ -39,7 +39,7 @@
       "parent": 1,
       "rank": "SUPERKINGDOM",
       "children": [
-        1001583
+        40296
       ],
       "left_number": 5,
       "right_number": 6

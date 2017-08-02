@@ -94,7 +94,12 @@ class ElasticsearchController(SearchController):
     @staticmethod
     def add_extra_counters(facet, agg_name, extra_counters):
         for ec in extra_counters:
-            facet["aggs"][agg_name]["aggs"][ec] = {"cardinality": {"field": "{}_acc".format(ec)}}
+            field = "{}_acc".format(ec)
+            if ec == "organism" or ec == "taxonomy":
+                field = "tax_id"
+            elif ec == "proteome":
+                field = "proteomes"
+            facet["aggs"][agg_name]["aggs"][ec] = {"cardinality": {"field": field}}
 
     def tune_counter_facet_for_entry(self, facet, endpoint, extra_counters):
         if endpoint == "entry":

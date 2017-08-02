@@ -27,8 +27,7 @@ class ProteomeHandler(CustomView):
     ]
     queryset = Proteome.objects.all()
     serializer_class = OrganismSerializer
-
-    # serializer_detail_filter = SerializerDetail.STRUCTURE_DB
+    serializer_detail_filter = SerializerDetail.ORGANISM_DB
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -54,6 +53,11 @@ class ProteomeHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("proteome", accession__isnull=False)
+        return queryset
+
 
 class TaxonomyAccessionHandler(CustomView):
     level_description = 'Taxonomy accession level'
@@ -73,6 +77,11 @@ class TaxonomyAccessionHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("taxonomy", accession=level_name.upper())
+        return queryset
+
 
 class TaxonomyHandler(CustomView):
     level_description = 'taxonomy level'
@@ -83,7 +92,7 @@ class TaxonomyHandler(CustomView):
     queryset = Taxonomy.objects.all()
     serializer_class = OrganismSerializer
     serializer_detail = SerializerDetail.ORGANISM_HEADERS
-    # serializer_detail_filter = SerializerDetail.STRUCTURE_DB
+    serializer_detail_filter = SerializerDetail.ORGANISM_DB
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):

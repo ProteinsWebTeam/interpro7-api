@@ -30,6 +30,8 @@ class SerializerDetail(Enum):
     GROUP_BY = 800
     GROUP_BY_MEMBER_DATABASES = 801
 
+    ANNOTATION_BLOB = 1000
+
 class QuerysetType(Enum):
     ENTRY = 100
     PROTEIN = 200

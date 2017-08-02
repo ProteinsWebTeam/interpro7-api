@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from webfront.constants import SerializerDetail
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
-
+from django.http import HttpResponse
 
 def is_single_endpoint(general_handler):
     return general_handler.filter_serializers == {}
@@ -43,6 +43,13 @@ class CustomView(GenericAPIView):
             if has_payload:
                 self.queryset = general_handler.modifiers.payload
                 self.serializer_detail = general_handler.modifiers.serializer
+                if self.serializer_detail == SerializerDetail.ANNOTATION_BLOB:
+                    #assuming queryset contains a list of one annotation object
+                    if len(self.queryset) == 1:
+                        annotation = self.queryset[0]
+                        mime_type = annotation.mime_type
+                        value = annotation.value
+                        return HttpResponse(value, content_type=mime_type)
                 general_handler.filter_serializers = []
                 self.many = general_handler.modifiers.many
                 if self.many:

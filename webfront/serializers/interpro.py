@@ -1,5 +1,5 @@
 from django.conf import settings
-from webfront.models import Entry
+from webfront.models import Entry, EntryAnnotation
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
@@ -90,6 +90,8 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_metadata_representation(instance, solr):
         recategorise_go_terms(instance.go_terms)
+        results = EntryAnnotation.objects.filter(accession=instance.accession).only("type")
+        annotation_types = map(lambda x: x.type, results)
         obj = {
             "accession": instance.accession,
             "entry_id": instance.entry_id,
@@ -111,6 +113,7 @@ class EntrySerializer(ModelContentSerializer):
                 "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
                 "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession)
             },
+            "entry_annotations": annotation_types,
             "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)
         }
         return obj

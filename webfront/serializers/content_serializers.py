@@ -1,6 +1,10 @@
 from rest_framework import serializers
 
 from webfront.views.custom import SerializerDetail, CustomView
+from webfront.views.queryset_manager import escape
+import webfront.serializers#.uniprot
+# import webfront.serializers.pdb
+# import webfront.serializers.taxonomy
 
 class ModelContentSerializer(serializers.ModelSerializer):
 
@@ -50,3 +54,15 @@ class ModelContentSerializer(serializers.ModelSerializer):
             if "organism" in bucket:
                 output["organisms"] = bucket["organism"] if is_search_payload else bucket["organism"]["value"]
         return output
+
+    @staticmethod
+    def to_organisms_detail_representation(instance, solr, query):
+        response = {r['tax_id']:
+            webfront.serializers.taxonomy.OrganismSerializer.get_organism_from_search_object(
+                r,
+            )
+            for r in solr.execute_query(None, fq=query, rows=10)
+        }.values()
+        if len(response) == 0:
+            raise ReferenceError('There are not structures for this request')
+        return response

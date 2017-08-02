@@ -51,6 +51,12 @@ class StructureSerializer(ModelContentSerializer):
                 representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, s)
             if SerializerDetail.ENTRY_DB in detail_filters:
                 representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, s)
+            if SerializerDetail.ORGANISM_DB in detail_filters:
+                representation["organisms"] = self.to_organisms_detail_representation(
+                    instance,
+                    self.searcher,
+                    "structure_acc:" + escape(instance.accession.lower())
+                )
             if SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, s)
             if SerializerDetail.ENTRY_DETAIL in detail_filters:

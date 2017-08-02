@@ -240,7 +240,7 @@ class ElasticsearchController(SearchController):
         conn = http.client.HTTPConnection(self.server, self.port)
         if fq is not None:
             q = query+" && "+fq.lower()
-        q = q.replace(" && ", "%20AND%20")
+        q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
         conn.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,

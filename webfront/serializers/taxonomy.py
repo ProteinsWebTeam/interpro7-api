@@ -34,15 +34,16 @@ class OrganismSerializer(ModelContentSerializer):
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
+        s = self.searcher
         if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
             representation["entries"] = self.to_entries_count_representation(instance)
         if SerializerDetail.PROTEIN_OVERVIEW in detail_filters:
             representation["proteins"] = self.to_proteins_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = self.to_structures_count_representation(instance)
-        # if detail != SerializerDetail.ORGANISM_OVERVIEW:
-        #     if SerializerDetail.ENTRY_DB in detail_filters:
-        #         representation["entries"] = ProteinSerializer.to_entries_detail_representation(instance, s)
+        if detail != SerializerDetail.ORGANISM_OVERVIEW:
+            if SerializerDetail.ENTRY_DB in detail_filters:
+                representation["entries"] = self.to_entries_detail_representation(instance, s)
         return representation
 
     @staticmethod
@@ -160,3 +161,30 @@ class OrganismSerializer(ModelContentSerializer):
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
             self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
         )["structures"]
+
+    @staticmethod
+    def get_organism_from_search_object(obj):
+        header = {
+            "tax_id": obj["tax_id"],
+            "lineage": obj["lineage"],
+            "proteomes": obj["proteomes"],
+        }
+        return header
+
+    def to_entries_detail_representation(self, instance, searcher, is_full=False):
+        query = self.get_searcher_query(instance)
+        response = [
+            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
+                r,
+                include_entry=is_full,
+                solr=searcher
+            )
+            for r in searcher.get_group_obj_of_field_by_query(None, "entry_acc", fq=query, rows=10)["groups"]
+            ]
+        if len(response) == 0:
+            raise ReferenceError('There are not entries for this request')
+
+        # for entry in response:
+        #     if (entry['accession'] in instance.residues):
+        #         entry['residues'] = instance.residues
+        return response

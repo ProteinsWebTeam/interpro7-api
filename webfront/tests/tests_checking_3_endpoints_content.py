@@ -511,7 +511,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     if response.status_code == status.HTTP_200_OK:
                                         self.compare_db_db_endpoint_expected_vs_response(expected, response, endpoint1)
                                     else:
-                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                         "HTTP error {}: {}".format(response.status_code, url))
 
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
                                         .format(endpoint1, db1, ep3, db3 + un3, acc3, endpoint2, db2)

@@ -66,3 +66,52 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if len(response) == 0:
             raise ReferenceError('There are not structures for this request')
         return response
+
+    @staticmethod
+    def to_structures_detail_representation(instance, searcher, query, is_full=False):
+        response = [
+            webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
+                r,
+                include_structure=is_full,
+                search=searcher
+            )
+            for r in searcher.get_group_obj_of_field_by_query(None, "structure_chain", fq=query, rows=10)["groups"]
+            ]
+        if len(response) == 0:
+            raise ReferenceError('There are not entries for this request')
+        return response
+
+    @staticmethod
+    def to_entries_detail_representation(instance, searcher, searcher_query, for_structure=False):
+        if for_structure:
+            search = searcher.execute_query(None, fq=searcher_query, rows=10)
+        else:
+            search = searcher.get_group_obj_of_field_by_query(None, "entry_acc", fq=searcher_query, rows=10)["groups"]
+        response = [
+            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
+                r, solr=searcher, for_structure=for_structure
+            )
+            for r in search
+            ]
+        if len(response) == 0:
+            raise ReferenceError('There are not entries for this request')
+
+        for entry in response:
+            if hasattr(instance, 'residues') and entry['accession'] in instance.residues:
+                entry['residues'] = instance.residues
+        return response
+
+    @staticmethod
+    def to_proteins_detail_representation(instance, searcher, searcher_query, for_structure=False, for_entry=False):
+        field = "structure_chain" if not for_entry else "protein_acc"
+        response = [
+            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
+                r,
+                for_entry=for_entry,
+                solr=searcher
+            )
+            for r in searcher.get_group_obj_of_field_by_query(None, field, fq=searcher_query, rows=10)["groups"]
+        ]
+        if len(response) == 0:
+            raise ReferenceError('There are not proteins for this request')
+        return response

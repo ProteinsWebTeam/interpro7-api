@@ -43,7 +43,18 @@ class OrganismSerializer(ModelContentSerializer):
             representation["structures"] = self.to_structures_count_representation(instance)
         if detail != SerializerDetail.ORGANISM_OVERVIEW:
             if SerializerDetail.ENTRY_DB in detail_filters:
-                representation["entries"] = self.to_entries_detail_representation(instance, s)
+                representation["entries"] = self.to_entries_detail_representation(
+                    instance, s,self.get_searcher_query(instance)
+                )
+            if SerializerDetail.STRUCTURE_DB in detail_filters:
+                representation["structures"] = self.to_structures_detail_representation(
+                    instance, s, "lineage:" + escape(str(instance.accession).lower())
+                )
+            if SerializerDetail.PROTEIN_DB in detail_filters or \
+                    SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                representation["proteins"] = self.to_proteins_detail_representation(
+                    instance, self.searcher, "entry_acc:" + escape(instance.accession.lower())
+                )
         return representation
 
     @staticmethod
@@ -171,20 +182,3 @@ class OrganismSerializer(ModelContentSerializer):
         }
         return header
 
-    def to_entries_detail_representation(self, instance, searcher, is_full=False):
-        query = self.get_searcher_query(instance)
-        response = [
-            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
-                r,
-                include_entry=is_full,
-                solr=searcher
-            )
-            for r in searcher.get_group_obj_of_field_by_query(None, "entry_acc", fq=query, rows=10)["groups"]
-            ]
-        if len(response) == 0:
-            raise ReferenceError('There are not entries for this request')
-
-        # for entry in response:
-        #     if (entry['accession'] in instance.residues):
-        #         entry['residues'] = instance.residues
-        return response

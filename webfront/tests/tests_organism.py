@@ -501,3 +501,24 @@ class OrganismStructureTest(InterproRESTTestCase):
                           "'taxa' should be one of the keys in the response")
             self.assertIn("proteomes", response.data["organisms"],
                           "'entproteomesries' should be one of the keys in the response")
+
+    def test_can_get_the_taxonomy_list_on_a_list(self):
+        urls = [
+            "/api/organism/taxonomy/structure/pdb",
+            # "/api/organism/proteome/structure/pdb",
+            # "/api/organism/taxonomy/proteome/structure/pdb",
+            # "/api/organism/taxonomy/2579/proteome/structure/pdb",
+            # "/api/organism/taxonomy/344612/proteome/structure/pdb",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            for result in response.data["results"]:
+                if "proteome" in url:
+                    self._check_proteome_details(result["metadata"])
+                else:
+                    self._check_taxonomy_details(result["metadata"], False)
+                for st in result["structures"]:
+                    self._check_structure_chain_details(st)

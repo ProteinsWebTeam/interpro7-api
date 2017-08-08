@@ -42,20 +42,22 @@ class EntrySerializer(ModelContentSerializer):
             representation["organisms"] = self.to_organism_count_representation(instance)
 
         if detail != SerializerDetail.ENTRY_OVERVIEW:
-            if SerializerDetail.PROTEIN_DB in detail_filters:
-                representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.searcher)
-            if SerializerDetail.STRUCTURE_DB in detail_filters:
-                representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.searcher)
+            if SerializerDetail.PROTEIN_DB in detail_filters or \
+                    SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                representation["proteins"] = EntrySerializer.to_proteins_detail_representation(
+                    instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()), for_entry=True
+                )
+            if SerializerDetail.STRUCTURE_DB in detail_filters or \
+                    SerializerDetail.STRUCTURE_DETAIL in detail_filters:
+                representation["structures"] = self.to_structures_detail_representation(
+                    instance, self.searcher, "entry_acc:" + escape(instance.accession.lower())
+                )
             if SerializerDetail.ORGANISM_DB in detail_filters:
                 representation["organisms"] = self.to_organisms_detail_representation(
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower())
                 )
-            if SerializerDetail.PROTEIN_DETAIL in detail_filters:
-                representation["proteins"] = EntrySerializer.to_proteins_detail_representation(instance, self.searcher)
-            if SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = EntrySerializer.to_structures_detail_representation(instance, self.searcher)
 
         return representation
 
@@ -124,35 +126,6 @@ class EntrySerializer(ModelContentSerializer):
         }
         return obj
 
-    @staticmethod
-    def to_proteins_detail_representation(instance, solr, is_full=False):
-        solr_query = "entry_acc:" + escape(instance.accession.lower())
-        response = [
-            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
-                r,
-                include_protein=is_full,
-                solr=solr
-            )
-            for r in solr.get_group_obj_of_field_by_query(None, "protein_acc", fq=solr_query, rows=10)["groups"]
-        ]
-        if len(response) == 0:
-            raise ReferenceError('There are not proteins for this request')
-        return response
-
-    @staticmethod
-    def to_structures_detail_representation(instance, solr, is_full=False):
-        solr_query = "entry_acc:" + escape(instance.accession.lower())
-        response = [
-            webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
-                r,
-                include_structure=is_full,
-                search=solr
-            )
-            for r in solr.execute_query(None, fq=solr_query, rows=10)
-        ]
-        if len(response) == 0:
-            raise ReferenceError('There are not structures for this request')
-        return response
 
     def to_headers_representation(self, instance):
         headers = {

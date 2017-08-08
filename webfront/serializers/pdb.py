@@ -47,20 +47,22 @@ class StructureSerializer(ModelContentSerializer):
             representation["organisms"] = self.to_organism_count_representation(representation)
 
         if self.detail != SerializerDetail.STRUCTURE_OVERVIEW:
-            if SerializerDetail.PROTEIN_DB in detail_filters:
-                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, s)
-            if SerializerDetail.ENTRY_DB in detail_filters:
-                representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, s)
+            if SerializerDetail.PROTEIN_DB in detail_filters or \
+                    SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(
+                    instance, s, "structure_acc:" + escape(instance.accession.lower())
+                )
+            if SerializerDetail.ENTRY_DB in detail_filters or \
+                    SerializerDetail.ENTRY_DETAIL in detail_filters:
+                representation["entries"] = self.to_entries_detail_representation(
+                    instance, s, "structure_acc:" + escape(instance.accession.lower()), True
+                )
             if SerializerDetail.ORGANISM_DB in detail_filters:
                 representation["organisms"] = self.to_organisms_detail_representation(
                     instance,
                     self.searcher,
                     "structure_acc:" + escape(instance.accession.lower())
                 )
-            if SerializerDetail.PROTEIN_DETAIL in detail_filters:
-                representation["proteins"] = StructureSerializer.to_proteins_detail_representation(instance, s)
-            if SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = StructureSerializer.to_entries_detail_representation(instance, s)
 
         return representation
 
@@ -125,38 +127,21 @@ class StructureSerializer(ModelContentSerializer):
             self.searcher.get_counter_object("organism", query, self.get_extra_endpoints_to_count())
         )["organisms"]
 
-
-    @staticmethod
-    def to_proteins_detail_representation(instance, searcher, is_full=False):
-        query = "structure_acc:" + escape(instance.accession.lower())
-        response = [
-            webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
-                r,
-                for_entry=False,
-                include_protein=is_full,
-                solr=searcher
-            )
-            for r in searcher.get_group_obj_of_field_by_query(None, "structure_chain", fq=query, rows=10)["groups"]
-            ]
-        if len(response) == 0:
-            raise ReferenceError('There are not structures for this request')
-        return response
-
-    @staticmethod
-    def to_entries_detail_representation(instance, searcher, is_full=False):
-        query = "structure_acc:" + escape(instance.accession.lower())
-        response = [
-            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
-                r,
-                for_structure=True,
-                include_entry=is_full,
-                solr=searcher
-            )
-            for r in searcher.execute_query(None, fq=query, rows=10)
-            ]
-        if len(response) == 0:
-            raise ReferenceError('There are not structures for this request')
-        return response
+    # @staticmethod
+    # def to_proteins_detail_representation(instance, searcher, is_full=False):
+    #     query = "structure_acc:" + escape(instance.accession.lower())
+    #     response = [
+    #         webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
+    #             r,
+    #             for_entry=False,
+    #             include_protein=is_full,
+    #             solr=searcher
+    #         )
+    #         for r in searcher.get_group_obj_of_field_by_query(None, "structure_chain", fq=query, rows=10)["groups"]
+    #         ]
+    #     if len(response) == 0:
+    #         raise ReferenceError('There are not structures for this request')
+    #     return response
 
     @staticmethod
     def to_chains_representation(chains):

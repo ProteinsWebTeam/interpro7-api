@@ -8,6 +8,7 @@ class ProteomeAccessionHandler(CustomView):
     serializer_class = OrganismSerializer
     queryset = Proteome.objects.all()
     many = False
+    serializer_detail_filter = SerializerDetail.ORGANISM_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):

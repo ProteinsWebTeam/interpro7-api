@@ -57,7 +57,8 @@ class StructureSerializer(ModelContentSerializer):
                 representation["entries"] = self.to_entries_detail_representation(
                     instance, s, "structure_acc:" + escape(instance.accession.lower()), True
                 )
-            if SerializerDetail.ORGANISM_DB in detail_filters:
+            if SerializerDetail.ORGANISM_DB in detail_filters or \
+                    SerializerDetail.ORGANISM_DETAIL in detail_filters:
                 representation["organisms"] = self.to_organisms_detail_representation(
                     instance,
                     self.searcher,

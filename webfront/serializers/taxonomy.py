@@ -42,11 +42,13 @@ class OrganismSerializer(ModelContentSerializer):
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = self.to_structures_count_representation(instance)
         if detail != SerializerDetail.ORGANISM_OVERVIEW:
-            if SerializerDetail.ENTRY_DB in detail_filters:
+            if SerializerDetail.ENTRY_DB in detail_filters or \
+                    SerializerDetail.ENTRY_DETAIL in detail_filters:
                 representation["entries"] = self.to_entries_detail_representation(
                     instance, s, self.get_searcher_query(instance)
                 )
-            if SerializerDetail.STRUCTURE_DB in detail_filters:
+            if SerializerDetail.STRUCTURE_DB in detail_filters or \
+                    SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
                     instance, s, self.get_searcher_query(instance)
                 )

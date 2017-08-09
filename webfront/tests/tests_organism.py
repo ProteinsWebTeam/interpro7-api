@@ -500,6 +500,23 @@ class OrganismEntryTest(InterproRESTTestCase):
             for st in response.data["entries"]:
                 self._check_entry_from_searcher(st)
 
+    def test_can_filter_organism_counter_with_acc(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_un = "PF17176"
+        urls = [
+            "/api/organism/entry/interpro/"+acc,
+            "/api/organism/entry/pfam/"+pfam,
+            "/api/organism/entry/pfam/"+pfam_un,
+            "/api/organism/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/organism/entry/interpro/pfam/"+pfam,
+            "/api/organism/entry/unintegrated/pfam/"+pfam_un,
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_organism_count_overview(response.data)
+
 
 class OrganismProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -614,6 +631,17 @@ class OrganismProteinTest(InterproRESTTestCase):
             self.assertIn("proteins", response.data)
             for st in response.data["proteins"]:
                 self._check_match(st)
+
+    def test_can_filter_organism_counter_with_acc(self):
+        urls = [
+            "/api/organism/protein/uniprot/M5ADK6",
+            "/api/organism/protein/unreviewed/A0A0A2L2G2",
+            "/api/organism/protein/reviewed/M5ADK6",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_organism_count_overview(response.data)
 
 
 class OrganismStructureTest(InterproRESTTestCase):
@@ -730,3 +758,13 @@ class OrganismStructureTest(InterproRESTTestCase):
             self.assertIn("structures", response.data)
             for st in response.data["structures"]:
                 self._check_structure_chain_details(st)
+
+    def test_can_filter_organism_counter_with_acc(self):
+        urls = [
+            "/api/organism/structure/pdb/1JM7",
+            "/api/organism/structure/pdb/1JZ8",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_organism_count_overview(response.data)

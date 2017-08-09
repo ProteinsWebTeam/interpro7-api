@@ -570,6 +570,33 @@ class OrganismEntryTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_organism_count_overview(response.data)
 
+    def test_can_get_object_on_a_taxonomy_list(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_un = "PF17176"
+        urls = [
+            "/api/organism/taxonomy/entry/interpro/"+acc,
+            "/api/organism/proteome/entry/pfam/"+pfam,
+            "/api/organism/taxonomy/entry/unintegrated/pfam/"+pfam_un,
+            "/api/organism/taxonomy/proteome/entry/unintegrated/pfam/"+pfam_un,
+            "/api/organism/taxonomy/proteome/entry/interpro/pfam/"+pfam,
+            "/api/organism/taxonomy/2579/proteome/entry/unintegrated/pfam/"+pfam_un,
+            "/api/organism/taxonomy/344612/proteome/entry/unintegrated/pfam/"+pfam_un,
+            "/api/organism/proteome/entry/interpro/IPR003165/pfam/"+pfam,
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "entries")
+            for result in response.data["results"]:
+                if "proteome" in url:
+                    self._check_proteome_details(result["metadata"], False)
+                else:
+                    self._check_taxonomy_details(result["metadata"], False)
+                for st in result["entries"]:
+                    self._check_entry_from_searcher(st)
+
 
 class OrganismProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -696,6 +723,28 @@ class OrganismProteinTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_organism_count_overview(response.data)
 
+    def test_can_get_object_on_a_taxonomy_list(self):
+        urls = [
+            "/api/organism/taxonomy/protein/uniprot/P16582",
+            "/api/organism/proteome/protein/uniprot/P16582",
+            "/api/organism/taxonomy/protein/unreviewed/A0A0A2L2G2",
+            "/api/organism/proteome/protein/unreviewed/A0A0A2L2G2",
+            "/api/organism/taxonomy/proteome/protein/unreviewed/A0A0A2L2G2",
+            "/api/organism/taxonomy/2579/proteome/protein/reviewed/M5ADK6",
+            "/api/organism/taxonomy/344612/proteome/protein/reviewed/a1cuj5",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            for result in response.data["results"]:
+                if "proteome" in url:
+                    self._check_proteome_details(result["metadata"], False)
+                else:
+                    self._check_taxonomy_details(result["metadata"], False)
+                for st in result["proteins"]:
+                    self._check_match(st)
 
 class OrganismStructureTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -821,3 +870,24 @@ class OrganismStructureTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_organism_count_overview(response.data)
+
+    def test_can_get_object_on_a_taxonomy_list(self):
+        urls = [
+            "/api/organism/taxonomy/structure/pdb/1JM7",
+            "/api/organism/proteome/structure/pdb/1JZ8",
+            "/api/organism/taxonomy/proteome/structure/pdb/1JZ8",
+            "/api/organism/taxonomy/2579/proteome/structure/pdb/1JM7",
+            "/api/organism/taxonomy/344612/proteome/structure/pdb/1JM7",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            for result in response.data["results"]:
+                if "proteome" in url:
+                    self._check_proteome_details(result["metadata"], False)
+                else:
+                    self._check_taxonomy_details(result["metadata"], False)
+                for st in result["structures"]:
+                    self._check_structure_chain_details(st)

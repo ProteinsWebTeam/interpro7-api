@@ -55,6 +55,14 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("accession", obj, msg)
         self.assertIn("counters", obj, msg)
 
+    def _check_entry_from_searcher(self, obj, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("entry_protein_locations", obj, msg)
+        self.assertIn("protein_length", obj, msg)
+        self.assertIn("source_database", obj, msg)
+        self.assertIn("entry_type", obj, msg)
+        self.assertIn("entry_integrated", obj, msg)
+
     def _check_entry_count_overview(self, main_obj, msg=""):
         obj = main_obj["entries"]
         self.assertIn("member_databases", obj, msg)
@@ -252,13 +260,14 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("lineage", obj, msg)
         self.assertIn("proteomes", obj, msg)
 
-    def _check_proteome_details(self, obj, msg=""):
+    def _check_proteome_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)
-        self.assertIn("assembly", obj, msg)
         self.assertIn("taxonomy", obj, msg)
         self.assertIn("is_reference", obj, msg)
-        self.assertIn("strain", obj, msg)
         self.assertIn("name", obj, msg)
+        if is_complete:
+            self.assertIn("strain", obj, msg)
+            self.assertIn("assembly", obj, msg)
 
     def _check_organism_count_overview(self, main_obj, msg=""):
         self.assertIn("organisms", main_obj, msg)

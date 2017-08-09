@@ -359,6 +359,28 @@ class OrganismEntryTest(InterproRESTTestCase):
             self.assertIn("proteomes", response.data["organisms"],
                           "'entproteomesries' should be one of the keys in the response")
 
+    def test_can_get_a_list_from_the_taxonomy_list(self):
+        urls = [
+            "/api/organism/taxonomy/entry/interpro",
+            "/api/organism/proteome/entry/pfam",
+            "/api/organism/taxonomy/proteome/entry/unintegrated",
+            "/api/organism/taxonomy/proteome/entry/interpro/pfam",
+            "/api/organism/taxonomy/2579/proteome/entry/unintegrated/pfam",
+            "/api/organism/taxonomy/344612/proteome/entry/unintegrated/pfam",
+            "/api/organism/proteome/entry/interpro/IPR003165/pfam",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "entries")
+            for result in response.data["results"]:
+                if "proteome" in url:
+                    self._check_proteome_details(result["metadata"], False)
+                else:
+                    self._check_taxonomy_details(result["metadata"], False)
+                for st in result["entries"]:
+                    self._check_entry_from_searcher(st)
 
 class OrganismProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -432,6 +454,27 @@ class OrganismProteinTest(InterproRESTTestCase):
             self.assertIn("proteomes", response.data["organisms"],
                           "'entproteomesries' should be one of the keys in the response")
 
+    def test_can_get_a_list_from_the_taxonomy_list(self):
+        urls = [
+            "/api/organism/taxonomy/protein/uniprot",
+            "/api/organism/proteome/protein/uniprot",
+            "/api/organism/taxonomy/proteome/protein/unreviewed",
+            "/api/organism/taxonomy/2579/proteome/protein/reviewed",
+            "/api/organism/taxonomy/344612/proteome/protein/reviewed",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            for result in response.data["results"]:
+                if "proteome" in url:
+                    self._check_proteome_details(result["metadata"], False)
+                else:
+                    self._check_taxonomy_details(result["metadata"], False)
+                for st in result["proteins"]:
+                    self._check_match(st)
+
 class OrganismStructureTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
         response = self.client.get("/api/organism/structure")
@@ -502,13 +545,13 @@ class OrganismStructureTest(InterproRESTTestCase):
             self.assertIn("proteomes", response.data["organisms"],
                           "'entproteomesries' should be one of the keys in the response")
 
-    def test_can_get_the_taxonomy_list_on_a_list(self):
+    def test_can_get_a_list_from_the_taxonomy_list(self):
         urls = [
             "/api/organism/taxonomy/structure/pdb",
-            # "/api/organism/proteome/structure/pdb",
-            # "/api/organism/taxonomy/proteome/structure/pdb",
-            # "/api/organism/taxonomy/2579/proteome/structure/pdb",
-            # "/api/organism/taxonomy/344612/proteome/structure/pdb",
+            "/api/organism/proteome/structure/pdb",
+            "/api/organism/taxonomy/proteome/structure/pdb",
+            "/api/organism/taxonomy/2579/proteome/structure/pdb",
+            "/api/organism/taxonomy/344612/proteome/structure/pdb",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -517,7 +560,7 @@ class OrganismStructureTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_key(response.data["results"], "structures")
             for result in response.data["results"]:
                 if "proteome" in url:
-                    self._check_proteome_details(result["metadata"])
+                    self._check_proteome_details(result["metadata"], False)
                 else:
                     self._check_taxonomy_details(result["metadata"], False)
                 for st in result["structures"]:

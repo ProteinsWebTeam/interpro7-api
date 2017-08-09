@@ -274,7 +274,6 @@ class EntrySerializer(ModelContentSerializer):
         header = {
             "accession": obj["entry_acc"],
             "entry_protein_locations": obj["entry_protein_locations"],
-            # "name": "PTHP_BUCAI",
             "protein_length": obj["protein_length"],
             "source_database": obj["entry_db"],
             "entry_type": obj["entry_type"],

@@ -44,16 +44,16 @@ class OrganismSerializer(ModelContentSerializer):
         if detail != SerializerDetail.ORGANISM_OVERVIEW:
             if SerializerDetail.ENTRY_DB in detail_filters:
                 representation["entries"] = self.to_entries_detail_representation(
-                    instance, s,self.get_searcher_query(instance)
+                    instance, s, self.get_searcher_query(instance)
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
-                    instance, s, "lineage:" + escape(str(instance.accession).lower())
+                    instance, s, self.get_searcher_query(instance)
                 )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = self.to_proteins_detail_representation(
-                    instance, self.searcher, "entry_acc:" + escape(instance.accession.lower())
+                    instance, self.searcher, self.get_searcher_query(instance)
                 )
         return representation
 
@@ -149,9 +149,9 @@ class OrganismSerializer(ModelContentSerializer):
     @staticmethod
     def get_searcher_query(instance):
         if isinstance(instance, Taxonomy):
-            return "lineage:" + escape(instance.accession) if hasattr(instance, 'accession') else None
+            return "lineage:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
         if isinstance(instance, Proteome):
-            return "proteomes:" + escape(instance.accession) if hasattr(instance, 'accession') else None
+            return "proteomes:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
         return None
 
     def to_entries_count_representation(self, instance):

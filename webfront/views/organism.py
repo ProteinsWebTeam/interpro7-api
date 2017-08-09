@@ -18,6 +18,11 @@ class ProteomeAccessionHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("proteome", accession=level_name.upper())
+        return queryset
+
 
 class ProteomeHandler(CustomView):
     level_description = 'proteome level'
@@ -102,6 +107,11 @@ class TaxonomyHandler(CustomView):
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
         )
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
+        return queryset
 
 
 class OrganismHandler(CustomView):

@@ -166,6 +166,20 @@ class EntryOrganismTest(InterproRESTTestCase):
             for org in response.data["organisms"]:
                 self._check_organism_from_searcher(org)
 
+    def test_can_filter_entry_counter_with_organism_acc(self):
+        urls = [
+            "/api/entry/organism/taxonomy/2579",
+            "/api/entry/organism/taxonomy/40296",
+            "/api/entry/organism/proteome/UP000006701",
+            "/api/entry/organism/taxonomy/proteome/UP000006701",
+            "/api/entry/organism/taxonomy/2579/proteome/UP000006701",
+            "/api/entry/organism/taxonomy/344612/proteome/UP000006701",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_entry_count_overview(response.data)
+
 
 class ProteinOrganismTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -259,6 +273,20 @@ class ProteinOrganismTest(InterproRESTTestCase):
             for org in response.data["organisms"]:
                 self._check_organism_from_searcher(org)
 
+    def test_can_filter_counter_with_organism_acc(self):
+        urls = [
+            "/api/protein/organism/taxonomy/2579",
+            "/api/protein/organism/taxonomy/40296",
+            "/api/protein/organism/proteome/UP000006701",
+            "/api/protein/organism/taxonomy/proteome/UP000006701",
+            "/api/protein/organism/taxonomy/2579/proteome/UP000006701",
+            "/api/protein/organism/taxonomy/344612/proteome/UP000006701",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_protein_count_overview(response.data)
+
 
 class StructureOrganismTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -336,6 +364,20 @@ class StructureOrganismTest(InterproRESTTestCase):
             self.assertIn("organisms", response.data)
             for org in response.data["organisms"]:
                 self._check_organism_from_searcher(org)
+
+    def test_can_filter_counter_with_organism_acc(self):
+        urls = [
+            "/api/structure/organism/taxonomy/2579",
+            "/api/structure/organism/taxonomy/40296",
+            "/api/structure/organism/proteome/UP000006701",
+            "/api/structure/organism/taxonomy/proteome/UP000006701",
+            "/api/structure/organism/taxonomy/2579/proteome/UP000006701",
+            "/api/structure/organism/taxonomy/344612/proteome/UP000006701",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_structure_count_overview(response.data)
 
 
 class OrganismEntryTest(InterproRESTTestCase):

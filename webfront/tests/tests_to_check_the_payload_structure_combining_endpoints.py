@@ -64,11 +64,27 @@ api_test_map = {
             "1JZ8",
         ]
     },
+    # "organism": {
+    #     "taxonomy": [
+    #         "1",
+    #         "2",
+    #         "2579",
+    #         "40296",
+    #         "344612",
+    #         "1001583",
+    #     ],
+    #     "proteome": [
+    #         "UP000006701",
+    #         "UP000012042",
+    #         "UP000030104",
+    #     ]
+    # }
 }
 plurals = {
     "entry": "entries",
     "protein": "proteins",
     "structure": "structures",
+    "organism": "organisms",
 }
 
 # TODO: Crete tests for entry/unintegrated
@@ -80,23 +96,25 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
 
     def test_endpoints_independently(self):
         for endpoint in api_test_map:
-            response = self.client.get("/api/"+endpoint)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_counter_by_endpoint(endpoint, response.data)
+            current = "/api/"+endpoint
+            response = self.client.get(current)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL: [{}]".format(current))
+            self._check_counter_by_endpoint(endpoint, response.data, "URL: [{}]".format(current))
 
             for db in api_test_map[endpoint]:
-                response_db = self.client.get("/api/"+endpoint+"/"+db)
-                self.assertEqual(response_db.status_code, status.HTTP_200_OK)
-                self.assertEqual(len(response_db.data["results"]), len(api_test_map[endpoint][db]))
-                self._check_is_list_of_metadata_objects(response_db.data["results"], "metadata")
+                current = "/api/"+endpoint+"/"+db
+                response_db = self.client.get(current)
+                self.assertEqual(response_db.status_code, status.HTTP_200_OK, "URL: [{}]".format(current))
+                self.assertEqual(len(response_db.data["results"]), len(api_test_map[endpoint][db]), "URL: [{}]".format(current))
+                self._check_is_list_of_metadata_objects(response_db.data["results"], "URL: [{}]".format(current))
 
                 for acc in api_test_map[endpoint][db]:
                     current = "/api/"+endpoint+"/"+db+"/"+acc
                     response_acc = self.client.get(current)
-                    self.assertEqual(response_acc.status_code, status.HTTP_200_OK)
-                    self._check_object_by_accesssion(response_acc.data)
+                    self.assertEqual(response_acc.status_code, status.HTTP_200_OK, "URL: [{}]".format(current))
+                    self._check_object_by_accesssion(response_acc.data, "URL: [{}]".format(current))
 
-                    self._check_structure_and_chains(response_acc, endpoint, db, acc)
+                    self._check_structure_and_chains(response_acc, endpoint, db, acc, "URL: [{}]".format(current))
 
     def test_endpoint_endpoint(self):
         for endpoint1 in api_test_map:

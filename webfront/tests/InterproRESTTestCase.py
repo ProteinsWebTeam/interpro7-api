@@ -73,7 +73,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         for obj in _list:
             self.assertIn("metadata", obj, msg)
             self.assertTrue(isinstance(obj, dict))
-            self.assertIn("source_database", obj["metadata"], msg)
+            if "children" not in obj["metadata"] and "is_reference" not in obj["metadata"]:
+                self.assertIn("source_database", obj["metadata"], msg)
             self.assertIn("accession", obj["metadata"], msg)
             self.assertIn("name", obj["metadata"], msg)
 
@@ -156,12 +157,16 @@ class InterproRESTTestCase(APITransactionTestCase):
             self._check_protein_count_overview(obj, msg)
         elif "structure" == endpoint:
             self._check_structure_count_overview(obj, msg)
+        elif "organism" == endpoint:
+            self._check_organism_count_overview(obj, msg)
 
     def _check_object_by_accesssion(self, obj, msg=""):
         self.assertIn("metadata", obj, msg)
-        self.assertIn("source_database", obj["metadata"], msg)
+        if "children" not in obj["metadata"] and "is_reference" not in obj["metadata"]:
+            self.assertIn("source_database", obj["metadata"], msg)
+            self.assertIn("counters", obj["metadata"], msg)
+            # TODO: do we need counters for organism
         self.assertIn("accession", obj["metadata"], msg)
-        self.assertIn("counters", obj["metadata"], msg)
         self.assertIn("name", obj["metadata"], msg)
 
     def _check_count_overview_per_endpoints(self, obj, endpoints1, endpoints2, msg=""):
@@ -247,11 +252,10 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     def _check_taxonomy_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)
-        self.assertIn("full_name", obj, msg)
+        self.assertIn("name", obj, msg)
         self.assertIn("children", obj, msg)
         self.assertIn("parent", obj, msg)
         if is_complete:
-            self.assertIn("scientific_name", obj, msg)
             self.assertIn("lineage", obj, msg)
             self.assertIn("rank", obj, msg)
 
@@ -271,5 +275,5 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     def _check_organism_count_overview(self, main_obj, msg=""):
         self.assertIn("organisms", main_obj, msg)
-        self.assertIn("taxa", main_obj["organisms"], msg)
-        self.assertIn("proteomes", main_obj["organisms"], msg)
+        self.assertIn("taxonomy", main_obj["organisms"], msg)
+        self.assertIn("proteome", main_obj["organisms"], msg)

@@ -17,8 +17,8 @@ class OrganismFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/organism")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("organisms", response.data)
-        self.assertIn("taxa", response.data["organisms"])
-        self.assertIn("proteomes", response.data["organisms"])
+        self.assertIn("taxonomy", response.data["organisms"])
+        self.assertIn("proteome", response.data["organisms"])
 
     def test_can_read_taxonomy_list(self):
         response = self.client.get("/api/organism/taxonomy")
@@ -561,10 +561,10 @@ class OrganismEntryTest(InterproRESTTestCase):
             self.assertIsInstance(response.data, dict)
             self.assertIn("entries", response.data["organisms"],
                           "'entries' should be one of the keys in the response")
-            self.assertIn("taxa", response.data["organisms"],
-                          "'taxa' should be one of the keys in the response")
-            self.assertIn("proteomes", response.data["organisms"],
-                          "'entproteomesries' should be one of the keys in the response")
+            self.assertIn("taxonomy", response.data["organisms"],
+                          "'taxonomy' should be one of the keys in the response")
+            self.assertIn("proteome", response.data["organisms"],
+                          "'proteome' should be one of the keys in the response")
 
     def test_can_get_a_list_from_the_taxonomy_list(self):
         urls = [
@@ -743,10 +743,10 @@ class OrganismProteinTest(InterproRESTTestCase):
             self.assertIsInstance(response.data, dict)
             self.assertIn("proteins", response.data["organisms"],
                           "'entries' should be one of the keys in the response")
-            self.assertIn("taxa", response.data["organisms"],
-                          "'taxa' should be one of the keys in the response")
-            self.assertIn("proteomes", response.data["organisms"],
-                          "'entproteomesries' should be one of the keys in the response")
+            self.assertIn("taxonomy", response.data["organisms"],
+                          "'taxonomy' should be one of the keys in the response")
+            self.assertIn("proteome", response.data["organisms"],
+                          "'proteome' should be one of the keys in the response")
 
     def test_can_get_a_list_from_the_taxonomy_list(self):
         urls = [
@@ -911,10 +911,10 @@ class OrganismStructureTest(InterproRESTTestCase):
             self.assertIsInstance(response.data, dict)
             self.assertIn("structures", response.data["organisms"],
                           "'structures' should be one of the keys in the response")
-            self.assertIn("taxa", response.data["organisms"],
-                          "'taxa' should be one of the keys in the response")
-            self.assertIn("proteomes", response.data["organisms"],
-                          "'entproteomesries' should be one of the keys in the response")
+            self.assertIn("taxonomy", response.data["organisms"],
+                          "'taxonomy' should be one of the keys in the response")
+            self.assertIn("proteome", response.data["organisms"],
+                          "'proteome' should be one of the keys in the response")
 
     def test_can_get_a_list_from_the_taxonomy_list(self):
         urls = [

@@ -64,12 +64,14 @@ class OrganismSerializer(ModelContentSerializer):
         obj = {
             "metadata": {
                 "accession": instance.accession,
-                "scientific_name": instance.scientific_name,
-                "full_name": instance.full_name,
                 "lineage": instance.lineage,
                 "rank": instance.rank,
                 "children": instance.children,
-                "parent": instance.parent.accession if instance.parent is not None else None
+                "parent": instance.parent.accession if instance.parent is not None else None,
+                "name": {
+                    "name": instance.scientific_name,
+                    "short": instance.full_name,
+                },
             }
         }
         if include_proteomes:
@@ -105,13 +107,13 @@ class OrganismSerializer(ModelContentSerializer):
     @staticmethod
     def serialize_counter_bucket(bucket, plural):
         output = {
-            "taxa": bucket["unique"],
-            "proteomes": bucket["proteomes"]
+            "taxonomy": bucket["unique"],
+            "proteome": bucket["proteomes"]
         }
         is_searcher = True
-        if isinstance(output["taxa"], dict):
-            output["taxa"] = output["taxa"]["value"]
-            output["proteomes"] = output["proteomes"]["value"]
+        if isinstance(output["taxonomy"], dict):
+            output["taxonomy"] = output["taxonomy"]["value"]
+            output["proteome"] = output["proteome"]["value"]
             is_searcher = False
         if "entry" in bucket or "protein" in bucket or "structure" in bucket:
             # output = {"organisms": output}
@@ -128,7 +130,7 @@ class OrganismSerializer(ModelContentSerializer):
         obj = {
             "metadata": {
                 "accession": instance.accession,
-                "full_name": instance.full_name,
+                "name": instance.full_name,
                 "children": instance.children,
                 "parent": instance.parent.accession if instance.parent is not None else None
             }

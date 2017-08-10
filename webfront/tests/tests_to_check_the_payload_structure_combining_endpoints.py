@@ -87,10 +87,6 @@ plurals = {
     "organism": "organisms",
 }
 
-# TODO: Crete tests for entry/unintegrated
-
-
-import unittest
 
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
 
@@ -105,7 +101,8 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                 current = "/api/"+endpoint+"/"+db
                 response_db = self.client.get(current)
                 self.assertEqual(response_db.status_code, status.HTTP_200_OK, "URL: [{}]".format(current))
-                self.assertEqual(len(response_db.data["results"]), len(api_test_map[endpoint][db]), "URL: [{}]".format(current))
+                self.assertEqual(len(response_db.data["results"]), len(api_test_map[endpoint][db]),
+                                 "URL: [{}]".format(current))
                 self._check_is_list_of_metadata_objects(response_db.data["results"], "URL: [{}]".format(current))
 
                 for acc in api_test_map[endpoint][db]:
@@ -678,8 +675,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 current = "/api/"+endpoint3+"/"+endpoint2+"/"+db2+"/"+endpoint1+"/"+db1+"/"+acc1
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
-                                    self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                                    self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                                    self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                     "URL : [{}]".format(current))
+                                    self._check_counter_by_endpoint(endpoint3, response.data,
+                                                                    "URL : [{}]".format(current))
                                     self._check_count_overview_per_endpoints(response.data,
                                                                              plurals[endpoint2],
                                                                              plurals[endpoint3],
@@ -712,8 +711,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 current = "/api/"+endpoint3+"/"+endpoint1+"/"+db1+"/"+acc1+"/"+endpoint2+"/"+db2
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
-                                    self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))
-                                    self._check_counter_by_endpoint(endpoint3, response.data, "URL : [{}]".format(current))
+                                    self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                     "URL : [{}]".format(current))
+                                    self._check_counter_by_endpoint(endpoint3, response.data,
+                                                                    "URL : [{}]".format(current))
                                     self._check_count_overview_per_endpoints(response.data,
                                                                              plurals[endpoint2],
                                                                              plurals[endpoint3],
@@ -729,7 +730,8 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         plurals[endpoint1],
                                         plurals[endpoint3])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, current))
+                                    self.fail("Unexpeted error code {} for the URL : [{}]"
+                                              .format(response.status_code, current))
 
     def test_acc_acc_endpoint(self):
         tested = []
@@ -842,7 +844,8 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             plurals[endpoint2],
                                             plurals[endpoint3])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, current))
+                                        self.fail("Unexpeted error code {} for the URL : [{}]"
+                                                  .format(response.status_code, current))
 
     def test_db_db_db(self):
         for endpoint1 in api_test_map:

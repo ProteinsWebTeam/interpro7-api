@@ -269,7 +269,7 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertIn("rank", obj, msg)
 
     def _check_organism_from_searcher(self, obj, msg=""):
-        self.assertIn("tax_id", obj, msg)
+        self.assertIn("accession", obj, msg)
         self.assertIn("lineage", obj, msg)
         self.assertIn("proteomes", obj, msg)
 

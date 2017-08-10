@@ -170,10 +170,13 @@ class EntrySerializer(ModelContentSerializer):
                     "interpro": 0,
                 }
             }
-            if SerializerDetail.PROTEIN_DB in filters or SerializerDetail.STRUCTURE_DB in filters :
+            if SerializerDetail.PROTEIN_DB in filters or\
+                    SerializerDetail.STRUCTURE_DB in filters or\
+                    SerializerDetail.ORGANISM_DB in filters:
                 result["entries"]["integrated"] = {"entries": 0}
                 result["entries"]["unintegrated"] = {"entries": 0}
                 result["entries"]["interpro"] = {"entries": 0}
+
             if SerializerDetail.PROTEIN_DB in filters:
                 result["entries"]["integrated"]["proteins"] = 0
                 result["entries"]["unintegrated"]["proteins"] = 0
@@ -182,6 +185,10 @@ class EntrySerializer(ModelContentSerializer):
                 result["entries"]["integrated"]["structures"] = 0
                 result["entries"]["unintegrated"]["structures"] = 0
                 result["entries"]["interpro"]["structures"] = 0
+            if SerializerDetail.ORGANISM_DB in filters:
+                result["entries"]["integrated"]["organisms"] = 0
+                result["entries"]["unintegrated"]["organisms"] = 0
+                result["entries"]["interpro"]["organisms"] = 0
 
             if "unintegrated" in instance and (
                     ("count" in instance["unintegrated"] and instance["unintegrated"]["count"]) or

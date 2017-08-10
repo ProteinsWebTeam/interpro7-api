@@ -64,21 +64,21 @@ api_test_map = {
             "1JZ8",
         ]
     },
-    # "organism": {
-    #     "taxonomy": [
-    #         "1",
-    #         "2",
-    #         "2579",
-    #         "40296",
-    #         "344612",
-    #         "1001583",
-    #     ],
-    #     "proteome": [
-    #         "UP000006701",
-    #         "UP000012042",
-    #         "UP000030104",
-    #     ]
-    # }
+    "organism": {
+        "taxonomy": [
+            "1",
+            "2",
+            "2579",
+            "40296",
+            "344612",
+            "1001583",
+        ],
+        "proteome": [
+            "UP000006701",
+            "UP000012042",
+            "UP000030104",
+        ]
+    }
 }
 plurals = {
     "entry": "entries",
@@ -270,8 +270,10 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                                                  "URL : [{}]".format(current))
                                 self._check_list_of_matches(response.data[plurals[endpoint2]],
                                                             "URL : [{}]".format(current))
-                                self._check_structure_and_chains(response, endpoint1, db, acc,
-                                                                 "/"+endpoint2+"/"+db2, plurals[endpoint2])
+                                self._check_structure_and_chains(
+                                    response, endpoint1, db, acc,
+                                    "/"+endpoint2+"/"+db2, plurals[endpoint2],
+                                    msg="URL : [{}]".format(current))
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -427,7 +429,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                     for db1 in api_test_map[endpoint1]:
                         for acc in api_test_map[endpoint1][db1]:
                             # [endpoint]/[endpoint]/[db]/[acc]/[endpoint]
-                            current = "/api/"+endpoint2+"/"+endpoint1+"/"+db1+"/"+acc+"/"+"/"+endpoint3
+                            current = "/api/"+endpoint2+"/"+endpoint1+"/"+db1+"/"+acc+"/"+endpoint3
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(current))

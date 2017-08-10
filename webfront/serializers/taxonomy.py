@@ -85,7 +85,9 @@ class OrganismSerializer(ModelContentSerializer):
         return {
             "metadata": {
                 "accession": instance.accession,
-                "name": instance.name,
+                "name": {
+                    "name": instance.name
+                },
                 "is_reference": instance.is_reference,
                 "strain": instance.strain,
                 "assembly": instance.assembly,
@@ -180,7 +182,7 @@ class OrganismSerializer(ModelContentSerializer):
     @staticmethod
     def get_organism_from_search_object(obj):
         header = {
-            "tax_id": obj["tax_id"],
+            "accession": obj["tax_id"],
             "lineage": obj["lineage"],
             "proteomes": obj["proteomes"],
         }

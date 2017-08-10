@@ -126,9 +126,17 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("accession", obj, msg)
         self.assertIn("source_database", obj, msg)
 
+    def _check__organism_match(self, obj, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("lineage", obj, msg)
+        self.assertIn("proteomes", obj, msg)
+
     def _check_list_of_matches(self, obj, msg=""):
         for match in obj:
-            self._check_match(match, msg)
+            if "lineage" in match:
+                self._check__organism_match(match, msg)
+            else:
+                self._check_match(match, msg)
 
     # methods to check structure related responses
     # TODO: Extend this tests
@@ -180,24 +188,25 @@ class InterproRESTTestCase(APITransactionTestCase):
                                   obj[endpoints2][inner_obj],
                                   msg)
 
-    def _check_structure_and_chains(self, response, endpoint, db, acc, postfix="", key=None):
+    def _check_structure_and_chains(self, response, endpoint, db, acc, postfix="", key=None, msg=""):
         urls = []
         if "structure" == endpoint:
             # _chains = [list(ch.keys())[0] for ch in chains[acc]]
-            self.assertEqual(chains[acc], response.data["metadata"]["chains"])
+            self.assertEqual(chains[acc], response.data["metadata"]["chains"], msg)
             for chain in chains[acc]:
                 current = "/api/"+endpoint+"/"+db+"/"+acc+"/"+chain+postfix
                 urls.append(current)
                 response_acc = self._get_in_debug_mode(current)
                 if response_acc.status_code == status.HTTP_200_OK:
-                    self.assertEqual(response_acc.status_code, status.HTTP_200_OK)
-                    self._check_object_by_accesssion(response_acc.data)
-                    self.assertEqual(len(response_acc.data["metadata"]["chains"]), 1)
+                    self.assertEqual(response_acc.status_code, status.HTTP_200_OK, msg)
+                    self._check_object_by_accesssion(response_acc.data, msg)
+                    self.assertEqual(len(response_acc.data["metadata"]["chains"]), 1, msg)
                     if key is not None:
                         for ch2 in response_acc.data[key]:
-                            self.assertEqual(ch2["chain"].upper(), chain)
-                    self.assertIn(chain.lower(), response_acc.data["metadata"]["chains"])
-                    self._check_match(response_acc.data["metadata"]["chains"][chain.lower()])
+                            if "lineage" not in ch2:
+                                self.assertEqual(ch2["chain"].upper(), chain, msg)
+                    self.assertIn(chain.lower(), response_acc.data["metadata"]["chains"], msg)
+                    self._check_match(response_acc.data["metadata"]["chains"][chain.lower()], msg)
                 elif response_acc.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)
         return urls

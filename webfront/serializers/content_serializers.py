@@ -56,13 +56,13 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return output
 
     @staticmethod
-    def to_organisms_detail_representation(instance, solr, query):
-        response = {r['tax_id']:
+    def to_organisms_detail_representation(instance, solr, query, include_chains=False):
+        response = list({"{}_{}".format(r['tax_id'], r['chain']) if include_chains else r['tax_id']:
             webfront.serializers.taxonomy.OrganismSerializer.get_organism_from_search_object(
-                r,
+                r, include_chain=include_chains
             )
             for r in solr.execute_query(None, fq=query, rows=10)
-        }.values()
+        }.values())
         if len(response) == 0:
             raise ReferenceError('There are not structures for this request')
         return response
@@ -102,13 +102,14 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def to_proteins_detail_representation(instance, searcher, searcher_query, for_structure=False, for_entry=False):
-        field = "structure_chain" if not for_entry else "protein_acc"
+    def to_proteins_detail_representation(instance, searcher, searcher_query, include_chains=False, include_coordinates=True):
+        field = "structure_chain" if not include_chains else "protein_acc"
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
                 r,
-                for_entry=for_entry,
-                solr=searcher
+                for_entry=include_chains,
+                solr=searcher,
+                include_coordinates=include_coordinates
             )
             for r in searcher.get_group_obj_of_field_by_query(None, field, fq=searcher_query, rows=10)["groups"]
         ]

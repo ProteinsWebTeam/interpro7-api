@@ -164,18 +164,18 @@ class ProteinSerializer(ModelContentSerializer):
         )["organisms"]
 
     @staticmethod
-    def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None):
-        key_coord = "entry_protein_locations" if for_entry else "protein_structure_locations"
+    def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None, include_coordinates=True):
         header = {
             "accession": obj["protein_acc"],
-            key_coord: obj[key_coord],
-            # "name": "PTHP_BUCAI",
             "protein_length": obj["protein_length"],
             "source_database": obj["protein_db"],
             "organism": obj["tax_id"],
         }
         if not for_entry:
             header["chain"] = obj["chain"]
+        if include_coordinates:
+            key_coord = "entry_protein_locations" if for_entry else "protein_structure_locations"
+            header[key_coord] = obj[key_coord]
         if include_protein:
             header["protein"] = ProteinSerializer.to_metadata_representation(
                 Protein.objects.get(accession__iexact=obj["protein_acc"]), solr

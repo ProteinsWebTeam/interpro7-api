@@ -62,7 +62,8 @@ class StructureSerializer(ModelContentSerializer):
                 representation["organisms"] = self.to_organisms_detail_representation(
                     instance,
                     self.searcher,
-                    "structure_acc:" + escape(instance.accession.lower())
+                    "structure_acc:" + escape(instance.accession.lower()),
+                    include_chains=True
                 )
 
         return representation

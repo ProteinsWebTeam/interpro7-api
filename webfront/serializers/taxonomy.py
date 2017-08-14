@@ -55,7 +55,8 @@ class OrganismSerializer(ModelContentSerializer):
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = self.to_proteins_detail_representation(
-                    instance, self.searcher, self.get_searcher_query(instance)
+                    instance, self.searcher, self.get_searcher_query(instance),
+                    include_chains=True, include_coordinates=False
                 )
         return representation
 
@@ -67,6 +68,7 @@ class OrganismSerializer(ModelContentSerializer):
                 "lineage": instance.lineage,
                 "rank": instance.rank,
                 "children": instance.children,
+                "source_database": "taxonomy",
                 "parent": instance.parent.accession if instance.parent is not None else None,
                 "name": {
                     "name": instance.scientific_name,
@@ -88,6 +90,7 @@ class OrganismSerializer(ModelContentSerializer):
                 "name": {
                     "name": instance.name
                 },
+                "source_database": "proteome",
                 "is_reference": instance.is_reference,
                 "strain": instance.strain,
                 "assembly": instance.assembly,
@@ -118,13 +121,20 @@ class OrganismSerializer(ModelContentSerializer):
             output["proteome"] = output["proteome"]["value"]
             is_searcher = False
         if "entry" in bucket or "protein" in bucket or "structure" in bucket:
+            output = {
+                "taxonomy": {"organisms": output["taxonomy"]},
+                "proteome": {"organisms": output["proteome"]},
+            }
             # output = {"organisms": output}
             if "entry" in bucket:
-                output["entries"] = bucket["entry"] if is_searcher else bucket["entry"]["value"]
+                output["taxonomy"]["entries"] = bucket["entry"] if is_searcher else bucket["entry"]["value"]
+                output["proteome"]["entries"] = bucket["entry"] if is_searcher else bucket["entry"]["value"]
             if "protein" in bucket:
-                output["proteins"] = bucket["protein"] if is_searcher else bucket["protein"]["value"]
+                output["taxonomy"]["proteins"] = bucket["protein"] if is_searcher else bucket["protein"]["value"]
+                output["proteome"]["proteins"] = bucket["protein"] if is_searcher else bucket["protein"]["value"]
             if "structure" in bucket:
-                output["structures"] = bucket["structure"] if is_searcher else bucket["structure"]["value"]
+                output["taxonomy"]["structures"] = bucket["structure"] if is_searcher else bucket["structure"]["value"]
+                output["proteome"]["structures"] = bucket["structure"] if is_searcher else bucket["structure"]["value"]
         return output
 
     @staticmethod
@@ -134,11 +144,13 @@ class OrganismSerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.full_name,
                 "children": instance.children,
-                "parent": instance.parent.accession if instance.parent is not None else None
+                "parent": instance.parent.accession if instance.parent is not None else None,
+                "source_database": "taxonomy"
             }
         }
         if include_proteomes:
             obj["proteomes"] = [p.accession for p in instance.proteome_set.all()]
+            obj["source_database"] = "proteome"
         return obj
 
     @staticmethod
@@ -148,7 +160,8 @@ class OrganismSerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.name,
                 "is_reference": instance.is_reference,
-                "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None
+                "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
+                "source_database": "taxonomy" if instance.taxonomy is not None else "proteome",
             }
         }
 
@@ -180,11 +193,14 @@ class OrganismSerializer(ModelContentSerializer):
         )["structures"]
 
     @staticmethod
-    def get_organism_from_search_object(obj):
+    def get_organism_from_search_object(obj, include_chain=False):
         header = {
             "accession": obj["tax_id"],
             "lineage": obj["lineage"],
             "proteomes": obj["proteomes"],
+            "source_database": "taxonomy"
         }
+        if include_chain:
+            header["chain"] = obj["chain"]
         return header
 

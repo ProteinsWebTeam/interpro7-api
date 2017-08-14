@@ -115,11 +115,12 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("accession", obj)
         self.assertIn("counters", obj)
 
-    def _check_match(self, obj, msg=""):
-        try:
-            self.assertIn("entry_protein_locations", obj, msg)
-        except Exception:
-            self.assertIn("protein_structure_locations", obj, msg)
+    def _check_match(self, obj, msg="", include_coordinates=True):
+        if include_coordinates:
+            try:
+                self.assertIn("entry_protein_locations", obj, msg)
+            except Exception:
+                self.assertIn("protein_structure_locations", obj, msg)
 
         # self.assertIsInstance(obj["coordinates"], list, msg)
         # TODO: Find a way to check JSON from elasticsearch
@@ -131,12 +132,12 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("lineage", obj, msg)
         self.assertIn("proteomes", obj, msg)
 
-    def _check_list_of_matches(self, obj, msg=""):
+    def _check_list_of_matches(self, obj, msg="", check_coordinates=True):
         for match in obj:
             if "lineage" in match:
                 self._check__organism_match(match, msg)
             else:
-                self._check_match(match, msg)
+                self._check_match(match, msg, include_coordinates=check_coordinates)
 
     # methods to check structure related responses
     # TODO: Extend this tests

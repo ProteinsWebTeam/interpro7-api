@@ -74,6 +74,21 @@ api_test_map = {
             "1JZ8/B",
         ]
     },
+    "organism": {
+        "taxonomy": [
+            "1",
+            "2",
+            "2579",
+            "40296",
+            "344612",
+            "1001583",
+        ],
+        "proteome": [
+            "UP000006701",
+            "UP000012042",
+            "UP000030104",
+        ]
+    },
 }
 rel_aux = {
     ("protein", "structure"): [
@@ -149,7 +164,156 @@ rel_aux = {
         ["PS50822", "1T2V/D"],
         ["PS50822", "1T2V/E"],
         ["SM00950", "1JM7/A"],
-    ]
+    ],
+    ("entry", "organism"): [
+        # ["IPR003165", "1"],
+        # ["IPR001165", "1"],
+        # ["PF02171", "1"],
+        # ["PF17180", "1"],
+        # ["PF17176", "1"],
+        # ["SM00950", "1"],
+        # ["PS50822", "1"],
+        # ["IPR003165", "2579"],
+        # ["IPR003165", "2"],
+        # ["IPR001165", "2579"],
+        # ["PF02171", "2579"],
+        # ["PF17180", "2579"],
+        # ["PF17176", "2579"],
+        # ["SM00950", "2579"],
+        # ["PS50822", "2"],
+        ["IPR003165", "344612"],
+        ["IPR003165", "40296"],
+        ["IPR001165", "344612"],
+        ["PF02171", "344612"],
+        ["PF17180", "1001583"],
+        ["PF17176", "344612"],
+        ["SM00950", "344612"],
+        ["PS50822", "40296"],
+
+        ["IPR003165", "UP000006701"],
+        ["IPR003165", "UP000030104"],
+        ["IPR001165", "UP000006701"],
+        ["PF02171", "UP000006701"],
+        ["PF17180", "UP000012042"],
+        ["PF17176", "UP000006701"],
+        ["SM00950", "UP000006701"],
+        ["PS50822", "UP000030104"],
+    ],
+    ("organism", "protein"): [
+        # ["1", "A1CUJ5"],
+        # ["1", "M5ADK6"],
+        # ["1", "A0A0A2L2G2"],
+        # ["1", "P16582"],
+        # ["2579", "A1CUJ5"],
+        # ["2579", "M5ADK6"],
+        # ["2", "A0A0A2L2G2"],
+        # ["2", "P16582"],
+        ["344612", "A1CUJ5"],
+        ["1001583", "M5ADK6"],
+        ["40296", "A0A0A2L2G2"],
+        ["40296", "P16582"],
+        ["UP000006701", "A1CUJ5"],
+        ["UP000012042", "M5ADK6"],
+        ["UP000030104", "A0A0A2L2G2"],
+        ["UP000030104", "P16582"],
+    ],
+    ("organism", "structure"): [
+        # ["1", "1JM7"],
+        # ["1", "2BKM"],
+        # ["1", "1JM7"],
+        # ["1", "1JZ8"],
+        # ["1", "1JZ8"],
+        # ["1", "2BKM"],
+        # ["1", "1T2V"],
+        # ["1", "1T2V"],
+        # ["1", "1T2V"],
+        # ["1", "1T2V"],
+        # ["1", "1T2V"],
+        # ["2579", "1JM7"],
+        # ["2579", "2BKM"],
+        # ["2579", "1JM7"],
+        # ["2", "1JZ8"],
+        # ["2", "1JZ8"],
+        # ["2", "2BKM"],
+        # ["2", "1T2V"],
+        # ["2", "1T2V"],
+        # ["2", "1T2V"],
+        # ["2", "1T2V"],
+        # ["2", "1T2V"],
+        ["344612", "1JM7"],
+        ["1001583", "2BKM"],
+        ["1001583", "1JM7"],
+        ["40296", "1JZ8"],
+        ["40296", "1JZ8"],
+        ["40296", "2BKM"],
+        ["40296", "1T2V"],
+        ["40296", "1T2V"],
+        ["40296", "1T2V"],
+        ["40296", "1T2V"],
+        ["40296", "1T2V"],
+        ["UP000006701", "1JM7"],
+        ["UP000012042", "2BKM"],
+        ["UP000012042", "1JM7"],
+        ["UP000030104", "1JZ8"],
+        ["UP000030104", "1JZ8"],
+        ["UP000030104", "2BKM"],
+        ["UP000030104", "1T2V"],
+        ["UP000030104", "1T2V"],
+        ["UP000030104", "1T2V"],
+        ["UP000030104", "1T2V"],
+        ["UP000030104", "1T2V"],
+    ],
+    ("organism", "chain"): [
+        # ["1", "1JM7/A"],
+        # ["1", "2BKM/B"],
+        # ["1", "1JM7/B"],
+        # ["1", "1JZ8/A"],
+        # ["1", "1JZ8/B"],
+        # ["1", "2BKM/A"],
+        # ["1", "1T2V/A"],
+        # ["1", "1T2V/B"],
+        # ["1", "1T2V/C"],
+        # ["1", "1T2V/D"],
+        # ["1", "1T2V/E"],
+        # ["2579", "1JM7/A"],
+        # ["2579", "2BKM/B"],
+        # ["2579", "1JM7/B"],
+        # ["2", "1JZ8/A"],
+        # ["2", "1JZ8/B"],
+        # ["2", "2BKM/A"],
+        # ["2", "1T2V/A"],
+        # ["2", "1T2V/B"],
+        # ["2", "1T2V/C"],
+        # ["2", "1T2V/D"],
+        # ["2", "1T2V/E"],
+        ["344612", "1JM7/A"],
+        ["1001583", "2BKM/B"],
+        ["1001583", "1JM7/B"],
+        ["40296", "1JZ8/A"],
+        ["40296", "1JZ8/B"],
+        ["40296", "2BKM/A"],
+        ["40296", "1T2V/A"],
+        ["40296", "1T2V/B"],
+        ["40296", "1T2V/C"],
+        ["40296", "1T2V/D"],
+        ["40296", "1T2V/E"],
+        ["UP000006701", "1JM7/A"],
+        ["UP000012042", "2BKM/B"],
+        ["UP000012042", "1JM7/B"],
+        ["UP000030104", "1JZ8/A"],
+        ["UP000030104", "1JZ8/B"],
+        ["UP000030104", "2BKM/A"],
+        ["UP000030104", "1T2V/A"],
+        ["UP000030104", "1T2V/B"],
+        ["UP000030104", "1T2V/C"],
+        ["UP000030104", "1T2V/D"],
+        ["UP000030104", "1T2V/E"],
+    ],
+}
+descendents = {
+    "1": ["40296", "344612", "1001583"],
+    "2579": ["344612", "1001583"],
+    "2": ["40296"],
 }
 
 relationships = {}
@@ -161,6 +325,7 @@ plurals = {
     "entry": "entries",
     "protein": "proteins",
     "structure": "structures",
+    "organism": "organisms",
 }
 singular = {v: k for k, v in plurals.items()}
 plurals["chain"] = "structures"
@@ -170,7 +335,7 @@ import unittest
 
 class ThreeEndpointsContentTest(InterproRESTTestCase):
     def test_endpoint_endpoint_endpoint(self):
-        response1 = self.client.get("/api/entry/protein/structure")
+        response1 = self.client.get("/api/entry/protein/structure/organism")
         self.assertEqual(response1.status_code, status.HTTP_200_OK)
         self._check_entry_count_overview(response1.data)
         for endpoint1 in api_test_map:
@@ -184,9 +349,10 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         continue
                     url = "/api/{}/{}/{}".format(endpoint1, endpoint2, endpoint3)
                     response2 = self.client.get(url)
-                    self.assertEqual(response2.status_code, status.HTTP_200_OK)
+                    self.assertEqual(response2.status_code, status.HTTP_200_OK, "URL: [{}]".format(url))
                     for ep, counter in response1.data.items():
-                        self.assertEqual(counter, response2.data[ep])
+                        if ep in [endpoint1, endpoint2, endpoint3]:
+                            self.assertEqual(counter, response2.data[ep], "URL: [{}]".format(url))
 
     def test_endpoint_endpoint_db(self):
         for endpoint1 in api_test_map:
@@ -289,12 +455,6 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             for acc3 in api_test_map[endpoint3][db3]:
                                 unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                     if db3 == "integrated" or db3 == "unintegrated" else ""
-                                # endpoint1 = "entry"
-                                # endpoint2 = "structure"
-                                # db2 = "pdb"
-                                # endpoint3 = ep3 = "protein"
-                                # db3 = "unreviewed"
-                                # acc3 = "P16582"
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2,
                                                                       ep3, db3 + unintegrated, acc3)
                                 response = self._get_in_debug_mode(url)
@@ -359,54 +519,54 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         response = self.client.get(url)
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                         expected = self.get_expected_list_payload(endpoint3, db3, endpoint1, endpoint2)
-                        expected.sort(key=lambda obj: obj["metadata"]["accession"])
-                        response.data["results"].sort(key=lambda obj: obj["metadata"]["accession"])
+                        expected.sort(key=lambda obj: str(obj["metadata"]["accession"]))
+                        response.data["results"].sort(key=lambda obj: str(obj["metadata"]["accession"]))
                         self.assertEqual(len(expected), len(response.data["results"]))
                         for i in range(len(expected)):
                             obj1 = expected[i]
                             obj2 = response.data["results"][i]
                             for key in obj1:
                                 if key == "metadata":
-                                    self.assertEqual(obj1[key]["accession"], obj2[key]["accession"])
+                                    self.assertEqual(str(obj1[key]["accession"]), str(obj2[key]["accession"]))
                                     self.assertIn("source_database", obj2[key])
                                     self.assertIn("name", obj2[key])
                                 else:
                                     self.assertEqual(obj1[key], obj2[key],
-                                                     "the number of {} of the {} {} doesn't match"
-                                                     .format(key, endpoint3, obj1["metadata"]["accession"]))
+                                                     "the number of {} of the {} {} doesn't match. URL: [{}]"
+                                                     .format(key, endpoint3, obj1["metadata"]["accession"], url))
 
     def compare_db_db_endpoint_expected_vs_response(self, expected, response, endpoint1):
-        expected.sort(key=lambda obj: obj["metadata"]["accession"])
-        response.data["results"].sort(key=lambda obj: obj["metadata"]["accession"])
+        expected.sort(key=lambda obj: str(obj["metadata"]["accession"]))
+        response.data["results"].sort(key=lambda obj: str(obj["metadata"]["accession"]))
         self.assertEqual(len(expected), len(response.data["results"]),
                          "Check length of the response array. \nEXP: {}\nRES: {}"
                          .format(expected, response.data["results"]))
         for i in range(len(expected)):
             self.compare_objects_expected_vs_response(expected[i], response.data["results"][i], endpoint1)
 
-    def compare_objects_expected_vs_response(self, expected, response, endpoint1):
+    def compare_objects_expected_vs_response(self, expected, response, endpoint1, msg=""):
         for key in expected:
             if key == "metadata":
-                self.assertEqual(expected[key]["accession"], response[key]["accession"])
+                self.assertEqual(str(expected[key]["accession"]), str(response[key]["accession"]))
                 self.assertIn("source_database", response[key])
                 self.assertIn("name", response[key])
             elif isinstance(expected[key], list):
                 self.assertEqual(
                     len(expected[key]), len(response[key]),
-                    "Check length of the {} array  of the {} {} \nEXP: {}\nRES: {}"
-                    .format(key, endpoint1, expected["metadata"]["accession"], expected[key], response[key]))
+                    "Check length of the {} array  of the {} {} \nEXP: {}\nRES: {}\n{}."
+                    .format(key, endpoint1, expected["metadata"]["accession"], expected[key], response[key], msg))
                 expected[key].sort(key=lambda obj: obj["accession"])
                 response[key].sort(key=lambda obj: obj["accession"])
                 for match in expected[key]:
-                    self.assertEqual(match["accession"], match["accession"])
-                    self.assertIn("source_database", match)
-                    self.assertIn("name", match)
+                    self.assertEqual(match["accession"], match["accession"], msg)
+                    self.assertIn("source_database", match, msg)
+                    self.assertIn("name", match, msg)
             elif isinstance(expected[key], dict):
-                self.assertIsInstance(response[key], dict)
+                self.assertIsInstance(response[key], dict, msg)
             else:
                 self.assertEqual(expected[key], response[key],
-                                 "the number of {} of the {} {} doesn't match"
-                                 .format(key, endpoint1, expected["metadata"]["accession"]))
+                                 "the number of {} of the {} {} doesn't match.\n{}"
+                                 .format(key, endpoint1, expected["metadata"]["accession"], msg))
 
     def test_db_db_endpoint(self):
         for endpoint1 in api_test_map:
@@ -602,6 +762,19 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 for acc3 in api_test_map[endpoint3][db3]:
                                     un3 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                         if db3 == "integrated" or db3 == "unintegrated" else ""
+                                    # ep1="organism"
+                                    # endpoint1 = "organism"
+                                    # db1="taxonomy"
+                                    # un1=""
+                                    # acc1="1"
+                                    # endpoint2="protein"
+                                    # endpoint3="structure"
+                                    # ep3="structure"
+                                    # db3="pdb"
+                                    # un3=""
+                                    # acc3="1JM7"
+                                    if acc1 == "1" or acc1 == "2" or acc1 == "2579":
+                                        continue
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
                                         .format(ep1, db1 + un1, acc1, endpoint2, ep3, db3 + un3, acc3)
                                     response = self._get_in_debug_mode(url)
@@ -610,7 +783,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                                                                 db3=db3, acc3=acc3)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.compare_objects_expected_vs_response(
-                                            expected, response.data, endpoint1)
+                                            expected, response.data, endpoint1,"URL: [{}]".format(url))
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
                                                          "HTTP error {}: {}".format(response.status_code, url))
@@ -629,6 +802,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             continue
                         for db1 in api_test_map[endpoint1]:
                             for acc1 in api_test_map[endpoint1][db1]:
+                                if acc1 == "1" or acc1 == "2" or acc1 == "2579":
+                                    continue
                                 un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
                                     if db1 == "integrated" or db1 == "unintegrated" else ""
                                 url = "/api/{}/{}/{}/{}/{}/{}" \
@@ -638,7 +813,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                                                             db2=db2)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.compare_objects_expected_vs_response(
-                                        expected, response.data, endpoint1)
+                                        expected, response.data, endpoint1, "URL: [{}]".format(url))
                                 else:
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
                                                      "HTTP code error{}: {}".format(response.status_code, url))
@@ -668,6 +843,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         for db3 in api_test_map[endpoint3]:
                             for db1 in api_test_map[endpoint1]:
                                 for acc1 in api_test_map[endpoint1][db1]:
+                                    if acc1 == "1" or acc1 == "2" or acc1 == "2579":
+                                        continue
                                     un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
                                         if db1 == "integrated" or db1 == "unintegrated" else ""
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}" \
@@ -697,6 +874,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         for db3 in api_test_map[endpoint3]:
                             for db1 in api_test_map[endpoint1]:
                                 for acc1 in api_test_map[endpoint1][db1]:
+                                    if acc1 == "1" or acc1 == "2" or acc1 == "2579":
+                                        continue
                                     un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc1[:2]] \
                                         if db1 == "integrated" or db1 == "unintegrated" else ""
                                     for acc3 in api_test_map[endpoint3][db3]:
@@ -743,6 +922,8 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     un1 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles"}[acc1[:2]] \
                                         if db1 == "integrated" or db1 == "unintegrated" else ""
+                                    if acc1 == "1" or acc1 == "2" or acc1 == "2579":
+                                        continue
                                     for acc2 in api_test_map[endpoint2][db2]:
                                         un2 = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles"}[acc2[:2]] \
                                             if db2 == "integrated" or db2 == "unintegrated" else ""
@@ -767,6 +948,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
     def get_expected_object_payload(self, endpoint1, db1, acc1, endpoint2, endpoint3, db2=None, db3=None,
                                     acc2=None, acc3=None):
+        accs1 = self.get_accs_considering_taxonomy(endpoint1, acc1)
         accs2 = []
         if acc2 is None:
             if db2 is None:
@@ -775,7 +957,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
             else:
                 accs2 = api_test_map[endpoint2][db2]
         else:
-            accs2 = [acc2]
+            accs2 = self.get_accs_considering_taxonomy(endpoint2, acc2)
         if acc3 is None:
             accs3 = []
             if db3 is None:
@@ -784,23 +966,23 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
             else:
                 accs3 = api_test_map[endpoint3][db3]
         else:
-            accs3 = [acc3]
+            accs3 = self.get_accs_considering_taxonomy(endpoint3, acc3)
 
         payload = {"metadata": {"accession": acc1.split("/")[0], "source_database": db1}}
 
         if db2 is None:
             payload[plurals[endpoint2]] = self.get_counter_object(endpoint2,
-                                                                  endpoint1, [acc1],
+                                                                  endpoint1, accs1,
                                                                   endpoint3, accs3)
         else:
-            self.set_object_for_db_filter(payload, endpoint1, acc1, endpoint2, db2, accs2, endpoint3, db3, accs3)
+            self.set_object_for_db_filter(payload, endpoint1, acc1, endpoint2, db2, accs2, endpoint3, db3, accs3, accs1)
 
         if db3 is None:
             payload[plurals[endpoint3]] = self.get_counter_object(endpoint3,
                                                                   endpoint2, accs2,
-                                                                  endpoint1, [acc1])
+                                                                  endpoint1, accs1)
         else:
-            self.set_object_for_db_filter(payload, endpoint1, acc1, endpoint3, db3, accs3, endpoint2, db2, accs2)
+            self.set_object_for_db_filter(payload, endpoint1, acc1, endpoint3, db3, accs3, endpoint2, db2, accs2, accs1)
         return payload
 
     def get_expected_list_payload(self, endpoint1, db1, endpoint2, endpoint3, db2=None, db3=None, acc2=None, acc3=None):
@@ -813,7 +995,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
             else:
                 accs2 = api_test_map[endpoint2][db2]
         else:
-            accs2 = [acc2]
+            accs2 = self.get_accs_considering_taxonomy(endpoint2, acc2)
         if acc3 is None:
             accs3 = []
             if db3 is None:
@@ -822,7 +1004,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
             else:
                 accs3 = api_test_map[endpoint3][db3]
         else:
-            accs3 = [acc3]
+            accs3 = self.get_accs_considering_taxonomy(endpoint3, acc3)
         accs1 = self.get_set_of_shared_ids(endpoint3, accs3,
                                            endpoint1, accs1,
                                            endpoint2, accs2)
@@ -835,12 +1017,18 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
         payload = payload if db3 is None else [obj for obj in payload if len(obj[plurals[endpoint3]]) > 0]
         return payload
 
+    @staticmethod
+    def get_accs_considering_taxonomy(endpoint, acc):
+        if endpoint == "organism" and acc in descendents:
+            return descendents[acc]
+        return [acc]
+
     def get_expected_counter_payload(self, endpoint1, endpoint2, endpoint3,
                                      db3, db2=None, acc3=None, acc2=None):
         payload = {}
         accs3 = api_test_map[endpoint3][db3]
         if acc3 in accs3:
-            accs3 = [acc3]
+            accs3 = self.get_accs_considering_taxonomy(endpoint3, acc3)
         # accs2 = api_test_map[endpoint2][db2] if db2 is not None else None
         accs2 = []
         if db2 is None:
@@ -849,7 +1037,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
         else:
             accs2 = api_test_map[endpoint2][db2]
         if accs2 is not None and acc2 in accs2:
-            accs2 = [acc2]
+            accs2 = self.get_accs_considering_taxonomy(endpoint2, acc2)
         accs1 = []
         for db in api_test_map[endpoint1]:
             accs1 += api_test_map[endpoint1][db]
@@ -934,25 +1122,35 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
 
         return shared_ids
 
-    def set_object_for_db_filter(self, obj, endpoint1, acc, endpoint2, db2, accs2, endpoint3, db3, accs3):
+    def set_object_for_db_filter(self, obj, endpoint1, acc, endpoint2, db2, accs2, endpoint3, db3, accs3, accs1=None):
+        accs1 = accs1 if accs1 is not None else [acc]
         accs2 = self.get_set_of_shared_ids(endpoint3, accs3,
                                            endpoint2, accs2,
-                                           endpoint1, [acc])
-        accs3 = self.get_set_of_shared_ids(endpoint1, [acc],
+                                           endpoint1, accs1)
+        accs3 = self.get_set_of_shared_ids(endpoint1, accs1,
                                            endpoint3, accs3,
                                            endpoint2, accs2)
-        accs = self.get_set_of_shared_ids(endpoint1, [acc], endpoint2, accs2, endpoint3, accs3)
+        accs = self.get_set_of_shared_ids(endpoint1, accs1, endpoint2, accs2, endpoint3, accs3)
         if db2 is None:
             obj[plurals[endpoint2]] = self.get_counter_object(endpoint2,
-                                                              endpoint1, [acc],
+                                                              endpoint1, accs1,
                                                               endpoint3, accs3,
                                                               include_3rd_endpoint=False,
                                                               display_object=False)
             #len(accs)
         else:
-            obj[plurals[endpoint2]] = [{"accession": x[1], "source_database": db2, "coordinates": [], "name": ""}
+            obj[plurals[endpoint2]] = []
+            # for x in relationships[endpoint1, endpoint2]:
+            #     if x[0] in accs1 and x[1] in accs:
+            #         obj[plurals[endpoint2]].append({"accession": x[1], "source_database": db2, "coordinates": [], "name": ""})
+            obj[plurals[endpoint2]] = [{"accession": x[1], "source_database": db2, "coordinates": [], "name": "", "acc": x[0]}
                                        for x in relationships[endpoint1, endpoint2]
-                                       if x[0] == acc and x[1] in accs]
+                                       if x[0] in accs1 and x[1] in accs]
+            if accs1 != [acc]:
+                uniques = {(o["accession"],o["acc"]) for o in obj[plurals[endpoint2]]}
+                obj[plurals[endpoint2]] =[{"accession": acc, "source_database": db2, "coordinates": [], "name": ""}
+                                          for acc in uniques]
+            # for obj in obj[plurals[endpoint2]]
             if db3 is not None:
                 ids = [x["accession"] for x in obj[plurals[endpoint2]]]
                 ids2 = [x[0] for x in relationships[endpoint2, endpoint3] if x[0] in ids and x[1] in accs3]

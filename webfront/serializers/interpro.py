@@ -45,7 +45,7 @@ class EntrySerializer(ModelContentSerializer):
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = EntrySerializer.to_proteins_detail_representation(
-                    instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()), for_entry=True
+                    instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()), include_chains=True
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:

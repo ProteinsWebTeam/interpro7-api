@@ -2,7 +2,7 @@ from urllib.error import URLError
 from webfront.views.custom import is_single_endpoint
 
 from django.db.models import Count
-from webfront.models import Entry
+from webfront.models import Entry, EntryAnnotation
 
 
 def group_by_member_databases(general_handler):
@@ -37,6 +37,17 @@ def group_by_organism(general_handler,endpoint_queryset):
         qs = endpoint_queryset.objects.filter(accession__in=queryset)
         return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:30]
 
+def group_by_annotations(general_handler):
+    if is_single_endpoint(general_handler):
+        #queryset = Entry.objects.values('source_database', 'entryannotation__type').annotate(total=Count('entryannotation__type'))
+        queryset = EntryAnnotation.objects.values_list('accession_id__source_database', 'type').annotate(total=Count('type'))
+        formatted_results = {}
+        for source, type, total in list(queryset):
+            if source not in formatted_results:
+                formatted_results[source] = {}
+            formatted_results[source][type] = total
+        results = [(key, value) for key, value in formatted_results.items()]
+        return results
 
 
 def group_by(endpoint_queryset, fields):
@@ -49,6 +60,8 @@ def group_by(endpoint_queryset, fields):
             return group_by_member_databases(general_handler)
         if "go_terms" == field:
             return group_by_go_terms(general_handler)
+        if "annotation" == field:
+            return group_by_annotations(general_handler)
         if is_single_endpoint(general_handler):
             if "tax_id" == field:
                 return group_by_organism(general_handler, endpoint_queryset)
@@ -125,6 +138,7 @@ def get_interpro_status_counter(field, general_handler):
     }
 
 
+
 def get_domain_architectures(field, general_handler):
     searcher = general_handler.searcher
     rows = general_handler.pagination["size"] if "size" in general_handler.pagination else 10
@@ -139,3 +153,12 @@ def get_domain_architectures(field, general_handler):
         return general_handler.queryset_manager\
             .get_base_queryset("protein")\
             .filter(accession__in=res)
+
+
+def get_entry_annotation(field, general_handler):
+    annotation = []
+    queryset = general_handler.queryset_manager.get_queryset()
+    for entry in queryset:
+        data = entry.entryannotation_set.filter(type=field)
+        annotation.append(data[0])
+    return(annotation)

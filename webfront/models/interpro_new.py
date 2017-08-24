@@ -20,6 +20,12 @@ class Entry(models.Model):
     hierarchy = JSONField(null=True)
     cross_references = JSONField()
 
+class EntryAnnotation(models.Model):
+    annotation_id = models.CharField(max_length=40, primary_key=True)
+    accession = models.ForeignKey(Entry)
+    type = models.CharField(max_length=20)
+    value = models.BinaryField()
+    mime_type = models.CharField(max_length=64)
 
 class Protein(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)

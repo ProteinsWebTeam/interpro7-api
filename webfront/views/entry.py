@@ -2,7 +2,8 @@ from django.db.models import Count
 
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
-from webfront.views.modifiers import group_by, sort_by, filter_by_field, get_interpro_status_counter, filter_by_contains_field, get_domain_architectures
+from webfront.views.modifiers import group_by, sort_by, filter_by_field, get_interpro_status_counter, \
+    filter_by_contains_field, get_domain_architectures, get_entry_annotation
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
@@ -21,6 +22,13 @@ class MemberAccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("entry", accession=endpoint_levels[level - 1].upper())
+
+        general_handler.modifiers.register(
+            "annotation",
+            get_entry_annotation,
+            use_model_as_payload=True,
+            serializer=SerializerDetail.ANNOTATION_BLOB
+        )
         return super(MemberAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level, self.queryset,
             handler, general_handler, *args, **kwargs
@@ -259,6 +267,7 @@ class EntryHandler(CustomView):
                 "type": "entry_type",
                 "integrated": "integrated",
                 "source_database": "entry_db",
+                "annotation": "entry_annotation"
             }),
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY
@@ -271,10 +280,16 @@ class EntryHandler(CustomView):
         general_handler.modifiers.register("type", filter_by_field("entry", "type"))
         general_handler.modifiers.register("integrated", filter_by_field("entry", "integrated__accession"))
         general_handler.modifiers.register("go_term", filter_by_contains_field("entry", "go_terms", '"category": "{}"'))
-        return super(EntryHandler, self).get(
+        general_handler.modifiers.register(
+            "annotation",
+            filter_by_contains_field("entry", "entryannotation__type"),
+            use_model_as_payload=False
+        )
+        response = super(EntryHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, *args, **kwargs
         )
+        return response
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):

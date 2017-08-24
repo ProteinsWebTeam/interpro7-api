@@ -161,7 +161,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                                                  plurals[endpoint2],
                                                                  "URL : [{}]".format(current))
                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                        self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, current))
+                        self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, current))
 
     def test_acc_endpoint(self):
         for endpoint1 in api_test_map:
@@ -760,7 +760,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         plurals[endpoint1],
                                         plurals[endpoint3])
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    self.fail("Unexpeted error code {} for the URL : [{}]"
+                                    self.fail("unexpected error code {} for the URL : [{}]"
                                               .format(response.status_code, current))
 
     def test_acc_acc_endpoint(self):
@@ -878,7 +878,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             plurals[endpoint2],
                                             plurals[endpoint3])
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        self.fail("Unexpeted error code {} for the URL : [{}]"
+                                        self.fail("unexpected error code {} for the URL : [{}]"
                                                   .format(response.status_code, current))
 
     def test_db_db_db(self):

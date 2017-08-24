@@ -124,7 +124,7 @@ if sys.argv[1:2] == ['test'] or INTERPRO_CONFIG.get('use_test_db', True):
     }
 if ORACLE_CONFIG is not None:
     DATABASES['interpro_ro'] = {
-        'ENGINE': ORACLE_CONFIG.get('engine', 'django.db.backends.oracle'),
+        # 'ENGINE': ORACLE_CONFIG.get('engine', 'django.db.backends.oracle'),
         'USER': ORACLE_CONFIG.get('user', 'USER'),
         'PASSWORD': ORACLE_CONFIG.get('password'),
     }

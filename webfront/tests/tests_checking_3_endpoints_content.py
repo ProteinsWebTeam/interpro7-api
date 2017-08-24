@@ -411,7 +411,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                                 self.assertEqual(response.data, expected)
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, url))
+                                self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_endpoint_db_db(self):
         for endpoint1 in api_test_map:
@@ -437,7 +437,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                                 self.assertEqual(response.data, expected)
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, url))
+                                self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_endpoint_db_acc(self):
         for endpoint1 in api_test_map:
@@ -470,7 +470,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                                     self.assertEqual(response.data, expected)
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, url))
+                                    self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_endpoint_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -502,7 +502,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                                                                                      db2=db2, acc2=acc2, acc3=acc3)
                                         self.assertEqual(response.data, expected)
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        self.fail("Unexpeted error code {} for the URL : [{}]".format(response.status_code, url))
+                                        self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_db_endpoint_endpoint(self):
         for endpoint1 in api_test_map:

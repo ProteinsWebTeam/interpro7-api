@@ -243,7 +243,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def get_key_from_bucket(bucket):
-        key = bucket["val"] if "val" in bucket else bucket["key"]
+        key = str(bucket["val"] if "val" in bucket else bucket["key"])
         if key.upper() in EntrySerializer.dbcode:
             return EntrySerializer.dbcode[key.upper()].lower()
         return key

@@ -32,7 +32,7 @@ class ElasticsearchController(SearchController):
         conn.request("POST", "/"+self.index+"/"+self.type+"/_delete_by_query?conflicts=proceed", body)
         return conn.getresponse()
 
-    def get_grouped_object(self, endpoint, field, solr_query=None, extra_counters=[]):
+    def get_grouped_object(self, endpoint, field, solr_query=None, extra_counters=[], size=10):
         qs = self.queryset_manager.get_searcher_query()
         if qs == '':
             qs = '*:*'
@@ -43,6 +43,7 @@ class ElasticsearchController(SearchController):
                 "groups": {
                     "terms": {
                         "field": field,
+                        "size": size,
                         "execution_hint": "map",
                     },
                     "aggs": {

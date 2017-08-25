@@ -32,10 +32,17 @@ def group_by_go_terms(general_handler):
         return qs
 
 
-def group_by_organism(general_handler,endpoint_queryset):
+def group_by_organism(general_handler ,endpoint_queryset):
+    if general_handler.queryset_manager.main_endpoint == "protein":
         queryset = general_handler.queryset_manager.get_queryset().distinct()
         qs = endpoint_queryset.objects.filter(accession__in=queryset)
         return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:30]
+    else:
+        searcher = general_handler.searcher
+        result = searcher.get_grouped_object(
+            general_handler.queryset_manager.main_endpoint, "tax_id", size=20
+        )
+        return result
 
 def group_by_annotations(general_handler):
     if is_single_endpoint(general_handler):

@@ -60,8 +60,8 @@ class OrganismSerializer(ModelContentSerializer):
                 )
         return representation
 
-    @staticmethod
-    def to_full_representation(instance, include_proteomes=False):
+    def to_full_representation(self, instance, include_proteomes=False):
+        s = self.searcher
         obj = {
             "metadata": {
                 "accession": instance.accession,
@@ -74,6 +74,11 @@ class OrganismSerializer(ModelContentSerializer):
                     "name": instance.scientific_name,
                     "short": instance.full_name,
                 },
+                "counters": {
+                    "entries": s.get_number_of_field_by_endpoint("organism", "entry_acc", instance.accession),
+                    "structures": s.get_number_of_field_by_endpoint("organism", "structure_acc", instance.accession),
+                    "proteins": s.get_number_of_field_by_endpoint("organism", "protein_acc", instance.accession)
+                }
             }
         }
         if include_proteomes:

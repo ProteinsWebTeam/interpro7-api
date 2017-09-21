@@ -15,8 +15,13 @@ class SearchController(metaclass=abc.ABCMeta):
             db = "entry_db"
         elif field.startswith("protein"):
             db = "protein_db"
+        elif field == "tax_id":
+            db = "{}_db".format(endpoint)
+        acc = "{}_acc".format(endpoint)
+        if endpoint == "organism":
+            acc = "lineage"
         ngroups = self.get_group_obj_of_field_by_query(
-             "{}:* && {}_acc:{}".format(db, endpoint, escape(accession)), field
+             "{}:* && {}:{}".format(db, acc, escape(accession)), field
         )["ngroups"]
         if isinstance(ngroups, dict):
             ngroups = ngroups["value"]

@@ -87,8 +87,8 @@ class OrganismSerializer(ModelContentSerializer):
                                 ]
         return obj
 
-    @staticmethod
-    def to_full_proteome_representation(instance):
+    def to_full_proteome_representation(self, instance):
+        s = self.searcher
         return {
             "metadata": {
                 "accession": instance.accession,
@@ -99,7 +99,13 @@ class OrganismSerializer(ModelContentSerializer):
                 "is_reference": instance.is_reference,
                 "strain": instance.strain,
                 "assembly": instance.assembly,
-                "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None
+                "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
+                "counters": {
+                    "entries": s.get_number_of_field_by_endpoint("organism", "entry_acc", instance.taxonomy.accession),
+                    "structures": s.get_number_of_field_by_endpoint("organism", "structure_acc", instance.taxonomy.accession),
+                    "proteins": s.get_number_of_field_by_endpoint("organism", "protein_acc", instance.taxonomy.accession)
+                }
+
             }
         }
 

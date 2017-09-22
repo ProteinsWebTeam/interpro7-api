@@ -72,6 +72,7 @@ class ElasticsearchController(SearchController):
                     "terms": {
                         "field": "{}_db".format(endpoint),
                         "execution_hint": "map",
+                        "size": 50,
                     },
                     "aggs": {
                         "unique": {

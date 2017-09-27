@@ -82,7 +82,7 @@ class UniprotHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        if level_name != "uniprot":
+        if level_name.lower() != "uniprot":
             general_handler.queryset_manager.add_filter("protein", source_database__iexact=level_name)
         else:
             general_handler.queryset_manager.add_filter("protein", source_database__isnull=False)

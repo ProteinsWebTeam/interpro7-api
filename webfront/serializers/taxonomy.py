@@ -77,7 +77,10 @@ class OrganismSerializer(ModelContentSerializer):
                 "counters": {
                     "entries": s.get_number_of_field_by_endpoint("organism", "entry_acc", instance.accession),
                     "structures": s.get_number_of_field_by_endpoint("organism", "structure_acc", instance.accession),
-                    "proteins": s.get_number_of_field_by_endpoint("organism", "protein_acc", instance.accession)
+                    "proteins": s.get_number_of_field_by_endpoint("organism", "protein_acc", instance.accession),
+                    "proteomes": Proteome.objects.filter(
+                        taxonomy__in=Taxonomy.objects.filter(lineage__contains=" {} ".format(instance.accession))
+                    ).count()
                 }
             }
         }

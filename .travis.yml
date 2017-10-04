@@ -35,4 +35,4 @@ branches:
   only:
     - master
     - dev
-    - adding_organism
+    - set_endpoint

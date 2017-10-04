@@ -1,4 +1,4 @@
-from webfront.models import Entry, Protein, Structure, Taxonomy, Proteome
+from webfront.models import Entry, Protein, Structure, Taxonomy, Proteome, Set
 from django.db.models import Q
 from functools import reduce
 from operator import or_
@@ -11,13 +11,8 @@ def escape(text):
 
 class QuerysetManager:
     main_endpoint = None
-    filters = {
-        "search": {},
-        "solr": {},
-        "entry": {},
-        "structure": {},
-        "protein": {},
-    }
+    filters = {}
+    exclusions = {}
     endpoints = []
     order_field =None;
 
@@ -32,11 +27,16 @@ class QuerysetManager:
             "protein": {},
             "taxonomy": {},
             "proteome": {},
+            "set": {},
         }
+        self.exclusions = self.filters.copy()
         self.order_field = None
 
     def add_filter(self, endpoint,  **kwargs):
         self.filters[endpoint] = {**self.filters[endpoint], **kwargs}
+
+    def add_exclusion(self, endpoint,  **kwargs):
+        self.exclusions[endpoint] = {**self.exclusions[endpoint], **kwargs}
 
     def remove_filter(self, endpoint, f):
         tmp = self.filters[endpoint][f]
@@ -105,13 +105,32 @@ class QuerysetManager:
             queryset = Proteome.objects.all()
         elif endpoint == "taxonomy":
             queryset = Taxonomy.objects.all()
+        elif endpoint == "set":
+            queryset = Set.objects.all()
         return queryset
+
+    @staticmethod
+    def get_current_filters(filters, endpoint, only_main_endpoint):
+        current_filters = {}
+        for ep in filters:
+            if ep == "search" or ep == "solr":
+                continue
+            if ep == endpoint:
+                current_filters = {**current_filters, **{k: v
+                                                         for k, v in filters[ep].items()}
+                                   }
+            elif not only_main_endpoint:
+                current_filters = {**current_filters, **{ep+"__"+k: v
+                                                         for k, v in filters[ep].items()}
+                                   }
+        return current_filters
 
     def get_queryset(self, endpoint=None, only_main_endpoint=False):
         if endpoint is None:
             endpoint = self.main_endpoint
         queryset = self.get_base_queryset(endpoint)
-        current_filters = {} #if only_main_endpoint else self.get_join_filters(endpoint)
+        current_filters = self.get_current_filters(self.filters, endpoint, only_main_endpoint)
+        current_exclusions = self.get_current_filters(self.exclusions, endpoint, only_main_endpoint)
 
         # creates an `OR` filter for the search fields
         search_filters = self.filters.get("search")
@@ -120,22 +139,10 @@ class QuerysetManager:
                 or_,
                 (Q(**{f[0]: f[1]}) for f in search_filters.items()),
             )
-
-        for ep in self.filters:
-            if ep == "search" or ep == "solr":
-                continue
-            if ep == endpoint:
-                current_filters = {**current_filters, **{k: v
-                                                         for k, v in self.filters[ep].items()}
-                                   }
-            elif not only_main_endpoint:
-                current_filters = {**current_filters, **{ep+"__"+k: v
-                                                         for k, v in self.filters[ep].items()}
-                                   }
-
-        if search_filters:
             queryset = queryset.filter(or_filter, **current_filters)
         queryset = queryset.filter(**current_filters)
+        if len(current_exclusions)>0:
+            queryset = queryset.exclude(**current_exclusions)
         if self.order_field is not None:
             queryset = queryset.order_by(self.order_field)
         return queryset

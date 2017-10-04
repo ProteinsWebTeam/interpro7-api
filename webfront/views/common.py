@@ -5,18 +5,19 @@ from rest_framework.response import Response
 
 from django.conf import settings
 from webfront.views.custom import CustomView
-from webfront.views.entry import EntryHandler
 from webfront.views.modifier_manager import ModifierManager
-from webfront.views.protein import ProteinHandler
 from webfront.views.queryset_manager import QuerysetManager
-from webfront.views.structure import StructureHandler
 from webfront.searcher.elastic_controller import ElasticsearchController
 from webfront.searcher.solr_controller import SolrController
+from webfront.views.entry import EntryHandler
+from webfront.views.protein import ProteinHandler
+from webfront.views.structure import StructureHandler
 from webfront.views.organism import OrganismHandler
+from webfront.views.set import SetHandler
 
 
 def map_url_to_levels(url):
-    parts = [x.strip("/") for x in re.compile("(entry|protein|structure)").split(url)]
+    parts = [x.strip("/") for x in re.compile("(entry|protein|structure|organism|set)").split(url)]
 
     new_url = parts[:3]
     for i in range(4, len(parts), 2):
@@ -57,6 +58,7 @@ class GeneralHandler(CustomView):
         ('protein', ProteinHandler),
         ('structure', StructureHandler),
         ('organism', OrganismHandler),
+        ('set', SetHandler),
     ]
     # The queryset manager for the current request.
     queryset_manager = QuerysetManager()

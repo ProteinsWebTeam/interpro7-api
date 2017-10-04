@@ -20,8 +20,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         'webfront/tests/fixtures.json',
         'webfront/tests/protein_fixtures.json',
         'webfront/tests/structure_fixtures.json',
-        'webfront/tests/fixtures_organisms.json'
-
+        'webfront/tests/fixtures_organisms.json',
+        'webfront/tests/fixtures_set.json',
     ]
     links_fixtures = 'webfront/tests/relationship_features.json'
 
@@ -287,3 +287,12 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("organisms", main_obj, msg)
         self.assertIn("taxonomy", main_obj["organisms"], msg)
         self.assertIn("proteome", main_obj["organisms"], msg)
+
+    def _check_set_details(self, obj, is_complete=True, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("name", obj, msg)
+        self.assertIn("source_database", obj, msg)
+        if is_complete:
+            self.assertIn("integrated", obj, msg)
+            self.assertIn("relationships", obj, msg)
+            self.assertIn("description", obj, msg)

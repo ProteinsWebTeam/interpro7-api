@@ -1,0 +1,75 @@
+[
+  {
+    "model": "webfront.Set",
+    "fields": {
+      "accession": "CL0001",
+      "name": "The Clan",
+      "description": "An example of a pfam clan",
+      "source_database": "pfam",
+      "integrated": null,
+      "relationships": {
+        "nodes": [
+          {"accession": "PF02171", "type": "entry"},
+          {"accession": "PF17180", "type": "entry"}
+        ],
+        "links": [{"source": "PF17180", "target": "PF02171"}]
+      }
+    }
+  },
+  {
+    "model": "webfront.Set",
+    "fields": {
+      "accession": "CL0002",
+      "name": "A Clan",
+      "description": "Another example of a pfam clan",
+      "source_database": "pfam",
+      "integrated": null,
+      "relationships": {
+        "nodes": [
+          {"accession": "PF02171", "type": "entry"},
+          {"accession": "PF17180", "type": "entry"}
+        ],
+        "links": [{"source": "PF17180", "target": "PF02171"}]
+      }
+    }
+  },
+  {
+    "model": "webfront.Set",
+    "fields": {
+      "accession": "KEGG01",
+      "name": "A Pathway",
+      "description": "Example of a pathway",
+      "source_database": "kegg",
+      "integrated": null,
+      "relationships": {
+        "nodes": [
+          {"accession": "KEGG01.1", "type": "node"},
+          {"accession": "KEGG01.2", "type": "node"}
+        ],
+        "links": [{"source": "KEGG01.1", "target": "KEGG01.2"}]
+      }
+    }
+  },
+  {
+    "model": "webfront.Set",
+    "fields": {
+      "accession": "KEGG01.1",
+      "name": "First Node",
+      "description": "Example of a step in a pathway",
+      "source_database": "node",
+      "integrated": ["KEGG01"],
+      "relationships": {}
+    }
+  },
+  {
+    "model": "webfront.Set",
+    "fields": {
+      "accession": "KEGG01.2",
+      "name": "Second Node",
+      "description": "yet another Example of a step in a pathway",
+      "source_database": "node",
+      "integrated": ["KEGG01"],
+      "relationships": {}
+    }
+  }
+]

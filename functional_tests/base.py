@@ -1,17 +1,14 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
-# from rest_framework.test import APIRequestFactory, APIClient
 from selenium import webdriver
 import sys
 import time
 import os
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
 
 from webfront.tests.fixtures_reader import FixtureReader
 from interpro.settings import SEARCHER_TEST_URL
-
 
 
 @override_settings(SEARCHER_URL=SEARCHER_TEST_URL)
@@ -20,7 +17,8 @@ class FunctionalTest(StaticLiveServerTestCase):
         'webfront/tests/fixtures.json',
         'webfront/tests/protein_fixtures.json',
         'webfront/tests/structure_fixtures.json',
-        'webfront/tests/fixtures_organisms.json'
+        'webfront/tests/fixtures_organisms.json',
+        'webfront/tests/fixtures_set.json',
     ]
     links_fixtures = 'webfront/tests/relationship_features.json'
 

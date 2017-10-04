@@ -84,3 +84,12 @@ class Proteome(models.Model):
     strain = models.CharField(max_length=512)
     assembly = models.CharField(max_length=512)
     taxonomy = models.ForeignKey("Taxonomy", null=True, blank=True)
+
+
+class Set(models.Model):
+    accession = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=512)
+    description = models.TextField()
+    source_database = models.CharField(max_length=20, db_index=True)
+    integrated = JSONField()
+    relationships = JSONField()  # {nodes: [{accession:"", type: ""}], links:[source:"", target: ""]}

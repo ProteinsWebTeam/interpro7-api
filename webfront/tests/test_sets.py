@@ -80,3 +80,35 @@ class OrganismSetTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_set_count_overview(response.data)
         self._check_organism_count_overview(response.data)
+
+
+class SetEntryTest(InterproRESTTestCase):
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/set/entry")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_set_count_overview(response.data)
+        self._check_entry_count_overview(response.data)
+
+
+class SetProteinTest(InterproRESTTestCase):
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/set/protein")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_set_count_overview(response.data)
+        self._check_protein_count_overview(response.data)
+
+
+class SetStructureTest(InterproRESTTestCase):
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/set/structure")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_set_count_overview(response.data)
+        self._check_structure_count_overview(response.data)
+
+
+class SetOrganismTest(InterproRESTTestCase):
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/set/organism")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_set_count_overview(response.data)
+        self._check_organism_count_overview(response.data)

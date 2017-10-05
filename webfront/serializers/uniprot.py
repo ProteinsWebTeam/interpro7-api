@@ -37,6 +37,8 @@ class ProteinSerializer(ModelContentSerializer):
             representation["structures"] = self.to_structures_count_representation(instance)
         if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
             representation["organisms"] = self.to_organism_count_representation(instance)
+        if SerializerDetail.SET_OVERVIEW in detail_filters:
+            representation["sets"] = self.to_set_count_representation(instance)
         if detail != SerializerDetail.PROTEIN_OVERVIEW:
             if SerializerDetail.ENTRY_DB in detail_filters or \
                     SerializerDetail.ENTRY_DETAIL in detail_filters:
@@ -158,6 +160,12 @@ class ProteinSerializer(ModelContentSerializer):
         return webfront.serializers.taxonomy.OrganismSerializer.to_counter_representation(
             self.searcher.get_counter_object("organism", query, self.get_extra_endpoints_to_count())
         )["organisms"]
+
+    def to_set_count_representation(self, instance):
+        query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        return webfront.serializers.collection.SetSerializer.to_counter_representation(
+            self.searcher.get_counter_object("set", query, self.get_extra_endpoints_to_count())
+        )["sets"]
 
     @staticmethod
     def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None, include_coordinates=True):

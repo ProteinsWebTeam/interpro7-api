@@ -9,6 +9,7 @@ import webfront.serializers.collection
 from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
 
+
 class EntrySerializer(ModelContentSerializer):
 
     def to_representation(self, instance):
@@ -69,7 +70,6 @@ class EntrySerializer(ModelContentSerializer):
     def reformat_cross_references(cross_references):
         DEFAULT_DESCRIPTION = "Description of data source (to be defined in API)"
         DEFAULT_URL_PATTERN = "https://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query={accession}"
-        #fetches values from interpro.yml
         xrefSettings = settings.CROSS_REFERENCES
 
         reformattedCrossReferences = {}
@@ -133,7 +133,6 @@ class EntrySerializer(ModelContentSerializer):
             "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)
         }
         return obj
-
 
     def to_headers_representation(self, instance):
         headers = {
@@ -225,7 +224,6 @@ class EntrySerializer(ModelContentSerializer):
 
             return result
         return instance
-
 
     dbcode = {
         "H": "Pfam",

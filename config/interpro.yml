@@ -209,3 +209,8 @@ cross_references:
     'SCOP':
         'rank': 24
 
+sets:
+  'pfam':
+    accession: 'CL\d{4}'
+  'kegg':
+    accession: 'KEGG\d+'

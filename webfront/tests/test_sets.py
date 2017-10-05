@@ -37,3 +37,14 @@ class SetsFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/set/pfam/CL0001")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_set_details(response.data["metadata"])
+
+    def test_can_read_set_nodes(self):
+        response = self.client.get("/api/set/kegg/KEGG01/node")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        self.assertEqual(len(response.data["results"]), 2)
+
+    def test_can_read_set__node_id(self):
+        response = self.client.get("/api/set/kegg/KEGG01/node/KEGG01.1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_set_details(response.data["metadata"])

@@ -180,6 +180,7 @@ REST_FRAMEWORK = {
 HMMER_PATH = INTERPRO_CONFIG.get('hmmer_path', '/tmp/')
 TMP_FOLDER = INTERPRO_CONFIG.get('tmp_path', '/tmp/')
 DB_MEMBERS = INTERPRO_CONFIG.get('members', {})
+ENTRY_SETS = INTERPRO_CONFIG.get('sets', {})
 CROSS_REFERENCES = INTERPRO_CONFIG.get('cross_references', {})
 
 import logging

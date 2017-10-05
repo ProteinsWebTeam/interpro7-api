@@ -146,6 +146,20 @@ class SetEntryTest(InterproRESTTestCase):
         self._check_set_count_overview(response.data)
         self._check_entry_count_overview(response.data)
 
+    def test_can_get_the_entry_count_on_a_list(self):
+        urls = [
+            "/api/set/pfam/entry",
+            "/api/set/kegg/entry",
+            "/api/set/kegg/KEGG01/node/entry",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "entries")
+            for result in response.data["results"]:
+                self._check_entry_count_overview(result)
+
 
 class SetProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -153,6 +167,20 @@ class SetProteinTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_set_count_overview(response.data)
         self._check_protein_count_overview(response.data)
+
+    def test_can_get_the_protein_count_on_a_list(self):
+        urls = [
+            "/api/set/pfam/protein",
+            "/api/set/kegg/protein",
+            "/api/set/kegg/KEGG01/node/protein",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            for result in response.data["results"]:
+                self._check_protein_count_overview(result)
 
 
 class SetStructureTest(InterproRESTTestCase):
@@ -162,6 +190,20 @@ class SetStructureTest(InterproRESTTestCase):
         self._check_set_count_overview(response.data)
         self._check_structure_count_overview(response.data)
 
+    def test_can_get_the_structure_count_on_a_list(self):
+        urls = [
+            "/api/set/pfam/structure",
+            "/api/set/kegg/structure",
+            "/api/set/kegg/KEGG01/node/structure",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            for result in response.data["results"]:
+                self._check_structure_count_overview(result)
+
 
 class SetOrganismTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -169,3 +211,17 @@ class SetOrganismTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_set_count_overview(response.data)
         self._check_organism_count_overview(response.data)
+
+    def test_can_get_the_organism_count_on_a_list(self):
+        urls = [
+            "/api/set/pfam/organism",
+            "/api/set/kegg/organism",
+            "/api/set/kegg/KEGG01/node/organism",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "organisms")
+            for result in response.data["results"]:
+                self._check_organism_count_overview(result)

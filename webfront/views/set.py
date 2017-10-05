@@ -26,8 +26,9 @@ class SetNodeHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
         general_handler.queryset_manager.add_filter("set", integrated__contains=endpoint_levels[level - 2])
-        general_handler.queryset_manager.add_filter("set", source_database='node')
+        # general_handler.queryset_manager.add_filter("set", source_database='node')
         general_handler.queryset_manager.remove_filter("set", "accession")
+        general_handler.queryset_manager.remove_filter("set", "source_database")
         return super(SetNodeHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

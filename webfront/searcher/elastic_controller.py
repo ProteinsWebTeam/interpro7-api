@@ -89,6 +89,7 @@ class ElasticsearchController(SearchController):
         self.tune_counter_facet_for_protein(facet, endpoint, extra_counters)
         self.tune_counter_facet_for_structure(facet, endpoint, extra_counters)
         self.tune_counter_facet_for_organism(facet, endpoint, extra_counters)
+        # self.tune_counter_facet_for_set(facet, endpoint, extra_counters)
 
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]
@@ -143,6 +144,15 @@ class ElasticsearchController(SearchController):
             #     TODO: count proteomes insted
             }
             del facet["aggs"]["databases"]["terms"]
+            self.add_extra_counters(facet, "databases", extra_counters)
+
+    def tune_counter_facet_for_set(self, facet, endpoint, extra_counters):
+        if endpoint == "set":
+            facet["aggs"]["databases"]["nested"] = {"path": "sets"}
+            facet["aggs"]["databases"]["terms"]["field"] = "sets.source_database"
+            facet["aggs"]["databases"]["aggs"]["unique"] = {
+                "cardinality": {"field": "sets.accession"}
+            }
             self.add_extra_counters(facet, "databases", extra_counters)
 
     def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=1, start=0, inner_field_to_count=None):

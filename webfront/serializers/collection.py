@@ -61,7 +61,10 @@ class SetSerializer(ModelContentSerializer):
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
                 raise ReferenceError('There are not structures for this request')
             instance = {
-                "sets": SetSerializer.serialize_counter_bucket(instance["databases"], "sets")
+                "sets": {
+                        SetSerializer.get_key_from_bucket(bucket): SetSerializer.serialize_counter_bucket(bucket, "sets")
+                        for bucket in instance["databases"]["buckets"]
+                }
             }
         return instance
 

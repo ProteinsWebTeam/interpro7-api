@@ -48,3 +48,11 @@ class SetsFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/set/kegg/KEGG01/node/KEGG01.1")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_set_details(response.data["metadata"])
+
+
+class EntrySetTest(InterproRESTTestCase):
+    def test_can_get_the_set_count(self):
+        response = self.client.get("/api/entry/set")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_set_count_overview(response.data)
+        self._check_entry_count_overview(response.data)

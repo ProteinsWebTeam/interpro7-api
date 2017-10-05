@@ -296,3 +296,10 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertIn("integrated", obj, msg)
             self.assertIn("relationships", obj, msg)
             self.assertIn("description", obj, msg)
+
+    def _check_set_count_overview(self, main_obj, msg=""):
+        self.assertIn("sets", main_obj, msg)
+        for s in main_obj["sets"]:
+            self.assertIn(s, ["pfam", "kegg"], msg)
+
+

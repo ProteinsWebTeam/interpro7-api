@@ -116,3 +116,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if len(response) == 0:
             raise ReferenceError('There are not proteins for this request')
         return response
+
+    @staticmethod
+    def get_key_from_bucket(bucket):
+        key = str(bucket["val"] if "val" in bucket else bucket["key"]).lower()
+        return key

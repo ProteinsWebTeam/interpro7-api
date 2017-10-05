@@ -19,7 +19,9 @@
         "text": {"type":  "text"},
         "id": {"type":  "keyword"},
         "IDA_FK": {"type":  "keyword"},
-        "IDA": {"type":  "text"}
+        "IDA": {"type":  "text"},
+        "set_acc": {"type":  "keyword"},
+        "set_db": {"type":  "keyword"}
       }
     }
   }

@@ -99,7 +99,7 @@ class SetHandler(CustomView):
     many = False
     serializer_class = SetSerializer
     serializer_detail = SerializerDetail.SET_OVERVIEW
-    # serializer_detail_filter = SerializerDetail.ORGANISM_OVERVIEW
+    serializer_detail_filter = SerializerDetail.SET_OVERVIEW
 
     def get_database_contributions(self, queryset):
         qs = Set.objects.filter(accession__in=queryset)

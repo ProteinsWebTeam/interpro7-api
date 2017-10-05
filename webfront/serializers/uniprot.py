@@ -140,11 +140,6 @@ class ProteinSerializer(ModelContentSerializer):
         return ("count" in instance and instance["count"] == 0) or \
                ("buckets" in instance[field] and len(instance[field]["buckets"]) == 0)
 
-    @staticmethod
-    def get_key_from_bucket(bucket):
-        key = str(bucket["val"] if "val" in bucket else bucket["key"]).lower()
-        return key
-
     def to_entries_count_representation(self, instance):
         query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.interpro.EntrySerializer.to_counter_representation(

@@ -18,6 +18,7 @@ class FixtureReader:
     entry_protein_list = []
     protein_structure_list = {}
     tax2lineage = {}
+    sets = {}
     search = None
 
     def __init__(self, fixture_paths):
@@ -41,9 +42,31 @@ class FixtureReader:
                 self.protein_structure_list[fixture['fields']["protein"]].append(fixture['fields'])
             elif fixture['model'] == "webfront.Taxonomy":
                 self.tax2lineage[fixture['fields']["accession"]] = fixture['fields']['lineage'].split()
+            elif fixture['model'] == "webfront.Set":
+                self.sets[fixture['fields']["accession"]] = fixture['fields']
+
+    def get_entry2set(self):
+        e2s = {}
+        for s in self.sets:
+            for n in self.sets[s]["relationships"]["nodes"]:
+                if n["type"] == "entry":
+                    db = self.sets[s]["source_database"]
+                    if db == "node":
+                        db = "kegg"
+                    if n["accession"] not in e2s:
+                        e2s[n["accession"]] = []
+                    e2s[n["accession"]].append({"accession": s, "source_database": db})
+                    if self.sets[s]["integrated"] is not None:
+                        for i in self.sets[s]["integrated"]:
+                            e2s[n["accession"]].append({
+                                "accession": i,
+                                "source_database": db
+                            })
+        return e2s
 
     def get_fixtures(self):
         to_add = []
+        entry2set = self.get_entry2set()
         for ep in self.entry_protein_list:
             e = ep["entry"]
             p = ep["protein"]
@@ -60,14 +83,12 @@ class FixtureReader:
                 "proteomes": [pm.lower() for pm in self.proteins[p]["proteomes"]],
                 "entry_protein_locations": ep["coordinates"],
                 "protein_length": self.proteins[p]["length"],
-                # "django_ct": get_model_ct(ProteinEntryFeature),
-                # "django_id": 0,
                 "id": get_id(e, p)
-
             }
             if "IDA" in ep:
                 obj["IDA"] = ep["IDA"]
                 obj["IDA_FK"] = ep["IDA_FK"]
+
             if p in self.protein_structure_list:
                 for sp in self.protein_structure_list[p]:
                     c = copy.copy(obj)
@@ -76,9 +97,24 @@ class FixtureReader:
                     c["chain"] = sp["chain"]
                     c["id"] = get_id(e, p, sp["structure"], sp["chain"])
                     c["protein_structure_locations"] = sp["coordinates"]
-                    to_add.append(c)
+                    if e in entry2set:
+                        for e2s in entry2set[e]:
+                            c2 = copy.copy(c)
+                            c2["set_acc"] = e2s["accession"]
+                            c2["set_db"] = e2s["source_database"]
+                            to_add.append(c2)
+                    else:
+                        to_add.append(c)
             else:
-                to_add.append(obj)
+                if e in entry2set:
+                    for e2s in entry2set[e]:
+                        c2 = copy.copy(obj)
+                        c2["set_acc"] = e2s["accession"]
+                        c2["set_db"] = e2s["source_database"]
+                        to_add.append(c2)
+                else:
+                    to_add.append(obj)
+
         proteins = [p["protein"] for p in self.entry_protein_list]
         for p, chains in self.protein_structure_list.items():
             if p not in proteins:

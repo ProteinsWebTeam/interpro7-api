@@ -27,9 +27,9 @@
       "relationships": {
         "nodes": [
           {"accession": "PF02171", "type": "entry"},
-          {"accession": "PF17180", "type": "entry"}
+          {"accession": "PF17176", "type": "entry"}
         ],
-        "links": [{"source": "PF17180", "target": "PF02171"}]
+        "links": [{"source": "PF17176", "target": "PF02171"}]
       }
     }
   },
@@ -58,7 +58,12 @@
       "description": "Example of a step in a pathway",
       "source_database": "node",
       "integrated": ["KEGG01"],
-      "relationships": {}
+      "relationships": {
+        "nodes": [
+          {"accession": "IPR003165", "type": "entry"},
+          {"accession": "PF02171", "type": "entry"}
+        ]
+      }
     }
   },
   {
@@ -69,7 +74,12 @@
       "description": "yet another Example of a step in a pathway",
       "source_database": "node",
       "integrated": ["KEGG01"],
-      "relationships": {}
+      "relationships": {
+        "nodes": [
+          {"accession": "IPR001165", "type": "entry"},
+          {"accession": "PS01031", "type": "entry"}
+        ]
+      }
     }
   }
 ]

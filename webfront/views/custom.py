@@ -190,6 +190,7 @@ class CustomView(GenericAPIView):
                      if v["filter_serializer"] in [SerializerDetail.PROTEIN_DB,
                                                    SerializerDetail.ENTRY_DB,
                                                    SerializerDetail.ORGANISM_DB,
+                                                   SerializerDetail.SET_DB,
                                                    SerializerDetail.STRUCTURE_DB]
                      ]
             return searcher.get_counter_object(general_handler.queryset_manager.main_endpoint, extra_counters=extra)

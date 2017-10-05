@@ -75,6 +75,25 @@ class EntrySetTest(InterproRESTTestCase):
             for result in response.data["results"]:
                 self._check_set_count_overview(result)
 
+    def test_urls_that_return_entry_with_set_count(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_un = "PF17176"
+        urls = [
+            "/api/entry/interpro/"+acc+"/set",
+            "/api/entry/pfam/"+pfam+"/set",
+            "/api/entry/pfam/"+pfam_un+"/set",
+            "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/set",
+            "/api/entry/interpro/pfam/"+pfam+"/set",
+            "/api/entry/unintegrated/pfam/"+pfam_un+"/set",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_entry_details(response.data["metadata"])
+            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self._check_set_count_overview(response.data)
+
 
 class ProteinSetTest(InterproRESTTestCase):
     def test_can_get_the_set_count(self):
@@ -97,6 +116,22 @@ class ProteinSetTest(InterproRESTTestCase):
             for result in response.data["results"]:
                 self._check_set_count_overview(result)
 
+    def test_urls_that_return_protein_with_set_count(self):
+        reviewed = "A1CUJ5"
+        unreviewed = "P16582"
+        urls = [
+            "/api/protein/uniprot/"+reviewed+"/set",
+            "/api/protein/uniprot/"+unreviewed+"/set",
+            "/api/protein/reviewed/"+reviewed+"/set",
+            "/api/protein/unreviewed/"+unreviewed+"/set",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_protein_details(response.data["metadata"])
+            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self._check_set_count_overview(response.data)
+
 
 class StructureSetTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -116,6 +151,15 @@ class StructureSetTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_key(response.data["results"], "sets")
             for result in response.data["results"]:
                 self._check_set_count_overview(result)
+
+    def test_urls_that_return_structure_with_set_count(self):
+        urls = ["/api/structure/pdb/"+pdb+"/set/" for pdb in ["1JM7", "2BKM", "1T2V"]]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_structure_details(response.data["metadata"])
+            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self._check_set_count_overview(response.data)
 
 
 class OrganismSetTest(InterproRESTTestCase):
@@ -137,6 +181,32 @@ class OrganismSetTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_key(response.data["results"], "sets")
             for result in response.data["results"]:
                 self._check_set_count_overview(result)
+
+    def test_urls_that_return_taxonomy_with_set_count(self):
+        urls = [
+            "/api/organism/taxonomy/40296/set",
+            "/api/organism/taxonomy/2/set",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_taxonomy_details(response.data["metadata"])
+            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self._check_set_count_overview(response.data)
+
+    def test_urls_that_return_proteome_with_set_count(self):
+        urls = [
+            "/api/organism/proteome/UP000012042/set",
+            "/api/organism/taxonomy/proteome/UP000006701/set",
+            "/api/organism/taxonomy/2/proteome/UP000030104/set",
+            "/api/organism/taxonomy/40296/proteome/UP000030104/set",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self._check_set_count_overview(response.data)
 
 
 class SetEntryTest(InterproRESTTestCase):

@@ -84,7 +84,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
     @staticmethod
     def to_entries_detail_representation(instance, searcher, searcher_query, for_structure=False):
         if for_structure:
-            search = searcher.execute_query(None, fq=searcher_query, rows=10)
+            # search = searcher.execute_query(None, fq=searcher_query, rows=10)
+            search = searcher.get_group_obj_of_field_by_query(None, ["structure_chain","entry_acc"], fq=searcher_query, rows=10)["groups"]
         else:
             search = searcher.get_group_obj_of_field_by_query(None, "entry_acc", fq=searcher_query, rows=10)["groups"]
         response = [

@@ -73,7 +73,6 @@ class FixtureReader:
     def get_fixtures(self):
         to_add = []
         entry2set = self.get_entry2set()
-        print(entry2set)
         for ep in self.entry_protein_list:
             e = ep["entry"]
             p = ep["protein"]

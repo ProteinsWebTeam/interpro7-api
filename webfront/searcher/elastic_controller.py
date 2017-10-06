@@ -155,8 +155,24 @@ class ElasticsearchController(SearchController):
             }
             self.add_extra_counters(facet, "databases", extra_counters)
 
-    def get_group_obj_of_field_by_query(self, query, field, fq=None, rows=1, start=0, inner_field_to_count=None):
+    def add_subterm_aggs(self, obj, field, size):
+        obj["aggs"] = {
+            "subgroups": {
+                "terms": {
+                    "field": field,
+                    "size": size,
+                    "execution_hint": "map",
+                },
+                "aggs": {
+                    "tops": {"top_hits": {"size": 1}}
+                }
+            }
+        }
+
+    def get_group_obj_of_field_by_query(self, query, fields, fq=None, rows=1, start=0, inner_field_to_count=None):
         query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
+        check_multiple_fields = type(fields) is list
+        field = fields[0] if check_multiple_fields else fields
         facet = {
             "aggs": {
                 "ngroups": {
@@ -179,13 +195,23 @@ class ElasticsearchController(SearchController):
         }
         if inner_field_to_count is not None:
             facet["aggs"]["groups"]["aggs"]["unique"] = {"cardinality": {"field": inner_field_to_count}}
+        if check_multiple_fields:
+            obj = facet["aggs"]["groups"]
+            for f in fields[1:]:
+                self.add_subterm_aggs(obj, f, start+rows)
+                obj = obj["aggs"]["subgroups"]
         if fq is not None:
             query += " && "+fq
         response = self._elastic_json_query(query, facet)
+        buckets = response["aggregations"]["groups"]["buckets"]
+        if len(buckets)>0 and "tops" not in buckets[0]:
+            buckets = [
+                b for sb in buckets for b in sb["subgroups"]["buckets"]
+            ]
         output = {
             "groups":  [
                 bucket["tops"]["hits"]["hits"][0]["_source"]
-                for bucket in response["aggregations"]["groups"]["buckets"][start:start+rows]
+                for bucket in buckets[start:start+rows]
             ],
             "ngroups": response["aggregations"]["ngroups"]
         }

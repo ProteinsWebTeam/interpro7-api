@@ -94,6 +94,21 @@ class EntrySetTest(InterproRESTTestCase):
             self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
             self._check_set_count_overview(response.data)
 
+    # def test_can_filter_entry_counter_with_set_db(self):
+    #     urls = [
+    #         "/api/entry/set/pfam",
+    #         "/api/entry/set/kegg",
+    #         "/api/entry/set/kegg/kegg01/node",
+    #         ]
+    #     for url in urls:
+    #         response = self.client.get(url)
+    #         self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+    #         self.assertIn("sets", response.data["entries"]["integrated"],
+    #                       "'sets' should be one of the keys in the response")
+    #         if response.data["entries"]["unintegrated"] != 0:
+    #             self.assertIn("sets", response.data["entries"]["unintegrated"],
+    #                           "'sets' should be one of the keys in the response")
+
 
 class ProteinSetTest(InterproRESTTestCase):
     def test_can_get_the_set_count(self):

@@ -4,6 +4,7 @@
       "properties": {
         "entry_acc": {"type":  "keyword"},
         "protein_acc": {"type":  "keyword"},
+        "protein_length": {"type":  "long"},
         "structure_acc": {"type":  "keyword"},
         "entry_db": {"type":  "keyword"},
         "protein_db": {"type":  "keyword"},
@@ -21,7 +22,8 @@
         "IDA_FK": {"type":  "keyword"},
         "IDA": {"type":  "text"},
         "set_acc": {"type":  "keyword"},
-        "set_db": {"type":  "keyword"}
+        "set_db": {"type":  "keyword"},
+        "set_integrated": {"type":  "keyword"}
       }
     }
   }

@@ -51,22 +51,29 @@ class FixtureReader:
             for n in self.sets[s]["relationships"]["nodes"]:
                 if n["type"] == "entry":
                     db = self.sets[s]["source_database"]
+                    integrated = self.sets[s]["integrated"]
+                    if integrated is not None:
+                        integrated = [x.lower() for x in integrated]
                     if db == "node":
                         db = "kegg"
                     if n["accession"] not in e2s:
                         e2s[n["accession"]] = []
-                    e2s[n["accession"]].append({"accession": s, "source_database": db})
+                    e2s[n["accession"]].append({"accession": s,
+                                                "source_database": db,
+                                                "integrated": integrated})
                     if self.sets[s]["integrated"] is not None:
                         for i in self.sets[s]["integrated"]:
                             e2s[n["accession"]].append({
                                 "accession": i,
-                                "source_database": db
+                                "source_database": db,
+                                "integrated": None
                             })
         return e2s
 
     def get_fixtures(self):
         to_add = []
         entry2set = self.get_entry2set()
+        print(entry2set)
         for ep in self.entry_protein_list:
             e = ep["entry"]
             p = ep["protein"]
@@ -95,22 +102,26 @@ class FixtureReader:
                     c["structure_acc"] = sp["structure"]
                     c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["chain"] = sp["chain"]
-                    c["id"] = get_id(e, p, sp["structure"], sp["chain"])
                     c["protein_structure_locations"] = sp["coordinates"]
                     if e in entry2set:
                         for e2s in entry2set[e]:
                             c2 = copy.copy(c)
                             c2["set_acc"] = e2s["accession"]
                             c2["set_db"] = e2s["source_database"]
+                            c2["set_integrated"] = e2s["integrated"]
+                            c2["id"] = get_id(e, p, sp["structure"], sp["chain"], e2s["accession"])
                             to_add.append(c2)
                     else:
+                        c["id"] = get_id(e, p, sp["structure"], sp["chain"])
                         to_add.append(c)
             else:
                 if e in entry2set:
                     for e2s in entry2set[e]:
                         c2 = copy.copy(obj)
+                        c2["id"] = get_id(e, p, e2s["accession"]),
                         c2["set_acc"] = e2s["accession"]
                         c2["set_db"] = e2s["source_database"]
+                        c2["set_integrated"] = e2s["integrated"]
                         to_add.append(c2)
                 else:
                     to_add.append(obj)

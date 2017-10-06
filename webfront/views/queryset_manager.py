@@ -75,8 +75,11 @@ class QuerysetManager:
                         q += " && {}proteomes:*".format("!" if v else "")
                     else:
                         q += " && {}{}_db:*".format("!" if v else "", ep)
-                elif k == "integrated" or k == "integrated__iexact":
-                    q += " && integrated:{}".format(escape(v))
+                elif k == "integrated" or k == "integrated__iexact" or k == "integrated__contains":
+                    if ep == 'set':
+                        q += " && set_integrated:{}".format(escape(v))
+                    else:
+                        q += " && integrated:{}".format(escape(v))
                 elif k == "integrated__isnull":
                     q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
                 elif k == "type" or k == "type__iexact":

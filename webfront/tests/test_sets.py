@@ -44,8 +44,8 @@ class SetsFixturesTest(InterproRESTTestCase):
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
         self.assertEqual(len(response.data["results"]), 2)
 
-    def test_can_read_set__node_id(self):
-        response = self.client.get("/api/set/kegg/KEGG01/node/KEGG01.1")
+    def test_can_read_set_node_id(self):
+        response = self.client.get("/api/set/kegg/KEGG01/node/KEGG01-1")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_set_details(response.data["metadata"])
 
@@ -230,6 +230,19 @@ class SetEntryTest(InterproRESTTestCase):
             for result in response.data["results"]:
                 self._check_entry_count_overview(result)
 
+    def test_can_get_the_entry_count_on_a_set(self):
+        urls = [
+            "/api/set/pfam/CL0001/entry",
+            "/api/set/kegg/KEGG01/entry",
+            "/api/set/kegg/KEGG01/node/KEGG01-1/entry",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"])
+            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self._check_entry_count_overview(response.data)
+
 
 class SetProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -251,6 +264,19 @@ class SetProteinTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
             for result in response.data["results"]:
                 self._check_protein_count_overview(result)
+
+    def test_can_get_the_protein_count_on_a_set(self):
+        urls = [
+            "/api/set/pfam/CL0001/protein",
+            "/api/set/kegg/KEGG01/protein",
+            "/api/set/kegg/KEGG01/node/KEGG01-1/protein",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"])
+            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+            self._check_protein_count_overview(response.data)
 
 
 class SetStructureTest(InterproRESTTestCase):
@@ -274,6 +300,19 @@ class SetStructureTest(InterproRESTTestCase):
             for result in response.data["results"]:
                 self._check_structure_count_overview(result)
 
+    def test_can_get_the_structure_count_on_a_set(self):
+        urls = [
+            "/api/set/pfam/CL0001/structure",
+            "/api/set/kegg/KEGG01/structure",
+            "/api/set/kegg/KEGG01/node/KEGG01-1/structure",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"])
+            self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
+            self._check_structure_count_overview(response.data)
+
 
 class SetOrganismTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -295,3 +334,16 @@ class SetOrganismTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_key(response.data["results"], "organisms")
             for result in response.data["results"]:
                 self._check_organism_count_overview(result)
+
+    def test_can_get_the_organism_count_on_a_set(self):
+        urls = [
+            "/api/set/pfam/CL0001/organism",
+            "/api/set/kegg/KEGG01/organism",
+            "/api/set/kegg/KEGG01/node/KEGG01-1/organism",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"])
+            self.assertIn("organisms", response.data, "'organisms' should be one of the keys in the response")
+            self._check_organism_count_overview(response.data)

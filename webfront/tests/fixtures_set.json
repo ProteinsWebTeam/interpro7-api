@@ -53,7 +53,7 @@
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "KEGG01.1",
+      "accession": "KEGG01-1",
       "name": "First Node",
       "description": "Example of a step in a pathway",
       "source_database": "node",
@@ -69,7 +69,7 @@
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "KEGG01.2",
+      "accession": "KEGG01-2",
       "name": "Second Node",
       "description": "yet another Example of a step in a pathway",
       "source_database": "node",

@@ -109,6 +109,24 @@ class EntrySetTest(InterproRESTTestCase):
                 self.assertIn("sets", response.data["entries"]["unintegrated"],
                               "'sets' should be one of the keys in the response")
 
+    def test_can_get_the_set_list_on_a_list(self):
+        acc = "IPR003165"
+        urls = [
+            "/api/entry/interpro/set/kegg",
+            "/api/entry/pfam/set/pfam",
+            "/api/entry/unintegrated/set/pfam",
+            "/api/entry/interpro/pfam/set/kegg/kegg01/node",
+            "/api/entry/interpro/"+acc+"/pfam/set/pfam",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "sets")
+            for result in response.data["results"]:
+                for s in result["sets"]:
+                    self._check_set_from_searcher(s)
+
 
 class ProteinSetTest(InterproRESTTestCase):
     def test_can_get_the_set_count(self):
@@ -171,6 +189,21 @@ class ProteinSetTest(InterproRESTTestCase):
                 self.assertIn("sets", response.data["proteins"]["unreviewed"],
                               "'sets' should be one of the keys in the response")
 
+    def test_can_get_the_set_list_on_a_list(self):
+        urls = [
+            "/api/protein/reviewed/set/pfam",
+            "/api/protein/unreviewed/set/kegg",
+            "/api/protein/uniprot/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "sets")
+            for result in response.data["results"]:
+                for s in result["sets"]:
+                    self._check_set_from_searcher(s)
+
 
 class StructureSetTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -213,6 +246,21 @@ class StructureSetTest(InterproRESTTestCase):
                           "'structures' should be one of the keys in the response")
             self.assertIn("sets", response.data["structures"]["pdb"],
                           "'sets' should be one of the keys in the response")
+
+    def test_can_get_the_set_list_on_a_list(self):
+        urls = [
+            "/api/structure/pdb/set/pfam",
+            "/api/structure/pdb/set/kegg",
+            "/api/structure/pdb/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "sets")
+            for result in response.data["results"]:
+                for s in result["sets"]:
+                    self._check_set_from_searcher(s)
 
 
 class OrganismSetTest(InterproRESTTestCase):
@@ -278,6 +326,21 @@ class OrganismSetTest(InterproRESTTestCase):
                           "'organisms' should be one of the keys in the response")
             self.assertIn("sets", response.data["organisms"]["taxonomy"],
                           "'sets' should be one of the keys in the response")
+
+    def test_can_get_the_set_list_on_a_list(self):
+        urls = [
+            "/api/organism/taxonomy/set/pfam",
+            "/api/organism/proteome/set/kegg",
+            "/api/organism/taxonomy/proteome/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "sets")
+            for result in response.data["results"]:
+                for s in result["sets"]:
+                    self._check_set_from_searcher(s)
 
 
 class SetEntryTest(InterproRESTTestCase):

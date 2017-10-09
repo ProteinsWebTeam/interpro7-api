@@ -302,4 +302,9 @@ class InterproRESTTestCase(APITransactionTestCase):
         for s in main_obj["sets"]:
             self.assertIn(s, ["pfam", "kegg"], msg)
 
+    def _check_set_from_searcher(self, obj, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("source_database", obj, msg)
+        self.assertIn("integrated", obj, msg)
+
 

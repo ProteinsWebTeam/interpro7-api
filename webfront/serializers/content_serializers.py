@@ -72,7 +72,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
     @staticmethod
     def to_set_detail_representation(instance, searcher, query, include_chains=False):
         response = [
-            r
+            webfront.serializers.collection.SetSerializer.get_set_from_search_object(r)
             for r in searcher.get_group_obj_of_field_by_query(None, "set_acc", fq=query, rows=10)["groups"]
             ]
         if len(response) == 0:

@@ -111,3 +111,15 @@ class SetSerializer(ModelContentSerializer):
         return webfront.serializers.taxonomy.OrganismSerializer.to_counter_representation(
             self.searcher.get_counter_object("organism", query, self.get_extra_endpoints_to_count())
         )["organisms"]
+
+    @staticmethod
+    def get_set_from_search_object(obj):
+        header = {
+            "accession": obj["set_acc"],
+            "source_database": obj["set_db"],
+        }
+        if "set_integrated" in obj:
+            header["integrated"] = obj["set_integrated"]
+        # if include_chain:
+        #     header["chain"] = obj["chain"]
+        return header

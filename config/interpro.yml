@@ -132,7 +132,7 @@ cross_references:
         'rank': 43
     'COMe': 
         'rank': 27
-        'description': 'OMe is an attempt to classify metalloproteins and some other complex proteins using the concept of bioinorganic motif (a common structural feature of a class of functionally related, but not necessarily homologous, proteins, that includes the metal atom(s) and first coordination shell ligands).'
+        'description': 'COMe is an attempt to classify metalloproteins and some other complex proteins using the concept of bioinorganic motif (a common structural feature of a class of functionally related, but not necessarily homologous, proteins, that includes the metal atom(s) and first coordination shell ligands).'
         'url': 'http://www.flymine.org/come/entry?gn={accession}'
     'Blocks': 
         'rank': 17

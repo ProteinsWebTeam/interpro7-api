@@ -270,12 +270,18 @@ class ProteinOrganismTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
             self.assertIn("proteins", response.data["proteins"]["uniprot"],
                           "'proteins' should be one of the keys in the response")
+            self.assertIn("organisms", response.data["proteins"]["uniprot"],
+                          "'organisms' should be one of the keys in the response")
             if "reviewed" in response.data["proteins"]:
                 self.assertIn("proteins", response.data["proteins"]["reviewed"],
                               "'proteins' should be one of the keys in the response")
+                self.assertIn("organisms", response.data["proteins"]["reviewed"],
+                              "'organisms' should be one of the keys in the response")
             if "unreviewed" in response.data["proteins"]:
                 self.assertIn("proteins", response.data["proteins"]["unreviewed"],
                               "'proteins' should be one of the keys in the response")
+                self.assertIn("organisms", response.data["proteins"]["unreviewed"],
+                              "'organisms' should be one of the keys in the response")
 
     def test_can_get_the_taxonomy_list_on_a_list(self):
         urls = [
@@ -403,6 +409,8 @@ class StructureOrganismTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
             self.assertIn("structures", response.data["structures"]["pdb"],
                           "'structures' should be one of the keys in the response")
+            self.assertIn("organisms", response.data["structures"]["pdb"],
+                          "'organisms' should be one of the keys in the response")
 
     def test_can_get_the_taxonomy_list_on_a_list(self):
         urls = [

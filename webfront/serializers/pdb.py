@@ -67,6 +67,13 @@ class StructureSerializer(ModelContentSerializer):
                     "structure_acc:" + escape(instance.accession.lower()),
                     include_chains=True
                 )
+            if SerializerDetail.SET_DB in detail_filters or \
+                    SerializerDetail.SET_DETAIL in detail_filters:
+                representation["sets"] = self.to_set_detail_representation(
+                    instance,
+                    self.searcher,
+                    "structure_acc:" + escape(instance.accession.lower())
+                )
 
         return representation
 

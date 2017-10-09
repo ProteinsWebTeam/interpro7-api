@@ -43,7 +43,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if isinstance(output, dict):
             output = output["value"]
             is_search_payload = False
-        if "entry" in bucket or "protein" in bucket or "structure" in bucket or "organism" in bucket:
+        if "entry" in bucket or "protein" in bucket or "structure" in bucket or "organism" in bucket or "set" in bucket:
             output = {plural: output}
             if "entry" in bucket:
                 output["entries"] = bucket["entry"] if is_search_payload else bucket["entry"]["value"]
@@ -53,6 +53,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 output["structures"] = bucket["structure"] if is_search_payload else bucket["structure"]["value"]
             if "organism" in bucket:
                 output["organisms"] = bucket["organism"] if is_search_payload else bucket["organism"]["value"]
+            if "set" in bucket:
+                output["sets"] = bucket["set"] if is_search_payload else bucket["set"]["value"]
         return output
 
     @staticmethod
@@ -66,6 +68,17 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if len(response) == 0:
             raise ReferenceError('There are not structures for this request')
         return response
+
+    @staticmethod
+    def to_set_detail_representation(instance, searcher, query, include_chains=False):
+        response = [
+            r
+            for r in searcher.get_group_obj_of_field_by_query(None, "set_acc", fq=query, rows=10)["groups"]
+            ]
+        if len(response) == 0:
+            raise ReferenceError('There are not sets for this request')
+        return response
+
 
     @staticmethod
     def to_structures_detail_representation(instance, searcher, query, is_full=False):

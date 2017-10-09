@@ -56,6 +56,13 @@ class ProteinSerializer(ModelContentSerializer):
                     instance,
                     self.searcher, "protein_acc:" + escape(instance.accession.lower())
                 )
+            if SerializerDetail.SET_DB in detail_filters or \
+                    SerializerDetail.SET_DETAIL in detail_filters:
+                representation["sets"] = self.to_set_detail_representation(
+                    instance,
+                    self.searcher,
+                    "protein_acc:" + escape(instance.accession.lower())
+                )
         return representation
 
     def to_full_representation(self, instance):

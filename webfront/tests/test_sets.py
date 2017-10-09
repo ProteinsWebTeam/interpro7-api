@@ -94,20 +94,20 @@ class EntrySetTest(InterproRESTTestCase):
             self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
             self._check_set_count_overview(response.data)
 
-    # def test_can_filter_entry_counter_with_set_db(self):
-    #     urls = [
-    #         "/api/entry/set/pfam",
-    #         "/api/entry/set/kegg",
-    #         "/api/entry/set/kegg/kegg01/node",
-    #         ]
-    #     for url in urls:
-    #         response = self.client.get(url)
-    #         self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-    #         self.assertIn("sets", response.data["entries"]["integrated"],
-    #                       "'sets' should be one of the keys in the response")
-    #         if response.data["entries"]["unintegrated"] != 0:
-    #             self.assertIn("sets", response.data["entries"]["unintegrated"],
-    #                           "'sets' should be one of the keys in the response")
+    def test_can_filter_entry_counter_with_set_db(self):
+        urls = [
+            "/api/entry/set/pfam",
+            "/api/entry/set/kegg",
+            "/api/entry/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertIn("sets", response.data["entries"]["integrated"],
+                          "'sets' should be one of the keys in the response")
+            if response.data["entries"]["unintegrated"] != 0:
+                self.assertIn("sets", response.data["entries"]["unintegrated"],
+                              "'sets' should be one of the keys in the response")
 
 
 class ProteinSetTest(InterproRESTTestCase):
@@ -147,6 +147,30 @@ class ProteinSetTest(InterproRESTTestCase):
             self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
             self._check_set_count_overview(response.data)
 
+    def test_can_filter_protein_counter_with_set_db(self):
+        urls = [
+            "/api/protein/set/pfam",
+            "/api/protein/set/kegg",
+            "/api/protein/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertIn("proteins", response.data["proteins"]["uniprot"],
+                          "'proteins' should be one of the keys in the response")
+            self.assertIn("sets", response.data["proteins"]["uniprot"],
+                          "'sets' should be one of the keys in the response")
+            if "reviewed" in response.data["proteins"]:
+                self.assertIn("proteins", response.data["proteins"]["reviewed"],
+                              "'proteins' should be one of the keys in the response")
+                self.assertIn("sets", response.data["proteins"]["reviewed"],
+                              "'sets' should be one of the keys in the response")
+            if "unreviewed" in response.data["proteins"]:
+                self.assertIn("proteins", response.data["proteins"]["unreviewed"],
+                              "'proteins' should be one of the keys in the response")
+                self.assertIn("sets", response.data["proteins"]["unreviewed"],
+                              "'sets' should be one of the keys in the response")
+
 
 class StructureSetTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -175,6 +199,20 @@ class StructureSetTest(InterproRESTTestCase):
             self._check_structure_details(response.data["metadata"])
             self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
             self._check_set_count_overview(response.data)
+
+    def test_can_filter_structure_counter_with_organism_db(self):
+        urls = [
+            "/api/structure/set/pfam",
+            "/api/structure/set/kegg",
+            "/api/structure/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertIn("structures", response.data["structures"]["pdb"],
+                          "'structures' should be one of the keys in the response")
+            self.assertIn("sets", response.data["structures"]["pdb"],
+                          "'sets' should be one of the keys in the response")
 
 
 class OrganismSetTest(InterproRESTTestCase):
@@ -222,6 +260,24 @@ class OrganismSetTest(InterproRESTTestCase):
             self._check_proteome_details(response.data["metadata"])
             self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
             self._check_set_count_overview(response.data)
+
+    def test_can_filter_organism_counter_with_organism_db(self):
+        urls = [
+            "/api/organism/set/pfam",
+            "/api/organism/set/kegg",
+            "/api/organism/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertIn("organisms", response.data["organisms"]["proteome"],
+                          "'organisms' should be one of the keys in the response")
+            self.assertIn("sets", response.data["organisms"]["proteome"],
+                          "'sets' should be one of the keys in the response")
+            self.assertIn("organisms", response.data["organisms"]["taxonomy"],
+                          "'organisms' should be one of the keys in the response")
+            self.assertIn("sets", response.data["organisms"]["taxonomy"],
+                          "'sets' should be one of the keys in the response")
 
 
 class SetEntryTest(InterproRESTTestCase):

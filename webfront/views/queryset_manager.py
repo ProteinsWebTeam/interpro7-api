@@ -150,11 +150,11 @@ class QuerysetManager:
             queryset = queryset.order_by(self.order_field)
         return queryset
 
-    def update_interpro_filter(self):
-        for k, f in self.filters["entry"].items():
+    def update_integrated_filter(self, endpoint):
+        for k, f in self.filters[endpoint].items():
             if k == "source_database" or k == "source_database__iexact":
-                self.filters["entry"]["integrated__isnull"] = False
-                del self.filters["entry"][k]
+                self.filters[endpoint]["integrated__isnull"] = False
+                del self.filters[endpoint][k]
             elif k == "accession" or k == "accession__iexact":
-                self.filters["entry"]["integrated__iexact"] = f
-                del self.filters["entry"][k]
+                self.filters[endpoint]["integrated__iexact"] = f
+                del self.filters[endpoint][k]

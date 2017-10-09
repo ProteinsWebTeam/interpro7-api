@@ -60,6 +60,13 @@ class OrganismSerializer(ModelContentSerializer):
                     instance, self.searcher, self.get_searcher_query(instance),
                     include_chains=True, include_coordinates=False
                 )
+            if SerializerDetail.SET_DB in detail_filters or \
+                    SerializerDetail.SET_DETAIL in detail_filters:
+                representation["sets"] = self.to_set_detail_representation(
+                    instance,
+                    self.searcher,
+                    self.get_searcher_query(instance)
+                )
         return representation
 
     def to_full_representation(self, instance, include_proteomes=False):
@@ -136,7 +143,7 @@ class OrganismSerializer(ModelContentSerializer):
             output["taxonomy"] = output["taxonomy"]["value"]
             output["proteome"] = output["proteome"]["value"]
             is_searcher = False
-        if "entry" in bucket or "protein" in bucket or "structure" in bucket:
+        if "entry" in bucket or "protein" in bucket or "structure" in bucket or "set" in bucket:
             output = {
                 "taxonomy": {"organisms": output["taxonomy"]},
                 "proteome": {"organisms": output["proteome"]},
@@ -151,6 +158,9 @@ class OrganismSerializer(ModelContentSerializer):
             if "structure" in bucket:
                 output["taxonomy"]["structures"] = bucket["structure"] if is_searcher else bucket["structure"]["value"]
                 output["proteome"]["structures"] = bucket["structure"] if is_searcher else bucket["structure"]["value"]
+            if "set" in bucket:
+                output["taxonomy"]["sets"] = bucket["set"] if is_searcher else bucket["set"]["value"]
+                output["proteome"]["sets"] = bucket["set"] if is_searcher else bucket["set"]["value"]
         return output
 
     @staticmethod

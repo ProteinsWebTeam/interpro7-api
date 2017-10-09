@@ -11,6 +11,10 @@ entry_sets_accessions = (
 )
 
 class SetNodeHandler(CustomView):
+    serializer_class = SetSerializer
+    serializer_detail = SerializerDetail.SET_HEADERS
+    serializer_detail_filter = SerializerDetail.SET_DB
+
     def __init__(self):
         self.level_description = 'set type level'
         self.child_handlers = [
@@ -18,9 +22,6 @@ class SetNodeHandler(CustomView):
             # ("proteome", ProteomeHandler),
         ]
         self.queryset = Set.objects.all()
-        self.serializer_class = SetSerializer
-        self.serializer_detail = SerializerDetail.SET_HEADERS
-        # serializer_detail_filter = SerializerDetail.ORGANISM_DB
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -34,10 +35,11 @@ class SetNodeHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
-    #     return queryset
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.update_integrated_filter("set")
+        # general_handler.queryset_manager.add_filter("set", source_database__iexact=level_name)
+        return queryset
 
 
 class SetAccessionHandler(CustomView):
@@ -58,10 +60,10 @@ class SetAccessionHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.queryset_manager.add_filter("taxonomy", accession=level_name.upper())
-    #     return queryset
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("set", accession=level_name.upper())
+        return queryset
 
 class SetTypeHandler(CustomView):
     level_description = 'set type level'
@@ -72,7 +74,7 @@ class SetTypeHandler(CustomView):
     queryset = Set.objects.all()
     serializer_class = SetSerializer
     serializer_detail = SerializerDetail.SET_HEADERS
-    # serializer_detail_filter = SerializerDetail.ORGANISM_DB
+    serializer_detail_filter = SerializerDetail.SET_DB
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
@@ -83,10 +85,10 @@ class SetTypeHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
-    #     return queryset
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("set", source_database=level_name)
+        return queryset
 
 
 

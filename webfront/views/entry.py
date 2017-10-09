@@ -87,9 +87,9 @@ class MemberHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-            general_handler.queryset_manager.update_interpro_filter()
-            general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
-            return queryset
+        general_handler.queryset_manager.update_integrated_filter("entry")
+        general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
+        return queryset
 
 
 class AccessionHandler(CustomView):

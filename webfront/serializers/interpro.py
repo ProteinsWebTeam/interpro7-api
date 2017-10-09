@@ -63,6 +63,13 @@ class EntrySerializer(ModelContentSerializer):
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower())
                 )
+            if SerializerDetail.SET_DB in detail_filters or \
+                    SerializerDetail.SET_DETAIL in detail_filters:
+                representation["sets"] = self.to_set_detail_representation(
+                    instance,
+                    self.searcher,
+                    "entry_acc:" + escape(instance.accession.lower())
+                )
 
         return representation
 
@@ -178,6 +185,7 @@ class EntrySerializer(ModelContentSerializer):
             }
             if SerializerDetail.PROTEIN_DB in filters or\
                     SerializerDetail.STRUCTURE_DB in filters or\
+                    SerializerDetail.SET_DB in filters or\
                     SerializerDetail.ORGANISM_DB in filters:
                 result["entries"]["integrated"] = {"entries": 0}
                 result["entries"]["unintegrated"] = {"entries": 0}
@@ -195,6 +203,10 @@ class EntrySerializer(ModelContentSerializer):
                 result["entries"]["integrated"]["organisms"] = 0
                 result["entries"]["unintegrated"]["organisms"] = 0
                 result["entries"]["interpro"]["organisms"] = 0
+            if SerializerDetail.SET_DB in filters:
+                result["entries"]["integrated"]["sets"] = 0
+                result["entries"]["unintegrated"]["sets"] = 0
+                result["entries"]["interpro"]["sets"] = 0
 
             if "unintegrated" in instance and (
                     ("count" in instance["unintegrated"] and instance["unintegrated"]["count"]) or
@@ -221,6 +233,8 @@ class EntrySerializer(ModelContentSerializer):
                         result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
                     if "organisms" in result["entries"]["interpro"]:
                         result["entries"]["integrated"]["organisms"] = result["entries"]["interpro"]["organisms"]
+                    if "sets" in result["entries"]["interpro"]:
+                        result["entries"]["integrated"]["sets"] = result["entries"]["interpro"]["sets"]
 
             return result
         return instance

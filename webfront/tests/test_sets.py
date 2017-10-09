@@ -402,6 +402,24 @@ class SetEntryTest(InterproRESTTestCase):
                 self.assertIn("sets", response.data["sets"]["pfam"],
                               "'sets' should be one of the keys in the response")
 
+    def test_can_get_the_set_list_on_a_list(self):
+        acc = "IPR003165"
+        urls = [
+            "/api/set/kegg/entry/interpro",
+            "/api/set/pfam/entry/pfam",
+            "/api/set/pfam/entry/unintegrated",
+            "/api/set/kegg/kegg01/node/entry/interpro/pfam",
+            "/api/set/pfam/entry/interpro/"+acc+"/pfam",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "entries")
+            for result in response.data["results"]:
+                for s in result["entries"]:
+                    self._check_entry_from_searcher(s)
+
 
 class SetProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -458,6 +476,22 @@ class SetProteinTest(InterproRESTTestCase):
                 self.assertIn("sets", response.data["sets"]["pfam"],
                               "'sets' should be one of the keys in the response")
 
+    def test_can_get_the_set_list_on_a_list(self):
+        urls = [
+            "/api/set/kegg/protein/uniprot",
+            "/api/set/kegg/protein/unreviewed",
+            "/api/set/pfam/protein/reviewed",
+            "/api/set/kegg/kegg01/node/protein/unreviewed",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            for result in response.data["results"]:
+                for s in result["proteins"]:
+                    self._check_match(s, include_coordinates=False)
+
 
 class SetStructureTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -511,6 +545,22 @@ class SetStructureTest(InterproRESTTestCase):
                               "'structures' should be one of the keys in the response")
                 self.assertIn("sets", response.data["sets"]["pfam"],
                               "'sets' should be one of the keys in the response")
+
+    def test_can_get_the_set_list_on_a_list(self):
+        urls = [
+            "/api/set/kegg/structure/pdb",
+            "/api/set/kegg/structure/pdb",
+            "/api/set/pfam/structure/pdb",
+            "/api/set/kegg/kegg01/node/structure/pdb",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            for result in response.data["results"]:
+                for s in result["structures"]:
+                    self._check_structure_chain_details(s)
 
 
 class SetOrganismTest(InterproRESTTestCase):
@@ -566,3 +616,22 @@ class SetOrganismTest(InterproRESTTestCase):
                               "'organisms' should be one of the keys in the response")
                 self.assertIn("sets", response.data["sets"]["pfam"],
                               "'sets' should be one of the keys in the response")
+
+    def test_can_get_the_set_list_on_a_list(self):
+        urls = [
+            "/api/set/kegg/organism/taxonomy",
+            "/api/set/kegg/organism/proteome",
+            "/api/set/pfam/organism/taxonomy/proteome",
+            "/api/set/kegg/kegg01/node/organism/taxonomy",
+            "/api/set/kegg/kegg01/node/organism/proteome",
+            "/api/set/kegg/kegg01/node/organism/taxonomy/proteome",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "organisms")
+            for result in response.data["results"]:
+                for s in result["organisms"]:
+                    self._check_organism_from_searcher(s)
+

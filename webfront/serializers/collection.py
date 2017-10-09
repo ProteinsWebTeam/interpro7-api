@@ -35,7 +35,7 @@ class SetSerializer(ModelContentSerializer):
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
-        # s = self.searcher
+        s = self.searcher
         if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
             representation["entries"] = self.to_entries_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
@@ -44,6 +44,25 @@ class SetSerializer(ModelContentSerializer):
             representation["proteins"] = self.to_proteins_count_representation(instance)
         if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
             representation["organisms"] = self.to_organism_count_representation(instance)
+        if detail != SerializerDetail.SET_OVERVIEW:
+            q = "set_acc:" + escape(instance.accession.lower())
+            if SerializerDetail.ENTRY_DB in detail_filters or \
+                    SerializerDetail.ENTRY_DETAIL in detail_filters:
+                representation["entries"] = self.to_entries_detail_representation(instance, s, q)
+            if SerializerDetail.STRUCTURE_DB in detail_filters or \
+                    SerializerDetail.STRUCTURE_DETAIL in detail_filters:
+                representation["structures"] = self.to_structures_detail_representation(instance, s, q)
+            if SerializerDetail.PROTEIN_DB in detail_filters or \
+                    SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                representation["proteins"] = self.to_proteins_detail_representation(
+                    instance, self.searcher, q,
+                    include_chains=True, include_coordinates=False
+                )
+            if SerializerDetail.ORGANISM_DB in detail_filters or \
+                    SerializerDetail.ORGANISM_DETAIL in detail_filters:
+                representation["organisms"] = self.to_organisms_detail_representation(
+                    instance, self.searcher, q
+                )
         return representation
 
 

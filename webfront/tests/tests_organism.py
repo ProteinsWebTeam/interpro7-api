@@ -553,7 +553,7 @@ class OrganismEntryTest(InterproRESTTestCase):
             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
             self._check_entry_count_overview(response.data)
 
-    def test_can_filter_entry_counter_with_organism_db(self):
+    def test_can_filter_organismcounter_with_entry_db(self):
         acc = "IPR003165"
         urls = [
             "/api/organism/entry/interpro",

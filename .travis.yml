@@ -31,6 +31,12 @@ script:
   - coverage run --source='.' manage.py test
 after_success:
   coveralls
+notifications:
+  slack:
+    on_success: change
+    on_failure: always
+    rooms:
+      - protein-families-team:z1Fwm5IHFOou6YBDj0fRcTTY#interpro7
 branches:
   only:
     - master

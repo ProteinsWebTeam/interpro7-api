@@ -499,6 +499,24 @@ class SetEntryTest(InterproRESTTestCase):
                 for s in result["entries"]:
                     self._check_entry_from_searcher(s)
 
+    def test_can_get_a_list_from_the_set_object(self):
+        urls = [
+            "/api/set/kegg/kegg01/entry/interpro",
+            "/api/set/pfam/Cl0001/entry/pfam",
+            "/api/set/pfam/CL0001/entry/unintegrated",
+            "/api/set/kegg/kegg01/node/kegg01-1/entry/interpro/pfam",
+            "/api/set/pfam/CL0001/entry/unintegrated/pfam",
+            "/api/set/kegg/kegg01/entry/interpro/IPR003165/pfam",
+            "/api/set/kegg/kegg01/node/KEGG01-1/entry/interpro/IPR003165/pfam",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"], True)
+            self.assertIn("entries", response.data)
+            for st in response.data["entries"]:
+                self._check_entry_from_searcher(st)
+
 
 class SetProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -571,6 +589,23 @@ class SetProteinTest(InterproRESTTestCase):
                 for s in result["proteins"]:
                     self._check_match(s, include_coordinates=False)
 
+    def test_can_get_a_list_from_the_set_object(self):
+        urls = [
+            "/api/set/pfam/Cl0001/protein/reviewed",
+            "/api/set/pfam/CL0001/protein/uniprot",
+            "/api/set/kegg/kegg01/protein/unreviewed",
+            "/api/set/kegg/kegg01/protein/reviewed",
+            "/api/set/kegg/kegg01/node/kegg01-1/protein/reviewed",
+            "/api/set/kegg/kegg01/node/KEGG01-1/protein/unreviewed",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"], True)
+            self.assertIn("proteins", response.data)
+            for st in response.data["proteins"]:
+                self._check_match(st, include_coordinates=False)
+
 
 class SetStructureTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -640,6 +675,20 @@ class SetStructureTest(InterproRESTTestCase):
             for result in response.data["results"]:
                 for s in result["structures"]:
                     self._check_structure_chain_details(s)
+
+    def test_can_get_a_list_from_the_set_object(self):
+        urls = [
+            "/api/set/pfam/Cl0001/structure/pdb",
+            "/api/set/kegg/kegg01/structure/pdb",
+            "/api/set/kegg/kegg01/node/KEGG01-1/structure/pdb",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"], True)
+            self.assertIn("structures", response.data)
+            for st in response.data["structures"]:
+                self._check_structure_chain_details(st)
 
 
 class SetOrganismTest(InterproRESTTestCase):
@@ -714,3 +763,18 @@ class SetOrganismTest(InterproRESTTestCase):
                 for s in result["organisms"]:
                     self._check_organism_from_searcher(s)
 
+    def test_can_get_a_list_from_the_set_object(self):
+        urls = [
+            "/api/set/pfam/Cl0001/organism/taxonomy",
+            "/api/set/pfam/Cl0001/organism/taxonomy/1/proteome",
+            "/api/set/pfam/Cl0001/organism/taxonomy/1001583/proteome",
+            "/api/set/kegg/kegg01/organism/proteome",
+            "/api/set/kegg/kegg01/node/KEGG01-1/organism/taxonomy/40296/proteome",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"], True)
+            self.assertIn("organisms", response.data)
+            for st in response.data["organisms"]:
+                self._check_organism_from_searcher(st)

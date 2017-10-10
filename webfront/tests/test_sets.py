@@ -144,6 +144,18 @@ class EntrySetTest(InterproRESTTestCase):
             for org in response.data["sets"]:
                 self._check_set_from_searcher(org)
 
+    def test_can_filter_entry_counter_with_set_acc(self):
+        urls = [
+            "/api/entry/set/pfam/Cl0001",
+            "/api/entry/set/kegg/kegg01",
+            "/api/entry/set/kegg/kegg01/node/KEGG01-1",
+            "/api/entry/set/kegg/kegg01/node/KEGG01-2",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_entry_count_overview(response.data)
+
 
 class ProteinSetTest(InterproRESTTestCase):
     def test_can_get_the_set_count(self):
@@ -237,6 +249,18 @@ class ProteinSetTest(InterproRESTTestCase):
             for s in response.data["sets"]:
                 self._check_set_from_searcher(s)
 
+    def test_can_filter_counter_with_set_acc(self):
+        urls = [
+            "/api/protein/set/pfam/Cl0001",
+            "/api/protein/set/kegg/kegg01",
+            "/api/protein/set/kegg/kegg01/node/KEGG01-1",
+            "/api/protein/set/kegg/kegg01/node/KEGG01-2",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_protein_count_overview(response.data)
+
 
 class StructureSetTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -309,6 +333,19 @@ class StructureSetTest(InterproRESTTestCase):
             self.assertIn("sets", response.data)
             for s in response.data["sets"]:
                 self._check_set_from_searcher(s)
+
+    def test_can_filter_counter_with_set_acc(self):
+        urls = [
+            "/api/structure/set/pfam/Cl0001",
+            "/api/structure/set/kegg/kegg01",
+            "/api/structure/set/kegg/kegg01/node/KEGG01-1",
+            "/api/structure/set/kegg/kegg01/node/KEGG01-2",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_structure_count_overview(response.data)
+
 
 
 class OrganismSetTest(InterproRESTTestCase):
@@ -420,6 +457,18 @@ class OrganismSetTest(InterproRESTTestCase):
             self.assertIn("sets", response.data)
             for s in response.data["sets"]:
                 self._check_set_from_searcher(s)
+
+    def test_can_filter_counter_with_set_acc(self):
+        urls = [
+            "/api/organism/set/pfam/Cl0001",
+            "/api/organism/set/kegg/kegg01",
+            "/api/organism/set/kegg/kegg01/node/KEGG01-1",
+            "/api/organism/set/kegg/kegg01/node/KEGG01-2",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_organism_count_overview(response.data)
 
 
 class SetEntryTest(InterproRESTTestCase):

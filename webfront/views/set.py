@@ -10,18 +10,39 @@ entry_sets_accessions = (
     r'^({})$'.format('|'.join((set['accession'] for (_, set) in settings.ENTRY_SETS.items())))
 )
 
+
+class SetNodeAccessionHandler(CustomView):
+    level_description = 'Set nodeaccession level'
+    serializer_class = SetSerializer
+    queryset = Set.objects.all()
+    many = False
+    child_handlers = []
+    serializer_detail_filter = SerializerDetail.SET_DETAIL
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+        general_handler.queryset_manager.add_filter("set", accession=endpoint_levels[level - 1].upper())
+        return super(SetNodeAccessionHandler, self).get(
+            request, endpoint_levels, available_endpoint_handlers, level,
+            self.queryset, handler, general_handler, *args, **kwargs
+        )
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("set", accession=level_name.upper())
+        return queryset
+
+
 class SetNodeHandler(CustomView):
     serializer_class = SetSerializer
     serializer_detail = SerializerDetail.SET_HEADERS
     serializer_detail_filter = SerializerDetail.SET_DB
-
-    def __init__(self):
-        self.level_description = 'set type level'
-        self.child_handlers = [
-            (r'.+', SetAccessionHandler),
-            # ("proteome", ProteomeHandler),
-        ]
-        self.queryset = Set.objects.all()
+    level_description = 'set type level'
+    child_handlers = [
+        (r'.+', SetNodeAccessionHandler),
+        # ("proteome", ProteomeHandler),
+    ]
+    queryset = Set.objects.all()
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):

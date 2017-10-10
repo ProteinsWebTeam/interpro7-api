@@ -566,6 +566,23 @@ class SetEntryTest(InterproRESTTestCase):
             for st in response.data["entries"]:
                 self._check_entry_from_searcher(st)
 
+    def test_can_filter_set_counter_with_acc(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_un = "PF17176"
+        urls = [
+            "/api/set/entry/interpro/"+acc,
+            "/api/set/entry/pfam/"+pfam,
+            "/api/set/entry/pfam/"+pfam_un,
+            "/api/set/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/set/entry/interpro/pfam/"+pfam,
+            "/api/set/entry/unintegrated/pfam/"+pfam_un,
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_count_overview(response.data)
+
 
 class SetProteinTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -655,6 +672,17 @@ class SetProteinTest(InterproRESTTestCase):
             for st in response.data["proteins"]:
                 self._check_match(st, include_coordinates=False)
 
+    def test_can_filter_set_counter_with_acc(self):
+        urls = [
+            "/api/set/protein/uniprot/M5ADK6",
+            "/api/set/protein/unreviewed/A0A0A2L2G2",
+            "/api/set/protein/reviewed/M5ADK6",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_count_overview(response.data)
+
 
 class SetStructureTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count(self):
@@ -738,6 +766,16 @@ class SetStructureTest(InterproRESTTestCase):
             self.assertIn("structures", response.data)
             for st in response.data["structures"]:
                 self._check_structure_chain_details(st)
+
+    def test_can_filter_set_counter_with_acc(self):
+        urls = [
+            "/api/set/structure/pdb/1JM7",
+            "/api/set/structure/pdb/1JZ8",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_count_overview(response.data)
 
 
 class SetOrganismTest(InterproRESTTestCase):
@@ -827,3 +865,15 @@ class SetOrganismTest(InterproRESTTestCase):
             self.assertIn("organisms", response.data)
             for st in response.data["organisms"]:
                 self._check_organism_from_searcher(st)
+
+    def test_can_filter_set_counter_with_acc(self):
+        urls = [
+            "/api/set/organism/proteome/UP000012042",
+            "/api/set/organism/taxonomy/proteome/UP000006701",
+            "/api/set/organism/taxonomy/2/proteome/UP000030104",
+            "/api/set/organism/taxonomy/40296/proteome/UP000030104",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_count_overview(response.data)

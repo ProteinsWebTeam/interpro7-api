@@ -65,7 +65,6 @@ class SetSerializer(ModelContentSerializer):
                 )
         return representation
 
-
     @staticmethod
     def to_counter_representation(instance):
         if "sets" not in instance:

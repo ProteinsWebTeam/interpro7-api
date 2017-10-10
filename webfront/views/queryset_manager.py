@@ -80,7 +80,7 @@ class QuerysetManager:
                         q += " && set_integrated:{}".format(escape(v))
                     else:
                         q += " && integrated:{}".format(escape(v))
-                elif k == "integrated__isnull":
+                elif k == "integrated__isnull" and ep != 'set':
                     q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
                 elif k == "type" or k == "type__iexact":
                     q += " && {}_type:{}".format(ep, escape(v))

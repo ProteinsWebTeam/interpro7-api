@@ -140,7 +140,7 @@ class SetHandler(CustomView):
             self.queryset, handler, general_handler, *args, **kwargs
         )
 
-    # @staticmethod
-    # def filter(queryset, level_name="", general_handler=None):
-    #     general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
-    #     return queryset
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("set", accession__isnull=False)
+        return queryset

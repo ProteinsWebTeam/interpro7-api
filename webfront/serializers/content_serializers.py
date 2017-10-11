@@ -34,6 +34,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
             extra.append("structure")
         if SerializerDetail.ORGANISM_DB in self.detail_filters:
             extra.append("organism")
+        if SerializerDetail.SET_DB in self.detail_filters:
+            extra.append("set")
         return extra
 
     @staticmethod

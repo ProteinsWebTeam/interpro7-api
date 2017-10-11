@@ -212,29 +212,33 @@ class EntrySerializer(ModelContentSerializer):
                     ("count" in instance["unintegrated"] and instance["unintegrated"]["count"]) or
                     ("doc_count" in instance["unintegrated"] and instance["unintegrated"]["doc_count"]) > 0):
                 result["entries"]["unintegrated"] = EntrySerializer.serialize_counter_bucket(instance["unintegrated"], "entries")
+            if "integrated" in instance and (
+                    ("count" in instance["integrated"] and instance["integrated"]["count"]) or
+                    ("doc_count" in instance["integrated"] and instance["integrated"]["doc_count"]) > 0):
+                result["entries"]["integrated"] = EntrySerializer.serialize_counter_bucket(instance["integrated"], "entries")
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]
             vals = list(result["entries"]["member_databases"].values())
-            if len(vals) > 0:
-                unintegrated = result["entries"]["unintegrated"]
-                if type(unintegrated) != int and "entries" in unintegrated:
-                    unintegrated = unintegrated["entries"]
-
-                if type(vals[0]) == int:
-                    result["entries"]["integrated"] = sum(vals) - unintegrated
-                else:
-                    result["entries"]["integrated"] = {
-                        "entries": sum([v["entries"] for v in vals]) - unintegrated
-                    }
-                    if "proteins" in result["entries"]["interpro"]:
-                        result["entries"]["integrated"]["proteins"] = result["entries"]["interpro"]["proteins"]
-                    if "structures" in result["entries"]["interpro"]:
-                        result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
-                    if "organisms" in result["entries"]["interpro"]:
-                        result["entries"]["integrated"]["organisms"] = result["entries"]["interpro"]["organisms"]
-                    if "sets" in result["entries"]["interpro"]:
-                        result["entries"]["integrated"]["sets"] = result["entries"]["interpro"]["sets"]
+            # if len(vals) > 0:
+            #     unintegrated = result["entries"]["unintegrated"]
+            #     if type(unintegrated) != int and "entries" in unintegrated:
+            #         unintegrated = unintegrated["entries"]
+            #
+            #     if type(vals[0]) == int:
+            #         result["entries"]["integrated"] = sum(vals) - unintegrated
+            #     else:
+            #         result["entries"]["integrated"] = {
+            #             "entries": sum([v["entries"] for v in vals]) - unintegrated
+            #         }
+            #         if "proteins" in result["entries"]["interpro"]:
+            #             result["entries"]["integrated"]["proteins"] = result["entries"]["interpro"]["proteins"]
+            #         if "structures" in result["entries"]["interpro"]:
+            #             result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
+            #         if "organisms" in result["entries"]["interpro"]:
+            #             result["entries"]["integrated"]["organisms"] = result["entries"]["interpro"]["organisms"]
+            #         if "sets" in result["entries"]["interpro"]:
+            #             result["entries"]["integrated"]["sets"] = result["entries"]["interpro"]["sets"]
 
             return result
         return instance

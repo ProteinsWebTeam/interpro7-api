@@ -47,6 +47,7 @@ class SetNodeHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
+        general_handler.queryset_manager.add_filter("set", integrated__isnull=False)
         general_handler.queryset_manager.add_filter("set", integrated__contains=endpoint_levels[level - 2].lower())
         # general_handler.queryset_manager.add_filter("set", source_database='node')
         general_handler.queryset_manager.remove_filter("set", "accession")
@@ -59,6 +60,8 @@ class SetNodeHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.update_integrated_filter("set")
+        # general_handler.queryset_manager.add_filter("set", integrated__isnull=False)
+        # general_handler.queryset_manager.remove_filter("set", "source_database")
         # general_handler.queryset_manager.add_filter("set", source_database__iexact=level_name)
         return queryset
 
@@ -86,6 +89,7 @@ class SetAccessionHandler(CustomView):
         general_handler.queryset_manager.add_filter("set", accession=level_name.upper())
         return queryset
 
+
 class SetTypeHandler(CustomView):
     level_description = 'set type level'
     child_handlers = [
@@ -112,7 +116,6 @@ class SetTypeHandler(CustomView):
         return queryset
 
 
-
 class SetHandler(CustomView):
     level_description = 'Set level'
     from_model = False
@@ -134,6 +137,8 @@ class SetHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
         general_handler.queryset_manager.reset_filters("set", endpoint_levels)
+        general_handler.queryset_manager.add_filter("set", integrated__isnull=True)
+        general_handler.queryset_manager.add_filter("set", accession__isnull=False)
 
         return super(SetHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -143,4 +148,5 @@ class SetHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
+        general_handler.queryset_manager.add_filter("set", integrated__isnull=True)
         return queryset

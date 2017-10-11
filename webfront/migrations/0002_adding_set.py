@@ -20,8 +20,8 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=512)),
                 ('description', models.TextField()),
                 ('source_database', models.CharField(db_index=True, max_length=20)),
-                ('integrated', jsonfield.fields.JSONField()),
-                ('relationships', jsonfield.fields.JSONField()),
+                ('integrated', jsonfield.fields.JSONField(null=True)),
+                ('relationships', jsonfield.fields.JSONField(null=True)),
             ],
         ),
     ]

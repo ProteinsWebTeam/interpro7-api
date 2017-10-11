@@ -89,6 +89,15 @@ api_test_map = {
             "UP000030104",
         ]
     },
+    "set": {
+        "kegg": [
+            "KEGG01"
+        ],
+        "pfam": [
+            "CL0001",
+            "CL0002"
+        ]
+    }
 }
 rel_aux = {
     ("protein", "structure"): [
@@ -166,21 +175,6 @@ rel_aux = {
         ["SM00950", "1JM7/A"],
     ],
     ("entry", "organism"): [
-        # ["IPR003165", "1"],
-        # ["IPR001165", "1"],
-        # ["PF02171", "1"],
-        # ["PF17180", "1"],
-        # ["PF17176", "1"],
-        # ["SM00950", "1"],
-        # ["PS50822", "1"],
-        # ["IPR003165", "2579"],
-        # ["IPR003165", "2"],
-        # ["IPR001165", "2579"],
-        # ["PF02171", "2579"],
-        # ["PF17180", "2579"],
-        # ["PF17176", "2579"],
-        # ["SM00950", "2579"],
-        # ["PS50822", "2"],
         ["IPR003165", "344612"],
         ["IPR003165", "40296"],
         ["IPR001165", "344612"],
@@ -200,14 +194,6 @@ rel_aux = {
         ["PS50822", "UP000030104"],
     ],
     ("organism", "protein"): [
-        # ["1", "A1CUJ5"],
-        # ["1", "M5ADK6"],
-        # ["1", "A0A0A2L2G2"],
-        # ["1", "P16582"],
-        # ["2579", "A1CUJ5"],
-        # ["2579", "M5ADK6"],
-        # ["2", "A0A0A2L2G2"],
-        # ["2", "P16582"],
         ["344612", "A1CUJ5"],
         ["1001583", "M5ADK6"],
         ["40296", "A0A0A2L2G2"],
@@ -218,28 +204,6 @@ rel_aux = {
         ["UP000030104", "P16582"],
     ],
     ("organism", "structure"): [
-        # ["1", "1JM7"],
-        # ["1", "2BKM"],
-        # ["1", "1JM7"],
-        # ["1", "1JZ8"],
-        # ["1", "1JZ8"],
-        # ["1", "2BKM"],
-        # ["1", "1T2V"],
-        # ["1", "1T2V"],
-        # ["1", "1T2V"],
-        # ["1", "1T2V"],
-        # ["1", "1T2V"],
-        # ["2579", "1JM7"],
-        # ["2579", "2BKM"],
-        # ["2579", "1JM7"],
-        # ["2", "1JZ8"],
-        # ["2", "1JZ8"],
-        # ["2", "2BKM"],
-        # ["2", "1T2V"],
-        # ["2", "1T2V"],
-        # ["2", "1T2V"],
-        # ["2", "1T2V"],
-        # ["2", "1T2V"],
         ["344612", "1JM7"],
         ["1001583", "2BKM"],
         ["1001583", "1JM7"],
@@ -264,28 +228,6 @@ rel_aux = {
         ["UP000030104", "1T2V"],
     ],
     ("organism", "chain"): [
-        # ["1", "1JM7/A"],
-        # ["1", "2BKM/B"],
-        # ["1", "1JM7/B"],
-        # ["1", "1JZ8/A"],
-        # ["1", "1JZ8/B"],
-        # ["1", "2BKM/A"],
-        # ["1", "1T2V/A"],
-        # ["1", "1T2V/B"],
-        # ["1", "1T2V/C"],
-        # ["1", "1T2V/D"],
-        # ["1", "1T2V/E"],
-        # ["2579", "1JM7/A"],
-        # ["2579", "2BKM/B"],
-        # ["2579", "1JM7/B"],
-        # ["2", "1JZ8/A"],
-        # ["2", "1JZ8/B"],
-        # ["2", "2BKM/A"],
-        # ["2", "1T2V/A"],
-        # ["2", "1T2V/B"],
-        # ["2", "1T2V/C"],
-        # ["2", "1T2V/D"],
-        # ["2", "1T2V/E"],
         ["344612", "1JM7/A"],
         ["1001583", "2BKM/B"],
         ["1001583", "1JM7/B"],
@@ -309,6 +251,67 @@ rel_aux = {
         ["UP000030104", "1T2V/D"],
         ["UP000030104", "1T2V/E"],
     ],
+    ("set", "entry"): [
+        ["CL0001", "PF02171"],
+        ["CL0001", "PF17180"],
+        ["CL0002", "PF02171"],
+        ["CL0002", "PF17176"],
+        ["KEGG01", "IPR003165"],
+        ["KEGG01", "PF02171"],
+        ["KEGG01", "IPR001165"],
+        ["KEGG01", "PS50822"],
+    ],
+    ("set", "protein"): [
+        ["CL0001", "A1CUJ5"],
+        ["CL0001", "M5ADK6"],
+        ["CL0002", "A1CUJ5"],
+        ["KEGG01", "A1CUJ5"],
+        ["KEGG01", "P16582"],
+        ["KEGG01", "A1CUJ5"],
+        ["KEGG01", "P16582"],
+    ],
+    ("set", "structure"): [
+        ["CL0001", "1JM7"],
+        ["CL0001", "2BKM"],
+        ["CL0002", "1JM7"],
+        ["KEGG01", "1T2V"],
+        ["KEGG01", "1JM7"],
+    ],
+    ("set", "chain"): [
+        ["CL0001", "1JM7/A"],
+        ["CL0001", "1JM7/B"],
+        ["CL0001", "2BKM/A"],
+        ["CL0001", "2BKM/B"],
+        ["CL0002", "1JM7/A"],
+        ["CL0002", "1JM7/B"],
+        ["KEGG01", "1T2V/A"],
+        ["KEGG01", "1T2V/B"],
+        ["KEGG01", "1T2V/C"],
+        ["KEGG01", "1T2V/D"],
+        ["KEGG01", "1T2V/E"],
+        ["KEGG01", "1JM7/A"],
+        ["KEGG01", "1JM7/B"],
+    ],
+    ("set", "organism"): [
+        ["CL0001", "344612"],
+        ["CL0001", "1001583"],
+        ["CL0002", "344612"],
+        ["CL0002", "344612"],
+        ["KEGG01", "344612"],
+        ["KEGG01", "40296"],
+        ["KEGG01", "344612"],
+        ["KEGG01", "344612"],
+
+        ["CL0001", "UP000006701"],
+        ["CL0001", "UP000012042"],
+        ["CL0002", "UP000006701"],
+        ["CL0002", "UP000006701"],
+        ["KEGG01", "UP000006701"],
+        ["KEGG01", "UP000030104"],
+        ["KEGG01", "UP000006701"],
+        ["KEGG01", "UP000006701"],
+    ],
+
 }
 descendents = {
     "1": ["40296", "344612", "1001583"],
@@ -326,16 +329,26 @@ plurals = {
     "protein": "proteins",
     "structure": "structures",
     "organism": "organisms",
+    "set": "sets",
 }
 singular = {v: k for k, v in plurals.items()}
 plurals["chain"] = "structures"
 
-import unittest
+# import unittest
+
+
+def combine_lists_by_first_item(l1, l2):
+    new_list = []
+    for item1 in l1:
+        for item2 in l2:
+            if item1[0] == item2[0]:
+                new_list.append(item1 + item2[1:])
+    return new_list
 
 
 class ThreeEndpointsContentTest(InterproRESTTestCase):
     def test_endpoint_endpoint_endpoint(self):
-        response1 = self.client.get("/api/entry/protein/structure/organism")
+        response1 = self.client.get("/api/entry/protein/structure/organism/set")
         self.assertEqual(response1.status_code, status.HTTP_200_OK)
         self._check_entry_count_overview(response1.data)
         for endpoint1 in api_test_map:
@@ -355,6 +368,7 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                             self.assertEqual(counter, response2.data[ep], "URL: [{}]".format(url))
 
     def test_endpoint_endpoint_db(self):
+        expected = []
         for endpoint1 in api_test_map:
             if endpoint1 == "chain":
                 continue
@@ -365,19 +379,32 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                     if endpoint1 == endpoint3 or endpoint2 == endpoint3 or endpoint3 == "chain":
                         continue
                     for db3 in api_test_map[endpoint3]:
+                        # endpoint1 = "organism"
+                        # endpoint2 = "entry"
+                        # endpoint3 = "set"
+                        # db3 = "kegg"
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
-                        response = self.client.get(url)
-                        self.assertEqual(response.status_code, status.HTTP_200_OK,
-                                         "the url {} got the HTTP error {}".format(url, response.status_code))
-                        expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3)
-                        self.assertEqual(response.data, expected,
-                                         "The URL {} wasn't equal to the expected response.\nRESPONSE: {}\nEXPECTED: {}"
-                                         .format(url, response.data, expected))
+                        response = self._get_in_debug_mode(url)
+                        if response.status_code == status.HTTP_200_OK:
+                            # print(url)
+                            expected = self.get_expected_counter_payload(endpoint1, endpoint2, endpoint3, db3)
+                            self.assertEqual(response.data, expected,
+                                             "The URL {} wasn't equal to the expected response.\nRESPONSE: {}\nEXPECTED: {}"
+                                             .format(url, response.data, expected))
+                        else:
+                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                             "the url {} got the HTTP error {}".format(url, response.status_code))
 
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint3, db3, endpoint2)
-                        response = self.client.get(url)
-                        self.assertEqual(response.status_code, status.HTTP_200_OK)
-                        self.assertEqual(response.data, expected)
+                        response = self._get_in_debug_mode(url)
+                        if response.status_code == status.HTTP_200_OK:
+                            # print(url)
+                            response = self.client.get(url)
+                            self.assertEqual(response.status_code, status.HTTP_200_OK)
+                            self.assertEqual(response.data, expected)
+                        else:
+                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                             "the url {} got the HTTP error {}".format(url, response.status_code))
 
     def test_endpoint_endpoint_acc(self):
         for endpoint1 in api_test_map:
@@ -453,10 +480,18 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
                         ep3 = "structure" if endpoint3 == "chain" else endpoint3
                         for db3 in api_test_map[endpoint3]:
                             for acc3 in api_test_map[endpoint3][db3]:
+                                # endpoint1 = "set"
+                                # endpoint2 = "entry"
+                                # db2 = "unintegrated"
+                                # endpoint3 = "chain"
+                                # ep3 = "structure"
+                                # db3 = "pdb"
+                                # acc3 = "1JM7/A"
                                 unintegrated = {"PF": "/pfam", "SM": "/smart", "PS": "/prosite_profiles", }[acc3[:2]] \
                                     if db3 == "integrated" or db3 == "unintegrated" else ""
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2,
                                                                       ep3, db3 + unintegrated, acc3)
+                                print(url)
                                 response = self._get_in_debug_mode(url)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -1106,21 +1141,34 @@ class ThreeEndpointsContentTest(InterproRESTTestCase):
             #         obj[db] = 0
         return _obj
 
-    def get_set_of_shared_ids(self, endpoint1, accs1,
+    def old_get_set_of_shared_ids(self, endpoint1, accs1,
                               endpoint2, accs2,
                               endpoint3=None, accs3=None):
-        shared_ids = set([x[1]
+        shared_ep2 = set([x[1]
                           for x in relationships[endpoint1, endpoint2]
                           if x[0] in accs1 and x[1] in accs2])
         if endpoint3 is not None:
-            link_ids = set([x[1]
+            shared_ep3_1 = set([x[1]
                             for x in relationships[endpoint1, endpoint3]
                             if x[0] in accs1 and x[1] in accs3])
             return set([x[1]
                         for x in relationships[endpoint3, endpoint2]
-                        if x[0] in accs3 and x[1] in accs2 and x[0] in link_ids and x[1] in shared_ids])
+                        if x[0] in accs3 and x[1] in accs2 and x[0] in shared_ep3_1 and x[1] in shared_ep2])
 
-        return shared_ids
+    def get_set_of_shared_ids(self, endpoint1, accs1,
+                              endpoint2, accs2,
+                              endpoint3=None, accs3=None):
+        shared_ep1_2 = [x for x in relationships[endpoint1, endpoint2]
+                        if x[0] in accs1 and x[1] in accs2]
+        if endpoint3 is not None:
+            shared_ep1_3 = [x for x in relationships[endpoint1, endpoint3]
+                            if x[0] in accs1 and x[1] in accs3]
+            cartesian = combine_lists_by_first_item(shared_ep1_2, shared_ep1_3)
+
+            filtered = [c[1] for c in cartesian if [c[1], c[2]] in relationships[endpoint2, endpoint3]]
+            return set(filtered)
+        else:
+            return set([x[1] for x in shared_ep1_2])  # Unique apparences of acc in endpoint2
 
     def set_object_for_db_filter(self, obj, endpoint1, acc, endpoint2, db2, accs2, endpoint3, db3, accs3, accs1=None):
         accs1 = accs1 if accs1 is not None else [acc]

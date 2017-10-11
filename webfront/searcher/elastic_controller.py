@@ -117,7 +117,18 @@ class ElasticsearchController(SearchController):
                 },
                 "aggs": {"unique": {"cardinality": {"field": "entry_acc"}}}
             }
+            facet["aggs"]["integrated"] = {
+                "filter": {
+                    "bool": {
+                        "must": [
+                            {"exists": {"field": "integrated"}}
+                        ]
+                    }
+                },
+                "aggs": {"unique": {"cardinality": {"field": "entry_acc"}}}
+            }
             self.add_extra_counters(facet, "unintegrated", extra_counters)
+            self.add_extra_counters(facet, "integrated", extra_counters)
 
     def tune_counter_facet_for_protein(self, facet, endpoint, extra_counters):
         if endpoint == "protein":

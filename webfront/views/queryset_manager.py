@@ -80,8 +80,11 @@ class QuerysetManager:
                         q += " && set_integrated:{}".format(escape(v))
                     else:
                         q += " && integrated:{}".format(escape(v))
-                elif k == "integrated__isnull" and ep != 'set':
-                    q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
+                elif k == "integrated__isnull":
+                    if ep == 'set':
+                        q += " && {}set_integrated:*".format("!" if v else "")
+                    else:
+                        q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
                 elif k == "type" or k == "type__iexact":
                     q += " && {}_type:{}".format(ep, escape(v))
                 elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":
@@ -151,7 +154,8 @@ class QuerysetManager:
         return queryset
 
     def update_integrated_filter(self, endpoint):
-        for k, f in self.filters[endpoint].items():
+        c = self.filters[endpoint].copy()
+        for k, f in c.items():
             if k == "source_database" or k == "source_database__iexact":
                 self.filters[endpoint]["integrated__isnull"] = False
                 del self.filters[endpoint][k]

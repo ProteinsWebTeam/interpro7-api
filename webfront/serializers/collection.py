@@ -20,18 +20,10 @@ class SetSerializer(ModelContentSerializer):
         detail = self.detail
         if detail == SerializerDetail.ALL:
             representation = self.to_full_representation(instance)
-        # elif detail == SerializerDetail.ORGANISM_TAXONOMY_PROTEOME:
-        #     representation = self.to_full_representation(instance, True)
-        # elif detail == SerializerDetail.ORGANISM_PROTEOME:
-        #     representation = self.to_full_proteome_representation(instance)
         elif detail == SerializerDetail.SET_OVERVIEW:
             representation = self.to_counter_representation(instance)
         elif detail == SerializerDetail.SET_HEADERS:
             representation = self.to_headers_representation(instance)
-        # elif detail == SerializerDetail.ORGANISM_PROTEOME_HEADERS:
-        #     representation = self.to_headers_proteome_representation(instance)
-        # elif detail == SerializerDetail.ORGANISM_TAXONOMY_PROTEOME_HEADERS:
-        #     representation = self.to_headers_representation(instance, True)
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -69,8 +61,9 @@ class SetSerializer(ModelContentSerializer):
     def to_counter_representation(instance):
         if "sets" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
-               ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise ReferenceError('There are not structures for this request')
+               ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
+               ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0) :
+                raise ReferenceError('There are not sets for this request')
             instance = {
                 "sets": {
                         SetSerializer.get_key_from_bucket(bucket): SetSerializer.serialize_counter_bucket(bucket, "sets")

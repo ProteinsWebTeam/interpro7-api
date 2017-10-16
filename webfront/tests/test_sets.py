@@ -862,7 +862,7 @@ class SetProteinTest(InterproRESTTestCase):
     def test_can_filter_set_counter_with_acc(self):
         urls = [
             "/api/set/protein/uniprot/M5ADK6",
-            "/api/set/protein/unreviewed/A0A0A2L2G2",
+            "/api/set/protein/unreviewed/p16582",
             "/api/set/protein/reviewed/M5ADK6",
             ]
         for url in urls:
@@ -994,7 +994,7 @@ class SetStructureTest(InterproRESTTestCase):
     def test_can_filter_set_counter_with_acc(self):
         urls = [
             "/api/set/structure/pdb/1JM7",
-            "/api/set/structure/pdb/1JZ8",
+            "/api/set/structure/pdb/2bkm",
             ]
         for url in urls:
             response = self.client.get(url)

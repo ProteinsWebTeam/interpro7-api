@@ -285,14 +285,14 @@ class ElasticsearchController(SearchController):
         return [ch["_source"] for ch in response["hits"]["hits"]]
 
     def execute_query(self, query, fq=None, rows=0, start=0):
-        query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
+        q = query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
         conn = http.client.HTTPConnection(self.server, self.port)
         if fq is not None:
             q = query+" && "+fq.lower()
         q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
         conn.request(
             "GET",
-            "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,
+            "/"+self.index+"/"+self.type+"/_search?pretty&q="+q+"&size="+str(rows),
         )
         response = conn.getresponse()
         data = response.read().decode()

@@ -195,7 +195,12 @@ class OrganismSerializer(ModelContentSerializer):
     def get_searcher_query(instance):
         if isinstance(instance, Taxonomy):
             return "lineage:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
-        if isinstance(instance, Proteome):
+        elif isinstance(instance, dict) and "metadata" in instance:
+            if "taxonomy" in instance["metadata"]:
+                return "lineage:" + escape(instance["metadata"]["taxonomy"]).lower()
+            elif "accession" in instance["metadata"]:
+                return "lineage:" + escape(instance["metadata"]["accession"]).lower()
+        elif isinstance(instance, Proteome):
             return "proteomes:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
         return None
 

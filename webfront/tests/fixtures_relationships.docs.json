@@ -8,7 +8,7 @@
       "structures":["1T2V","1JM7"],
       "member_databases" : {
         "smart": ["SM00950"],
-        "prosite_profiles": ["PS50822"],
+        "profile": ["PS50822"],
         "pfam": ["PF02171"]
       },
       "source_database" : "interpro"
@@ -43,7 +43,7 @@
       },
       "structures":["1T2V"],
       "integrated" : "IPR003165",
-      "source_database" : "prosites_profiles"
+      "source_database" : "profile"
     },
     "PF17180":{
       "proteins": {

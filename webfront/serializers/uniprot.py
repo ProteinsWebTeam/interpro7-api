@@ -48,7 +48,8 @@ class ProteinSerializer(ModelContentSerializer):
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
-                    instance, s, "protein_acc:" + escape(instance.accession.lower())
+                    instance, s, "protein_acc:" + escape(instance.accession.lower()),
+                    include_chain=SerializerDetail.STRUCTURE_DETAIL not in detail_filters
                 )
             if SerializerDetail.ORGANISM_DB in detail_filters or \
                     SerializerDetail.ORGANISM_DETAIL in detail_filters:
@@ -186,7 +187,7 @@ class ProteinSerializer(ModelContentSerializer):
             header["chain"] = obj["chain"]
         if include_coordinates:
             key_coord = "entry_protein_locations" if for_entry else "protein_structure_locations"
-            header[key_coord] = obj[key_coord]
+            header[key_coord] = obj[key_coord] if key_coord in obj else None
         if include_protein:
             header["protein"] = ProteinSerializer.to_metadata_representation(
                 Protein.objects.get(accession__iexact=obj["protein_acc"]), solr

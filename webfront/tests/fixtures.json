@@ -11,7 +11,7 @@
       "source_database" : "interpro",
       "member_databases" : {
         "smart": ["SM00950"],
-        "prosite_profiles": ["PS50822"],
+        "profile": ["PS50822"],
         "pfam": ["PF02171"]
       },
       "integrated" : null,
@@ -283,7 +283,7 @@
       "short_name": "Piwi",
       "other_names": [],
       "go_terms": [],
-      "source_database": "prosite_profiles",
+      "source_database": "profile",
       "member_databases": null,
       "integrated": "IPR003165",
       "description": ["The Piwi box (or Sting domain) is an about 40 to 80 amino-acid conserved region, which was first identified in the C-terminal part of Drosophila Piwi and Sting proteins, and of related proteins from human, Caenorhabditis elegans, Arabidopsis thaliana, fission yeast and Dictyostelium discoideum."],
@@ -366,7 +366,7 @@
       "short_name": "HSP20",
       "other_names": [],
       "go_terms": [],
-      "source_database": "prosite_profiles",
+      "source_database": "profile",
       "member_databases": null,
       "integrated": null,
       "description": ["Heat shock hsp20 proteins family profile."],

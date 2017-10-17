@@ -52,13 +52,13 @@ class OrganismSerializer(ModelContentSerializer):
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
-                    instance, s, self.get_searcher_query(instance)
+                    instance, s, self.get_searcher_query(instance),
+                    include_chain=SerializerDetail.STRUCTURE_DETAIL not in detail_filters
                 )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = self.to_proteins_detail_representation(
-                    instance, self.searcher, self.get_searcher_query(instance),
-                    include_chains=True, include_coordinates=False
+                    instance, self.searcher, self.get_searcher_query(instance)
                 )
             if SerializerDetail.SET_DB in detail_filters or \
                     SerializerDetail.SET_DETAIL in detail_filters:

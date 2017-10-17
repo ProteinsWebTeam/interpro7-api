@@ -352,9 +352,9 @@ def get_endpoint_payload(obj, endpoint, db, acc=None, replace_proteome_accession
 # }
 
 
-def get_payload_list(data, endpoint, db, embed_as_metadata=True):
+def get_payload_list(data, endpoint, db, embed_as_metadata=True, include_chains=False):
     attrs = endpoint_attributes[endpoint].copy()
-    if not embed_as_metadata and endpoint == "structure":
+    if include_chains:
         attrs.append("chain")
     group_values = unique(
         select_fields(data, attrs)
@@ -368,34 +368,46 @@ def get_payload_list(data, endpoint, db, embed_as_metadata=True):
     return payload
 
 
+def extend_obj_with_other_endpoints(data, endpoints, dbs, accs, instance, ep):
+    for i in range(1, len(endpoints)):
+        current_ep = endpoints[i]
+        current_db = dbs[i]
+        current_acc = None if accs is None else accs[i]
+        if current_db is None:
+            instance[plurals[current_ep]] = get_endpoint_counter[current_ep](data)
+            for j in range(1, len(endpoints)):
+                if dbs[j] is not None and (accs is None or accs[j] is None):
+                    extend_counter_with_db[current_ep](
+                        instance[plurals[current_ep]],
+                        data,
+                        endpoints[j],
+                        dbs[j]
+                    )
+        else:
+            instance[plurals[current_ep]] = get_payload_list(
+                data, current_ep, current_db, False,
+                (ep == "structure" or current_ep == "structure") and current_acc is None
+            )[:10]  # the API only returns up to 10 items in a sublist
+
+
 def get_db_payload(data, endpoints, dbs, accs=None):
     ep = endpoints[0]
     db = dbs[0]
     payload = get_payload_list(data, ep, db)
     for instance in payload:
-        for i in range(1, len(endpoints)):
-            current_ep = endpoints[i]
-            if db == "proteome":
-                filtered = filter_by_contain_value(data, "proteomes", instance["metadata"]["accession"])
-            else:
-                filtered = filter_by_value(data, endpoint_attributes[ep][0], instance["metadata"]["accession"])
-            if dbs[i] is None:
-                instance[plurals[current_ep]] = get_endpoint_counter[current_ep](filtered)
-                for j in range(1, len(endpoints)):
-                    if dbs[j] is not None and (accs is None or accs[j] is None):
-                        extend_counter_with_db[current_ep](
-                            instance[plurals[current_ep]],
-                            filtered,
-                            endpoints[j],
-                            dbs[j]
-                        )
-            else:
-                instance[plurals[endpoints[i]]] = get_payload_list(filtered,endpoints[i], dbs[i], False)
+        if db == "proteome":
+            filtered = filter_by_contain_value(data, "proteomes", instance["metadata"]["accession"])
+        else:
+            filtered = filter_by_value(data, endpoint_attributes[ep][0], instance["metadata"]["accession"])
+        extend_obj_with_other_endpoints(filtered, endpoints, dbs, accs, instance, ep)
     return payload
 
+
 def get_acc_payload(data, endpoints, dbs, accs):
-    return {
+    payload = {
         "metadata": get_endpoint_payload(data[0], endpoints[0], dbs[0], accs[0], True),
-        plurals[endpoints[1]]: get_payload_list(data, endpoints[1], dbs[1], False),
-        plurals[endpoints[2]]: get_payload_list(data, endpoints[2], dbs[2], False),
+        # plurals[endpoints[1]]: get_payload_list(data, endpoints[1], dbs[1], False),
+        # plurals[endpoints[2]]: get_payload_list(data, endpoints[2], dbs[2], False),
     }
+    extend_obj_with_other_endpoints(data, endpoints, dbs, accs, payload, endpoints[0])
+    return payload

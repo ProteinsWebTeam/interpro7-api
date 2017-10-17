@@ -43,12 +43,14 @@ class SetSerializer(ModelContentSerializer):
                 representation["entries"] = self.to_entries_detail_representation(instance, s, q)
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = self.to_structures_detail_representation(instance, s, q)
+                representation["structures"] = self.to_structures_detail_representation(
+                    instance, s, q,
+                    include_chain=SerializerDetail.STRUCTURE_DETAIL not in detail_filters
+                )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = self.to_proteins_detail_representation(
-                    instance, self.searcher, q,
-                    include_chains=True, include_coordinates=False
+                    instance, self.searcher, q
                 )
             if SerializerDetail.ORGANISM_DB in detail_filters or \
                     SerializerDetail.ORGANISM_DETAIL in detail_filters:
@@ -124,13 +126,13 @@ class SetSerializer(ModelContentSerializer):
         )["organisms"]
 
     @staticmethod
-    def get_set_from_search_object(obj):
+    def get_set_from_search_object(obj, include_chain=False):
         header = {
             "accession": obj["set_acc"],
             "source_database": obj["set_db"],
         }
         if "set_integrated" in obj:
             header["integrated"] = obj["set_integrated"]
-        # if include_chain:
-        #     header["chain"] = obj["chain"]
+        if include_chain:
+            header["chain"] = obj["chain"]
         return header

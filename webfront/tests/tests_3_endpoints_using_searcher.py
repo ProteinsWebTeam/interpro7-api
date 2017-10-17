@@ -4,8 +4,102 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 from webfront.searcher.elastic_controller import ElasticsearchController
 
-from webfront.tests.tests_checking_3_endpoints_content import api_test_map
 from webfront.tests.actions_on_test_dataset import *
+api_test_map = {
+    "entry": {
+        "interpro": [
+            "IPR003165",
+            "IPR001165"
+        ],
+        "pfam": [
+            "PF02171",
+            "PF17180",
+            "PF17176",
+        ],
+        "smart": [
+            "SM00950",
+            "SM00002",
+        ],
+        "profile": [
+            "PS50822",
+            "PS01031",
+        ],
+        "unintegrated": [
+            "PF17180",
+            "PF17176",
+            "SM00002",
+            "PS01031",
+        ],
+        "integrated": [
+            "PF02171",
+            "SM00950",
+            "PS50822",
+        ]
+    },
+    "protein": {
+        "uniprot": [
+            "A1CUJ5",
+            "M5ADK6",
+            "A0A0A2L2G2",
+            "P16582",
+        ],
+        "reviewed": [
+            "A1CUJ5",
+            "M5ADK6",
+        ],
+        "unreviewed": [
+            "A0A0A2L2G2",
+            "P16582",
+        ],
+    },
+    "structure": {
+        "pdb": [
+            "1JM7",
+            "1T2V",
+            "2BKM",
+            "1JZ8",
+        ]
+    },
+    "chain": {
+        "pdb": [
+            "1JM7/A",
+            "1JM7/B",
+            "1T2V/A",
+            "1T2V/B",
+            "1T2V/C",
+            "1T2V/D",
+            "1T2V/E",
+            "2BKM/A",
+            "2BKM/B",
+            "1JZ8/A",
+            "1JZ8/B",
+        ]
+    },
+    "organism": {
+        "taxonomy": [
+            "1",
+            "2",
+            "2579",
+            "40296",
+            "344612",
+            "1001583",
+        ],
+        "proteome": [
+            "UP000006701",
+            "UP000012042",
+            "UP000030104",
+        ]
+    },
+    "set": {
+        "kegg": [
+            "KEGG01"
+        ],
+        "pfam": [
+            "CL0001",
+            "CL0002"
+        ]
+    }
+}
 
 del api_test_map["chain"]
 del api_test_map["entry"]["integrated"]
@@ -106,11 +200,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                     for db3 in api_test_map[endpoint3]:
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
                         response = self._get_in_debug_mode(url)
-                        if response.status_code == status.HTTP_200_OK:
-                            data = filter_by_endpoint(all_docs, endpoint1)
-                            data = filter_by_endpoint(data, endpoint2)
-                            data = filter_by_endpoint(data, endpoint3, db3)
-
+                        data = filter_by_endpoint(all_docs, endpoint1)
+                        data = filter_by_endpoint(data, endpoint2)
+                        data = filter_by_endpoint(data, endpoint3, db3)
+                        if len(data) == 0:
+                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                             "It should be an empty response for URL {}".format(url))
+                        else:
+                            self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                             "It should be an OK response for URL {}".format(url))
                             expected = get_counter_payload(
                                 data,
                                 [endpoint1, endpoint2, endpoint3],
@@ -132,10 +230,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 .format(url, response.data, expected)
                             )
 
-                        else:
-                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
-                                             "the url {} got the HTTP error {}".format(url, response.status_code))
-
     def test_endpoint_endpoint_acc(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
@@ -148,10 +242,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                         for acc3 in api_test_map[endpoint3][db3]:
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3, acc3)
                             response = self._get_in_debug_mode(url)
-                            if response.status_code == status.HTTP_200_OK:
-                                data = filter_by_endpoint(all_docs, endpoint1)
-                                data = filter_by_endpoint(data, endpoint2)
-                                data = filter_by_endpoint(data, endpoint3, db3, acc3)
+                            data = filter_by_endpoint(all_docs, endpoint1)
+                            data = filter_by_endpoint(data, endpoint2)
+                            data = filter_by_endpoint(data, endpoint3, db3, acc3)
+                            if len(data) == 0:
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                 "It should be an empty response for URL {}".format(url))
+                            else:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                 "It should be an OK response for URL {}".format(url))
 
                                 expected = get_counter_payload(
                                     data,
@@ -186,9 +285,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         "The URL {} wasn't equal. Response on key {}.\nRESPONSE: {}\nEXPECTED: {}"
                                         .format(url, key, response.data, expected)
                                     )
-                            else:
-                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
-                                                 "the url {} got the HTTP error {}".format(url, response.status_code))
 
     def test_endpoint_db_db(self):
         for endpoint1 in api_test_map:
@@ -202,11 +298,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                         for db3 in api_test_map[endpoint3]:
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2, endpoint3, db3)
                             response = self._get_in_debug_mode(url)
-                            if response.status_code == status.HTTP_200_OK:
-                                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                                data = filter_by_endpoint(all_docs, endpoint1)
-                                data = filter_by_endpoint(data, endpoint2, db2)
-                                data = filter_by_endpoint(data, endpoint3, db3)
+                            data = filter_by_endpoint(all_docs, endpoint1)
+                            data = filter_by_endpoint(data, endpoint2, db2)
+                            data = filter_by_endpoint(data, endpoint3, db3)
+                            if len(data) == 0:
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                 "It should be an empty response for URL {}".format(url))
+                            else:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                 "It should be an OK response for URL {}".format(url))
 
                                 expected = get_counter_payload(
                                     data,
@@ -220,8 +320,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 response = self.client.get(url)
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                                 self.assertEqual(response.data, expected)
-                            elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_endpoint_db_acc(self):
         for endpoint1 in api_test_map:
@@ -237,11 +335,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2,
                                                                       endpoint3, db3, acc3)
                                 response = self._get_in_debug_mode(url)
-                                if response.status_code == status.HTTP_200_OK:
-                                    self.assertEqual(response.status_code, status.HTTP_200_OK)
-                                    data = filter_by_endpoint(all_docs, endpoint1)
-                                    data = filter_by_endpoint(data, endpoint2, db2)
-                                    data = filter_by_endpoint(data, endpoint3, db3, acc3)
+                                data = filter_by_endpoint(all_docs, endpoint1)
+                                data = filter_by_endpoint(data, endpoint2, db2)
+                                data = filter_by_endpoint(data, endpoint3, db3, acc3)
+                                if len(data) == 0:
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                     "It should be an empty response for URL {}".format(url))
+                                else:
+                                    self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                     "It should be an OK response for URL {}".format(url))
 
                                     expected = get_counter_payload(
                                         data,
@@ -257,8 +359,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     response = self.client.get(url)
                                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                                     self.assertEqual(response.data, expected)
-                                elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_endpoint_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -276,10 +376,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         endpoint1, endpoint2, db2, acc2, endpoint3, db3, acc3
                                     )
                                     response = self._get_in_debug_mode(url)
-                                    if response.status_code == status.HTTP_200_OK:
-                                        data = filter_by_endpoint(all_docs, endpoint1)
-                                        data = filter_by_endpoint(data, endpoint2, db2, acc2)
-                                        data = filter_by_endpoint(data, endpoint3, db3, acc3)
+                                    data = filter_by_endpoint(all_docs, endpoint1)
+                                    data = filter_by_endpoint(data, endpoint2, db2, acc2)
+                                    data = filter_by_endpoint(data, endpoint3, db3, acc3)
+                                    if len(data) == 0:
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                         "It should be an empty response for URL {}".format(url))
+                                    else:
+                                        self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                         "It should be an OK response for URL {}".format(url))
 
                                         expected = get_counter_payload(
                                             data,
@@ -296,8 +401,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         response = self.client.get(url)
                                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                                         self.assertEqual(response.data, expected)
-                                    elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
     def assertFieldsInObjectsAreEqual(self, obj1, obj2, fields):
         for f in fields:
@@ -317,10 +420,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                             continue
                         url = "/api/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, endpoint3)
                         response = self._get_in_debug_mode(url)
-                        if response.status_code == status.HTTP_200_OK:
-                            data = filter_by_endpoint(all_docs, endpoint1, db1)
-                            data = filter_by_endpoint(data, endpoint2)
-                            data = filter_by_endpoint(data, endpoint3)
+                        data = filter_by_endpoint(all_docs, endpoint1, db1)
+                        data = filter_by_endpoint(data, endpoint2)
+                        data = filter_by_endpoint(data, endpoint3)
+                        if len(data) == 0:
+                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                             "It should be an empty response for URL {}".format(url))
+                        else:
+                            self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                             "It should be an OK response for URL {}".format(url))
                             expected = get_db_payload(
                                 data,
                                 [endpoint1, endpoint2, endpoint3],
@@ -343,9 +451,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                                          "the counter of {} of the {} {} doesn't match. URL: [{}]"
                                                          .format(key, endpoint1, obj1["metadata"]["accession"], url))
 
-                        elif response.status_code != status.HTTP_204_NO_CONTENT:
-                            self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
-
     def assert_obj_response_is_as_expected(self, obj_response, obj_expected, endpoint1, url):
         for key in obj_expected:
             if key == "metadata":
@@ -362,6 +467,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                 else:
                     self.assertEqual(type(obj_expected[key]), list)
                     self.assertEqual(type(obj_response[key]), list)
+                    self.assertEqual(len(obj_response[key]), len(obj_expected[key]), "URL: {}".format(url))
                     obj_expected[key].sort(key=lambda obj: str(obj["accession"]).lower())
                     obj_response[key].sort(key=lambda obj: str(obj["accession"]).lower())
                     for j in range(len(obj_expected[key])):
@@ -391,10 +497,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 continue
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, db2, endpoint3)
                             response = self._get_in_debug_mode(url)
-                            if response.status_code == status.HTTP_200_OK:
-                                data = filter_by_endpoint(all_docs, endpoint1, db1)
-                                data = filter_by_endpoint(data, endpoint2, db2)
-                                data = filter_by_endpoint(data, endpoint3)
+                            data = filter_by_endpoint(all_docs, endpoint1, db1)
+                            data = filter_by_endpoint(data, endpoint2, db2)
+                            data = filter_by_endpoint(data, endpoint3)
+                            if len(data) == 0:
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                 "It should be an empty response for URL {}".format(url))
+                            else:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                 "It should be an OK response for URL {}".format(url))
                                 expected = get_db_payload(
                                     data,
                                     [endpoint1, endpoint2, endpoint3],
@@ -407,8 +518,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 response = self.client.get(url)
                                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                                 self.assert_db_response_is_as_expected(response, expected, endpoint1, url)
-                            elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
     def test_db_db_db(self):
         for endpoint1 in api_test_map:
@@ -422,7 +531,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 continue
                             for db3 in api_test_map[endpoint3]:
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, db2, endpoint3, db3)
-                                print(url)
                                 response = self._get_in_debug_mode(url)
                                 if response.status_code == status.HTTP_200_OK:
                                     data = filter_by_endpoint(all_docs, endpoint1, db1)
@@ -502,6 +610,199 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                                             self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
 
+    def test_acc_endpoint_endpoint(self):
+        for endpoint1 in api_test_map:
+            for db1 in api_test_map[endpoint1]:
+                for acc1 in api_test_map[endpoint1][db1]:
+                    for endpoint2 in api_test_map:
+                        if endpoint1 == endpoint2:
+                            continue
+                        for endpoint3 in api_test_map:
+                            if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                                continue
+                            url = "/api/{}/{}/{}/{}/{}".format(
+                                endpoint1, db1, acc1, endpoint2, endpoint3)
+                            data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                            data = filter_by_endpoint(data, endpoint2)
+                            data = filter_by_endpoint(data, endpoint3)
+                            response = self._get_in_debug_mode(url)
+                            if len(data) == 0:
+                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                 "It should be an empty response for URL {}".format(url))
+                            else:
+                                self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                 "It should be an OK response for URL {}".format(url))
+                                expected = get_acc_payload(
+                                    data,
+                                    [endpoint1, endpoint2, endpoint3],
+                                    [db1, None, None],
+                                    [acc1, None, None],
+                                )
+                                self.assert_obj_response_is_as_expected(
+                                    response.data, expected, endpoint1, url
+                                )
+
+    def test_acc_endpoint_db(self):
+        for endpoint1 in api_test_map:
+            for db1 in api_test_map[endpoint1]:
+                for acc1 in api_test_map[endpoint1][db1]:
+                    for endpoint2 in api_test_map:
+                        if endpoint1 == endpoint2:
+                            continue
+                        for endpoint3 in api_test_map:
+                            if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                                continue
+                            for db3 in api_test_map[endpoint3]:
+                                url = "/api/{}/{}/{}/{}/{}/{}".format(
+                                    endpoint1, db1, acc1, endpoint2, endpoint3, db3)
+                                data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                data = filter_by_endpoint(data, endpoint2)
+                                data = filter_by_endpoint(data, endpoint3, db3)
+                                response = self._get_in_debug_mode(url)
+                                if len(data) == 0:
+                                    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                     "It should be an empty response for URL {}".format(url))
+                                else:
+                                    self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                     "It should be an OK response for URL {}".format(url))
+                                    expected = get_acc_payload(
+                                        data,
+                                        [endpoint1, endpoint2, endpoint3],
+                                        [db1, None, db3],
+                                        [acc1, None, None],
+                                    )
+                                    self.assert_obj_response_is_as_expected(
+                                        response.data, expected, endpoint1, url
+                                    )
+
+                                    # test_acc_db_endpoint
+                                    url = "/api/{}/{}/{}/{}/{}/{}".format(
+                                        endpoint1, db1, acc1, endpoint3, db3, endpoint2)
+                                    response = self.client.get(url)
+                                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                    self.assert_obj_response_is_as_expected(
+                                        response.data, expected, endpoint1, url
+                                    )
+
+    def test_acc_endpoint_acc(self):
+        for endpoint1 in api_test_map:
+            for db1 in api_test_map[endpoint1]:
+                for acc1 in api_test_map[endpoint1][db1]:
+                    for endpoint2 in api_test_map:
+                        if endpoint1 == endpoint2:
+                            continue
+                        for endpoint3 in api_test_map:
+                            if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                                continue
+                            for db3 in api_test_map[endpoint3]:
+                                for acc3 in api_test_map[endpoint3][db3]:
+                                    url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
+                                        endpoint1, db1, acc1, endpoint2, endpoint3, db3, acc3)
+                                    data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                    data = filter_by_endpoint(data, endpoint2)
+                                    data = filter_by_endpoint(data, endpoint3, db3, acc3)
+                                    response = self._get_in_debug_mode(url)
+                                    if len(data) == 0:
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                         "It should be an empty response for URL {}".format(url))
+                                    else:
+                                        self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                         "It should be an OK response for URL {}".format(url))
+                                        expected = get_acc_payload(
+                                            data,
+                                            [endpoint1, endpoint2, endpoint3],
+                                            [db1, None, db3],
+                                            [acc1, None, acc3],
+                                        )
+                                        self.assert_obj_response_is_as_expected(
+                                            response.data, expected, endpoint1, url
+                                        )
+                                        # test_acc_acc_endpoint
+                                        url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
+                                            endpoint1, db1, acc1, endpoint3, db3, acc3, endpoint2)
+                                        response = self.client.get(url)
+                                        self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                        self.assert_obj_response_is_as_expected(
+                                            response.data, expected, endpoint1, url
+                                        )
+
+    def test_acc_db_db(self):
+        for endpoint1 in api_test_map:
+            for db1 in api_test_map[endpoint1]:
+                for acc1 in api_test_map[endpoint1][db1]:
+                    for endpoint2 in api_test_map:
+                        if endpoint1 == endpoint2:
+                            continue
+                        for db2 in api_test_map[endpoint2]:
+                            for endpoint3 in api_test_map:
+                                if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                                    continue
+                                for db3 in api_test_map[endpoint3]:
+                                    url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
+                                        endpoint1, db1, acc1, endpoint2, db2, endpoint3, db3)
+                                    data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                    data = filter_by_endpoint(data, endpoint2, db2)
+                                    data = filter_by_endpoint(data, endpoint3, db3)
+                                    response = self._get_in_debug_mode(url)
+                                    if len(data) == 0:
+                                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                         "It should be an empty response for URL {}".format(url))
+                                    else:
+                                        self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                         "It should be an OK response for URL {}".format(url))
+                                        expected = get_acc_payload(
+                                            data,
+                                            [endpoint1, endpoint2, endpoint3],
+                                            [db1, db2, db3],
+                                            [acc1, None, None],
+                                        )
+                                        self.assert_obj_response_is_as_expected(
+                                            response.data, expected, endpoint1, url
+                                        )
+
+    def test_acc_db_acc(self):
+        for endpoint1 in api_test_map:
+            for db1 in api_test_map[endpoint1]:
+                for acc1 in api_test_map[endpoint1][db1]:
+                    for endpoint2 in api_test_map:
+                        if endpoint1 == endpoint2:
+                            continue
+                        for db2 in api_test_map[endpoint2]:
+                            for endpoint3 in api_test_map:
+                                if endpoint1 == endpoint3 or endpoint2 == endpoint3:
+                                    continue
+                                for db3 in api_test_map[endpoint3]:
+                                    for acc3 in api_test_map[endpoint3][db3]:
+                                        url = "/api/{}/{}/{}/{}/{}/{}/{}/{}".format(
+                                            endpoint1, db1, acc1, endpoint2, db2, endpoint3, db3, acc3)
+                                        data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                        data = filter_by_endpoint(data, endpoint2, db2)
+                                        data = filter_by_endpoint(data, endpoint3, db3, acc3)
+                                        response = self._get_in_debug_mode(url)
+                                        if len(data) == 0:
+                                            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
+                                                             "It should be an empty response for URL {}".format(url))
+                                        else:
+                                            self.assertEqual(response.status_code, status.HTTP_200_OK,
+                                                             "It should be an OK response for URL {}".format(url))
+                                            expected = get_acc_payload(
+                                                data,
+                                                [endpoint1, endpoint2, endpoint3],
+                                                [db1, db2, db3],
+                                                [acc1, None, acc3],
+                                            )
+                                            self.assert_obj_response_is_as_expected(
+                                                response.data, expected, endpoint1, url
+                                            )
+                                            # test_acc_acc_db
+                                            url = "/api/{}/{}/{}/{}/{}/{}/{}/{}".format(
+                                                endpoint1, db1, acc1, endpoint3, db3, acc3, endpoint2, db2)
+                                            response = self.client.get(url)
+                                            self.assertEqual(response.status_code, status.HTTP_200_OK)
+                                            self.assert_obj_response_is_as_expected(
+                                                response.data, expected, endpoint1, url
+                                            )
+
     def test_acc_acc_acc(self):
         for endpoint1 in api_test_map:
             for db1 in api_test_map[endpoint1]:
@@ -528,7 +829,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                             else:
                                                 self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                                  "It should be an OK response for URL {}".format(url))
-                                                print(url, "OK")
                                                 expected = get_acc_payload(
                                                     data,
                                                     [endpoint1, endpoint2, endpoint3],

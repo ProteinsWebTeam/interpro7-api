@@ -31,7 +31,7 @@ class EntryRESTTest(InterproRESTTestCase):
     db_members = {
         "pfam": 3,
         "smart": 2,
-        "prosite_profiles": 2,
+        "profile": 2,
     }
 
     def test_can_read_entry_overview(self):

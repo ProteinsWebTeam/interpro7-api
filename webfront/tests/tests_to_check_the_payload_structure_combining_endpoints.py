@@ -16,7 +16,7 @@ api_test_map = {
             "SM00950",
             "SM00002",
         ],
-        "prosite_profiles": [
+        "profile": [
             "PS50822",
             "PS01031",
         ],
@@ -26,7 +26,7 @@ api_test_map = {
         "interpro/smart": [
             "SM00950",
         ],
-        "interpro/prosite_profiles": [
+        "interpro/profile": [
             "PS50822",
         ],
         "unintegrated/pfam": [
@@ -36,7 +36,7 @@ api_test_map = {
         "unintegrated/smart": [
             "SM00002",
         ],
-        "unintegrated/prosite_profiles": [
+        "unintegrated/profile": [
             "PS01031",
         ],
     },

@@ -27,7 +27,7 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("pfam", response.data)
         self.assertIn("smart", response.data)
-        self.assertIn("prosite_profiles", response.data)
+        self.assertIn("profile", response.data)
 
     def test_wrong_field_fro_group_by_should_fail(self):
         self._check_HTTP_response_code("/api/entry?group_by=entry_type", code=status.HTTP_404_NOT_FOUND)
@@ -100,7 +100,7 @@ class SortByModifierTest(InterproRESTTestCase):
 class InterProStatusModifierTest(InterproRESTTestCase):
 
     def test_can_apply_interpro_status(self):
-        mdbs = ["prosite_profiles", "smart", "pfam"]
+        mdbs = ["profile", "smart", "pfam"]
         for db in mdbs:
             response = self.client.get("/api/entry/"+db)
             self.assertEqual(response.status_code, status.HTTP_200_OK)

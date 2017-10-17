@@ -73,9 +73,10 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def to_set_detail_representation(instance, searcher, query, include_chains=False):
+        fields = ["set_acc", "structure_chain"] if include_chains else "set_acc"
         response = [
-            webfront.serializers.collection.SetSerializer.get_set_from_search_object(r)
-            for r in searcher.get_group_obj_of_field_by_query(None, "set_acc", fq=query, rows=10)["groups"]
+            webfront.serializers.collection.SetSerializer.get_set_from_search_object(r, include_chains)
+            for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
             ]
         if len(response) == 0:
             raise ReferenceError('There are not sets for this request')
@@ -83,22 +84,23 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
 
     @staticmethod
-    def to_structures_detail_representation(instance, searcher, query, is_full=False):
+    def to_structures_detail_representation(instance, searcher, query, include_chain=True):
+        field = "structure_chain" if include_chain else "structure_acc"
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r,
-                include_structure=is_full,
+                include_structure=include_chain,
                 search=searcher
             )
-            for r in searcher.get_group_obj_of_field_by_query(None, "structure_chain", fq=query, rows=10)["groups"]
+            for r in searcher.get_group_obj_of_field_by_query(None, field, fq=query, rows=10)["groups"]
             ]
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
         return response
 
     @staticmethod
-    def to_entries_detail_representation(instance, searcher, searcher_query, for_structure=False):
-        if for_structure:
+    def to_entries_detail_representation(instance, searcher, searcher_query, include_chains=False, for_structure=False):
+        if include_chains:
             # search = searcher.execute_query(None, fq=searcher_query, rows=10)
             search = searcher.get_group_obj_of_field_by_query(None, ["structure_chain","entry_acc"], fq=searcher_query, rows=10)["groups"]
         else:
@@ -118,12 +120,12 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def to_proteins_detail_representation(instance, searcher, searcher_query, include_chains=False, include_coordinates=True):
-        field = "structure_chain" if not include_chains else "protein_acc"
+    def to_proteins_detail_representation(instance, searcher, searcher_query, include_chains=False, include_coordinates=True, for_entry=False):
+        field = "structure_chain" if include_chains else "protein_acc"
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
                 r,
-                for_entry=include_chains,
+                for_entry=for_entry,
                 solr=searcher,
                 include_coordinates=include_coordinates
             )

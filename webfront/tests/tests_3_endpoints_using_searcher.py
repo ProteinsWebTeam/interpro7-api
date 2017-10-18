@@ -106,68 +106,76 @@ del api_test_map["entry"]["integrated"]
 del api_test_map["entry"]["unintegrated"]
 
 
-search = ElasticsearchController()
-all_docs = search.execute_query("*:*", rows=50)
-
-
 class ActionsOnTestDocumentTest(InterproRESTTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(InterproRESTTestCase, cls).setUpClass()
+        search = ElasticsearchController()
+        cls.all_docs = search.execute_query("*:*", rows=50)
+
     def tests_all_docs_are_loaded(self):
-        self.assertNotEqual(None, all_docs)
-        self.assertGreater(len(all_docs), 0)
+        self.assertNotEqual(None, self.all_docs)
+        self.assertGreater(len(self.all_docs), 0)
 
     def tests_can_filter_by_entry_acc(self):
-        empty = filter_by_value(all_docs, "entry_acc", "Unicorn")
+        empty = filter_by_value(self.all_docs, "entry_acc", "Unicorn")
         self.assertEqual(len(empty), 0)
-        not_entry_acc = filter_by_value(all_docs, "entry_acc", None)
-        self.assertLess(len(not_entry_acc), len(all_docs))
-        with_entry_acc = filter_by_value(all_docs, "entry_acc", "*")
-        self.assertLess(len(with_entry_acc), len(all_docs))
-        self.assertEqual(len(with_entry_acc)+len(not_entry_acc), len(all_docs))
-        filtered = filter_by_value(all_docs, "entry_acc", "ipr003165")
+        not_entry_acc = filter_by_value(self.all_docs, "entry_acc", None)
+        self.assertLess(len(not_entry_acc), len(self.all_docs))
+        with_entry_acc = filter_by_value(self.all_docs, "entry_acc", "*")
+        self.assertLess(len(with_entry_acc), len(self.all_docs))
+        self.assertEqual(len(with_entry_acc)+len(not_entry_acc), len(self.all_docs))
+        filtered = filter_by_value(self.all_docs, "entry_acc", "ipr003165")
         self.assertGreater(len(filtered), 1)
 
     def tests_can_select(self):
-        with_entry_acc = filter_by_value(all_docs, "entry_acc", "*")
+        with_entry_acc = filter_by_value(self.all_docs, "entry_acc", "*")
         entry_acc_db = select_fields(with_entry_acc, ["entry_acc", "entry_db"])
         for doc in entry_acc_db:
             self.assertIn("entry_acc", doc)
 
     def tests_can_get_unique_set(self):
-        with_entry_db = filter_by_value(all_docs, "entry_db", "*")
+        with_entry_db = filter_by_value(self.all_docs, "entry_db", "*")
         entry_dbs = select_fields(with_entry_db, ["entry_db"])
         entry_dbs = unique(entry_dbs)
         entry_dbs = [d["entry_db"] for d in entry_dbs]
         self.assertEqual(len(entry_dbs), len(set(entry_dbs)))
 
     def tests_group_and_count(self):
-        db_counts = group_by_field_and_count(all_docs, "entry_db", "entry_acc")
+        db_counts = group_by_field_and_count(self.all_docs, "entry_db", "entry_acc")
         for db in db_counts:
             c = 0
-            for doc in all_docs:
+            for doc in self.all_docs:
                 if "entry_db" in doc and doc["entry_db"] == db:
                     c += 1
             self.assertEqual(db_counts[db], c)
 
     def tests_group_and_count_unique(self):
-        db_counts_unique = group_by_field_and_count(all_docs, "entry_db", "entry_acc", True)
+        db_counts_unique = group_by_field_and_count(self.all_docs, "entry_db", "entry_acc", True)
         for db in db_counts_unique:
             uni = set()
-            for doc in all_docs:
+            for doc in self.all_docs:
                 if "entry_db" in doc and doc["entry_db"] == db:
                     uni.add(doc["entry_acc"])
             self.assertEqual(db_counts_unique[db], len(uni))
 
     def tests_contains_filter(self):
-        with_root = filter_by_contain_value(all_docs, "lineage", "1")
-        self.assertEqual(len(all_docs), len(with_root))
-        with_bacteria = filter_by_contain_value(all_docs, "lineage", "2")
-        self.assertGreater(len(all_docs), len(with_bacteria))
-        with_tax_id = filter_by_value(all_docs, "tax_id", 344612)
+        with_root = filter_by_contain_value(self.all_docs, "lineage", "1")
+        self.assertEqual(len(self.all_docs), len(with_root))
+        with_bacteria = filter_by_contain_value(self.all_docs, "lineage", "2")
+        self.assertGreater(len(self.all_docs), len(with_bacteria))
+        with_tax_id = filter_by_value(self.all_docs, "tax_id", 344612)
         with_parent = filter_by_contain_value(with_tax_id, "lineage", "2579")
         self.assertEqual(len(with_parent), len(with_tax_id))
 
 
 class ThreeEndpointsTableTest(InterproRESTTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(InterproRESTTestCase, cls).setUpClass()
+        search = ElasticsearchController()
+        cls.all_docs = search.execute_query("*:*", rows=50)
+
     def test_endpoint_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
             for endpoint2 in api_test_map:
@@ -179,7 +187,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                     url = "/api/{}/{}/{}".format(endpoint1, endpoint2, endpoint3)
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, status.HTTP_200_OK, "URL: [{}]".format(url))
-                    data = filter_by_endpoint(all_docs, endpoint1)
+                    data = filter_by_endpoint(self.all_docs, endpoint1)
                     data = filter_by_endpoint(data, endpoint2)
                     data = filter_by_endpoint(data, endpoint3)
                     expected = get_counter_payload(data, [endpoint1, endpoint2, endpoint3])
@@ -200,7 +208,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                     for db3 in api_test_map[endpoint3]:
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
                         response = self._get_in_debug_mode(url)
-                        data = filter_by_endpoint(all_docs, endpoint1)
+                        data = filter_by_endpoint(self.all_docs, endpoint1)
                         data = filter_by_endpoint(data, endpoint2)
                         data = filter_by_endpoint(data, endpoint3, db3)
                         if len(data) == 0:
@@ -242,7 +250,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                         for acc3 in api_test_map[endpoint3][db3]:
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3, acc3)
                             response = self._get_in_debug_mode(url)
-                            data = filter_by_endpoint(all_docs, endpoint1)
+                            data = filter_by_endpoint(self.all_docs, endpoint1)
                             data = filter_by_endpoint(data, endpoint2)
                             data = filter_by_endpoint(data, endpoint3, db3, acc3)
                             if len(data) == 0:
@@ -298,7 +306,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                         for db3 in api_test_map[endpoint3]:
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2, endpoint3, db3)
                             response = self._get_in_debug_mode(url)
-                            data = filter_by_endpoint(all_docs, endpoint1)
+                            data = filter_by_endpoint(self.all_docs, endpoint1)
                             data = filter_by_endpoint(data, endpoint2, db2)
                             data = filter_by_endpoint(data, endpoint3, db3)
                             if len(data) == 0:
@@ -335,7 +343,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, endpoint2, db2,
                                                                       endpoint3, db3, acc3)
                                 response = self._get_in_debug_mode(url)
-                                data = filter_by_endpoint(all_docs, endpoint1)
+                                data = filter_by_endpoint(self.all_docs, endpoint1)
                                 data = filter_by_endpoint(data, endpoint2, db2)
                                 data = filter_by_endpoint(data, endpoint3, db3, acc3)
                                 if len(data) == 0:
@@ -376,7 +384,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         endpoint1, endpoint2, db2, acc2, endpoint3, db3, acc3
                                     )
                                     response = self._get_in_debug_mode(url)
-                                    data = filter_by_endpoint(all_docs, endpoint1)
+                                    data = filter_by_endpoint(self.all_docs, endpoint1)
                                     data = filter_by_endpoint(data, endpoint2, db2, acc2)
                                     data = filter_by_endpoint(data, endpoint3, db3, acc3)
                                     if len(data) == 0:
@@ -420,7 +428,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                             continue
                         url = "/api/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, endpoint3)
                         response = self._get_in_debug_mode(url)
-                        data = filter_by_endpoint(all_docs, endpoint1, db1)
+                        data = filter_by_endpoint(self.all_docs, endpoint1, db1)
                         data = filter_by_endpoint(data, endpoint2)
                         data = filter_by_endpoint(data, endpoint3)
                         if len(data) == 0:
@@ -497,7 +505,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 continue
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, db2, endpoint3)
                             response = self._get_in_debug_mode(url)
-                            data = filter_by_endpoint(all_docs, endpoint1, db1)
+                            data = filter_by_endpoint(self.all_docs, endpoint1, db1)
                             data = filter_by_endpoint(data, endpoint2, db2)
                             data = filter_by_endpoint(data, endpoint3)
                             if len(data) == 0:
@@ -533,7 +541,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, db2, endpoint3, db3)
                                 response = self._get_in_debug_mode(url)
                                 if response.status_code == status.HTTP_200_OK:
-                                    data = filter_by_endpoint(all_docs, endpoint1, db1)
+                                    data = filter_by_endpoint(self.all_docs, endpoint1, db1)
                                     data = filter_by_endpoint(data, endpoint2, db2)
                                     data = filter_by_endpoint(data, endpoint3, db3)
                                     expected = get_db_payload(
@@ -543,7 +551,9 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     )
                                     self.assert_db_response_is_as_expected(response, expected, endpoint1, url)
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                    self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
+                                    self.fail("unexpected error code {} for the URL : [{}]".format(
+                                        response.status_code, url)
+                                    )
 
     def test_db_db_acc(self):
         for endpoint1 in api_test_map:
@@ -561,7 +571,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         endpoint1, db1, endpoint2, db2, endpoint3, db3, acc3)
                                     response = self._get_in_debug_mode(url)
                                     if response.status_code == status.HTTP_200_OK:
-                                        data = filter_by_endpoint(all_docs, endpoint1, db1)
+                                        data = filter_by_endpoint(self.all_docs, endpoint1, db1)
                                         data = filter_by_endpoint(data, endpoint2, db2)
                                         data = filter_by_endpoint(data, endpoint3, db3, acc3)
                                         expected = get_db_payload(
@@ -578,7 +588,9 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                                         self.assert_db_response_is_as_expected(response, expected, endpoint1, url)
                                     elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                        self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
+                                        self.fail("unexpected error code {} for the URL : [{}]".format(
+                                            response.status_code, url)
+                                        )
 
     def test_db_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -597,7 +609,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                             endpoint1, db1, endpoint2, db2, acc2, endpoint3, db3, acc3)
                                         response = self._get_in_debug_mode(url)
                                         if response.status_code == status.HTTP_200_OK:
-                                            data = filter_by_endpoint(all_docs, endpoint1, db1)
+                                            data = filter_by_endpoint(self.all_docs, endpoint1, db1)
                                             data = filter_by_endpoint(data, endpoint2, db2, acc2)
                                             data = filter_by_endpoint(data, endpoint3, db3, acc3)
                                             expected = get_db_payload(
@@ -608,7 +620,9 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                             )
                                             self.assert_db_response_is_as_expected(response, expected, endpoint1, url)
                                         elif response.status_code != status.HTTP_204_NO_CONTENT:
-                                            self.fail("unexpected error code {} for the URL : [{}]".format(response.status_code, url))
+                                            self.fail("unexpected error code {} for the URL : [{}]".format(
+                                                response.status_code, url)
+                                            )
 
     def test_acc_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
@@ -622,7 +636,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 continue
                             url = "/api/{}/{}/{}/{}/{}".format(
                                 endpoint1, db1, acc1, endpoint2, endpoint3)
-                            data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                            data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
                             data = filter_by_endpoint(data, endpoint2)
                             data = filter_by_endpoint(data, endpoint3)
                             response = self._get_in_debug_mode(url)
@@ -655,7 +669,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                             for db3 in api_test_map[endpoint3]:
                                 url = "/api/{}/{}/{}/{}/{}/{}".format(
                                     endpoint1, db1, acc1, endpoint2, endpoint3, db3)
-                                data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
                                 data = filter_by_endpoint(data, endpoint2)
                                 data = filter_by_endpoint(data, endpoint3, db3)
                                 response = self._get_in_debug_mode(url)
@@ -698,7 +712,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 for acc3 in api_test_map[endpoint3][db3]:
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
                                         endpoint1, db1, acc1, endpoint2, endpoint3, db3, acc3)
-                                    data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                    data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
                                     data = filter_by_endpoint(data, endpoint2)
                                     data = filter_by_endpoint(data, endpoint3, db3, acc3)
                                     response = self._get_in_debug_mode(url)
@@ -740,7 +754,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 for db3 in api_test_map[endpoint3]:
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
                                         endpoint1, db1, acc1, endpoint2, db2, endpoint3, db3)
-                                    data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                    data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
                                     data = filter_by_endpoint(data, endpoint2, db2)
                                     data = filter_by_endpoint(data, endpoint3, db3)
                                     response = self._get_in_debug_mode(url)
@@ -775,7 +789,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     for acc3 in api_test_map[endpoint3][db3]:
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}/{}".format(
                                             endpoint1, db1, acc1, endpoint2, db2, endpoint3, db3, acc3)
-                                        data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                        data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
                                         data = filter_by_endpoint(data, endpoint2, db2)
                                         data = filter_by_endpoint(data, endpoint3, db3, acc3)
                                         response = self._get_in_debug_mode(url)
@@ -819,13 +833,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         for acc3 in api_test_map[endpoint3][db3]:
                                             url = "/api/{}/{}/{}/{}/{}/{}/{}/{}/{}".format(
                                                 endpoint1, db1, acc1, endpoint2, db2, acc2, endpoint3, db3, acc3)
-                                            data = filter_by_endpoint(all_docs, endpoint1, db1, acc1)
+                                            data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
                                             data = filter_by_endpoint(data, endpoint2, db2, acc2)
                                             data = filter_by_endpoint(data, endpoint3, db3, acc3)
                                             response = self._get_in_debug_mode(url)
                                             if len(data) == 0:
-                                                self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
-                                                                 "It should be an empty response for URL {}".format(url))
+                                                self.assertEqual(
+                                                    response.status_code, status.HTTP_204_NO_CONTENT,
+                                                    "It should be an empty response for URL {}".format(url)
+                                                )
                                             else:
                                                 self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                                  "It should be an OK response for URL {}".format(url))

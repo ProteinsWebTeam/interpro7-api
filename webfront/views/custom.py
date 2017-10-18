@@ -67,9 +67,9 @@ class CustomView(GenericAPIView):
                     self.update_queryset_from_search(searcher, general_handler)
 
                 if self.queryset.count() == 0:
-                    if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).count():
-                        raise Exception("The URL requested didn't have any data related.\nList of endpoints: {}"
-                                        .format(endpoint_levels))
+                    # if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).count():
+                    #     raise Exception("The URL requested didn't have any data related.\nList of endpoints: {}"
+                    #                     .format(endpoint_levels))
 
                     raise ReferenceError("The URL requested didn't have any data related.\nList of endpoints: {}"
                                          .format(endpoint_levels))

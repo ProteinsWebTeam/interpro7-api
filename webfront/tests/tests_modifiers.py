@@ -29,7 +29,7 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertIn("smart", response.data)
         self.assertIn("profile", response.data)
 
-    def test_wrong_field_fro_group_by_should_fail(self):
+    def test_wrong_field_for_group_by_should_fail(self):
         self._check_HTTP_response_code("/api/entry?group_by=entry_type", code=status.HTTP_404_NOT_FOUND)
 
 
@@ -46,7 +46,9 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
             self.assertEqual(result["metadata"]["integrated"], acc)
 
     def test_fails_filtering_interpro_by_integrated(self):
-        self._check_HTTP_response_code("/api/entry/interpro?integrated=IPR003165", code=status.HTTP_404_NOT_FOUND)
+        self._check_HTTP_response_code(
+            "/api/entry/interpro?integrated=IPR003165", code=status.HTTP_204_NO_CONTENT
+        )
 
     def test_can_filter_smart_by_type(self):
         entry_types = ["family", "domain"]
@@ -71,9 +73,6 @@ class FilterByContainsFieldModifierTest(InterproRESTTestCase):
         self.assertIn("results", response.data)
         for result in response.data["results"]:
             self.assertIn(db, result["metadata"]["member_databases"])
-
-    # def test_fails_filtering_pfam_by_signature_in(self):
-    #     self._check_HTTP_response_code("/api/entry/pfam?signature_in=pfam", code=status.HTTP_404_NOT_FOUND)
 
 
 class SortByModifierTest(InterproRESTTestCase):

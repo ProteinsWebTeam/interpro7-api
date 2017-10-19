@@ -187,7 +187,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
         else:
             self.assertEqual(response.status_code, status.HTTP_200_OK,
                              "It should be an OK response for URL {}".format(url))
-            print(url)
             if payload_type == PAYLOAD_TYPE_COUNTER:
                 expected = get_counter_payload(data, endpoints, dbs, accs)
                 self.assertEqual(

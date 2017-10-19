@@ -2,7 +2,7 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
-import unittest
+# import unittest
 
 
 class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
@@ -53,10 +53,21 @@ class ProteinWithFilterEntryRESTTest(InterproRESTTestCase):
         tests = [
             "/api/protein/reviewed/"+unreviewed+"/entry/",
             "/api/protein/unreviewed/"+reviewed+"/entry/",
-            "/api/protein/bad_db/entry/",
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(
+                url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed."
+            )
+        tests = [
+            "/api/protein/reviewed/"+unreviewed+"/bad_endpoint/",
+            "/api/protein/bad_db/"+reviewed+"/entry/",
+            "/api/protein/bad_db/entry/",
+            "/api/protein/reviewed/bad_endpoint/",
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(
+                url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed."
+            )
 
 
 class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
@@ -132,7 +143,19 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/protein/unreviewed/"+sp_1+"/entry/unintegrated",
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(
+                url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed."
+            )
+        tests = [
+            "/api/protein/reviewed/"+tr_1+"/entry/bad_db",
+            "/api/protein/unreviewed/"+sp_1+"/bad_endpoint/unintegrated",
+            "/api/bad_endpoint/reviewed/"+tr_1+"/entry/unintegrated",
+            "/api/protein/bad_db/"+sp_1+"/entry/unintegrated",
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(
+                url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed."
+            )
 
     def test_urls_that_should_fails_with_no_content(self):
         tr_1 = "P16582"
@@ -245,12 +268,19 @@ class ProteinWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
     def test_urls_that_should_fail(self):
         tr_1 = "P16582"
         sp_1 = "M5ADK6"
-        acc = "IPR003165"
-        pfam = "PF02171"
         pfam_u = "PF17180"
         tests = [
             "/api/protein/reviewed/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
             "/api/protein/unreviewed/"+sp_1+"/entry/unintegrated/pfam/"+pfam_u,
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed.")
+        tests = [
+            "/api/bad_endpoint/reviewed/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
+            "/api/protein/unreviewed/"+sp_1+"/bad_endpoint/unintegrated/pfam/"+pfam_u,
+            "/api/protein/bad_db/"+tr_1+"/entry/unintegrated/pfam/"+pfam_u,
+            "/api/protein/bad_db/"+tr_1+"/entry/unintegrated/bad_db/"+pfam_u,
+            "/api/protein/unreviewed/"+sp_1+"/entry/bad_db/pfam/"+pfam_u,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

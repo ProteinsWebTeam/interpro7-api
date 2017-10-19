@@ -51,4 +51,10 @@ class ProteinRESTTest(InterproRESTTestCase):
         self._check_HTTP_response_code("/api/protein/bad_db", code=status.HTTP_404_NOT_FOUND)
 
     def test_cant_read_protein_uniprot_bad_id(self):
-        self._check_HTTP_response_code("/api/protein/uniprot/bad_id", code=status.HTTP_404_NOT_FOUND)
+        self._check_HTTP_response_code(
+            "/api/protein/uniprot/badformmedID", code=status.HTTP_404_NOT_FOUND
+        )
+        self._check_HTTP_response_code(
+            "/api/protein/uniprot/A1CUJ6", code=status.HTTP_204_NO_CONTENT,
+            msg="It should fail as 204 because the ID is well formed but it is not in the BD"
+        )

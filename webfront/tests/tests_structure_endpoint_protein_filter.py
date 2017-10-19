@@ -162,12 +162,22 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         for url in tests:
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
-    def test_urls_that_should_fails(self):
+    def test_urls_that_should_fail(self):
         pdb = "1JM7"
         prot_s = "M5ADK6"
-        prot_t = "P16582"
         tests = [
-            "/api/structure/pdb/BADP/protein/uniprot/"+prot_s,
+            "/api/structure/pdb/bad_structure/protein/uniprot/"+prot_s,
+            "/api/bad_endpoint/pdb/"+pdb+"/protein/uniprot/"+prot_s,
+            "/api/structure/bad_db/"+pdb+"/protein/uniprot/"+prot_s,
+            "/api/structure/pdb/"+pdb+"/protein/uniprot/bad_protein",
+            "/api/structure/pdb/"+pdb+"/protein/bad_db/"+prot_s,
+            "/api/structure/pdb/"+pdb+"/bad_endpoint/uniprot/"+prot_s,
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
+        tests = [
+            "/api/structure/pdb/BADP/protein/uniprot/"+prot_s,
+            "/api/structure/pdb/"+pdb+"/protein/uniprot/bad_prot",
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed.")

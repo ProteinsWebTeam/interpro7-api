@@ -97,7 +97,15 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         tests = [
             "/api/protein/reviewed/"+prot_t+"/structure/pdb",
             "/api/protein/unreviewed/"+prot_s+"/structure/pdb",
+            ]
+        for url in tests:
+            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed.")
+        tests = [
             "/api/protein/unreviewed/BADP/structure/pdb",
+            "/api/bad_endpoint/reviewed/"+prot_t+"/structure/pdb",
+            "/api/protein/unreviewed/"+prot_s+"/bad_endpoint/pdb",
+            "/api/protein/bad_db/"+prot_t+"/structure/pdb",
+            "/api/protein/unreviewed/"+prot_s+"/structure/bad_db",
             ]
         for url in tests:
             self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")

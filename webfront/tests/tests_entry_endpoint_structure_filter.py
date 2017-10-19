@@ -167,4 +167,6 @@ class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
             "/api/entry/unintegrated/pfam/"+pfam+"/structure/pdb/"+pdb_2,
             ]
         for url in tests:
-            self._check_HTTP_response_code(url, code=status.HTTP_404_NOT_FOUND, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(
+                url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed."
+            )

@@ -49,21 +49,6 @@ api_test_map = {
             "1JZ8",
         ]
     },
-    "chain": {
-        "pdb": [
-            "1JM7/A",
-            "1JM7/B",
-            "1T2V/A",
-            "1T2V/B",
-            "1T2V/C",
-            "1T2V/D",
-            "1T2V/E",
-            "2BKM/A",
-            "2BKM/B",
-            "1JZ8/A",
-            "1JZ8/B",
-        ]
-    },
     "organism": {
         "taxonomy": [
             "1",
@@ -90,7 +75,12 @@ api_test_map = {
     }
 }
 
-del api_test_map["chain"]
+chains = {
+    "1JM7": ["a", "b"],
+    "1T2V": ["a", "b", "c", "d", "e"],
+    "2BKM": ["a", "b"],
+    "1JZ8": ["a", "b"],
+}
 
 
 class ActionsOnTestDocumentTest(InterproRESTTestCase):
@@ -203,6 +193,23 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                     response.data, expected, endpoints[0], url
                 )
 
+    def assert_chain_urls(self, data, endpoints, dbs, accs):
+        payload_type = PAYLOAD_TYPE_COUNTER
+        if dbs[0] is not None:
+            payload_type = PAYLOAD_TYPE_LIST
+            if accs is not None and accs[0] is not None:
+                payload_type = PAYLOAD_TYPE_ENTITY
+        for i in range(len(accs)):
+            if accs[i] is not None and endpoints[i] == "structure":
+                for chain in chains[accs[i]]:
+                    accs_copy = accs.copy()
+                    accs_copy[i] = accs_copy[i] + "/" + chain
+                    url = get_url(endpoints, dbs, accs_copy)
+                    with_chain = filter_by_value(data, "chain", chain)
+                    self.assert_response_equal_to_expectd(
+                        url, with_chain, payload_type, endpoints, dbs, accs
+                    )
+
     def assert_db_integration_urls(self, data, endpoints, dbs, accs=None):
         payload_type = PAYLOAD_TYPE_COUNTER
         if dbs[0] is not None:
@@ -311,15 +318,14 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
                                                  "It should be an empty response for URL {}".format(url))
                             else:
-                                self.assertEqual(response.status_code, status.HTTP_200_OK,
-                                                 "It should be an OK response for URL {}".format(url))
-
-                                expected = get_counter_payload(
-                                    data,
-                                    [endpoint1, endpoint2, endpoint3],
-                                    [None, None, db3],
-                                    [None, None, acc3],
+                                self.assertEqual(
+                                    response.status_code, status.HTTP_200_OK,
+                                    "It should be an OK response for URL {}".format(url)
                                 )
+                                eps = [endpoint1, endpoint2, endpoint3]
+                                dbs = [None, None, db3]
+                                accs = [None, None, acc3]
+                                expected = get_counter_payload(data, eps, dbs, accs)
                                 self.assertEqual(
                                     len(response.data), len(expected),
                                     "The URL {} wasn't equal to the expected response.\nRESPONSE: {}\nEXPECTED: {}"
@@ -347,12 +353,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         "The URL {} wasn't equal. Response on key {}.\nRESPONSE: {}\nEXPECTED: {}"
                                         .format(url, key, response.data, expected)
                                     )
-                                self.assert_db_integration_urls(
-                                    data,
-                                    [endpoint1, endpoint2, endpoint3],
-                                    [None, None, db3],
-                                    [None, None, acc3],
-                                )
+                                self.assert_db_integration_urls(data, eps, dbs, accs)
+                                self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_endpoint_db_db(self):
         for endpoint1 in api_test_map:
@@ -415,15 +417,14 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
                                                      "It should be an empty response for URL {}".format(url))
                                 else:
-                                    self.assertEqual(response.status_code, status.HTTP_200_OK,
-                                                     "It should be an OK response for URL {}".format(url))
-
-                                    expected = get_counter_payload(
-                                        data,
-                                        [endpoint1, endpoint2, endpoint3],
-                                        [None, db2, db3],
-                                        [None, None, acc3],
+                                    self.assertEqual(
+                                        response.status_code, status.HTTP_200_OK,
+                                        "It should be an OK response for URL {}".format(url)
                                     )
+                                    eps = [endpoint1, endpoint2, endpoint3]
+                                    dbs = [None, db2, db3]
+                                    accs = [None, None, acc3]
+                                    expected = get_counter_payload(data, eps, dbs, accs)
 
                                     self.assertEqual(response.data, expected)
 
@@ -432,12 +433,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     response = self.client.get(url)
                                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                                     self.assertEqual(response.data, expected)
-                                    self.assert_db_integration_urls(
-                                        data,
-                                        [endpoint1, endpoint2, endpoint3],
-                                        [None, db2, db3],
-                                        [None, None, acc3],
-                                    )
+                                    self.assert_db_integration_urls(data, eps, dbs, accs)
+                                    self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_endpoint_acc_acc(self):
         for endpoint1 in api_test_map:
@@ -464,13 +461,10 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                          "It should be an OK response for URL {}".format(url))
-
-                                        expected = get_counter_payload(
-                                            data,
-                                            [endpoint1, endpoint2, endpoint3],
-                                            [None, db2, db3],
-                                            [None, acc2, acc3],
-                                        )
+                                        eps = [endpoint1, endpoint2, endpoint3]
+                                        dbs = [None, db2, db3]
+                                        accs = [None, acc2, acc3]
+                                        expected = get_counter_payload(data, eps, dbs, accs)
 
                                         self.assertEqual(response.data, expected)
 
@@ -480,12 +474,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         response = self.client.get(url)
                                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                                         self.assertEqual(response.data, expected)
-                                        self.assert_db_integration_urls(
-                                            data,
-                                            [endpoint1, endpoint2, endpoint3],
-                                            [None, db2, db3],
-                                            [None, acc2, acc3],
-                                        )
+                                        self.assert_db_integration_urls(data, eps, dbs, accs)
+                                        self.assert_chain_urls(data, eps, dbs, accs)
 
     def assertFieldsInObjectsAreEqual(self, obj1, obj2, fields):
         for f in fields:
@@ -667,19 +657,13 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                          "It should be an OK response for URL {}".format(url))
-                                        expected = get_db_payload(
-                                            data,
-                                            [endpoint1, endpoint2, endpoint3],
-                                            [db1, db2, db3],
-                                            [None, None, acc3],
-                                        )
+                                        eps = [endpoint1, endpoint2, endpoint3]
+                                        dbs = [db1, db2, db3]
+                                        accs = [None, None, acc3]
+                                        expected = get_db_payload(data, eps, dbs, accs)
                                         self.assert_db_response_is_as_expected(response, expected, endpoint1, url)
-                                        self.assert_db_integration_urls(
-                                            data,
-                                            [endpoint1, endpoint2, endpoint3],
-                                            [db1, db2, db3],
-                                            [None, None, acc3],
-                                        )
+                                        self.assert_db_integration_urls(data, eps, dbs, accs)
+                                        self.assert_chain_urls(data, eps, dbs, accs)
                                         # test_db_acc_db
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
                                             endpoint1, db1, endpoint3, db3, acc3, endpoint2, db2)
@@ -712,19 +696,13 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         else:
                                             self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                              "It should be an OK response for URL {}".format(url))
-                                            expected = get_db_payload(
-                                                data,
-                                                [endpoint1, endpoint2, endpoint3],
-                                                [db1, db2, db3],
-                                                [None, acc2, acc3],
-                                            )
+                                            eps = [endpoint1, endpoint2, endpoint3]
+                                            dbs = [db1, db2, db3]
+                                            accs = [None, acc2, acc3]
+                                            expected = get_db_payload(data, eps, dbs, accs)
                                             self.assert_db_response_is_as_expected(response, expected, endpoint1, url)
-                                            self.assert_db_integration_urls(
-                                                data,
-                                                [endpoint1, endpoint2, endpoint3],
-                                                [db1, db2, db3],
-                                                [None, acc2, acc3],
-                                            )
+                                            self.assert_db_integration_urls(data, eps, dbs, accs)
+                                            self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_acc_endpoint_endpoint(self):
         for endpoint1 in api_test_map:
@@ -748,21 +726,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                             else:
                                 self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                  "It should be an OK response for URL {}".format(url))
-                                expected = get_acc_payload(
-                                    data,
-                                    [endpoint1, endpoint2, endpoint3],
-                                    [db1, None, None],
-                                    [acc1, None, None],
-                                )
+                                eps = [endpoint1, endpoint2, endpoint3]
+                                dbs = [db1, None, None]
+                                accs = [acc1, None, None]
+                                expected = get_acc_payload(data, eps, dbs, accs)
                                 self.assert_obj_response_is_as_expected(
                                     response.data, expected, endpoint1, url
                                 )
-                                self.assert_db_integration_urls(
-                                    data,
-                                    [endpoint1, endpoint2, endpoint3],
-                                    [db1, None, None],
-                                    [acc1, None, None],
-                                )
+                                self.assert_db_integration_urls(data, eps, dbs, accs)
+                                self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_acc_endpoint_db(self):
         for endpoint1 in api_test_map:
@@ -787,12 +759,10 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 else:
                                     self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                      "It should be an OK response for URL {}".format(url))
-                                    expected = get_acc_payload(
-                                        data,
-                                        [endpoint1, endpoint2, endpoint3],
-                                        [db1, None, db3],
-                                        [acc1, None, None],
-                                    )
+                                    eps = [endpoint1, endpoint2, endpoint3]
+                                    dbs = [db1, None, db3]
+                                    accs = [acc1, None, None]
+                                    expected = get_acc_payload(data, eps, dbs, accs)
                                     self.assert_obj_response_is_as_expected(
                                         response.data, expected, endpoint1, url
                                     )
@@ -805,12 +775,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     self.assert_obj_response_is_as_expected(
                                         response.data, expected, endpoint1, url
                                     )
-                                    self.assert_db_integration_urls(
-                                        data,
-                                        [endpoint1, endpoint2, endpoint3],
-                                        [db1, None, db3],
-                                        [acc1, None, None],
-                                    )
+                                    self.assert_db_integration_urls(data, eps, dbs, accs)
+                                    self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_acc_endpoint_acc(self):
         for endpoint1 in api_test_map:
@@ -836,21 +802,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                          "It should be an OK response for URL {}".format(url))
-                                        expected = get_acc_payload(
-                                            data,
-                                            [endpoint1, endpoint2, endpoint3],
-                                            [db1, None, db3],
-                                            [acc1, None, acc3],
-                                        )
+                                        eps = [endpoint1, endpoint2, endpoint3]
+                                        dbs = [db1, None, db3]
+                                        accs = [acc1, None, acc3]
+                                        expected = get_acc_payload(data, eps, dbs, accs)
                                         self.assert_obj_response_is_as_expected(
                                             response.data, expected, endpoint1, url
                                         )
-                                        self.assert_db_integration_urls(
-                                            data,
-                                            [endpoint1, endpoint2, endpoint3],
-                                            [db1, None, db3],
-                                            [acc1, None, acc3],
-                                        )
+                                        self.assert_db_integration_urls(data, eps, dbs, accs)
+                                        self.assert_chain_urls(data, eps, dbs, accs)
 
                                         # test_acc_acc_endpoint
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
@@ -885,21 +845,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     else:
                                         self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                          "It should be an OK response for URL {}".format(url))
-                                        expected = get_acc_payload(
-                                            data,
-                                            [endpoint1, endpoint2, endpoint3],
-                                            [db1, db2, db3],
-                                            [acc1, None, None],
-                                        )
+                                        eps = [endpoint1, endpoint2, endpoint3]
+                                        dbs = [db1, db2, db3]
+                                        accs = [acc1, None, None]
+                                        expected = get_acc_payload(data, eps, dbs, accs)
                                         self.assert_obj_response_is_as_expected(
                                             response.data, expected, endpoint1, url
                                         )
-                                        self.assert_db_integration_urls(
-                                            data,
-                                            [endpoint1, endpoint2, endpoint3],
-                                            [db1, db2, db3],
-                                            [acc1, None, None],
-                                        )
+                                        self.assert_db_integration_urls(data, eps, dbs, accs)
+                                        self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_acc_db_acc(self):
         for endpoint1 in api_test_map:
@@ -926,21 +880,15 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         else:
                                             self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                              "It should be an OK response for URL {}".format(url))
-                                            expected = get_acc_payload(
-                                                data,
-                                                [endpoint1, endpoint2, endpoint3],
-                                                [db1, db2, db3],
-                                                [acc1, None, acc3],
-                                            )
+                                            eps = [endpoint1, endpoint2, endpoint3]
+                                            dbs = [db1, db2, db3]
+                                            accs = [acc1, None, acc3]
+                                            expected = get_acc_payload(data, eps, dbs, accs)
                                             self.assert_obj_response_is_as_expected(
                                                 response.data, expected, endpoint1, url
                                             )
-                                            self.assert_db_integration_urls(
-                                                data,
-                                                [endpoint1, endpoint2, endpoint3],
-                                                [db1, db2, db3],
-                                                [acc1, None, acc3],
-                                            )
+                                            self.assert_db_integration_urls(data, eps, dbs, accs)
+                                            self.assert_chain_urls(data, eps, dbs, accs)
 
                                             # test_acc_acc_db
                                             url = "/api/{}/{}/{}/{}/{}/{}/{}/{}".format(
@@ -979,19 +927,13 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                             else:
                                                 self.assertEqual(response.status_code, status.HTTP_200_OK,
                                                                  "It should be an OK response for URL {}".format(url))
-                                                expected = get_acc_payload(
-                                                    data,
-                                                    [endpoint1, endpoint2, endpoint3],
-                                                    [db1, db2, db3],
-                                                    [acc1, acc2, acc3],
-                                                )
+                                                eps = [endpoint1, endpoint2, endpoint3]
+                                                dbs = [db1, db2, db3]
+                                                accs = [acc1, acc2, acc3]
+                                                expected = get_acc_payload(data, eps, dbs, accs)
                                                 self.assert_obj_response_is_as_expected(
                                                     response.data, expected, endpoint1, url
                                                 )
-                                                self.assert_db_integration_urls(
-                                                    data,
-                                                    [endpoint1, endpoint2, endpoint3],
-                                                    [db1, db2, db3],
-                                                    [acc1, acc2, acc3],
-                                                )
+                                                self.assert_db_integration_urls(data, eps, dbs, accs)
+                                                self.assert_chain_urls(data, eps, dbs, accs)
 

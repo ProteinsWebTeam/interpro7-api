@@ -79,7 +79,9 @@ class SetSerializer(ModelContentSerializer):
         obj = {
             "metadata": {
                 "accession": instance.accession,
-                "name": instance.name,
+                "name": {
+                    "name": instance.name,
+                },
                 "source_database": instance.source_database,
                 "description": instance.description,
                 "integrated": instance.integrated,

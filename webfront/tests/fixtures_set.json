@@ -9,10 +9,10 @@
       "integrated": null,
       "relationships": {
         "nodes": [
-          {"accession": "PF02171", "type": "entry"},
-          {"accession": "PF17180", "type": "entry"}
+          {"accession": "PF02171", "type": "entry", "score": 0.6},
+          {"accession": "PF17180", "type": "entry", "score": 0.9}
         ],
-        "links": [{"source": "PF17180", "target": "PF02171"}]
+        "links": [{"source": "PF17180", "target": "PF02171", "score": 0.4}]
       }
     }
   },
@@ -26,10 +26,10 @@
       "integrated": null,
       "relationships": {
         "nodes": [
-          {"accession": "PF02171", "type": "entry"},
-          {"accession": "PF17176", "type": "entry"}
+          {"accession": "PF02171", "type": "entry", "score": 0.2},
+          {"accession": "PF17176", "type": "entry", "score": 0.8}
         ],
-        "links": [{"source": "PF17176", "target": "PF02171"}]
+        "links": [{"source": "PF17176", "target": "PF02171", "score": 0.6}]
       }
     }
   },
@@ -43,10 +43,10 @@
       "integrated": null,
       "relationships": {
         "nodes": [
-          {"accession": "KEGG01.1", "type": "node"},
-          {"accession": "KEGG01.2", "type": "node"}
+          {"accession": "KEGG01.1", "type": "node", "score": 0.5},
+          {"accession": "KEGG01.2", "type": "node", "score": 0.5}
         ],
-        "links": [{"source": "KEGG01.1", "target": "KEGG01.2"}]
+        "links": [{"source": "KEGG01.1", "target": "KEGG01.2", "score": 0.5}]
       }
     }
   },
@@ -60,9 +60,10 @@
       "integrated": ["KEGG01"],
       "relationships": {
         "nodes": [
-          {"accession": "IPR003165", "type": "entry"},
-          {"accession": "PF02171", "type": "entry"}
-        ]
+          {"accession": "IPR003165", "type": "entry", "score": 0.5},
+          {"accession": "PF02171", "type": "entry", "score": 0.5}
+        ],
+        "links": []
       }
     }
   },
@@ -76,9 +77,10 @@
       "integrated": ["KEGG01"],
       "relationships": {
         "nodes": [
-          {"accession": "IPR001165", "type": "entry"},
-          {"accession": "PS50822", "type": "entry"}
-        ]
+          {"accession": "IPR001165", "type": "entry", "score": 0.5},
+          {"accession": "PS50822", "type": "entry", "score": 0.5}
+        ],
+        "links": []
       }
     }
   }

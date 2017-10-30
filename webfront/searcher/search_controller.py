@@ -11,6 +11,7 @@ class SearchController(metaclass=abc.ABCMeta):
 
     def get_number_of_field_by_endpoint(self, endpoint, field, accession):
         db = field
+        fq = None
         if field.startswith("entry"):
             db = "entry_db"
         elif field.startswith("protein"):
@@ -20,8 +21,10 @@ class SearchController(metaclass=abc.ABCMeta):
         acc = "{}_acc".format(endpoint)
         if endpoint == "organism":
             acc = "lineage"
+        if field == "set_acc":
+            fq = "!set_integrated:* && !set_db:kegg"
         ngroups = self.get_group_obj_of_field_by_query(
-             "{}:* && {}:{}".format(db, acc, escape(accession)), field
+             "{}:* && {}:{}".format(db, acc, escape(accession)), field, fq
         )["ngroups"]
         if isinstance(ngroups, dict):
             ngroups = ngroups["value"]

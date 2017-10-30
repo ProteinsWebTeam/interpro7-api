@@ -74,8 +74,8 @@ class SetSerializer(ModelContentSerializer):
             }
         return instance
 
-    @staticmethod
-    def to_full_representation(instance):
+    def to_full_representation(self, instance):
+        s = self.searcher
         obj = {
             "metadata": {
                 "accession": instance.accession,
@@ -86,8 +86,13 @@ class SetSerializer(ModelContentSerializer):
                 "description": instance.description,
                 "integrated": instance.integrated,
                 "relationships": instance.relationships,
+                "counters": {
+                    "entries": s.get_number_of_field_by_endpoint("set", "entry_acc", instance.accession),
+                    "structures": s.get_number_of_field_by_endpoint("set", "structure_acc", instance.accession),
+                    "proteins": s.get_number_of_field_by_endpoint("set", "protein_acc", instance.accession),
+                    "organisms": s.get_number_of_field_by_endpoint("set", "tax_id", instance.accession),
+                }
             },
-            "counters": {}
         }
         return obj
 

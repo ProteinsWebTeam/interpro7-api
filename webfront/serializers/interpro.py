@@ -136,7 +136,8 @@ class EntrySerializer(ModelContentSerializer):
             "counters": {
                 "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
                 "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession),
-                "organisms": solr.get_number_of_field_by_endpoint("entry", "tax_id", instance.accession)
+                "organisms": solr.get_number_of_field_by_endpoint("entry", "tax_id", instance.accession),
+                "sets": solr.get_number_of_field_by_endpoint("entry", "set_acc", instance.accession),
             },
             "entry_annotations": annotation_types,
             "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)

@@ -69,7 +69,7 @@ class MemberHandler(CustomView):
                 "source_database": "entry_db",
                 "member_databases": "",
                 "go_terms": "go_terms",
-        }),
+            }),
             use_model_as_payload=True,
             # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
@@ -208,7 +208,7 @@ class InterproHandler(CustomView):
                 "source_database": "entry_db",
                 "member_databases": "",
                 "go_terms": "go_terms",
-        }),
+            }),
             use_model_as_payload=True,
             # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
@@ -224,10 +224,36 @@ class InterproHandler(CustomView):
         return queryset
 
 
+class AllHandler(CustomView):
+    level_description = 'all level'
+    queryset = Entry.objects.all()
+    serializer_class = EntrySerializer
+    serializer_detail = SerializerDetail.ENTRY_HEADERS
+    serializer_detail_filter = SerializerDetail.ENTRY_DB
+    child_handlers = [
+        ('interpro', InterproHandler),
+        (db_members, MemberHandler)
+    ]
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+        general_handler.queryset_manager.add_filter("entry", source_database__isnull=False)
+        return super(AllHandler, self).get(
+            request, endpoint_levels, available_endpoint_handlers, level,
+            self.queryset, handler, general_handler, *args, **kwargs
+        )
+
+    @staticmethod
+    def filter(queryset, level_name="", general_handler=None):
+        general_handler.queryset_manager.add_filter("entry", source_database__isnull=False)
+        return queryset
+
+
 class EntryHandler(CustomView):
     level_description = 'Entry level'
     from_model = False  # The object generated will be serialized as JSON, without checking the model
     child_handlers = [
+        ('all', AllHandler),
         ('interpro', InterproHandler),
         ('unintegrated', UnintegratedHandler),
         ('integrated', IntegratedHandler),

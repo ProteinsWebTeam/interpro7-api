@@ -111,11 +111,20 @@ class GeneralHandler(CustomView):
             }
 
     def search_modifier(self, search, general_handler):
-        self.queryset_manager.add_filter(
-            "search",
-            accession__icontains=search,
-            name__icontains=search
-        )
+        if search.strip() == "":
+            return
+        if general_handler.queryset_manager.main_endpoint == "taxonomy":
+            self.queryset_manager.add_filter(
+                "search",
+                accession__icontains=search,
+                full_name__icontains=search
+            )
+        else:
+            self.queryset_manager.add_filter(
+                "search",
+                accession__icontains=search,
+                name__icontains=search
+            )
 
     @staticmethod
     def get_search_controller(queryset_manager=None):

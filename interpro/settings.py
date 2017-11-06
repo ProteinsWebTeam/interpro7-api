@@ -195,12 +195,12 @@ if DEBUG and ("TRAVIS" not in os.environ):
                 'class': 'logging.StreamHandler',
             },
         },
-        'loggers': {
-            'django.db.backends': {
-                'level': 'DEBUG',
-                'handlers': ['console'],
-            },
-        },
+        # 'loggers': {
+        #     'django.db.backends': {
+        #         'level': 'DEBUG',
+        #         'handlers': ['console'],
+        #     },
+        # },
     }
 
 # Debug toolbar

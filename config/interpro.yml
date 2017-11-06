@@ -3,6 +3,7 @@ tmp_path: "/tmp/"
 django_cors: true
 searcher_path: "http://hmmer-prod-db04:9200/reviewed_proteomes/relationship"
 searcher_test_path: "http://localhost:9200/test/relationship"
+api_url: "https://wwwdev.ebi.ac.uk/interpro7/api/"
 use_test_db: false
 
 members:

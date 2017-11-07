@@ -44,7 +44,7 @@ class CustomView(GenericAPIView):
                 self.queryset = general_handler.modifiers.payload
                 self.serializer_detail = general_handler.modifiers.serializer
                 if self.serializer_detail == SerializerDetail.ANNOTATION_BLOB:
-                    #assuming queryset contains a list of one annotation object
+                    # assuming queryset contains a list of one annotation object
                     if len(self.queryset) == 1:
                         annotation = self.queryset[0]
                         mime_type = annotation.mime_type

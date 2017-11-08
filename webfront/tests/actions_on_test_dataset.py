@@ -118,6 +118,12 @@ def count_unintegrated(docs):
     return len(u)
 
 
+def count_all(docs):
+    select = select_fields(docs, ["entry_acc"])
+    u = unique(select)
+    return len(u)
+
+
 def filter_by_db_field(subset, db_field, db):
     if db_field is not None:
         if db_field != "protein_db" or db != "uniprot":
@@ -148,6 +154,7 @@ def get_entry_counter(data):
         "interpro": groups["interpro"] if "interpro" in groups else 0,
         "integrated": count_integrated(data),
         "unintegrated": count_unintegrated(data),
+        "all": count_all(data),
         "member_databases": {
             k: v
             for k, v in groups.items()
@@ -160,6 +167,7 @@ def extend_entry_counter(counter, data, ep, db):
     extend_entry_db_counter(counter, data, "interpro", ep, db)
     extend_entry_db_counter(counter, data, "integrated", ep, db)
     extend_entry_db_counter(counter, data, "unintegrated", ep, db)
+    extend_entry_db_counter(counter, data, "all", ep, db)
     for m in counter["member_databases"]:
         extend_entry_db_counter(counter["member_databases"], data, m, ep, db)
 
@@ -176,6 +184,8 @@ def extend_entry_db_counter(counter, data, member, ep, db):
     elif member == "unintegrated":
         just_member = filter_by_value(data, "integrated", None)
         just_member = exclude_by_value(just_member, "entry_db", "interpro")
+    elif member == "all":
+        just_member = data
     else:
         just_member = filter_by_value(data, "entry_db", member)
     counter[member][plurals[ep]] = count_unique(

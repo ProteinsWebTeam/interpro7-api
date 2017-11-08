@@ -5,7 +5,7 @@ from webfront.serializers.collection import SetSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from django.conf import settings
 
-entry_sets = '|'.join(settings.ENTRY_SETS)
+entry_sets = '|'.join(settings.ENTRY_SETS) + '|all'
 entry_sets_accessions = (
     r'^({})$'.format('|'.join((set['accession'] for (_, set) in settings.ENTRY_SETS.items())))
 )
@@ -103,8 +103,9 @@ class SetTypeHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-
-        general_handler.queryset_manager.add_filter("set", source_database=endpoint_levels[level - 1])
+        db = endpoint_levels[level - 1]
+        if db.lower() != "all":
+            general_handler.queryset_manager.add_filter("set", source_database=db)
         return super(SetTypeHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -112,7 +113,8 @@ class SetTypeHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("set", source_database=level_name)
+        if level_name.lower() != "all":
+            general_handler.queryset_manager.add_filter("set", source_database=level_name)
         return queryset
 
 

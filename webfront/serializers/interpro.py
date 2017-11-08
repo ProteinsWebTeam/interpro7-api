@@ -184,6 +184,7 @@ class EntrySerializer(ModelContentSerializer):
                     "integrated": 0,
                     "unintegrated": 0,
                     "interpro": 0,
+                    "all": 0,
                 }
             }
             if SerializerDetail.PROTEIN_DB in filters or\
@@ -193,28 +194,37 @@ class EntrySerializer(ModelContentSerializer):
                 result["entries"]["integrated"] = {"entries": 0}
                 result["entries"]["unintegrated"] = {"entries": 0}
                 result["entries"]["interpro"] = {"entries": 0}
+                result["entries"]["all"] = {"entries": 0}
 
             if SerializerDetail.PROTEIN_DB in filters:
                 result["entries"]["integrated"]["proteins"] = 0
                 result["entries"]["unintegrated"]["proteins"] = 0
                 result["entries"]["interpro"]["proteins"] = 0
+                result["entries"]["all"]["proteins"] = 0
             if SerializerDetail.STRUCTURE_DB in filters:
                 result["entries"]["integrated"]["structures"] = 0
                 result["entries"]["unintegrated"]["structures"] = 0
                 result["entries"]["interpro"]["structures"] = 0
+                result["entries"]["all"]["structures"] = 0
             if SerializerDetail.ORGANISM_DB in filters:
                 result["entries"]["integrated"]["organisms"] = 0
                 result["entries"]["unintegrated"]["organisms"] = 0
                 result["entries"]["interpro"]["organisms"] = 0
+                result["entries"]["all"]["organisms"] = 0
             if SerializerDetail.SET_DB in filters:
                 result["entries"]["integrated"]["sets"] = 0
                 result["entries"]["unintegrated"]["sets"] = 0
                 result["entries"]["interpro"]["sets"] = 0
+                result["entries"]["all"]["sets"] = 0
 
             if "unintegrated" in instance and (
                     ("count" in instance["unintegrated"] and instance["unintegrated"]["count"]) or
                     ("doc_count" in instance["unintegrated"] and instance["unintegrated"]["doc_count"]) > 0):
                 result["entries"]["unintegrated"] = EntrySerializer.serialize_counter_bucket(instance["unintegrated"], "entries")
+            if "all" in instance and (
+                    ("count" in instance["all"] and instance["all"]["count"]) or
+                    ("doc_count" in instance["all"] and instance["all"]["doc_count"]) > 0):
+                result["entries"]["all"] = EntrySerializer.serialize_counter_bucket(instance["all"], "entries")
             if "integrated" in instance and (
                     ("count" in instance["integrated"] and instance["integrated"]["count"]) or
                     ("doc_count" in instance["integrated"] and instance["integrated"]["doc_count"]) > 0):

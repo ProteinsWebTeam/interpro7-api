@@ -281,6 +281,7 @@ class EntryHandler(CustomView):
         output["unintegrated"] = qs \
             .exclude(**{'source_database__iexact': "interpro"}) \
             .filter(**{'integrated__isnull': True}).count()
+        output["all"] = qs.count()
         return {"entries": output}
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,

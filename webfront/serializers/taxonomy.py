@@ -31,6 +31,9 @@ class OrganismSerializer(ModelContentSerializer):
             representation = self.to_headers_proteome_representation(instance)
         elif detail == SerializerDetail.ORGANISM_TAXONOMY_PROTEOME_HEADERS:
             representation = self.to_headers_representation(instance, True)
+        elif detail == SerializerDetail.ORGANISM_DETAIL_NAMES:
+            representation = self.to_full_representation(instance)
+            representation["names"] = self.get_names_map(instance)
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -73,12 +76,12 @@ class OrganismSerializer(ModelContentSerializer):
         s = self.searcher
         obj = {
             "metadata": {
-                "accession": instance.accession,
+                "accession": str(instance.accession),
                 "lineage": instance.lineage,
                 "rank": instance.rank,
-                "children": instance.children,
+                "children": [str(c)for c in instance.children],
                 "source_database": "taxonomy",
-                "parent": instance.parent.accession if instance.parent is not None else None,
+                "parent": str(instance.parent.accession) if instance.parent is not None else None,
                 "name": {
                     "name": instance.scientific_name,
                     "short": instance.full_name,
@@ -240,4 +243,15 @@ class OrganismSerializer(ModelContentSerializer):
         if include_chain:
             header["chain"] = obj["chain"]
         return header
+
+    @staticmethod
+    def get_names_map(instance):
+        qs = Taxonomy.objects.filter(accession__in=instance.lineage.strip().split()+instance.children)
+        return {
+            t.accession: {
+                "name": t.scientific_name,
+                "short": t.full_name,
+            }
+            for t in qs
+        }
 

@@ -40,9 +40,10 @@ class CustomView(GenericAPIView):
         if len(endpoint_levels) == level:
             searcher = general_handler.searcher
             has_payload = general_handler.modifiers.execute(request)
+            if has_payload or general_handler.modifiers.serializer is not None:
+                self.serializer_detail = general_handler.modifiers.serializer
             if has_payload:
                 self.queryset = general_handler.modifiers.payload
-                self.serializer_detail = general_handler.modifiers.serializer
                 if self.serializer_detail == SerializerDetail.ANNOTATION_BLOB:
                     # assuming queryset contains a list of one annotation object
                     if len(self.queryset) == 1:

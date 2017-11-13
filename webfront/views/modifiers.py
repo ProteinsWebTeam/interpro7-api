@@ -169,3 +169,7 @@ def get_entry_annotation(field, general_handler):
         data = entry.entryannotation_set.filter(type=field)
         annotation.append(data[0])
     return(annotation)
+
+
+def passing(x, y):
+    pass

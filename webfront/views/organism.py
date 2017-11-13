@@ -1,6 +1,7 @@
 from webfront.models import Taxonomy, Proteome
 from webfront.serializers.taxonomy import OrganismSerializer
 from webfront.views.custom import CustomView, SerializerDetail
+from webfront.views.modifiers import passing
 
 
 class ProteomeAccessionHandler(CustomView):
@@ -78,6 +79,10 @@ class TaxonomyAccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("taxonomy", accession=endpoint_levels[level - 1].upper())
+        general_handler.modifiers.register(
+            "with_names", passing, serializer=SerializerDetail.ORGANISM_DETAIL_NAMES
+        )
+
         return super(TaxonomyAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

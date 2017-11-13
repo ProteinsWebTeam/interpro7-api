@@ -4,7 +4,8 @@ from django.shortcuts import redirect
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from webfront.views.modifiers import \
-    group_by, sort_by, filter_by_field, get_single_value, filter_by_field_range, get_domain_architectures
+    group_by, sort_by, filter_by_field, get_single_value, filter_by_field_range,\
+    get_domain_architectures, filter_by_contains_field
 from webfront.models import Protein
 from django.conf import settings
 
@@ -121,7 +122,8 @@ class ProteinHandler(CustomView):
             group_by(Protein, {
                 "tax_id": "tax_id",
                 "protein_evidence": None,
-                "source_database": "protein_db"
+                "source_database": "protein_db",
+                "go_terms": "text",
             }),
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY
@@ -139,6 +141,7 @@ class ProteinHandler(CustomView):
         general_handler.modifiers.register("id", filter_by_field("protein", "identifier"))
         general_handler.modifiers.register("tax_id", filter_by_field("protein", "tax_id"))
         general_handler.modifiers.register("protein_evidence", filter_by_field("protein", "evidence_code"))
+        general_handler.modifiers.register("go_term", filter_by_contains_field("protein", "go_terms", '"identifier": "{}"'))
 
         return super(ProteinHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

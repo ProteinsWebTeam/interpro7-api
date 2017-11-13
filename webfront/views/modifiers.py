@@ -5,6 +5,25 @@ from django.db.models import Count
 from webfront.models import Entry, EntryAnnotation
 
 
+go_terms = [
+    "GO:0003824",
+    "GO:0003677",
+    "GO:0008152",
+    "GO:0055114",
+    "GO:0019867",
+    "GO:0005524",
+    "GO:0016491",
+    "GO:0006810",
+    "GO:0006260",
+    "GO:0016021",
+    "GO:0048037",
+    "GO:0042575",
+    "GO:0030031",
+    "GO:0016043",
+    "GO:0016049",
+]
+
+
 def group_by_member_databases(general_handler):
     if is_single_endpoint(general_handler):
         holder = general_handler.queryset_manager.remove_filter('entry', 'source_database__iexact')
@@ -20,15 +39,27 @@ def group_by_member_databases(general_handler):
         return qs
 
 
-def group_by_go_terms(general_handler):
+def group_by_go_categories(general_handler):
+    template = '"category": "{}"'
+    groups = {"P": "Biological Process", "C": "Cellular Component", "F": "Molecular Function"}
     if is_single_endpoint(general_handler):
-        categories = {"P": "Biological Process", "C": "Cellular Component", "F": "Molecular Function"}
-        qs = {categories[cat]:
+        qs = {groups[cat]:
                   general_handler.queryset_manager.get_queryset()
-                      .filter(go_terms__contains='"category": "{}"'.format(cat))
+                      .filter(go_terms__contains=template.format(cat))
                       .count()
-              for cat in categories
+              for cat in groups
               }
+        return qs
+
+
+def group_by_go_terms(general_handler):
+    template = '"identifier": "{}"'
+    if is_single_endpoint(general_handler):
+        qs = [(term, general_handler.queryset_manager.get_queryset()
+                        .filter(go_terms__contains=template.format(term))
+                        .count())
+              for term in go_terms
+              ]
         return qs
 
 
@@ -67,6 +98,8 @@ def group_by(endpoint_queryset, fields):
             return group_by_member_databases(general_handler)
         if "go_terms" == field:
             return group_by_go_terms(general_handler)
+        if "go_categories" == field:
+            return group_by_go_categories(general_handler)
         if "annotation" == field:
             return group_by_annotations(general_handler)
         if is_single_endpoint(general_handler):

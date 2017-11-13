@@ -207,7 +207,7 @@ class InterproHandler(CustomView):
                 "integrated": "integrated",
                 "source_database": "entry_db",
                 "member_databases": "",
-                "go_terms": "go_terms",
+                "go_categories": "go_categories",
             }),
             use_model_as_payload=True,
             # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
@@ -295,7 +295,8 @@ class EntryHandler(CustomView):
                 "integrated": "integrated",
                 "source_database": "entry_db",
                 "annotation": "entry_annotation",
-                "tax_id": "tax_id"
+                "tax_id": "tax_id",
+                "go_terms": "text",
             }),
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY
@@ -307,7 +308,8 @@ class EntryHandler(CustomView):
         }))
         general_handler.modifiers.register("type", filter_by_field("entry", "type"))
         general_handler.modifiers.register("integrated", filter_by_field("entry", "integrated__accession"))
-        general_handler.modifiers.register("go_term", filter_by_contains_field("entry", "go_terms", '"category": "{}"'))
+        general_handler.modifiers.register("go_category", filter_by_contains_field("entry", "go_terms", '"category": "{}"'))
+        general_handler.modifiers.register("go_term", filter_by_contains_field("entry", "go_terms", '"identifier": "{}"'))
         general_handler.modifiers.register(
             "annotation",
             filter_by_contains_field("entry", "entryannotation__type"),

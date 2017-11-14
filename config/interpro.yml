@@ -213,5 +213,7 @@ cross_references:
 sets:
   'pfam':
     accession: 'CL\d{4}'
+  'cdd':
+    accession: 'cl\d{5}'
   'kegg':
     accession: 'KEGG\d+'

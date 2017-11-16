@@ -257,7 +257,9 @@ def extend_organism_counter(counter, data, ep, db):
 
 def get_set_counter(data):
     without_nodes = filter_by_value(data, "set_integrated", None)
-    return group_by_field_and_count(without_nodes, "set_db", "set_acc", True)
+    without_nodes = group_by_field_and_count(without_nodes, "set_db", "set_acc", True)
+    without_nodes["all"] = sum(without_nodes.values())
+    return without_nodes
 
 
 def extend_set_counter(counter, data, ep, db):
@@ -266,7 +268,7 @@ def extend_set_counter(counter, data, ep, db):
             counter[member] = {
                 "sets": counter[member]
             }
-        just_member = filter_by_db_field(data, "set_db", member)
+        just_member = data if member == "all" else filter_by_db_field(data, "set_db", member)
         field_db = get_db_field(ep)
         field_acc = get_acc_field(ep)
         counter[member][plurals[ep]] = count_unique(

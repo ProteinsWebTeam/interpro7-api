@@ -1,6 +1,6 @@
 from django.test import override_settings
 
-from interpro import settings
+from django.conf import settings
 from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
@@ -300,7 +300,7 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_set_count_overview(self, main_obj, msg=""):
         self.assertIn("sets", main_obj, msg)
         for s in main_obj["sets"]:
-            self.assertIn(s, ["pfam", "kegg"], msg)
+            self.assertIn(s, list(settings.ENTRY_SETS.keys()) + ["all"], msg)
 
     def _check_set_from_searcher(self, obj, msg=""):
         self.assertIn("accession", obj, msg)

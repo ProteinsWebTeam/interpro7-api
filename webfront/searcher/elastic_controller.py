@@ -89,7 +89,7 @@ class ElasticsearchController(SearchController):
         self.tune_counter_facet_for_protein(facet, endpoint, extra_counters)
         self.tune_counter_facet_for_structure(facet, endpoint, extra_counters)
         self.tune_counter_facet_for_organism(facet, endpoint, extra_counters)
-        # self.tune_counter_facet_for_set(facet, endpoint, extra_counters)
+        self.tune_counter_facet_for_set(facet, endpoint, extra_counters)
 
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]
@@ -163,19 +163,23 @@ class ElasticsearchController(SearchController):
             }
             facet["aggs"]["databases"]["aggs"]["proteomes"] = {
                 "cardinality": {"field": "proteomes"}
-            #     TODO: count proteomes insted
             }
             del facet["aggs"]["databases"]["terms"]
             self.add_extra_counters(facet, "databases", extra_counters)
 
     def tune_counter_facet_for_set(self, facet, endpoint, extra_counters):
         if endpoint == "set":
-            facet["aggs"]["databases"]["nested"] = {"path": "sets"}
-            facet["aggs"]["databases"]["terms"]["field"] = "sets.source_database"
-            facet["aggs"]["databases"]["aggs"]["unique"] = {
-                "cardinality": {"field": "sets.accession"}
+            facet["aggs"]["all"] = {
+              "filter": {"exists": {"field": "set_acc"}},
+              "aggs": {"unique": {"cardinality": {"field": "set_acc"}}}
             }
-            self.add_extra_counters(facet, "databases", extra_counters)
+            self.add_extra_counters(facet, "all", extra_counters)
+        #     facet["aggs"]["databases"]["nested"] = {"path": "sets"}
+        #     facet["aggs"]["databases"]["terms"]["field"] = "sets.source_database"
+        #     facet["aggs"]["databases"]["aggs"]["unique"] = {
+        #         "cardinality": {"field": "sets.accession"}
+        #     }
+        #     self.add_extra_counters(facet, "databases", extra_counters)
 
     def add_subterm_aggs(self, obj, field, size):
         obj["aggs"] = {

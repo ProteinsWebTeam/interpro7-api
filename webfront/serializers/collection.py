@@ -66,13 +66,17 @@ class SetSerializer(ModelContentSerializer):
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
                ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0) :
                 raise ReferenceError('There are not sets for this request')
-            instance = {
+            ins2 = {
                 "sets": {
                         SetSerializer.get_key_from_bucket(bucket): SetSerializer.serialize_counter_bucket(bucket, "sets")
                         for bucket in instance["databases"]["buckets"]
                 }
             }
-            instance["sets"]["all"] = sum(instance["sets"].values())
+            ins2["sets"]["all"] = SetSerializer.serialize_counter_bucket(
+                instance["all"], "sets"
+            )
+            instance = ins2
+            # instance["sets"]["all"] = sum(instance["sets"].values())
         return instance
 
     def to_full_representation(self, instance):

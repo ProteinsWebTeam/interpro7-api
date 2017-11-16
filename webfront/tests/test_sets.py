@@ -653,7 +653,6 @@ class SetEntryTest(InterproRESTTestCase):
     def test_can_filter_set_counter_with_entry_db(self):
         acc = "IPR003165"
         urls = [
-            "/api/set/entry/interpro",
             "/api/set/entry/pfam",
             "/api/set/entry/unintegrated",
             "/api/set/entry/unintegrated/pfam",

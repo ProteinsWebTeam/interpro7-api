@@ -133,7 +133,9 @@ class SetHandler(CustomView):
     def get_database_contributions(self, queryset):
         qs = Set.objects.filter(accession__in=queryset)
         set_counter = qs.values_list('source_database').annotate(total=Count('source_database'))
-        return {"sets": {c[0]: c[1] for c in set_counter if c[0] != "node"}}
+        output = {c[0]: c[1] for c in set_counter if c[0] != "node"}
+        output["all"] = sum(output.values())
+        return {"sets": output}
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):

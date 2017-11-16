@@ -72,6 +72,7 @@ class SetSerializer(ModelContentSerializer):
                         for bucket in instance["databases"]["buckets"]
                 }
             }
+            instance["sets"]["all"] = sum(instance["sets"].values())
         return instance
 
     def to_full_representation(self, instance):

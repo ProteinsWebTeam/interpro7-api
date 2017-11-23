@@ -30,11 +30,13 @@ dbcode = {
 }
 query_for_interpro_entries = '''SELECT DISTINCT
     e.ENTRY_AC, e.ENTRY_TYPE, e.NAME, e.SHORT_NAME, DBMS_LOB.substr(e.ANNOTATION, 3000) as DESCRIPTION,
-    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID, p.LEN as LEN,
-    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN
+    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID, p.LEN as LEN, p_dw.DESCRIPTION as PROTEIN_DESCRIPTION, 
+    p_dw.PROTEIN_NAME, p_dw.TAXONOMY_SCIENTIFIC_NAME as TAX_NAME, p_dw.TAXONOMY_FULL_NAME as TAX_FULLNAME,
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN, PS.TITLE, PS.METHOD
   FROM INTERPRODW.DW_ENTRY e
     JOIN  INTERPRODW.UPI_SUPERMATCH_STG pe ON e.ENTRY_AC=pe.ENTRY_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
+    LEFT JOIN INTERPRODW.DW_PROTEIN_XREF p_dw ON p_dw.PROTEIN_AC=p.PROTEIN_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=p.PROTEIN_AC
   WHERE ROWNUM <= {} AND {}'''
 
@@ -42,11 +44,13 @@ query_for_memberdb_entries = '''SELECT DISTINCT
     e.METHOD_AC as ENTRY_AC, e.SIG_TYPE as ENTRY_TYPE, e.DBCODE as ENTRY_DB,
     e.NAME, e.DESCRIPTION, e.ABSTRACT as SHORT_NAME,
     em.ENTRY_AC as INTEGRATED,
-    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID, p.LEN as LEN,
-    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN
+    p.PROTEIN_AC, p.DBCODE as PROTEIN_DB, p.TAX_ID, p.LEN as LEN, p_dw.DESCRIPTION as PROTEIN_DESCRIPTION,
+    p_dw.PROTEIN_NAME, p_dw.TAXONOMY_SCIENTIFIC_NAME as TAX_NAME, p_dw.TAXONOMY_FULL_NAME as TAX_FULLNAME,
+    ps.ENTRY_ID as STRUCTURE_AC, PS.CHAIN, PS.TITLE, PS.METHOD
   FROM INTERPRO.METHOD e
     JOIN INTERPRO.MATCH pe ON e.METHOD_AC=pe.METHOD_AC
     JOIN INTERPRO.PROTEIN p ON p.PROTEIN_AC=pe.PROTEIN_AC
+    LEFT JOIN INTERPRODW.DW_PROTEIN_XREF p_dw ON p_dw.PROTEIN_AC=p.PROTEIN_AC
     LEFT JOIN INTERPRO.ENTRY2METHOD em ON em.METHOD_AC=e.METHOD_AC
     LEFT JOIN INTERPRO.UNIPROT_PDBE ps ON ps.SPTR_AC=pe.PROTEIN_AC
   WHERE pe.DBCODE=e.DBCODE AND ROWNUM <= {} AND {}'''
@@ -65,8 +69,8 @@ def get_dbcodes(con):
     sql = "SELECT * FROM INTERPRO.CV_DATABASE"
     cur.execute(sql)
     dbcodes = {row[0]: row[3] for row in cur}
-    dbcodes["S"]: "reviewed"# Swiss-Prot
-    dbcodes["T"]: "unreviewed"# TrEMBL
+    dbcodes["S"] = "reviewed"# Swiss-Prot
+    dbcodes["T"] = "unreviewed"# TrEMBL
     return dbcodes
 
 
@@ -133,7 +137,7 @@ def attach_structure_coordinates(con, obj):
 
 def attach_ida_data(con, obj):
     cur = con.cursor()
-    sql = """  SELECT DBMS_LOB.substr(ida.IDA, 12000) as IDA, ida.IDA_FK
+    sql = """  SELECT ida.IDA, ida.IDA_FK
                FROM PROTEIN_IDA_NEW ida
                WHERE PROTEIN_AC='{}'"""\
         .format(obj["protein_acc"])
@@ -152,19 +156,50 @@ def attach_ida_data(con, obj):
 def get_object_from_row(con, row, col, is_for_interpro_entries=True):
     codes = get_dbcodes(con)
     ep = get_entry_types(con)
+    entry_db = "interpro" if is_for_interpro_entries else codes[row[col["ENTRY_DB"]]]
+    integrated = None if is_for_interpro_entries else row[col["INTEGRATED"]]
+    protein_db = codes[row[col["PROTEIN_DB"]]]
+    structure = {
+        "acc": row[col["STRUCTURE_AC"]] if row[col["STRUCTURE_AC"]] is not None else None,
+        "chain": row[col["CHAIN"]] if row[col["CHAIN"]] is not None else None,
+        "method": row[col["METHOD"]] if row[col["METHOD"]] is not None else None,
+        "title": row[col["TITLE"]] if row[col["TITLE"]] is not None else None,
+    }
     obj = attach_coordinates(con, {
-        "text": " ".join([str(r) for r in row]),
+        "text_entry":
+            str(row[col["ENTRY_AC"]]) + " " +
+            str(row[col["ENTRY_TYPE"]]) + " " +
+            str(row[col["SHORT_NAME"]]) + " " +
+            str(integrated) + " " +
+            str(row[col["NAME"]]) + " " +
+            str(row[col["TAX_ID"]]) + " " +
+            str(row[col["DESCRIPTION"]]) + " " +
+            entry_db,
+        "text_protein":
+            str(row[col["PROTEIN_AC"]]) + " " +
+            str(row[col["PROTEIN_DESCRIPTION"]]) + " " +
+            str(row[col["PROTEIN_NAME"]]) + " " +
+            str(protein_db),
+        "text_structure":
+            str(structure["acc"]) + " " +
+            str(structure["chain"]) + " " +
+            str(structure["method"]) + " " +
+            str(structure["title"]),
+        "text_organism":
+            str(row[col["TAX_ID"]]) + " " +
+            str(row[col["TAX_NAME"]]) + " " +
+            str(row[col["TAX_FULLNAME"]]),
         "entry_acc": row[col["ENTRY_AC"]],
         "entry_type": ep[row[col["ENTRY_TYPE"]]],
-        "entry_db": "interpro" if is_for_interpro_entries else codes[row[col["ENTRY_DB"]]],
-        "integrated": None if is_for_interpro_entries else row[col["INTEGRATED"]],
+        "entry_db": entry_db,
+        "integrated": integrated,
         "protein_acc": row[col["PROTEIN_AC"]],
-        "protein_db": codes[row[col["PROTEIN_DB"]]],
+        "protein_db": protein_db,
         "protein_length": row[col["LEN"]],
         "tax_id": row[col["TAX_ID"]],
-        "structure_acc": row[col["STRUCTURE_AC"]] if row[col["STRUCTURE_AC"]] is not None else None,
-        "chain": row[col["CHAIN"]] if row[col["CHAIN"]] is not None else None,
-        "structure_chain": row[col["STRUCTURE_AC"]] + " - " + row[col["CHAIN"]] if row[col["STRUCTURE_AC"]] is not None else None,
+        "structure_acc": structure["acc"],
+        "chain": structure["chain"],
+        "structure_chain": structure["acc"] + " - " + structure["chain"] if structure["acc"] is not None else None,
         "id": get_id(row[col["ENTRY_AC"]], row[col["PROTEIN_AC"]], row[col["STRUCTURE_AC"]], row[col["CHAIN"]])
     }, row[col["LEN"]], is_for_interpro_entries)
     return {k: v.lower() if type(v) == str and k not in ['chain', 'id'] else v for k, v in obj.items()}
@@ -196,7 +231,7 @@ def chunks(iterable, max=1000):
 
 def oracle2json(interpro_db, protein_db, block_size, match_pos, compare_sym, end):
     ipro = DATABASES['interpro_ro']
-    print('connecting to '+ipro['NAME'])
+    print('connecting to ', ipro['HOST'], ipro['PORT'], ipro['NAME'])
     con = cx_Oracle.connect(
         ipro['USER'], ipro['PASSWORD'],
         cx_Oracle.makedsn(ipro['HOST'], ipro['PORT'], ipro['NAME']) if ipro['PORT'] else ipro['NAME']

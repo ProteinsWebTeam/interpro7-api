@@ -54,7 +54,10 @@ class QuerysetManager:
                 if ep == "solr":
                     q += " && {}:{}".format(k, escape(v))
                 elif include_search and ep == "search":
-                    q += " && text:*{}*".format(escape(v))
+                    main_ep = self.main_endpoint
+                    if main_ep == "taxonomy" or main_ep == "proteome":
+                        main_ep = "organism"
+                    q += " && text_{}:*{}*".format(main_ep, escape(v))
                 elif k == "source_database__isnull":
                     q += " && {}{}_db:*".format("!" if v else "", ep)
                 elif k == "accession" or k == "accession__iexact":

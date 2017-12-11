@@ -1,6 +1,4 @@
-from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
-import ipdb
 
 
 class EntryRESTSearchTest(InterproRESTTestCase):
@@ -108,18 +106,41 @@ class TwoEndpointsRESTSearchTest(InterproRESTTestCase):
         )
 
     def test_return_filtered_subset_of_unfiltered(self):
-        filtered = self.client.get(
-            "/api/structure/pdb/entry?search=adk"
-        ).data["results"]
-        unfiltered = self.client.get("/api/structure/pdb/entry").data["results"]
-        self.assertSubset(subset=filtered, superset=unfiltered, proper=True)
+        urls = [
+            ("/api/protein/reviewed/entry", "degradation"),
+            ("/api/protein/reviewed/structure", "degradation"),
+            ("/api/protein/reviewed/set", "degradation"),
+            ("/api/protein/reviewed/organism", "degradation"),
+            ("/api/entry/interpro/protein", "cleave"),
+            ("/api/entry/interpro/structure", "cleave"),
+            ("/api/entry/interpro/set", "cleave"),
+            ("/api/entry/interpro/organism", "cleave"),
+            ("/api/structure/pdb/entry", "t2v"),
+            ("/api/structure/pdb/protein", "t2v"),
+            ("/api/structure/pdb/set", "t2v"),
+            ("/api/structure/pdb/organism", "t2v"),
+            ("/api/set/pfam/entry", "002"),
+            ("/api/set/pfam/protein", "002"),
+            ("/api/set/pfam/structure", "002"),
+            ("/api/set/pfam/organism", "002"),
+            ("/api/organism/taxonomy/entry", "2579"),
+            ("/api/organism/taxonomy/protein", "2579"),
+            ("/api/organism/taxonomy/structure", "2579"),
+            ("/api/organism/taxonomy/set", "2579"),
+        ]
+        for url in urls:
+            filtered = self.client.get(
+                "{}?search={}".format(url[0], url[1])
+            ).data["results"]
+            unfiltered = self.client.get(url[0]).data["results"]
+            self.assertSubset(subset=filtered, superset=unfiltered, proper=True)
 
     def test_return_same_case_insensitive(self):
-        response = self.client.get("/api/structure/pdb/entry?search=adk").json()
-        for othercase in ["ADK", "aDk", "AdK"]:
+        response = self.client.get("/api/protein/reviewed/entry?search=degradation").json()
+        for othercase in ["degradatioN", "DEGRADATION", "degRADAtion"]:
             self.assertEqual(
                 response,
                 self.client.get(
-                    "/api/structure/pdb/entry?search={}".format(othercase)
+                    "/api/protein/reviewed/entry?search={}".format(othercase)
                 ).json()
             )

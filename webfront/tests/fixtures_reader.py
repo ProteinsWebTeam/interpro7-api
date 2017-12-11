@@ -77,13 +77,14 @@ class FixtureReader:
             e = ep["entry"]
             p = ep["protein"]
             obj = {
-                "text": e + " " + p,
                 "entry_acc": e,
                 "entry_type": self.entries[e]["type"],
                 "entry_db": self.entries[e]["source_database"],
+                "text_entry": e + " " + self.entries[e]["type"] + " " + (" ".join(self.entries[e]["description"])),
                 "integrated": self.entries[e]["integrated"],
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
+                "text_protein": p+" "+self.proteins[p]["source_database"]+" "+(" ".join(self.proteins[p]["description"])),
                 "tax_id": self.proteins[p]["organism"]["taxid"],
                 "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxid"]],
                 "proteomes": [pm.lower() for pm in self.proteins[p]["proteomes"]],
@@ -91,6 +92,7 @@ class FixtureReader:
                 "protein_length": self.proteins[p]["length"],
                 "id": get_id(e, p)
             }
+            obj["text_organism"] = str(obj["tax_id"]) +" "+(" ".join(obj["lineage"]))+" "+(" ".join(obj["proteomes"]))
             if "IDA" in ep:
                 obj["IDA"] = ep["IDA"]
                 obj["IDA_FK"] = ep["IDA_FK"]
@@ -101,6 +103,8 @@ class FixtureReader:
                     c["structure_acc"] = sp["structure"]
                     c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["chain"] = sp["chain"]
+                    c["text_structure"] = c["structure_acc"] + " " + c["chain"]
+
                     c["protein_structure_locations"] = sp["coordinates"]
                     if e in entry2set:
                         for e2s in entry2set[e]:
@@ -108,6 +112,7 @@ class FixtureReader:
                             c2["set_acc"] = e2s["accession"]
                             c2["set_db"] = e2s["source_database"]
                             c2["set_integrated"] = e2s["integrated"]
+                            c2["text_set"] = c2["set_acc"] + " " + c2["set_db"]
                             c2["id"] = get_id(e, p, sp["structure"], sp["chain"], e2s["accession"])
                             to_add.append(c2)
                     else:
@@ -121,6 +126,7 @@ class FixtureReader:
                         c2["set_acc"] = e2s["accession"]
                         c2["set_db"] = e2s["source_database"]
                         c2["set_integrated"] = e2s["integrated"]
+                        c2["text_set"] = c2["set_acc"] + " " + c2["set_db"]
                         to_add.append(c2)
                 else:
                     to_add.append(obj)
@@ -133,6 +139,7 @@ class FixtureReader:
                         "text": p + " " + sp["structure"],
                         "protein_acc": p,
                         "protein_db": self.proteins[p]["source_database"],
+                        "text_protein": p + " " + self.proteins[p]["source_database"] + " " + (" ".join(self.proteins[p]["description"])),
                         "tax_id": self.proteins[p]["organism"]["taxid"],
                         "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxid"]],
                         "proteomes": [pm.lower() for pm in self.proteins[p]["proteomes"]],
@@ -141,9 +148,9 @@ class FixtureReader:
                         "structure_acc": sp["structure"],
                         "structure_chain": sp["structure"] + " - " + sp["chain"],
                         "chain": sp["chain"],
+                        "text_structure": sp["structure"] + " " + sp["chain"],
                         "protein_structure_locations": sp["coordinates"],
                     })
-
         lower = []
         for doc in to_add:
             lower.append({k: v.lower() if type(v) == str else v for k, v in doc.items()})

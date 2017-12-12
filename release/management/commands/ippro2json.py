@@ -110,8 +110,10 @@ def attach_coordinates(con, obj, protein_length, is_for_interpro_entries):
 
     # Included in a second array to support discontinuous domains in the future
     # see  https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=34998332
+    # obj = attach_structure_coordinates(con, obj)
+    obj = attach_ida_data(con, obj)
 
-    return attach_structure_coordinates(con, obj)
+    return obj
 
 
 def attach_structure_coordinates(con, obj):
@@ -132,20 +134,19 @@ def attach_structure_coordinates(con, obj):
             }
             for row in cur
         ]
-    return attach_ida_data(con, obj)
+    return obj
 
 
 def attach_ida_data(con, obj):
     cur = con.cursor()
-    sql = """  SELECT ida.IDA, ida.IDA_FK
-               FROM PROTEIN_IDA_NEW ida
+    sql = """  SELECT DBMS_LOB.substr(ida.IDA, 13000) as IDA, ida.IDA_FK
+               FROM INTERPRODW.PROTEIN_IDA_NEW ida
                WHERE PROTEIN_AC='{}'"""\
         .format(obj["protein_acc"])
     try:
         cur.execute(sql)
         col = get_column_dict_from_cursor(cur)
-        if cur.rowcount > 0:
-            row = cur.fetchone()
+        for row in cur:
             obj["IDA"] = row[col["IDA"]]
             obj["IDA_FK"] = row[col["IDA_FK"]]
     except:

@@ -110,8 +110,9 @@ def attach_coordinates(con, obj, protein_length, is_for_interpro_entries):
 
     # Included in a second array to support discontinuous domains in the future
     # see  https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=34998332
-    # obj = attach_structure_coordinates(con, obj)
-    obj = attach_ida_data(con, obj)
+    obj = attach_structure_coordinates(con, obj)
+    if obj["entry_db"] == "interpro":
+        obj = attach_ida_data(con, obj)
 
     return obj
 

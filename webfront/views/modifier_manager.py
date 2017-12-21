@@ -18,6 +18,10 @@ class ModifierManager:
             "many": many,
         }
 
+    def unregister(self, parameter):
+        if parameter in self.modifiers:
+            del self.modifiers[parameter]
+
     def execute(self, request):
         payload_modifiers = {}
         queryset_modifiers = {}

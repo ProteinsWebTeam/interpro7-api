@@ -41,6 +41,7 @@ class ProteomeHandler(CustomView):
         general_handler.queryset_manager.main_endpoint = "proteome"
         self.serializer_detail = SerializerDetail.ORGANISM_PROTEOME_HEADERS
         general_handler.queryset_manager.add_filter("proteome", accession__isnull=False)
+        general_handler.modifiers.unregister("with_names")
 
         if "accession" in general_handler.queryset_manager.filters["taxonomy"]:
             tax_id = general_handler.queryset_manager.remove_filter("taxonomy", "accession")

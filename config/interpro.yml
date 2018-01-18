@@ -10,7 +10,7 @@ members:
   gene3d:
     filter: "gene3d"
     label: "Gene3D"
-    accession: 'G3DSA:[0-9]{1}\.[0-9]{2,3}\.[0-9]{1,4}\.[0-9]{2,4}$'
+    accession: 'G3DSA:[0-9]{1}\.[0-9]{2,3}\.[0-9]{1,4}\.[0-9]{2,5}$'
     options: []
     options_per_family: []
   hamap:

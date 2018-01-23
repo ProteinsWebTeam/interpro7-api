@@ -11,7 +11,7 @@ class Entry(models.Model):
     other_names = JSONField(null=True)
     source_database = models.CharField(max_length=20, db_index=True)
     member_databases = JSONField(null=True)
-    integrated = models.ForeignKey("Entry", null=True, blank=True)
+    integrated = models.ForeignKey("Entry", on_delete=models.SET_NULL, null=True, blank=True)
     go_terms = JSONField(null=True)
     description = JSONField(null=True)
     wikipedia = models.TextField(null=True)
@@ -22,7 +22,7 @@ class Entry(models.Model):
 
 class EntryAnnotation(models.Model):
     annotation_id = models.CharField(max_length=40, primary_key=True)
-    accession = models.ForeignKey(Entry)
+    accession = models.ForeignKey(Entry, on_delete=models.SET_NULL, null=True)
     type = models.CharField(max_length=20)
     value = models.BinaryField()
     mime_type = models.CharField(max_length=64)
@@ -70,7 +70,7 @@ class Taxonomy(models.Model):
     scientific_name = models.CharField(max_length=255)
     full_name = models.CharField(max_length=512)
     lineage = models.CharField(max_length=512)
-    parent = models.ForeignKey("Taxonomy", null=True, blank=True)
+    parent = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)
     rank = models.CharField(max_length=20)
     children = JSONField(null=True)
     left_number = models.IntegerField()
@@ -83,7 +83,7 @@ class Proteome(models.Model):
     is_reference = models.BooleanField()
     strain = models.CharField(max_length=512)
     assembly = models.CharField(max_length=512)
-    taxonomy = models.ForeignKey("Taxonomy", null=True, blank=True)
+    taxonomy = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class Set(models.Model):

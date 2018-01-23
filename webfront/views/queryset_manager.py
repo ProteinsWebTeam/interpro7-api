@@ -9,6 +9,12 @@ def escape(text):
     return re.sub(r'([-+!(){}[\]^"~*?:\\\/])', r"\\\1", str(text))
 
 
+def merge_two_dicts(x, y):
+    z = x.copy()   # start with x's keys and values
+    z.update(y)    # modifies z with y's keys and values & returns None
+    return z
+
+
 class QuerysetManager:
     main_endpoint = None
     filters = {}
@@ -33,10 +39,10 @@ class QuerysetManager:
         self.order_field = None
 
     def add_filter(self, endpoint,  **kwargs):
-        self.filters[endpoint] = {**self.filters[endpoint], **kwargs}
+        self.filters[endpoint] = merge_two_dicts(self.filters[endpoint], kwargs)
 
     def add_exclusion(self, endpoint,  **kwargs):
-        self.exclusions[endpoint] = {**self.exclusions[endpoint], **kwargs}
+        self.exclusions[endpoint] = merge_two_dicts(self.exclusions[endpoint], kwargs)
 
     def remove_filter(self, endpoint, f):
         tmp = self.filters[endpoint][f]
@@ -125,13 +131,15 @@ class QuerysetManager:
             if ep == "search" or ep == "solr":
                 continue
             if ep == endpoint:
-                current_filters = {**current_filters, **{k: v
-                                                         for k, v in filters[ep].items()}
-                                   }
+                current_filters = merge_two_dicts(
+                    current_filters,
+                    {k: v for k, v in filters[ep].items()}
+                )
             elif not only_main_endpoint:
-                current_filters = {**current_filters, **{ep+"__"+k: v
-                                                         for k, v in filters[ep].items()}
-                                   }
+                current_filters = merge_two_dicts(
+                    current_filters,
+                    {ep+"__"+k: v for k, v in filters[ep].items()}
+                )
         return current_filters
 
     def get_queryset(self, endpoint=None, only_main_endpoint=False):

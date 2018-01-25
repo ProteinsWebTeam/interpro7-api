@@ -128,7 +128,7 @@ class EntrySerializer(ModelContentSerializer):
             "name": {
                 "name": instance.name,
                 "short": instance.short_name,
-                "other": instance.other_names,
+                # "other": instance.other_names,
             },
             "description": instance.description,
             "wikipedia": instance.wikipedia,

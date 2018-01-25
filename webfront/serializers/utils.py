@@ -30,11 +30,11 @@ def flat_to_nested(flat, convert_to_camel_case = True):
 
 def recategorise_go_terms(go_terms):
     for term in go_terms:
-        if term['category'] == "F":
+        if term['category_code'] == "F":
             term['category'] = "Molecular Function"
-        elif term['category'] == "C":
+        elif term['category_code'] == "C":
             term['category'] = "Cellular Component"
-        elif term['category'] == "P":
+        elif term['category_code'] == "P":
             term['category'] = "Biological Process"
         else:
             raise Exception("Unknown Go Term category '{0}'".format(term['category']))

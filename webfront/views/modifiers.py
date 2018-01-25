@@ -40,7 +40,7 @@ def group_by_member_databases(general_handler):
 
 
 def group_by_go_categories(general_handler):
-    template = '"category": "{}"'
+    template = '"category_code": "{}"'
     groups = {"P": "Biological Process", "C": "Cellular Component", "F": "Molecular Function"}
     if is_single_endpoint(general_handler):
         qs = {groups[cat]:

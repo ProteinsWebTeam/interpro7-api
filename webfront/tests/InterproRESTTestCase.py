@@ -20,17 +20,17 @@ class InterproRESTTestCase(APITransactionTestCase):
         'webfront/tests/fixtures_entry.json',
         'webfront/tests/fixtures_protein.json',
         'webfront/tests/fixtures_structure.json',
-        # 'webfront/tests/fixtures_organisms.json',
-        # 'webfront/tests/fixtures_set.json',
+        'webfront/tests/fixtures_organisms.json',
+        'webfront/tests/fixtures_set.json',
     ]
     links_fixtures = 'webfront/tests/relationship_features.json'
 
     @classmethod
     def setUpClass(cls):
         super(InterproRESTTestCase, cls).setUpClass()
-        # cls.fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
-        # docs = cls.fr.get_fixtures()
-        # cls.fr.add_to_search_engine(docs)
+        cls.fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
+        docs = cls.fr.get_fixtures()
+        cls.fr.add_to_search_engine(docs)
 
     @classmethod
     def tearDownClass(cls):

@@ -69,8 +69,6 @@ class ProteinSerializer(ModelContentSerializer):
     def to_full_representation(self, instance):
         return {
             "metadata": self.to_metadata_representation(instance, self.searcher),
-            "representation": instance.feature,
-            "genomic_context": instance.genomic_context,
         }
 
     @staticmethod
@@ -95,7 +93,6 @@ class ProteinSerializer(ModelContentSerializer):
             "source_organism": instance.organism,
             "name": {
                 "name": instance.name,
-                "short": instance.short_name,
                 "other": instance.other_names,
             },
             "description": instance.description,

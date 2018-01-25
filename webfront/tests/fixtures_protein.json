@@ -10,32 +10,14 @@
         "taxid": 344612
       },
       "name": "Carboxypeptidase Y homolog A",
-      "short_name": null,
       "other_names": [],
       "description": ["Vacuolar carboxypeptidase involved in degradation of small peptides. Digests preferentially peptides containing an aliphatic or hydrophobic residue in P1' position, as well as methionine, leucine or phenylalanine in P1 position of ester substrate (By similarity)."],
       "sequence": "MRVLPATLLVGAATAAVPPFQQILGLPKKGADTLSKPLHDFQEQLKTLSDDARRLWDEVAKHFPDSMDHNPVFSLPKKHTRRPDSHWDHIVRGADVQSVWVTGANGEKEREVDGKLEAYDLRVKTTDPGALGIDPGVKQYTGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFLELGPSSIDSKIKPVYNDFAWNSNASVIFLDQPVNVGYSYSGSAVSDTVAAGKDVYALLTLFFKQFPEYAKQDFHIAGESYAGHYIPVFASEILSHKKRNINLKSVLIGNGLTDPLTQYDHYRPMACGDGGYPAVLDEASCQSMDNALPRCKSMIESCYNTESSWVCVPASIYCNNALIGPYQRTGQNVYDVRGKCEDESNLCYKGMGYVSEYLNKREVREAVGAEVDGYDSCNFDINRNFLFHGDWMKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEYASAELEDLVIEQNEHQGKKIGQIKSHGNFTFMRLYGGGHMVPMDQPEASLEFFNRWIGGEWF",
       "length" : "543",
       "proteomes": ["UP000006701"],
       "gene": "cpyA",
-      "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category": "F"}],
+      "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category_code": "F"}],
       "evidence_code": 3,
-      "feature": {
-        "signal_peptide": [],
-        "transmembrane": [],
-        "coiled_coil": [],
-        "low_complexity_disorder": [],
-        "active_sites": [
-          {
-            "id": "IPR018202",
-            "name": "Peptidase S10, serine carboxypeptidase, active site"
-          }
-        ],
-        "per_residue_features": [],
-        "disulphide_bridges": []
-      },
-      "genomic_context": {
-        "DNA": ""
-      },
       "source_database": "reviewed",
       "fragment": "N",
       "residues": {}
@@ -52,7 +34,6 @@
         "taxid": 1001583
       },
       "name": "Band 7 protein",
-      "short_name": null,
       "other_names": [],
       "description": [],
       "sequence": "MESGIIEILIRNGVSHMTEKPVFHINGYLGLILVLVILGLGVYLSVVGWGVLGVILVVLAVLAASSLTIIEPNQSKVLTFFGRYIGTIKESGLYLTVPLTTKTTVSLRVRNFNSAILKVNDLQGNPVEIAAVIVFKVVDTSKALFAVEDYEKFVEIQSESAIRHVASEYAYDNFGDHQALTLRSNPTEVSNHLTEELQARLEVAGVQIIETRLTHLAYATEIASAMLQRQQSQAILSARKIIVEGAVSITEGAIEQLAAETDLHLTDNQKLQLINNMMVSIINERGSQPVINTGKVE",
@@ -63,62 +44,50 @@
         {
           "identifier": "GO:0016740",
           "name": "transferase activity",
-          "category": "F"
+          "category_code": "F"
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": "P"
+          "category_code": "P"
         },
         {
           "identifier": "GO:0016787",
           "name": "hydrolase activity",
-          "category": "F"
+          "category_code": "F"
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": "P"
+          "category_code": "P"
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": "P"
+          "category_code": "P"
         },
         {
           "identifier": "GO:0003824",
           "name": "catalytic activity",
-          "category": "F"
+          "category_code": "F"
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": "P"
+          "category_code": "P"
         },
         {
           "identifier": "GO:0003824",
           "name": "catalytic activity",
-          "category": "F"
+          "category_code": "F"
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": "P"
+          "category_code": "P"
         }
       ],
       "evidence_code": 1,
-      "feature": {
-        "signal_peptide": [],
-        "transmembrane": [],
-        "coiled_coil": [],
-        "low_complexity_disorder": [],
-        "active_sites": [],
-        "per_residue_features": [],
-        "disulphide_bridges": []
-      },
-      "genomic_context": {
-        "DNA": ""
-      },
       "source_database": "reviewed",
       "fragment": "N",
       "residues": {}
@@ -135,32 +104,14 @@
         "taxid": 40296
       },
       "name": "Propeptide, carboxypeptidase Y",
-      "short_name": null,
       "other_names": [],
       "description": [],
       "sequence": "MRVLSTTLLVGAASAAAPSFQQVLGAHSEHAENVAQQGADAFKPLQHLQDQFKSLSSEARQLWEEVSNYFPESMGSAPMLSLPKKHTRRPDSHWDYHVSGAKVQDIWVSGAEGTKEREVDGKLEDYALRAKKVDPSALGIDPGVKQYSGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFMELGPSSIGANIKPIYNDFSWNNNASVIFLDQPINVGYSYSGSSVSDTVAAGKDVYALLTLFFKQFPEYATQDFHIAGESYAGHYIPVMASEILSHKKRNINLKSVLIGNGLTDGLTQYEYYRPMACGEGGYPAVLDESTCQSMDNALSRCQSMIQSCYNSESPWVCVPASIYCNNAMLGPYQRTGQNVYDVRGKCEDESNLCYKGLGYVSEYLGQESVREAVGAEVDGYDSCNFDINRNFLFNGDWFKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEFASAELEDLKIVQNEHVGKKIGQIKSHGNFTFMRIFGGGHMVPMDQPESGLEFFNRWIGGEWF",
       "length" : "550",
       "proteomes": ["UP000030104"],
       "gene": "PITC_084940",
-      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": "F"}],
+      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category_code": "F"}],
       "evidence_code": 1,
-      "feature": {
-        "signal_peptide": [],
-        "transmembrane": [],
-        "coiled_coil": [],
-        "low_complexity_disorder": [],
-        "active_sites": [
-          {
-            "id": "IPR018202",
-            "name": "Peptidase S10, serine carboxypeptidase, active site"
-          }
-        ],
-        "per_residue_features": [],
-        "disulphide_bridges": []
-      },
-      "genomic_context": {
-        "DNA": ""
-      },
       "source_database": "unreviewed",
       "fragment": "N",
       "residues": {}
@@ -177,27 +128,14 @@
         "taxid": 40296
       },
       "name": "Lutropin-choriogonadotropic hormone receptor",
-      "short_name": "LH/CG-R",
       "other_names": ["Luteinizing hormone receptor", "LSH-R"],
       "description": ["Receptor for lutropin-choriogonadotropic hormone. The activity of this receptor is mediated by G proteins which activate adenylate cyclase."],
       "sequence": "MRRRSLALRLLLALLLLPPPLPQTLLGAPCPEPCSCRPDGALRCPGPRAGLSRLSLTYLPIKVIPSQAFRGLNEVVKIEISQSDSLEKIEANAFDNLLNLSEILIQNTKNLVYIEPGAFTNLPRLKYLSICNTGIRKLPDVTKIFSSEFNFILEICDNLHITTVPANAFQGMNNESITLKLYGNGFEEIQSHAFNGTTLISLELKENAHLKKMHNDAFRGARGPSILDISSTKLQALPSYGLESIQTLIATSSYSLKKLPSREKFTNLLDATLTYPSHCCAFRNLPTKEQNFSFSIFKNFSKQCESTARRPNNETLYSAIFAESELSDWDYDYGFCSPKTLQCAPEPDAFNPCEDIMGYDFLRVLIWLINILAIMGNVTVLFVLLTSHYKLTVPRFLMCNLSFADFCMGLYLLLIASVDAQTKGQYYNHAIDWQTGNGCSVAGFFTVFASELSVYTLTVITLERWHTITYAIQLDQKLRLRHAIPIMLGGWLFSTLIAMLPLVGVSSYMKVSICLPMDVETTLSQVYILTILILNVVAFIIICACYIKIYFAVQNPELMATNKDTKIAKKMAVLIFTDFTCMAPISFFAISAALKVPLITVTNSKVLLVLFYPVNSCANPFLYAIFTKAFRRDFFLLLSKSGCCKHQAELYRRKDFSAYCKNGFTGSNKPSRSTLKLTTLQCQYSTVMDKTCYKDC",
       "length" : 696,
       "proteomes": ["UP000030104"],
       "gene": "LHCGR",
-      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": "F"}],
+      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category_code": "F"}],
       "evidence_code": 4,
-      "feature": {
-        "signal_peptide": [],
-        "transmembrane": [],
-        "coiled_coil": [],
-        "low_complexity_disorder": [],
-        "active_sites": [],
-        "per_residue_features": [],
-        "disulphide_bridges": []
-      },
-      "genomic_context": {
-        "DNA": ""
-      },
       "source_database": "unreviewed",
       "fragment": "N",
       "residues": {}

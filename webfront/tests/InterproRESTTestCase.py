@@ -17,8 +17,8 @@ chains = {
 @override_settings(SEARCHER_URL=settings.SEARCHER_TEST_URL)
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [
-        'webfront/tests/fixtures.json',
-        # 'webfront/tests/protein_fixtures.json',
+        'webfront/tests/fixtures_entry.json',
+        'webfront/tests/fixtures_protein.json',
         # 'webfront/tests/structure_fixtures.json',
         # 'webfront/tests/fixtures_organisms.json',
         # 'webfront/tests/fixtures_set.json',

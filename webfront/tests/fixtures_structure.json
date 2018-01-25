@@ -1,0 +1,121 @@
+[
+  {
+    "model": "webfront.Structure",
+    "fields": {
+      "accession": "1JM7",
+      "name": "Solution structure of the BRCA1/BARD1 RING-domain heterodimer",
+      "other_names": [],
+      "experiment_type": "Solution NMR",
+      "release_date": "2009-02-24",
+      "resolution": 2.5,
+      "literature": {
+        "PUB00020128": {
+          "PMID": 15284453,
+          "type": "J",
+          "ISBN": null,
+          "volume": "305",
+          "issue": "5689",
+          "year": 2004,
+          "title": "Crystal structure of Argonaute and its implications for RISC slicer activity.",
+          "URL": null,
+          "raw_pages": "1434-7",
+          "medline_journal": "Science",
+          "ISO_journal": "Science",
+          "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
+          "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
+        },
+        "PUB00018283": {
+          "PMID": 11050429,
+          "type": "J",
+          "ISBN": null,
+          "volume": "25",
+          "issue": "10",
+          "year": 2000,
+          "title": "Domains in gene silencing and cell differentiation proteins: the novel PAZ domain and redefinition of the Piwi domain.",
+          "URL": null,
+          "raw_pages": "481-2",
+          "medline_journal": "Trends Biochem Sci",
+          "ISO_journal": "Trends Biochem. Sci.",
+          "authors": "Cerutti L, Mian N, Bateman A.",
+          "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
+        }
+      },
+      "chains": ["A", "B"],
+      "source_database": "pdb"
+    }
+  },
+  {
+    "model": "webfront.Structure",
+    "fields": {
+      "accession": "1T2V",
+      "resolution": 2.9,
+      "name": "Structural basis of phospho-peptide recognition by the brct domain of brca1, structure with phosphopeptide",
+      "other_names": [],
+      "experiment_type": "X-ray diffraction, resolution 3.30",
+      "release_date": "2011-07-13",
+      "literature": {},
+      "chains": ["A", "B", "C", "D", "E"],
+      "source_database": "pdb"
+    }
+  },
+  {
+    "model": "webfront.Structure",
+    "fields": {
+      "accession": "2BKM",
+      "resolution": 9.2,
+      "name": "Crystal structure of the truncated hemoglobin from geobacillus stearothermophilus",
+      "other_names": [],
+      "experiment_type": "X-ray diffraction, resolution 1.50",
+      "release_date": "2009-02-24",
+      "literature": {
+        "PUB00018283": {
+          "PMID": 11050429,
+          "type": "J",
+          "ISBN": null,
+          "volume": "25",
+          "issue": "10",
+          "year": 2000,
+          "title": "Domains in gene silencing and cell differentiation proteins: the novel PAZ domain and redefinition of the Piwi domain.",
+          "URL": null,
+          "raw_pages": "481-2",
+          "medline_journal": "Trends Biochem Sci",
+          "ISO_journal": "Trends Biochem. Sci.",
+          "authors": "Cerutti L, Mian N, Bateman A.",
+          "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
+        }
+      },
+      "chains": ["A", "B"],
+      "source_database": "pdb"
+    }
+  },
+  {
+    "model": "webfront.Structure",
+    "fields": {
+      "accession": "1JZ8",
+      "resolution": 59.2,
+      "name": "E. COLI (lacZ) BETA-GALACTOSIDASE (E537Q) IN COMPLEX WITH ALLOLACTOSE",
+      "other_names": [],
+      "experiment_type": "X-ray diffraction, resolution 1.50",
+      "release_date": "2009-02-24",
+      "literature": {
+        "PUB00020128": {
+          "PMID": 15284453,
+          "type": "J",
+          "ISBN": null,
+          "volume": "305",
+          "issue": "5689",
+          "year": 2004,
+          "title": "Crystal structure of Argonaute and its implications for RISC slicer activity.",
+          "URL": null,
+          "raw_pages": "1434-7",
+          "medline_journal": "Science",
+          "ISO_journal": "Science",
+          "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
+          "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
+        }
+      },
+      "chains": ["A", "B"],
+      "source_database": "pdb"
+    }
+  }
+]

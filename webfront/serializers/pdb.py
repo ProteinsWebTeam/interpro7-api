@@ -103,8 +103,9 @@ class StructureSerializer(ModelContentSerializer):
             },
             "experiment_type": instance.experiment_type,
             "release_date": instance.release_date,
-            "authors": instance.authors,
+            "literature": instance.literature,
             "chains": instance.chains,
+            "resolution": instance.resolution,
             "source_database": instance.source_database,
             "counters": {
                 "entries": searcher.get_number_of_field_by_endpoint("structure", "entry_acc", instance.accession),

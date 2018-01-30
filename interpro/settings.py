@@ -175,6 +175,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
     'DEFAULT_PAGINATION_CLASS': 'webfront.pagination.CustomPagination',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'interpro.renderers.TSVRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
 }
 
 HMMER_PATH = INTERPRO_CONFIG.get('hmmer_path', '/tmp/')

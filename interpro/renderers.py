@@ -19,7 +19,7 @@ def flatDict(original, output=None, prefix=None):
 
 
 class TSVRenderer(renderers.BaseRenderer):
-    media_type = 'text/plain'
+    media_type = 'text/tab-separated-values'
     format = 'tsv'
 
     def render(self, data, media_type=None, renderer_context=None):
@@ -32,8 +32,6 @@ class TSVRenderer(renderers.BaseRenderer):
             objs = [item["metadata"] for item in data["results"]]
         elif isinstance(data, dict):
             objs = [flatDict(data)]
-
-        print("result", objs)
 
         output = io.StringIO()
         if objs is not None:

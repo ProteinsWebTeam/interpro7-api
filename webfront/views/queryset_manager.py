@@ -86,7 +86,8 @@ class QuerysetManager:
                         q += " && {}{}_db:*".format("!" if v else "", ep)
                 elif k == "integrated" or k == "integrated__iexact" or k == "integrated__contains":
                     if ep == 'set':
-                        q += " && set_integrated:{}".format(escape(v))
+                        pass
+                        # q += " && set_integrated:{}".format(escape(v))
                     else:
                         q += " && integrated:{}".format(escape(v))
                 elif k == "integrated__isnull":

@@ -70,11 +70,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 if (INTERPRO_CONFIG.get('django_cors', False)):
-    INSTALLED_APPS = (*INSTALLED_APPS, 'corsheaders')
-    MIDDLEWARE_CLASSES = (
-        'corsheaders.middleware.CorsMiddleware',
-        *MIDDLEWARE_CLASSES
-    )
+    INSTALLED_APPS = INSTALLED_APPS + ('corsheaders',)
+    MIDDLEWARE_CLASSES = ('corsheaders.middleware.CorsMiddleware',) + MIDDLEWARE_CLASSES
     CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'interpro.urls'

@@ -161,7 +161,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/interpro7/api/static_files'
+STATIC_URL = '/interpro7/api/static_files/'
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'static_files'))
 
 

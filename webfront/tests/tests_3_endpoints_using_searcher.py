@@ -900,7 +900,10 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                             )
 
     def test_acc_acc_acc(self):
+        import time
+        counter = 0
         for endpoint1 in api_test_map:
+            print("counter", counter)
             for db1 in api_test_map[endpoint1]:
                 for acc1 in api_test_map[endpoint1][db1]:
                     for endpoint2 in api_test_map:
@@ -913,6 +916,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         continue
                                     for db3 in api_test_map[endpoint3]:
                                         for acc3 in api_test_map[endpoint3][db3]:
+                                            counter += 1
+                                            time.sleep(0.5)
                                             url = "/api/{}/{}/{}/{}/{}/{}/{}/{}/{}".format(
                                                 endpoint1, db1, acc1, endpoint2, db2, acc2, endpoint3, db3, acc3)
                                             data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)

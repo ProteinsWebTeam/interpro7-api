@@ -903,7 +903,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
         import time
         counter = 0
         for endpoint1 in api_test_map:
-            print("counter", counter)
             for db1 in api_test_map[endpoint1]:
                 for acc1 in api_test_map[endpoint1][db1]:
                     for endpoint2 in api_test_map:
@@ -917,7 +916,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     for db3 in api_test_map[endpoint3]:
                                         for acc3 in api_test_map[endpoint3][db3]:
                                             counter += 1
-                                            time.sleep(0.5)
+                                            time.sleep(0.1)
                                             url = "/api/{}/{}/{}/{}/{}/{}/{}/{}/{}".format(
                                                 endpoint1, db1, acc1, endpoint2, db2, acc2, endpoint3, db3, acc3)
                                             data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
@@ -941,4 +940,5 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                                 )
                                                 self.assert_db_integration_urls(data, eps, dbs, accs)
                                                 self.assert_chain_urls(data, eps, dbs, accs)
+            print("counter", counter)
 

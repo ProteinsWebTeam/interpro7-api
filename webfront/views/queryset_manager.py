@@ -100,9 +100,22 @@ class QuerysetManager:
                     q += " && tax_id:{}".format(escape(v))
                 elif "lineage__contains" in k:
                     q += " && lineage:{}".format(escape(v).strip())
+                elif "__gt" in k:
+                    q += " && {}:{}{} TO *]".format(
+                        re.sub(r"__gte?", "", k),
+                        "[" if "__gte" in k else "{",
+                        escape(v)
+                    )
+                elif "__lt" in k:
+                    q += " && {}:[* TO {}{}".format(
+                        re.sub(r"__lte?", "", k),
+                        escape(v),
+                        "]" if "__lte" in k else "}"
+                    )
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
                         q += " && {}_db:{}".format(ep, escape(v))
+
         q = q[4:].lower()
         if self.order_field is not None:
             q += "&sort="+self.order_field

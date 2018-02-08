@@ -17,19 +17,25 @@ class ElasticsearchController(SearchController):
         self.index = parts[1]
         self.type = parts[2]
         self.queryset_manager = queryset_manager
+        self.headers = {"Content-Type": "application/json"}
 
     def add(self, docs):
         body = ""
         for doc in docs:
             body += '{ "index": { "_type": "'+self.type+'", "_id":"'+doc["id"]+'"}}\n'+json.dumps(doc)+'\n'
         conn = http.client.HTTPConnection(self.server, self.port)
-        conn.request("POST", "/"+self.index+"/_bulk/", body)
+        conn.request("POST", "/"+self.index+"/_bulk/", body, self.headers)
         return conn.getresponse()
 
     def clear_all_docs(self):
         body = '{ "query": { "match_all": {} } }'
         conn = http.client.HTTPConnection(self.server, self.port)
-        conn.request("POST", "/"+self.index+"/"+self.type+"/_delete_by_query?conflicts=proceed", body)
+        conn.request(
+            "POST",
+            "/"+self.index+"/"+self.type+"/_delete_by_query?conflicts=proceed",
+            body,
+            self.headers
+        )
         return conn.getresponse()
 
     def get_grouped_object(self, endpoint, field, solr_query=None, extra_counters=[], size=10):
@@ -308,6 +314,8 @@ class ElasticsearchController(SearchController):
         conn.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q+"&size="+str(rows),
+            None,
+            self.headers
         )
         response = conn.getresponse()
         data = response.read().decode()
@@ -322,7 +330,8 @@ class ElasticsearchController(SearchController):
         conn.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,
-            json.dumps(query_obj)
+            json.dumps(query_obj),
+            self.headers
         )
         response = conn.getresponse()
         data = response.read().decode()

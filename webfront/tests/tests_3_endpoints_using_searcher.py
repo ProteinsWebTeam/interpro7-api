@@ -901,7 +901,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
 
     def test_acc_acc_acc(self):
         import time
-        counter = 0
         for endpoint1 in api_test_map:
             for db1 in api_test_map[endpoint1]:
                 for acc1 in api_test_map[endpoint1][db1]:
@@ -940,5 +939,4 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                                 )
                                                 self.assert_db_integration_urls(data, eps, dbs, accs)
                                                 self.assert_chain_urls(data, eps, dbs, accs)
-            print("counter", counter)
 

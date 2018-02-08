@@ -1,10 +1,12 @@
+import time
+
+from interpro import settings
 from rest_framework import status
 
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
-
 from webfront.searcher.elastic_controller import ElasticsearchController
-
 from webfront.tests.actions_on_test_dataset import *
+
 api_test_map = {
     "entry": {
         "interpro": [
@@ -790,6 +792,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 continue
                             for db3 in api_test_map[endpoint3]:
                                 for acc3 in api_test_map[endpoint3][db3]:
+                                    if not settings.DEBUG:
+                                        time.sleep(0.1)
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
                                         endpoint1, db1, acc1, endpoint2, endpoint3, db3, acc3)
                                     data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
@@ -833,6 +837,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 if endpoint1 == endpoint3 or endpoint2 == endpoint3:
                                     continue
                                 for db3 in api_test_map[endpoint3]:
+                                    if not settings.DEBUG:
+                                        time.sleep(0.1)
                                     url = "/api/{}/{}/{}/{}/{}/{}/{}".format(
                                         endpoint1, db1, acc1, endpoint2, db2, endpoint3, db3)
                                     data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
@@ -868,6 +874,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     continue
                                 for db3 in api_test_map[endpoint3]:
                                     for acc3 in api_test_map[endpoint3][db3]:
+                                        if not settings.DEBUG:
+                                            time.sleep(0.1)
                                         url = "/api/{}/{}/{}/{}/{}/{}/{}/{}".format(
                                             endpoint1, db1, acc1, endpoint2, db2, endpoint3, db3, acc3)
                                         data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)
@@ -900,7 +908,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                             )
 
     def test_acc_acc_acc(self):
-        import time
         for endpoint1 in api_test_map:
             for db1 in api_test_map[endpoint1]:
                 for acc1 in api_test_map[endpoint1][db1]:
@@ -914,7 +921,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         continue
                                     for db3 in api_test_map[endpoint3]:
                                         for acc3 in api_test_map[endpoint3][db3]:
-                                            time.sleep(0.1)
+                                            if not settings.DEBUG:
+                                                time.sleep(0.1)
                                             url = "/api/{}/{}/{}/{}/{}/{}/{}/{}/{}".format(
                                                 endpoint1, db1, acc1, endpoint2, db2, acc2, endpoint3, db3, acc3)
                                             data = filter_by_endpoint(self.all_docs, endpoint1, db1, acc1)

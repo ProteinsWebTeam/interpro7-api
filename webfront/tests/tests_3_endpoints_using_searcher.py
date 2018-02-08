@@ -914,7 +914,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         continue
                                     for db3 in api_test_map[endpoint3]:
                                         for acc3 in api_test_map[endpoint3][db3]:
-                                            counter += 1
                                             time.sleep(0.1)
                                             url = "/api/{}/{}/{}/{}/{}/{}/{}/{}/{}".format(
                                                 endpoint1, db1, acc1, endpoint2, db2, acc2, endpoint3, db3, acc3)

@@ -1,4 +1,3 @@
-
 from django.conf import settings
 import http.client
 import json
@@ -18,6 +17,7 @@ class ElasticsearchController(SearchController):
         self.type = parts[2]
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
+        self.connection = http.client.HTTPConnection(self.server, self.port)
 
     def add(self, docs):
         body = ""
@@ -305,19 +305,19 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs)
         return [ch["_source"] for ch in response["hits"]["hits"]]
 
+    # TODO: check if this could be replaced by the following "_elastic_json_query()"
     def execute_query(self, query, fq=None, rows=0, start=0):
         q = query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
-        conn = http.client.HTTPConnection(self.server, self.port)
         if fq is not None:
             q = query+" && "+fq.lower()
         q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
-        conn.request(
+        self.connection.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q+"&size="+str(rows),
             None,
             self.headers
         )
-        response = conn.getresponse()
+        response = self.connection.getresponse()
         data = response.read().decode()
         obj = json.loads(data)
         return [o["_source"] for o in obj["hits"]["hits"]]
@@ -325,15 +325,14 @@ class ElasticsearchController(SearchController):
     def _elastic_json_query(self, q, query_obj=None):
         if query_obj is None:
             query_obj = {"from": 0}
-        conn = http.client.HTTPConnection(self.server, self.port)
         q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
-        conn.request(
+        self.connection.request(
             "GET",
             "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,
             json.dumps(query_obj),
             self.headers
         )
-        response = conn.getresponse()
+        response = self.connection.getresponse()
         data = response.read().decode()
         obj = json.loads(data)
         return obj

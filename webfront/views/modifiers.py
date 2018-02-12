@@ -151,13 +151,33 @@ def filter_by_contains_field(endpoint, field, value_template='{}'):
 def filter_by_field_range(endpoint, field, value_template='{}'):
     def x(value, general_handler):
         pos = value.split('-')
-        general_handler.queryset_manager.add_filter(
-            endpoint,
-            **{
-                "{}__gte".format(field): value_template.format(pos[0]),
-                "{}__lte".format(field): value_template.format(pos[1]),
-            }
-        )
+        if (is_single_endpoint(general_handler)):
+            general_handler.queryset_manager.add_filter(
+                endpoint,
+                **{
+                    "{}__gte".format(field): value_template.format(pos[0]),
+                    "{}__lte".format(field): value_template.format(pos[1]),
+                }
+            )
+        else:
+            general_handler.queryset_manager.add_filter(
+                endpoint,
+                **{
+                    "{}_{}__gte".format(endpoint, field): value_template.format(pos[0]),
+                    "{}_{}__lte".format(endpoint, field): value_template.format(pos[1]),
+                }
+            )
+    return x
+
+def filter_by_field_or_field_range(endpoint, field):
+    def x(value, general_handler):
+        minmax = value.split('-')
+        if (len(minmax) == 2 and minmax[0] and minmax[1]):
+            filter_by_field_range(endpoint, field)(value, general_handler)
+        elif (len(minmax) == 1 and minmax[0]):
+            filter_by_field(endpoint, field)(value, general_handler)
+        else:
+            raise URLError("{} is not a valid value for filter {}".format(value, field))
     return x
 
 def get_single_value(field):

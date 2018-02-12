@@ -70,11 +70,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 if (INTERPRO_CONFIG.get('django_cors', False)):
-    INSTALLED_APPS = (*INSTALLED_APPS, 'corsheaders')
-    MIDDLEWARE_CLASSES = (
-        'corsheaders.middleware.CorsMiddleware',
-        *MIDDLEWARE_CLASSES
-    )
+    INSTALLED_APPS = INSTALLED_APPS + ('corsheaders',)
+    MIDDLEWARE_CLASSES = ('corsheaders.middleware.CorsMiddleware',) + MIDDLEWARE_CLASSES
     CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'interpro.urls'
@@ -164,7 +161,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/interpro/static_files/'
+STATIC_URL = '/interpro7/api/static_files/'
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'static_files'))
 
 
@@ -175,6 +172,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
     'DEFAULT_PAGINATION_CLASS': 'webfront.pagination.CustomPagination',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'interpro.renderers.TSVRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
 }
 
 HMMER_PATH = INTERPRO_CONFIG.get('hmmer_path', '/tmp/')

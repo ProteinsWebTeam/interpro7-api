@@ -148,7 +148,7 @@ class EntrySerializer(ModelContentSerializer):
         headers = {
             "metadata": {
                 "accession": instance.accession,
-                "name": instance.name,
+                "name": instance.name if instance.name else instance.short_name,
                 "source_database": instance.source_database,
                 "type": instance.type,
                 "integrated": instance.integrated.accession if instance.integrated else None,

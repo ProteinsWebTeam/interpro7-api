@@ -3,5 +3,6 @@ djangorestframework~=3.6.3
 PyYAML~=3.12
 jsonfield~=2.0.1
 mysqlclient~=1.3.10
-pysolr~=3.6.0
 django-cors-headers~=2.0.2
+pysolr~=3.6.0
+gunicorn==19.7.1

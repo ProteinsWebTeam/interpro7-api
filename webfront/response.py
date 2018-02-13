@@ -31,7 +31,7 @@ class Response(R):
             ]
 
             headers["Server-Timing"] = ','.join(timings)
-            
+
         headers["InterPro-Version"] = interpro_version
 
         super(Response, self).__init__(

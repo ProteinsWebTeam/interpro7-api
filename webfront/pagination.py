@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from django.core.paginator import Paginator as DjangoPaginator
 
-from rest_framework.response import Response
+from webfront.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.utils.urls import replace_query_param, remove_query_param
 from django.conf import settings

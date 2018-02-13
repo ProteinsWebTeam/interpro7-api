@@ -1,7 +1,7 @@
 import re
 from django.conf import settings
 from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
+from webfront.response import Response
 
 from webfront.constants import SerializerDetail
 from webfront.models import Entry

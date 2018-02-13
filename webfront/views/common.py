@@ -1,7 +1,7 @@
 import re
 
 from rest_framework import status
-from rest_framework.response import Response
+from webfront.response import Response
 
 from django.conf import settings
 from webfront.views.custom import CustomView

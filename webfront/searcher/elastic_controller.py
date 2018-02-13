@@ -5,6 +5,10 @@ import urllib.parse
 
 from webfront.searcher.search_controller import SearchController
 
+from django.conf import settings
+
+
+es_results = list()
 
 class ElasticsearchController(SearchController):
 
@@ -335,4 +339,6 @@ class ElasticsearchController(SearchController):
         response = self.connection.getresponse()
         data = response.read().decode()
         obj = json.loads(data)
+        if settings.DEBUG:
+            es_results.append(obj)
         return obj

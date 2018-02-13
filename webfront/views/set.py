@@ -141,7 +141,7 @@ class SetHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
         general_handler.queryset_manager.reset_filters("set", endpoint_levels)
-        general_handler.queryset_manager.add_filter("set", integrated={})
+        general_handler.queryset_manager.add_filter("set", integrated=[])
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
 
         return super(SetHandler, self).get(

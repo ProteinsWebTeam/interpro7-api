@@ -4,7 +4,7 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 import webfront.serializers.interpro
 import webfront.serializers.pdb
 from webfront.views.custom import SerializerDetail
-from webfront.serializers.utils import recategorise_go_terms
+# from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
 
 
@@ -85,7 +85,7 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance, searcher):
-        recategorise_go_terms(instance.go_terms)
+        # recategorise_go_terms(instance.go_terms)
         
         protein = {
             "accession": instance.accession,

@@ -28,14 +28,15 @@ def flat_to_nested(flat, convert_to_camel_case = True):
         set_or_create_and_set(nested, path, value)
     return nested
 
-def recategorise_go_terms(go_terms):
-    for term in go_terms:
-        if term['category_code'] == "F":
-            term['category'] = "Molecular Function"
-        elif term['category_code'] == "C":
-            term['category'] = "Cellular Component"
-        elif term['category_code'] == "P":
-            term['category'] = "Biological Process"
-        else:
-            raise Exception("Unknown Go Term category '{0}'".format(term['category']))
+# def recategorise_go_terms(go_terms):
+#     for term in go_terms:
+#         if "category" in term and "code" in term['category']:
+#             if term['category']["code"] == "F":
+#                 term['category'] = "Molecular Function"
+#             elif term['category']["code"] == "C":
+#                 term['category'] = "Cellular Component"
+#             elif term['category']["code"] == "P":
+#                 term['category'] = "Biological Process"
+#             return
+#         raise Exception("Unknown Go Term category '{0}'".format(term['category']))
 

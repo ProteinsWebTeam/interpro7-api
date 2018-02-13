@@ -40,14 +40,14 @@ def group_by_member_databases(general_handler):
 
 
 def group_by_go_categories(general_handler):
-    template = '"category_code": "{}"'
+    template = '"code": "{}"'
     groups = {"P": "Biological Process", "C": "Cellular Component", "F": "Molecular Function"}
     if is_single_endpoint(general_handler):
         qs = {groups[cat]:
-                  general_handler.queryset_manager.get_queryset()
+                general_handler.queryset_manager.get_queryset()
                       .filter(go_terms__contains=template.format(cat))
                       .count()
-              for cat in groups
+                for cat in groups
               }
         return qs
 

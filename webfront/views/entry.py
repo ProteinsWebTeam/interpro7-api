@@ -310,7 +310,7 @@ class EntryHandler(CustomView):
         general_handler.modifiers.register("integrated", filter_by_field("entry", "integrated__accession"))
         general_handler.modifiers.register(
             "go_category",
-            filter_by_contains_field("entry", "go_terms", '"category_code": "{}"'))
+            filter_by_contains_field("entry", "go_terms", '"code": "{}"'))
         general_handler.modifiers.register("go_term", filter_by_contains_field("entry", "go_terms", '"identifier": "{}"'))
         general_handler.modifiers.register(
             "annotation",

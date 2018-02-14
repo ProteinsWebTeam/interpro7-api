@@ -47,7 +47,8 @@ class SetNodeHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
-        general_handler.queryset_manager.add_filter("set", integrated__isnull=False)
+        # general_handler.queryset_manager.add_filter("set", integrated__isnull=False)
+        general_handler.queryset_manager.remove_filter("set", "integrated")
         general_handler.queryset_manager.add_filter("set", integrated__contains=endpoint_levels[level - 2].lower())
         # general_handler.queryset_manager.add_filter("set", source_database='node')
         general_handler.queryset_manager.remove_filter("set", "accession")
@@ -152,5 +153,5 @@ class SetHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
-        general_handler.queryset_manager.add_filter("set", integrated__isnull=True)
+        general_handler.queryset_manager.add_filter("set", integrated=[])
         return queryset

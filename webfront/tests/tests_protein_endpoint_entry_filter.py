@@ -118,14 +118,14 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         sp_2 = "A1CUJ5"
         acc = "IPR003165"
         urls = {
-            "/api/protein/uniprot/"+sp_2+"/entry/interpro": ["IPR003165", "IPR001165"],
-            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated": ["PF17180"],
-            "/api/protein/uniprot/"+sp_2+"/entry/pfam": ["PF17176", "PF02171"],
+            # "/api/protein/uniprot/"+sp_2+"/entry/interpro": ["IPR003165", "IPR001165"],
+            # "/api/protein/uniprot/"+sp_1+"/entry/unintegrated": ["PF17180"],
+            # "/api/protein/uniprot/"+sp_2+"/entry/pfam": ["PF17176", "PF02171"],
             "/api/protein/uniprot/"+sp_2+"/entry/interpro/pfam": ["PF02171"],
-            "/api/protein/uniprot/"+sp_2+"/entry/interpro/smart": ["SM00950"],
-            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated/pfam": ["PF17180"],
-            "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/smart": ["SM00950"],
-            "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/pfam": ["PF02171"],
+            # "/api/protein/uniprot/"+sp_2+"/entry/interpro/smart": ["SM00950"],
+            # "/api/protein/uniprot/"+sp_1+"/entry/unintegrated/pfam": ["PF17180"],
+            # "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/smart": ["SM00950"],
+            # "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/pfam": ["PF02171"],
         }
         for url in urls:
             response = self.client.get(url)

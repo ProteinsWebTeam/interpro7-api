@@ -6,7 +6,7 @@
       "name": "The Clan",
       "description": "An example of a pfam clan",
       "source_database": "pfam",
-      "integrated": null,
+      "integrated": [],
       "relationships": {
         "nodes": [
           {"accession": "PF02171", "type": "entry", "score": 0.6},
@@ -23,7 +23,7 @@
       "name": "A Clan",
       "description": "Another example of a pfam clan",
       "source_database": "pfam",
-      "integrated": null,
+      "integrated": [],
       "relationships": {
         "nodes": [
           {"accession": "PF02171", "type": "entry", "score": 0.2},
@@ -40,7 +40,7 @@
       "name": "A Pathway",
       "description": "Example of a pathway",
       "source_database": "kegg",
-      "integrated": null,
+      "integrated": [],
       "relationships": {
         "nodes": [
           {"accession": "KEGG01.1", "type": "node", "score": 0.5},

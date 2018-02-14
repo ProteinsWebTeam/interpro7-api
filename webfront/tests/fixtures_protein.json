@@ -16,7 +16,7 @@
       "length" : "543",
       "proteomes": ["UP000006701"],
       "gene": "cpyA",
-      "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category_code": "F"}],
+      "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 3,
       "source_database": "reviewed",
       "fragment": "N",
@@ -44,47 +44,47 @@
         {
           "identifier": "GO:0016740",
           "name": "transferase activity",
-          "category_code": "F"
+          "category": {"name": "molecular_function", "code": "F"}
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category_code": "P"
+          "category": {"name": "biological_process", "code": "P"}
         },
         {
           "identifier": "GO:0016787",
           "name": "hydrolase activity",
-          "category_code": "F"
+          "category": {"name": "molecular_function", "code": "F"}
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category_code": "P"
+          "category": {"name": "biological_process", "code": "P"}
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category_code": "P"
+          "category": {"name": "biological_process", "code": "P"}
         },
         {
           "identifier": "GO:0003824",
           "name": "catalytic activity",
-          "category_code": "F"
+          "category": {"name": "molecular_function", "code": "F"}
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category_code": "P"
+          "category": {"name": "biological_process", "code": "P"}
         },
         {
           "identifier": "GO:0003824",
           "name": "catalytic activity",
-          "category_code": "F"
+          "category": {"name": "molecular_function", "code": "F"}
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category_code": "P"
+          "category": {"name": "biological_process", "code": "P"}
         }
       ],
       "evidence_code": 1,
@@ -110,7 +110,7 @@
       "length" : "550",
       "proteomes": ["UP000030104"],
       "gene": "PITC_084940",
-      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category_code": "F"}],
+      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 1,
       "source_database": "unreviewed",
       "fragment": "N",
@@ -134,7 +134,7 @@
       "length" : 696,
       "proteomes": ["UP000030104"],
       "gene": "LHCGR",
-      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category_code": "F"}],
+      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 4,
       "source_database": "unreviewed",
       "fragment": "N",

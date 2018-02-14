@@ -29,27 +29,42 @@
         {
           "identifier": "GO:0005634",
           "name": "nucleus",
-          "category_code": "C"
+          "category": {
+            "name": "cellular_component",
+            "code": "C"
+          }
         },
         {
           "identifier": "GO:0003677",
           "name": "DNA binding",
-          "category_code": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0003707",
           "name": "steroid hormone receptor activity",
-          "category_code": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0008270",
           "name": "zinc ion binding",
-          "category_code": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0006355",
           "name": "regulation of transcription, DNA-templated",
-          "category_code": "P"
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         }
       ],
       "description" : ["The piwi domain [PUB00020128] is a protein domain found in piwi proteins and a large number of related nucleic acid-binding proteins, especially those that bind and cleave RNA. The function of the domain is double stranded-RNA-guided hydrolysis of single stranded-RNA, as has been determined in the argonaute family of related proteins [PUB00018283]."],
@@ -158,27 +173,42 @@
         {
           "identifier": "GO:0005634",
           "name": "nucleus",
-          "category_code": "C"
+          "category": {
+            "name": "cellular_component",
+            "code": "C"
+          }
         },
         {
           "identifier": "GO:0003677",
           "name": "DNA binding",
-          "category_code": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0003707",
           "name": "steroid hormone receptor activity",
-          "category_code": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0008270",
           "name": "zinc ion binding",
-          "category_code": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0006355",
           "name": "regulation of transcription, DNA-templated",
-          "category_code": "P"
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         }
       ],
       "description" : ["The qiwi domain "],
@@ -265,7 +295,10 @@
         {
           "identifier": "GO:0005634",
           "name": "nucleus",
-          "category_code": "C"
+          "category": {
+            "name": "cellular_component",
+            "code": "C"
+          }
         }
       ],
       "source_database": "smart",
@@ -352,7 +385,10 @@
         {
           "identifier": "GO:0005634",
           "name": "nucleus",
-          "category_code": "C"
+          "category": {
+            "name": "cellular_component",
+            "code": "C"
+          }
         }
       ],
       "source_database": "smart",

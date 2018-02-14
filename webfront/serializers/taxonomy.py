@@ -204,7 +204,7 @@ class OrganismSerializer(ModelContentSerializer):
             elif "accession" in instance["metadata"]:
                 return "lineage:" + escape(instance["metadata"]["accession"]).lower()
         elif isinstance(instance, Proteome):
-            return "proteomes:" + escape(instance.accession).upper() if hasattr(instance, 'accession') else None
+            return "proteomes:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
         return None
 
     def to_entries_count_representation(self, instance):

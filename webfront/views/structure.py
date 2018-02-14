@@ -115,7 +115,7 @@ class StructureHandler(CustomView):
             "experiment_type": "experiment_type",
             "name": "name"
         }))
-        general_handler.modifiers.register("length", filter_by_field_or_field_range("structure", "resolution"))
+        general_handler.modifiers.register("resolution", filter_by_field_or_field_range("structure", "resolution"))
         general_handler.modifiers.register("experiment_type", filter_by_field("structure", "experiment_type"))
 
         return super(StructureHandler, self).get(

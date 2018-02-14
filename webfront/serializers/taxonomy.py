@@ -190,7 +190,7 @@ class OrganismSerializer(ModelContentSerializer):
                 "name": instance.name,
                 "is_reference": instance.is_reference,
                 "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
-                "source_database": "taxonomy" if instance.taxonomy is not None else "proteome",
+                "source_database": "proteome",
             }
         }
 

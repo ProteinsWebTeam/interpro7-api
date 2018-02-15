@@ -103,6 +103,8 @@ class QuerysetManager:
                     q += " && tax_id:{}".format(escape(v))
                 elif "lineage__contains" in k:
                     q += " && lineage:{}".format(escape(v).strip())
+                elif "experiment_type__iexact" in k:
+                    q += " && structure_evidence:{}".format(escape(v).strip())
                 elif "__gt" in k:
                     q += " && {}:{}{} TO *]".format(
                         re.sub(r"__gte?", "", k),

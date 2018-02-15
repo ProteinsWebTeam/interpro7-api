@@ -4,7 +4,7 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 import webfront.serializers.interpro
 import webfront.serializers.pdb
 from webfront.views.custom import SerializerDetail
-from webfront.serializers.utils import recategorise_go_terms
+# from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
 
 
@@ -69,8 +69,6 @@ class ProteinSerializer(ModelContentSerializer):
     def to_full_representation(self, instance):
         return {
             "metadata": self.to_metadata_representation(instance, self.searcher),
-            "representation": instance.feature,
-            "genomic_context": instance.genomic_context,
         }
 
     @staticmethod
@@ -87,7 +85,7 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance, searcher):
-        recategorise_go_terms(instance.go_terms)
+        # recategorise_go_terms(instance.go_terms)
         
         protein = {
             "accession": instance.accession,
@@ -95,7 +93,6 @@ class ProteinSerializer(ModelContentSerializer):
             "source_organism": instance.organism,
             "name": {
                 "name": instance.name,
-                "short": instance.short_name,
                 "other": instance.other_names,
             },
             "description": instance.description,

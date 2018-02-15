@@ -4,46 +4,49 @@ from jsonfield import JSONField
 
 class Entry(models.Model):
     entry_id = models.CharField(max_length=10, null=True)
-    accession = models.CharField(primary_key=True, max_length=19)
-    type = models.CharField(max_length=14)
+    accession = models.CharField(primary_key=True, max_length=25)
+    type = models.CharField(max_length=50)
     name = models.TextField()
-    short_name = models.CharField(max_length=30)
-    other_names = JSONField(null=True)
-    source_database = models.CharField(max_length=20, db_index=True)
+    short_name = models.CharField(max_length=100)
+    # other_names = JSONField(null=True)
+    source_database = models.CharField(max_length=100, db_index=True)
     member_databases = JSONField(null=True)
     integrated = models.ForeignKey("Entry", on_delete=models.SET_NULL, null=True, blank=True)
     go_terms = JSONField(null=True)
     description = JSONField(null=True)
     wikipedia = models.TextField(null=True)
     literature = JSONField(null=True)
-    # Array of the string representing the domain architecture
     hierarchy = JSONField(null=True)
     cross_references = JSONField(null=True)
+    entry_date = models.DateField(null=True)
+    is_featured = models.CharField(max_length=2)
+
 
 class EntryAnnotation(models.Model):
     annotation_id = models.CharField(max_length=40, primary_key=True)
     accession = models.ForeignKey(Entry, on_delete=models.SET_NULL, null=True)
-    type = models.CharField(max_length=20)
+    type = models.CharField(max_length=32)
     value = models.BinaryField()
-    mime_type = models.CharField(max_length=64)
+    mime_type = models.CharField(max_length=32)
+
 
 class Protein(models.Model):
-    accession = models.CharField(max_length=20, primary_key=True)
-    identifier = models.CharField(max_length=20, unique=True, null=False)
+    accession = models.CharField(max_length=15, primary_key=True)
+    identifier = models.CharField(max_length=16, unique=True, null=False)
     organism = JSONField(null=True)
     name = models.CharField(max_length=20)
-    short_name = models.CharField(max_length=20, null=True)
+    # short_name = models.CharField(max_length=20, null=True)
     other_names = JSONField(null=True)
     description = JSONField(null=True)
     sequence = models.TextField(null=False)
     length = models.IntegerField(null=False)
     proteomes = JSONField(null=True)
-    gene = models.CharField(max_length=20, null=False)
+    gene = models.CharField(max_length=70, null=True)
     go_terms = JSONField(null=True)
     evidence_code = models.IntegerField()
-    feature = JSONField(null=True)
-    genomic_context = JSONField(null=True)
-    source_database = models.CharField(max_length=20, default="uniprot", db_index=True)
+    # feature = JSONField(null=True)
+    # genomic_context = JSONField(null=True)
+    source_database = models.CharField(max_length=20, default="unreviewed", db_index=True)
     residues = JSONField(null=True)
     structure = JSONField(default={})
     fragment = models.CharField(max_length=1, null=False)
@@ -53,15 +56,16 @@ class Protein(models.Model):
 
 
 class Structure(models.Model):
-    accession = models.CharField(max_length=20, primary_key=True)
+    accession = models.CharField(max_length=4, primary_key=True)
     name = models.CharField(max_length=512)
     short_name = models.CharField(max_length=20, null=True)
     other_names = JSONField(null=True)
-    experiment_type = models.CharField(max_length=30)
+    experiment_type = models.CharField(max_length=16)
     release_date = models.DateField()
-    authors = JSONField(null=True)
+    literature = JSONField(null=True)
     chains = JSONField(null=True)
-    source_database = models.CharField(max_length=20, default="pdb", db_index=True)
+    source_database = models.CharField(max_length=10, default="pdb", db_index=True)
+    resolution = models.FloatField(null=True)
     #TODO add description
 
 
@@ -80,7 +84,7 @@ class Taxonomy(models.Model):
 class Proteome(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=512)
-    is_reference = models.BooleanField()
+    is_reference = models.CharField(max_length=1)
     strain = models.CharField(max_length=512)
     assembly = models.CharField(max_length=512)
     taxonomy = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)

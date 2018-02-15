@@ -66,7 +66,7 @@ class FixtureReader:
                             e2s[n["accession"]].append({
                                 "accession": i,
                                 "source_database": db,
-                                "integrated": None
+                                "integrated": []
                             })
         return e2s
 
@@ -101,6 +101,8 @@ class FixtureReader:
                 for sp in self.protein_structure_list[p]:
                     c = copy.copy(obj)
                     c["structure_acc"] = sp["structure"]
+                    c["structure_evidence"] = self.structures[sp["structure"]]["experiment_type"]
+                    c["structure_resolution"] = self.structures[sp["structure"]]["resolution"]
                     c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["chain"] = sp["chain"]
                     c["text_structure"] = c["structure_acc"] + " " + c["chain"]
@@ -146,6 +148,8 @@ class FixtureReader:
                         "protein_length": self.proteins[p]["length"],
                         "id": get_id(None, p, sp["structure"], sp["chain"]),
                         "structure_acc": sp["structure"],
+                        "structure_evidence": self.structures[sp["structure"]]["experiment_type"],
+                        "structure_resolution": self.structures[sp["structure"]]["resolution"],
                         "structure_chain": sp["structure"] + " - " + sp["chain"],
                         "chain": sp["chain"],
                         "text_structure": sp["structure"] + " " + sp["chain"],

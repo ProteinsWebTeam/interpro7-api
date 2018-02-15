@@ -105,17 +105,17 @@ class StructureHandler(CustomView):
         general_handler.modifiers.register(
             "group_by",
             group_by(Structure, {
-                "experiment_type": "experiment_type",
+                "experiment_type": "structure_evidence",
             }),
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY
         )
         general_handler.modifiers.register("sort_by", sort_by({
             "accession": "structure_acc",
-            "experiment_type": "experiment_type",
+            "experiment_type": "structure_evidence",
             "name": "name"
         }))
-        general_handler.modifiers.register("length", filter_by_field_or_field_range("structure", "resolution"))
+        general_handler.modifiers.register("resolution", filter_by_field_or_field_range("structure", "resolution"))
         general_handler.modifiers.register("experiment_type", filter_by_field("structure", "experiment_type"))
 
         return super(StructureHandler, self).get(

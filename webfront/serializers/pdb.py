@@ -88,7 +88,8 @@ class StructureSerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.name,
                 "source_database": instance.source_database,
-                "experiment_type": instance.experiment_type
+                "experiment_type": instance.experiment_type,
+                "resolution": instance.resolution,
             }
         }
 
@@ -103,8 +104,9 @@ class StructureSerializer(ModelContentSerializer):
             },
             "experiment_type": instance.experiment_type,
             "release_date": instance.release_date,
-            "authors": instance.authors,
+            "literature": instance.literature,
             "chains": instance.chains,
+            "resolution": instance.resolution,
             "source_database": instance.source_database,
             "counters": {
                 "entries": searcher.get_number_of_field_by_endpoint("structure", "entry_acc", instance.accession),
@@ -183,6 +185,8 @@ class StructureSerializer(ModelContentSerializer):
             "accession": obj["protein_acc"],
             "chain": obj["chain"],
             "protein_length": obj["protein_length"],
+            "resolution": obj["structure_resolution"],
+            "experiment_type": obj["structure_evidence"],
             "source_database": obj["protein_db"]
         }
         if "entry_protein_locations" in obj:

@@ -7,8 +7,9 @@
       "type" : "domain",
       "name" : "Piwi domain",
       "short_name" : "Piwi",
-      "other_names" : [],
       "source_database" : "interpro",
+      "entry_date": "2001-04-21",
+      "is_featured": "y",
       "member_databases" : {
         "smart": ["SM00950"],
         "profile": ["PS50822"],
@@ -28,27 +29,42 @@
         {
           "identifier": "GO:0005634",
           "name": "nucleus",
-          "category": "C"
+          "category": {
+            "name": "cellular_component",
+            "code": "C"
+          }
         },
         {
           "identifier": "GO:0003677",
           "name": "DNA binding",
-          "category": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0003707",
           "name": "steroid hormone receptor activity",
-          "category": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0008270",
           "name": "zinc ion binding",
-          "category": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0006355",
           "name": "regulation of transcription, DNA-templated",
-          "category": "P"
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         }
       ],
       "description" : ["The piwi domain [PUB00020128] is a protein domain found in piwi proteins and a large number of related nucleic acid-binding proteins, especially those that bind and cleave RNA. The function of the domain is double stranded-RNA-guided hydrolysis of single stranded-RNA, as has been determined in the argonaute family of related proteins [PUB00018283]."],
@@ -139,9 +155,10 @@
       "type" : "domain",
       "name" : "Qiwi domain",
       "short_name" : "Qiwi",
-      "other_names" : [],
       "source_database" : "interpro",
       "member_databases" : {},
+      "entry_date": "2002-04-21",
+      "is_featured": "n",
       "integrated" : null,
       "hierarchy": {
           "children": [
@@ -156,27 +173,42 @@
         {
           "identifier": "GO:0005634",
           "name": "nucleus",
-          "category": "C"
+          "category": {
+            "name": "cellular_component",
+            "code": "C"
+          }
         },
         {
           "identifier": "GO:0003677",
           "name": "DNA binding",
-          "category": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0003707",
           "name": "steroid hormone receptor activity",
-          "category": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0008270",
           "name": "zinc ion binding",
-          "category": "F"
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0006355",
           "name": "regulation of transcription, DNA-templated",
-          "category": "P"
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         }
       ],
       "description" : ["The qiwi domain "],
@@ -192,13 +224,14 @@
       "accession": "PF02171",
       "type": "domain",
       "name": "Piwi domain",
+      "is_featured": "y",
+      "entry_date": "2003-04-21",
       "short_name": "Piwi",
-      "other_names": [],
       "go_terms": [
         {
         "identifier": "GO:0005634",
         "name": "nucleus",
-        "category": "C"
+        "category_code": "C"
         }
       ],
       "source_database": "pfam",
@@ -255,13 +288,17 @@
       "accession": "SM00950",
       "type": "domain",
       "name": "Piwi domain",
+      "entry_date": "2004-04-21",
+      "is_featured": "y",
       "short_name": "Piwi",
-      "other_names": [],
       "go_terms": [
         {
           "identifier": "GO:0005634",
           "name": "nucleus",
-          "category": "C"
+          "category": {
+            "name": "cellular_component",
+            "code": "C"
+          }
         }
       ],
       "source_database": "smart",
@@ -279,9 +316,10 @@
       "entry_id": "PS50822",
       "accession": "PS50822",
       "type": "MATRIX",
+      "entry_date": "2001-04-21",
       "name": "PIWI",
+      "is_featured": "y",
       "short_name": "Piwi",
-      "other_names": [],
       "go_terms": [],
       "source_database": "profile",
       "member_databases": null,
@@ -298,13 +336,14 @@
       "accession": "PF17180",
       "entry_id": "id3",
       "type": "domain",
+      "is_featured": "y",
+      "entry_date": "2002-04-21",
       "go_terms": [],
       "source_database": "pfam",
       "member_databases": {},
       "integrated": null,
       "name": "Zinc-binding domain",
       "short_name": "zf-3CxxC_2",
-      "other_names": [],
       "description": [],
       "wikipedia": "",
       "literature": {},
@@ -317,13 +356,14 @@
       "accession": "PF17176",
       "entry_id": "id4",
       "type": "domain",
+      "entry_date": "2002-04-21",
+      "is_featured": "y",
       "go_terms": [],
       "source_database": "pfam",
       "member_databases": {},
       "integrated": null,
       "name": "tRNA-binding domain",
       "short_name": "tRNA_bind_3",
-      "other_names": [],
       "description": [],
       "wikipedia": "",
       "literature": {},
@@ -338,13 +378,17 @@
       "accession": "SM00002",
       "type": "family",
       "name": "Myelin family",
+      "entry_date": "2003-04-21",
+      "is_featured": "y",
       "short_name": "Myelin",
-      "other_names": [],
       "go_terms": [
         {
           "identifier": "GO:0005634",
           "name": "nucleus",
-          "category": "C"
+          "category": {
+            "name": "cellular_component",
+            "code": "C"
+          }
         }
       ],
       "source_database": "smart",
@@ -364,8 +408,9 @@
       "type": "MATRIX",
       "name": "HSP20",
       "short_name": "HSP20",
-      "other_names": [],
       "go_terms": [],
+      "entry_date": "2004-04-21",
+      "is_featured": "y",
       "source_database": "profile",
       "member_databases": null,
       "integrated": null,

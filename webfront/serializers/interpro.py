@@ -6,7 +6,7 @@ import webfront.serializers.uniprot
 import webfront.serializers.pdb
 import webfront.serializers.taxonomy
 import webfront.serializers.collection
-from webfront.serializers.utils import recategorise_go_terms
+# from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
 
 
@@ -113,7 +113,7 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance, solr):
-        recategorise_go_terms(instance.go_terms)
+        # recategorise_go_terms(instance.go_terms)
         results = EntryAnnotation.objects.filter(accession=instance.accession).only("type")
         annotation_types = map(lambda x: x.type, results)
         obj = {
@@ -128,7 +128,7 @@ class EntrySerializer(ModelContentSerializer):
             "name": {
                 "name": instance.name,
                 "short": instance.short_name,
-                "other": instance.other_names,
+                # "other": instance.other_names,
             },
             "description": instance.description,
             "wikipedia": instance.wikipedia,

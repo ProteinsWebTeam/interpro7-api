@@ -86,7 +86,10 @@ class QuerysetManager:
                         q += " && {}{}_db:*".format("!" if v else "", ep)
                 elif k == "integrated" or k == "integrated__iexact" or k == "integrated__contains":
                     if ep == 'set':
-                        q += " && set_integrated:{}".format(escape(v))
+                        if not v:
+                            q += " && !_exists_:set_integrated"
+                        else:
+                            q += " && set_integrated:{}".format(escape(v))
                     else:
                         q += " && integrated:{}".format(escape(v))
                 elif k == "integrated__isnull":
@@ -100,6 +103,8 @@ class QuerysetManager:
                     q += " && tax_id:{}".format(escape(v))
                 elif "lineage__contains" in k:
                     q += " && lineage:{}".format(escape(v).strip())
+                elif "experiment_type__iexact" in k:
+                    q += " && structure_evidence:{}".format(escape(v).strip())
                 elif "__gt" in k:
                     q += " && {}:{}{} TO *]".format(
                         re.sub(r"__gte?", "", k),
@@ -181,8 +186,11 @@ class QuerysetManager:
         c = self.filters[endpoint].copy()
         for k, f in c.items():
             if k == "source_database" or k == "source_database__iexact":
-                self.filters[endpoint]["integrated__isnull"] = False
-                del self.filters[endpoint][k]
+                if endpoint == "set" and "integrated" in c:
+                    del self.filters[endpoint]["integrated"]
+                else:
+                    self.filters[endpoint]["integrated__isnull"] = False
+                    del self.filters[endpoint][k]
             elif k == "accession" or k == "accession__iexact":
                 self.filters[endpoint]["integrated__iexact"] = f
                 del self.filters[endpoint][k]

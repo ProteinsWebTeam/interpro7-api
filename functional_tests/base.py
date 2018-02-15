@@ -14,9 +14,9 @@ from interpro.settings import SEARCHER_TEST_URL
 @override_settings(SEARCHER_URL=SEARCHER_TEST_URL)
 class FunctionalTest(StaticLiveServerTestCase):
     fixtures = [
-        'webfront/tests/fixtures.json',
-        'webfront/tests/protein_fixtures.json',
-        'webfront/tests/structure_fixtures.json',
+        'webfront/tests/fixtures_entry.json',
+        'webfront/tests/fixtures_protein.json',
+        'webfront/tests/fixtures_structure.json',
         'webfront/tests/fixtures_organisms.json',
         'webfront/tests/fixtures_set.json',
     ]

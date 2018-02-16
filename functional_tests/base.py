@@ -19,6 +19,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         'webfront/tests/fixtures_structure.json',
         'webfront/tests/fixtures_organisms.json',
         'webfront/tests/fixtures_set.json',
+        'webfront/tests/fixtures_database.json',
     ]
     links_fixtures = 'webfront/tests/relationship_features.json'
 

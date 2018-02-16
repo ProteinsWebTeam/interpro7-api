@@ -1,0 +1,12 @@
+[
+  {
+    "model": "webfront.Database",
+    "fields": {
+      "name": "INTERPRO",
+      "code": "a",
+      "name_long": "InterPro",
+      "type": "entry",
+      "version": "66.0"
+    }
+  }
+]

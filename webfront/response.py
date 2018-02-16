@@ -1,11 +1,9 @@
 from rest_framework.response import Response as R
 from django.conf import settings
 
-# from webfront.models import Database
-#
-#
-# interpro_version = Database.objects.get(pk="INTERPRO").version
-interpro_version = "65.0"
+from webfront.models import Database
+
+interpro_version = Database.objects.get(pk="INTERPRO").version
 
 
 class Response(R):

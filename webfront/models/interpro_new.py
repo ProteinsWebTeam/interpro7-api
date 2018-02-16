@@ -1,6 +1,15 @@
 from django.db import models
 from jsonfield import JSONField
 
+class Database(models.Model):
+    name = models.CharField(max_length=100, primary_key=True)
+    code = models.CharField(max_length=1)
+    name_long = models.CharField(max_length=100)
+    description = models.TextField()
+    version = models.CharField(max_length=100)
+    release_date = models.DateField()
+    type = models.CharField(max_length=100)
+
 
 class Entry(models.Model):
     entry_id = models.CharField(max_length=10, null=True)

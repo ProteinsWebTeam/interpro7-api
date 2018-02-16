@@ -3,8 +3,6 @@ from django.conf import settings
 
 from webfront.models import Database
 
-interpro_version = Database.objects.get(pk="INTERPRO").version
-
 
 class Response(R):
     def __init__(self, data=None, status=None, template_name=None, headers={},
@@ -30,7 +28,7 @@ class Response(R):
 
             headers["Server-Timing"] = ','.join(timings)
 
-        headers["InterPro-Version"] = interpro_version
+        headers["InterPro-Version"] = Database.objects.get(pk="INTERPRO").version
 
         super(Response, self).__init__(
             data, status, template_name, headers, exception, content_type,

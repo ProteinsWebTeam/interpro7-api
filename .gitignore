@@ -12,3 +12,4 @@ config/oracle_dw.yml
 config/mysql.yml
 config/~mysql.yml
 *.db
+*.iml

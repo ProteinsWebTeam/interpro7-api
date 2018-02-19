@@ -15,6 +15,8 @@ from webfront.views.structure import StructureHandler
 from webfront.views.organism import OrganismHandler
 from webfront.views.set import SetHandler
 
+from webfront.models import Database
+
 
 def map_url_to_levels(url):
     parts = [x.strip("/") for x in re.compile("(entry|protein|structure|organism|set)").split(url)]
@@ -28,12 +30,26 @@ def map_url_to_levels(url):
 
     return "/".join(filter(lambda a: len(a) != 0, new_url)).split("/")
 
-
 def pagination_information(request):
     # Extracts the pagination parameters out of the URL and returns a dictionary.
     return {
-        'index': int(request.GET.get('page', 1)),
-        'size':  int(request.GET.get('page_size', 10)),
+        "index": int(request.GET.get("page", 1)),
+        "size":  int(request.GET.get("page_size", 10)),
+    }
+
+def getDataForRoot(handlers):
+    return {
+        "endpoints": [x[0] for x in handlers],
+        "databases": {
+            db["name"]: {
+                "canonical": db["name"],
+                "name": db["name_long"],
+                "description": db["description"],
+                "version": db["version"],
+                "releaseDate": db["release_date"],
+                "type": db["type"],
+            } for db in Database.objects.order_by("type").values("name", "name_long", "description", "version", "release_date", "type")
+        },
     }
 
 
@@ -70,7 +86,7 @@ class GeneralHandler(CustomView):
 
     def get(self, request, url='', *args, **kwargs):
         if url.strip() == '' or url.strip() == '/':
-            return Response({"endpoints": [x[0] for x in self.available_endpoint_handlers]})
+            return Response(getDataForRoot(self.available_endpoint_handlers))
         self.filter_serializers = {}
         self.pagination = pagination_information(request)
         endpoint_levels = map_url_to_levels(url)

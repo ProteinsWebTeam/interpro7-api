@@ -63,11 +63,16 @@ def group_by_go_terms(general_handler):
         return qs
 
 
-def group_by_organism(general_handler ,endpoint_queryset):
+def get_queryset_to_group(general_handler, endpoint_queryset):
+    queryset = general_handler.queryset_manager.get_queryset()
+    if endpoint_queryset.objects.count() == queryset.count():
+        return endpoint_queryset.objects
+    return endpoint_queryset.objects.filter(accession__in=queryset.distinct())
+
+
+def group_by_organism(general_handler, endpoint_queryset):
     if general_handler.queryset_manager.main_endpoint == "protein":
-        # TODO: Optimize this query
-        queryset = general_handler.queryset_manager.get_queryset().distinct()
-        qs = endpoint_queryset.objects.filter(accession__in=queryset)
+        qs = get_queryset_to_group(general_handler, endpoint_queryset)
         return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:30]
     else:
         searcher = general_handler.searcher
@@ -106,8 +111,7 @@ def group_by(endpoint_queryset, fields):
         if is_single_endpoint(general_handler):
             if "tax_id" == field:
                 return group_by_organism(general_handler, endpoint_queryset)
-            queryset = general_handler.queryset_manager.get_queryset().distinct()
-            qs = endpoint_queryset.objects.filter(accession__in=queryset)
+            qs = get_queryset_to_group(general_handler, endpoint_queryset)
             return qs.values_list(field).annotate(total=Count(field))
         else:
             searcher = general_handler.searcher

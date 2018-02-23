@@ -103,7 +103,10 @@ class ProteinHandler(CustomView):
     serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW
 
     def get_database_contributions(self, queryset):
-        qs = Protein.objects.filter(accession__in=queryset)
+        if Protein.objects.count() == queryset.count():
+            qs = Protein.objects
+        else:
+            qs = Protein.objects.filter(accession__in=queryset)
         protein_counter = qs.values_list('source_database').annotate(total=Count('source_database'))
         output = {}
         for (source_database, total) in protein_counter:

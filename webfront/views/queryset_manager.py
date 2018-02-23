@@ -165,6 +165,8 @@ class QuerysetManager:
             endpoint = self.main_endpoint
         queryset = self.get_base_queryset(endpoint)
         current_filters = self.get_current_filters(self.filters, endpoint, only_main_endpoint)
+        if "accession__isnull" in current_filters:
+            del current_filters["accession__isnull"]
         current_exclusions = self.get_current_filters(self.exclusions, endpoint, only_main_endpoint)
 
         # creates an `OR` filter for the search fields

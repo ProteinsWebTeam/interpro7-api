@@ -197,11 +197,25 @@ if DEBUG and ("TRAVIS" not in os.environ):
                 'level': 'DEBUG',
                 'class': 'logging.StreamHandler',
             },
+            'file_sql': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '../sql.log',
+            },
+            'file_elastic': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '../elastic.log',
+            },
         },
         # 'loggers': {
         #     'django.db.backends': {
         #         'level': 'DEBUG',
-        #         'handlers': ['console'],
+        #         'handlers': ['file_sql'],
+        #     },
+        #     'interpro.elastic': {
+        #         'level': 'DEBUG',
+        #         'handlers': ['file_elastic'],
         #     },
         # },
     }

@@ -6,7 +6,7 @@ import urllib.parse
 from webfront.searcher.search_controller import SearchController
 
 from django.conf import settings
-
+import logging
 
 es_results = list()
 
@@ -311,13 +311,16 @@ class ElasticsearchController(SearchController):
 
     # TODO: check if this could be replaced by the following "_elastic_json_query()"
     def execute_query(self, query, fq=None, rows=0, start=0):
+        logger = logging.getLogger("interpro.elastic")
         q = query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
         if fq is not None:
             q = query+" && "+fq.lower()
         q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
+        path = "/"+self.index+"/"+self.type+"/_search?pretty&q="+q+"&size="+str(rows)
+        logger.debug("URL:"+path)
         self.connection.request(
             "GET",
-            "/"+self.index+"/"+self.type+"/_search?pretty&q="+q+"&size="+str(rows),
+            path,
             None,
             self.headers
         )
@@ -327,12 +330,16 @@ class ElasticsearchController(SearchController):
         return [o["_source"] for o in obj["hits"]["hits"]]
 
     def _elastic_json_query(self, q, query_obj=None):
+        logger = logging.getLogger("interpro.elastic")
         if query_obj is None:
             query_obj = {"from": 0}
         q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
+        path = "/"+self.index+"/"+self.type+"/_search?pretty&q="+q
+        logger.debug("URL:"+path)
+        logger.debug("JSON:"+json.dumps(query_obj))
         self.connection.request(
             "GET",
-            "/"+self.index+"/"+self.type+"/_search?pretty&q="+q,
+            path,
             json.dumps(query_obj),
             self.headers
         )

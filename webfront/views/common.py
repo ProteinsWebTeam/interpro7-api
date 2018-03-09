@@ -30,6 +30,7 @@ def map_url_to_levels(url):
 
     return "/".join(filter(lambda a: len(a) != 0, new_url)).split("/")
 
+
 def pagination_information(request):
     # Extracts the pagination parameters out of the URL and returns a dictionary.
     return {
@@ -37,18 +38,20 @@ def pagination_information(request):
         "size":  int(request.GET.get("page_size", 10)),
     }
 
+
 def getDataForRoot(handlers):
     return {
         "endpoints": [x[0] for x in handlers],
         "databases": {
-            db["name"]: {
+            db["name"].upper(): {
                 "canonical": db["name"],
                 "name": db["name_long"],
                 "description": db["description"],
                 "version": db["version"],
                 "releaseDate": db["release_date"],
                 "type": db["type"],
-            } for db in Database.objects.order_by("type").values("name", "name_long", "description", "version", "release_date", "type")
+            } for db in Database.objects.order_by("type")
+                .values("name", "name_long", "description", "version", "release_date", "type")
         },
     }
 

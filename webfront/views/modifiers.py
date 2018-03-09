@@ -71,10 +71,11 @@ def get_queryset_to_group(general_handler, endpoint_queryset):
 
 
 def group_by_organism(general_handler, endpoint_queryset):
-    if general_handler.queryset_manager.main_endpoint == "protein":
-        qs = get_queryset_to_group(general_handler, endpoint_queryset)
-        return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:30]
-    else:
+    # if general_handler.queryset_manager.main_endpoint == "protein":
+    #     qs = get_queryset_to_group(general_handler, endpoint_queryset)
+    #     return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:30]
+    # else:
+    # Running this always on elastic for performance reasons
         searcher = general_handler.searcher
         result = searcher.get_grouped_object(
             general_handler.queryset_manager.main_endpoint, "tax_id", size=20

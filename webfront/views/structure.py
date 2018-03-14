@@ -2,7 +2,7 @@ from django.db.models import Count
 from webfront.models import Structure
 from webfront.serializers.pdb import StructureSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.views.modifiers import group_by, sort_by, filter_by_field, filter_by_field_or_field_range
+from webfront.views.modifiers import group_by, sort_by, filter_by_field, filter_by_field_or_field_range, add_extra_fields
 
 
 class ChainPDBAccessionHandler(CustomView):
@@ -67,6 +67,10 @@ class PDBHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         ds = endpoint_levels[level - 1].lower()
         general_handler.queryset_manager.add_filter("structure", source_database="pdb")
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Structure),
+        )
         return super(PDBHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

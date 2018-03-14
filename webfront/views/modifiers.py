@@ -230,5 +230,18 @@ def get_entry_annotation(field, general_handler):
     return(annotation)
 
 
+def add_extra_fields(endpoint):
+    supported_fields = [f.name for f in endpoint._meta.get_fields() if not f.is_relation]
+    def x(fields, general_handler):
+        fs = fields.split(',')
+        for field in fs:
+            if field not in supported_fields:
+                raise URLError("{} is not a valid field to to be included. Allowed fields : {}".format(
+                    field, ", ".join(supported_fields)
+                ))
+        general_handler.queryset_manager.other_fields = fs
+    return x
+
+
 def passing(x, y):
     pass

@@ -14,6 +14,8 @@ class SetSerializer(ModelContentSerializer):
         representation = {}
         representation = self.endpoint_representation(representation, instance)
         representation = self.filter_representation(representation, instance, self.detail_filters, self.detail)
+        if self.queryset_manager.other_fields is not None:
+            representation = self.add_other_fields(representation, instance, self.queryset_manager.other_fields)
         return representation
 
     def endpoint_representation(self, representation, instance):

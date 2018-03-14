@@ -139,3 +139,11 @@ class ModelContentSerializer(serializers.ModelSerializer):
     def get_key_from_bucket(bucket):
         key = str(bucket["val"] if "val" in bucket else bucket["key"]).lower()
         return key
+
+    @staticmethod
+    def add_other_fields(representation, instance, other_fields):
+        representation["extra_fields"] = {
+            f: instance.__getattribute__(f)
+            for f in other_fields
+        }
+        return representation

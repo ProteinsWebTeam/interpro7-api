@@ -5,6 +5,8 @@ from webfront.serializers.collection import SetSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from django.conf import settings
 
+from webfront.views.modifiers import add_extra_fields
+
 entry_sets = '|'.join(settings.ENTRY_SETS) + '|all'
 entry_sets_accessions = (
     r'^({})$'.format('|'.join((set['accession'] for (_, set) in settings.ENTRY_SETS.items())))
@@ -107,6 +109,10 @@ class SetTypeHandler(CustomView):
         db = endpoint_levels[level - 1]
         if db.lower() != "all":
             general_handler.queryset_manager.add_filter("set", source_database=db)
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Set),
+        )
         return super(SetTypeHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

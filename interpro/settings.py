@@ -208,16 +208,16 @@ if DEBUG and ("TRAVIS" not in os.environ):
                 'filename': '../elastic.log',
             },
         },
-        # 'loggers': {
-        #     'django.db.backends': {
-        #         'level': 'DEBUG',
-        #         'handlers': ['file_sql'],
-        #     },
-        #     'interpro.elastic': {
-        #         'level': 'DEBUG',
-        #         'handlers': ['file_elastic'],
-        #     },
-        # },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'DEBUG',
+                'handlers': ['file_sql'],
+            },
+            'interpro.elastic': {
+                'level': 'DEBUG',
+                'handlers': ['file_elastic'],
+            },
+        },
     }
 
 # Debug toolbar

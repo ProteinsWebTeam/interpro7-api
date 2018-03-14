@@ -1,7 +1,7 @@
 from webfront.models import Taxonomy, Proteome
 from webfront.serializers.taxonomy import OrganismSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.views.modifiers import passing
+from webfront.views.modifiers import passing, add_extra_fields
 
 
 class ProteomeAccessionHandler(CustomView):
@@ -42,6 +42,10 @@ class ProteomeHandler(CustomView):
         self.serializer_detail = SerializerDetail.ORGANISM_PROTEOME_HEADERS
         general_handler.queryset_manager.add_filter("proteome", accession__isnull=False)
         general_handler.modifiers.unregister("with_names")
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Proteome),
+        )
 
         if "accession" in general_handler.queryset_manager.filters["taxonomy"]:
             tax_id = general_handler.queryset_manager.remove_filter("taxonomy", "accession")
@@ -110,6 +114,10 @@ class TaxonomyHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
         general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Taxonomy),
+        )
         return super(TaxonomyHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

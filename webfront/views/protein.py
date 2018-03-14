@@ -5,7 +5,7 @@ from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from webfront.views.modifiers import \
     group_by, sort_by, filter_by_field, get_single_value, get_domain_architectures,\
-    filter_by_contains_field, filter_by_field_or_field_range
+    filter_by_contains_field, filter_by_field_or_field_range, add_extra_fields
 from webfront.models import Protein
 from django.conf import settings
 
@@ -76,6 +76,10 @@ class UniprotHandler(CustomView):
             general_handler.queryset_manager.add_filter("protein", source_database__iexact=ds)
         general_handler.modifiers.register("ida", get_domain_architectures,
             use_model_as_payload=True, serializer=SerializerDetail.PROTEIN_HEADERS, many=True)
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Protein),
+        )
         return super(UniprotHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

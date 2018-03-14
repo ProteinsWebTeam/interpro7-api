@@ -3,7 +3,7 @@ from django.db.models import Count
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
 from webfront.views.modifiers import group_by, sort_by, filter_by_field, get_interpro_status_counter, \
-    filter_by_contains_field, get_domain_architectures, get_entry_annotation
+    filter_by_contains_field, get_domain_architectures, get_entry_annotation, add_extra_fields
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
 
@@ -73,6 +73,10 @@ class MemberHandler(CustomView):
             use_model_as_payload=True,
             # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Entry),
+        )
 
         general_handler.modifiers.register(
             "interpro_status",
@@ -139,6 +143,10 @@ class UnintegratedHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry",
                                                     integrated__isnull=True,
                                                     source_database__iregex=db_members)
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Entry),
+        )
         return super(UnintegratedHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -170,6 +178,10 @@ class IntegratedHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry",
                                                     integrated__isnull=False,
                                                     source_database__iregex=db_members)
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Entry),
+        )
         return super(IntegratedHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -212,6 +224,10 @@ class InterproHandler(CustomView):
             use_model_as_payload=True,
             # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Entry),
+        )
         general_handler.modifiers.register("signature_in", filter_by_contains_field("entry", "member_databases"))
         return super(InterproHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -238,6 +254,10 @@ class AllHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("entry", source_database__isnull=False)
+        general_handler.modifiers.register(
+            "extra_fields",
+            add_extra_fields(Entry),
+        )
         return super(AllHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs

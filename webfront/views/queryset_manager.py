@@ -20,7 +20,8 @@ class QuerysetManager:
     filters = {}
     exclusions = {}
     endpoints = []
-    order_field =None;
+    order_field = None
+    other_fields = None
 
     def reset_filters(self, endpoint, endpoint_levels=[]):
         self.main_endpoint = endpoint

@@ -143,3 +143,77 @@ class IDAModifiersTest(InterproRESTTestCase):
         self.assertIn("count", response.data)
         self.assertEqual(response.data["count"], 1)
         self.assertEqual("A1CUJ5", response.data["results"][0]["metadata"]["accession"])
+
+
+class ExtraFieldsModifierTest(InterproRESTTestCase):
+    fields = {
+        "entry": [
+          'entry_id', 'accession', 'type', 'name', 'short_name', 'source_database', 'member_databases', 'go_terms',
+          'description', 'wikipedia', 'literature', 'hierarchy', 'cross_references', 'entry_date', 'is_featured'
+        ],
+        "protein": [
+          'accession', 'identifier', 'organism', 'name', 'other_names', 'description', 'sequence', 'length', 'proteomes', 'gene', 'go_terms',
+          'evidence_code', 'source_database', 'residues', 'structure', 'fragment', 'tax_id'
+        ],
+        'structure': [
+            'accession', 'name', 'short_name', 'other_names', 'experiment_type', 'release_date', 'literature', 'chains',
+            'source_database', 'resolution'
+        ],
+        'organism': [
+            'accession', 'scientific_name', 'full_name', 'lineage', 'rank', 'children', 'left_number', 'right_number'
+        ],
+        'set': [
+            'accession', 'name', 'description', 'source_database', 'integrated', 'relationships'
+        ],
+    }
+    list_url = {
+        "entry": "/entry/interpro",
+        "protein": "/protein/uniprot",
+        "structure": "/structure/pdb",
+        "organism": "/organism/taxonomy",
+        "set": "/set/pfam",
+    }
+
+    def test_extra_fields(self):
+        for endpoint in self.fields:
+            for field in self.fields[endpoint]:
+                url = "/api{}?extra_fields={}".format(self.list_url[endpoint], field)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, status.HTTP_200_OK, url)
+                self.assertIn("results", response.data)
+                for result in response.data["results"]:
+                    self.assertIn("extra_fields", result)
+                    self.assertIn(field, result["extra_fields"])
+            url = "/api{}?extra_fields=ERROR".format(self.list_url[endpoint])
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_extra_fields_together(self):
+        for endpoint in self.fields:
+            url = "/api{}?extra_fields={}".format(self.list_url[endpoint], ",".join(self.fields[endpoint]))
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, url)
+            self.assertIn("results", response.data)
+            for field in self.fields[endpoint]:
+                for result in response.data["results"]:
+                    self.assertIn("extra_fields", result)
+                    self.assertIn(field, result["extra_fields"])
+            url = "/api{}?extra_fields=name,ERROR".format(self.list_url[endpoint])
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_extra_fields_with_other_endpoint(self):
+        for endpoint in self.fields:
+            other_ep = [ep for ep in self.fields if ep != endpoint]
+            for ep in other_ep:
+                for field in self.fields[endpoint]:
+                    url = "/api{}/{}?extra_fields={}".format(self.list_url[endpoint], ep, field)
+                    response = self.client.get(url)
+                    self.assertEqual(response.status_code, status.HTTP_200_OK, url)
+                    self.assertIn("results", response.data)
+                    for result in response.data["results"]:
+                        self.assertIn("extra_fields", result)
+                        self.assertIn(field, result["extra_fields"])
+                url = "/api{}/{}?extra_fields=name,ERROR".format(self.list_url[endpoint], ep)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

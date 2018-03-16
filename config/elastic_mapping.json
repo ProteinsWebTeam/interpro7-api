@@ -27,7 +27,8 @@
         "IDA": {"type":  "text"},
         "set_acc": {"type":  "keyword"},
         "set_db": {"type":  "keyword"},
-        "set_integrated": {"type":  "keyword"}
+        "set_integrated": {"type":  "keyword"},
+        "entry_go_terms" : {"type" : "keyword"}
       }
     }
   }

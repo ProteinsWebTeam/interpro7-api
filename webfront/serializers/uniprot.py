@@ -7,6 +7,14 @@ from webfront.views.custom import SerializerDetail
 # from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
 
+mamberDBNames = {
+    "REVIEWED": "reviewed",
+    "UNREVIEWED": "unreviewed",
+}
+
+def formatMemberDBName(name):
+    return mamberDBNames[name] if name in mamberDBNames else name
+
 
 class ProteinSerializer(ModelContentSerializer):
 
@@ -125,7 +133,7 @@ class ProteinSerializer(ModelContentSerializer):
                 for bucket in instance["groups"]["buckets"]
             }
         else:
-            return {field_value: total for field_value, total in instance}
+            return {formatMemberDBName(field_value): total for field_value, total in instance}
 
     @staticmethod
     def to_counter_representation(instance):

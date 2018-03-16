@@ -333,7 +333,7 @@ class ElasticsearchController(SearchController):
         logger = logging.getLogger("interpro.elastic")
         if query_obj is None:
             query_obj = {"from": 0}
-        q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
+        q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20").replace(" or ", "%20OR%20")
         path = "/"+self.index+"/"+self.type+"/_search?pretty&q="+q
         logger.debug("URL:"+path)
         logger.debug("JSON:"+json.dumps(query_obj))

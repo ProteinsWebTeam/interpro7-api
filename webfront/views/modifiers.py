@@ -53,14 +53,25 @@ def group_by_go_categories(general_handler):
 
 
 def group_by_go_terms(general_handler):
-    template = '"identifier": "{}"'
-    if is_single_endpoint(general_handler):
-        qs = [(term, general_handler.queryset_manager.get_queryset()
-                        .filter(go_terms__contains=template.format(term))
-                        .count())
-              for term in go_terms
-              ]
-        return qs
+    q = "({})".format(" OR ".join(g.replace(':', '\\:') for g in go_terms))
+    searcher = general_handler.searcher
+    result = searcher.get_grouped_object(
+        general_handler.queryset_manager.main_endpoint, 'entry_go_terms', q, size=1000
+    )
+    return [
+        (r['key'], r['unique']['value'])
+        for r in result['groups']['buckets']
+        if r['key'] in go_terms
+    ]
+    #
+    # template = '"identifier": "{}"'
+    # if is_single_endpoint(general_handler):
+    #     qs = [(term, general_handler.queryset_manager.get_queryset()
+    #                     .filter(go_terms__contains=template.format(term))
+    #                     .count())
+    #           for term in go_terms
+    #           ]
+    #     return qs
 
 
 def get_queryset_to_group(general_handler, endpoint_queryset):

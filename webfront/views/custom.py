@@ -181,11 +181,12 @@ class CustomView(GenericAPIView):
                 pass
 
     def get_counter_response(self, general_handler, searcher):
-        if is_single_endpoint(general_handler):
-            self.queryset = general_handler.queryset_manager.get_queryset().distinct()
-            obj = self.get_database_contributions(self.queryset)
-            return obj
-        else:
+        # Commentd out to test if this query runs faster in elastic
+        # if is_single_endpoint(general_handler):
+        #     self.queryset = general_handler.queryset_manager.get_queryset().distinct()
+        #     obj = self.get_database_contributions(self.queryset)
+        #     return obj
+        # else:
             extra = [k
                      for k, v in general_handler.filter_serializers.items()
                      if v["filter_serializer"] in [SerializerDetail.PROTEIN_DB,

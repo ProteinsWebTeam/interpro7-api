@@ -120,7 +120,7 @@ def group_by(endpoint_queryset, fields):
             return group_by_go_categories(general_handler)
         if "annotation" == field:
             return group_by_annotations(general_handler)
-        if is_single_endpoint(general_handler):
+        if is_single_endpoint(general_handler) and general_handler.queryset_manager.main_endpoint != "protein":
             if "tax_id" == field:
                 return group_by_organism(general_handler, endpoint_queryset)
             qs = get_queryset_to_group(general_handler, endpoint_queryset)

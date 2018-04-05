@@ -14,6 +14,7 @@ from webfront.views.protein import ProteinHandler
 from webfront.views.structure import StructureHandler
 from webfront.views.organism import OrganismHandler
 from webfront.views.set import SetHandler
+from webfront.views.cache import InterProCache
 
 from webfront.models import Database
 
@@ -87,9 +88,15 @@ class GeneralHandler(CustomView):
     modifiers = ModifierManager()
     searcher = None
 
+    cache = InterProCache()
+
     def get(self, request, url='', *args, **kwargs):
         if url.strip() == '' or url.strip() == '/':
             return Response(getDataForRoot(self.available_endpoint_handlers))
+        response = self.cache.get(url)
+        if response != None:
+            return response
+
         self.filter_serializers = {}
         self.pagination = pagination_information(request)
         endpoint_levels = map_url_to_levels(url)
@@ -98,7 +105,7 @@ class GeneralHandler(CustomView):
         self.queryset_manager = QuerysetManager()
         self.searcher = self.get_search_controller(self.queryset_manager)
         try:
-            return super(GeneralHandler, self).get(
+            response = super(GeneralHandler, self).get(
                 request, endpoint_levels,
                 available_endpoint_handlers=self.available_endpoint_handlers,
                 level=0,
@@ -106,6 +113,8 @@ class GeneralHandler(CustomView):
                 general_handler=self,
                 *args, **kwargs
             )
+            self.cache.set(url, response)
+            return response
         except ReferenceError as e:
             if settings.DEBUG:
                 raise

@@ -67,6 +67,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    #'django.middleware.cache.UpdateCacheMiddleware',
+    #'django.middleware.common.CommonMiddleware',
+    #'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 if (INTERPRO_CONFIG.get('django_cors', False)):
@@ -185,6 +188,28 @@ DB_MEMBERS = INTERPRO_CONFIG.get('members', {})
 ENTRY_SETS = INTERPRO_CONFIG.get('sets', {})
 CROSS_REFERENCES = INTERPRO_CONFIG.get('cross_references', {})
 
+import django_redis.cache
+import django_redis.client
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+#DJANGO_REDIS_LOGGER = 'django.redis'
+
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#        'LOCATION': '127.0.0.1:11211',
+#    }
+#}
+
+
 import logging
 l = logging.getLogger('django.db.backends')
 l.setLevel(logging.DEBUG)
@@ -241,3 +266,5 @@ if DEBUG and ("TRAVIS" not in os.environ):
 #     'debug_toolbar.panels.redirects.RedirectsPanel',
 #     'debug_toolbar.panels.profiling.ProfilingPanel',
 # ]
+
+

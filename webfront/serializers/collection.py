@@ -40,14 +40,15 @@ class SetSerializer(ModelContentSerializer):
             representation["organisms"] = self.to_organism_count_representation(instance)
         if detail != SerializerDetail.SET_OVERVIEW:
             q = "set_acc:" + escape(instance.accession.lower())
+            sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.ENTRY_DB in detail_filters or \
                     SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = self.to_entries_detail_representation(instance, s, q)
+                representation["entries"] = self.to_entries_detail_representation(instance, s, q, base_query=sq)
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
                     instance, s, q,
-                    include_chain=SerializerDetail.STRUCTURE_DETAIL not in detail_filters
+                    include_chain=True
                 )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:

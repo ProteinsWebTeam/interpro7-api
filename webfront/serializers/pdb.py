@@ -51,18 +51,20 @@ class StructureSerializer(ModelContentSerializer):
             representation["sets"] = self.to_set_count_representation(representation)
 
         if self.detail != SerializerDetail.STRUCTURE_OVERVIEW:
+            sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = StructureSerializer.to_proteins_detail_representation(
                     instance, s, "structure_acc:" + escape(instance.accession.lower()),
-                    include_chains=SerializerDetail.PROTEIN_DETAIL not in detail_filters
+                    include_chains=True
                 )
             if SerializerDetail.ENTRY_DB in detail_filters or \
                     SerializerDetail.ENTRY_DETAIL in detail_filters:
                 representation["entries"] = self.to_entries_detail_representation(
                     instance, s, "structure_acc:" + escape(instance.accession.lower()),
-                    include_chains=SerializerDetail.ENTRY_DETAIL not in detail_filters,
-                    for_structure=True
+                    include_chains=True,
+                    for_structure=True,
+                    base_query=sq
                 )
             if SerializerDetail.ORGANISM_DB in detail_filters or \
                     SerializerDetail.ORGANISM_DETAIL in detail_filters:
@@ -70,7 +72,7 @@ class StructureSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "structure_acc:" + escape(instance.accession.lower()),
-                    include_chains=SerializerDetail.ORGANISM_DETAIL not in detail_filters
+                    include_chains=True
                 )
             if SerializerDetail.SET_DB in detail_filters or \
                     SerializerDetail.SET_DETAIL in detail_filters:
@@ -78,7 +80,7 @@ class StructureSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "structure_acc:" + escape(instance.accession.lower()),
-                    include_chains=SerializerDetail.SET_DETAIL not in detail_filters
+                    include_chains=True
                 )
 
         return representation

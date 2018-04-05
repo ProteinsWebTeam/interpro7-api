@@ -84,12 +84,12 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
 
     @staticmethod
-    def to_structures_detail_representation(instance, searcher, query, include_chain=True):
+    def to_structures_detail_representation(instance, searcher, query, include_structure=True, include_chain=True):
         field = "structure_chain" if include_chain else "structure_acc"
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r,
-                include_structure=include_chain,
+                include_structure=include_structure,
                 search=searcher
             )
             for r in searcher.get_group_obj_of_field_by_query(None, field, fq=query, rows=10)["groups"]
@@ -99,15 +99,16 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def to_entries_detail_representation(instance, searcher, searcher_query, include_chains=False, for_structure=False):
+    def to_entries_detail_representation(instance, searcher, searcher_query, include_chains=False, for_structure=False, base_query=None):
         if include_chains:
             # search = searcher.execute_query(None, fq=searcher_query, rows=10)
             search = searcher.get_group_obj_of_field_by_query(None, ["structure_chain","entry_acc"], fq=searcher_query, rows=10)["groups"]
         else:
             search = searcher.get_group_obj_of_field_by_query(None, "entry_acc", fq=searcher_query, rows=10)["groups"]
+
         response = [
-            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_solr_object(
-                r, solr=searcher, for_structure=for_structure
+            webfront.serializers.interpro.EntrySerializer.get_entry_header_from_search_object(
+                r, searcher=searcher, for_structure=for_structure, sq=base_query
             )
             for r in search
             ]

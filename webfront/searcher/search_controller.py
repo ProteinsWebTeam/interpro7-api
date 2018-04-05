@@ -9,7 +9,7 @@ class SearchController(metaclass=abc.ABCMeta):
     def get_group_obj_of_field_by_query(self, query, fields, fq=None, rows=0, start=0, inner_field_to_count=None):
         raise NotImplementedError('users must define get_group_obj_of_field_by_query to use this base class')
 
-    def get_number_of_field_by_endpoint(self, endpoint, field, accession):
+    def get_number_of_field_by_endpoint(self, endpoint, field, accession, query="*:*"):
         db = field
         fq = None
         if field.startswith("entry"):
@@ -24,7 +24,7 @@ class SearchController(metaclass=abc.ABCMeta):
         if field == "set_acc":
             fq = "!set_integrated:* && !set_db:kegg"
         ngroups = self.get_group_obj_of_field_by_query(
-             "{}:* && {}:{}".format(db, acc, escape(accession)), field, fq
+             "{} && {}:* && {}:{}".format(query, db, acc, escape(accession)), field, fq
         )["ngroups"]
         if isinstance(ngroups, dict):
             ngroups = ngroups["value"]

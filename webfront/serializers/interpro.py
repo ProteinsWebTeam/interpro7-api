@@ -81,34 +81,36 @@ class EntrySerializer(ModelContentSerializer):
     def reformat_cross_references(cross_references):
         DEFAULT_DESCRIPTION = "Description of data source (to be defined in API)"
         DEFAULT_URL_PATTERN = "https://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query={accession}"
+        DEFAULT_RANK = 1000
         xrefSettings = settings.CROSS_REFERENCES
 
         reformattedCrossReferences = {}
         for database in cross_references.keys():
             accessions = cross_references[database]
-            reformattedCrossReferences[database] = {}
+            reformattedCrossReferences[database] = {
+                "displayName": database,
+                "description": DEFAULT_DESCRIPTION,
+                "rank": DEFAULT_RANK,
+                "accessions": []
+            }
 
-            if database in xrefSettings and 'displayName' in xrefSettings[database]:
-                reformattedCrossReferences[database]['displayName'] =  xrefSettings[database]['displayName']
-            else:
-                reformattedCrossReferences[database]['displayName'] = database
+            if database in xrefSettings:
+                if 'displayName' in xrefSettings[database]:
+                    reformattedCrossReferences[database]['displayName'] = xrefSettings[database]['displayName']
+                if 'description' in xrefSettings[database]:
+                    reformattedCrossReferences[database]['description'] = xrefSettings[database]['description']
+                if 'rank' in xrefSettings[database]:
+                    reformattedCrossReferences[database]['rank'] = xrefSettings[database]['rank']
 
-            if database in xrefSettings and 'description' in xrefSettings[database]:
-                reformattedCrossReferences[database]['description'] =  xrefSettings[database]['description']
-            else:
-                reformattedCrossReferences[database]['description'] = DEFAULT_DESCRIPTION
-
-            reformattedCrossReferences[database]['rank'] =  xrefSettings[database]['rank']
-
-            reformattedCrossReferences[database]['accessions'] = []
             for accession in accessions:
-                accessionObj = {}
-                accessionObj['accession'] = accession
+                accessionObj = {
+                    'accession': accession,
+                    'url': DEFAULT_URL_PATTERN
+                }
 
                 if database in xrefSettings and 'urlPattern' in xrefSettings[database]:
-                    accessionObj['url'] =  xrefSettings[database]['urlPattern']
-                else:
-                    accessionObj['url'] = DEFAULT_URL_PATTERN
+                    accessionObj['url'] = xrefSettings[database]['urlPattern']
+
                 accessionObj['url'] = accessionObj['url'].replace('{accession}', accession)
                 reformattedCrossReferences[database]['accessions'].append(accessionObj)
         return reformattedCrossReferences

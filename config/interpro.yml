@@ -4,7 +4,7 @@ django_cors: true
 searcher_path: "http://hmmer-prod-db04:9200/interpro1/relationship"
 searcher_test_path: "http://localhost:9200/test/relationship"
 api_url: "https://wwwdev.ebi.ac.uk/interpro7/api/"
-use_test_db: true
+use_test_db: false
 
 members:
   cathgene3d:

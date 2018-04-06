@@ -48,17 +48,20 @@ class EntrySerializer(ModelContentSerializer):
             representation["sets"] = self.to_set_count_representation(instance)
 
         if detail != SerializerDetail.ENTRY_OVERVIEW:
+            sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = EntrySerializer.to_proteins_detail_representation(
                     instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()),
-                    for_entry=True
+                    for_entry=True,
+                    base_query=sq
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
                     instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()),
-                    include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters
+                    include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters,
+                    base_query=sq
                 )
             if SerializerDetail.ORGANISM_DB in detail_filters or \
                     SerializerDetail.ORGANISM_DETAIL in detail_filters:

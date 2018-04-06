@@ -21,6 +21,12 @@ class SearchController(metaclass=abc.ABCMeta):
         acc = "{}_acc".format(endpoint)
         if endpoint == "organism":
             acc = "lineage"
+        elif endpoint == "structure":
+            db = "chain"
+        elif endpoint == "proteome":
+            db = "proteomes"
+            acc = "proteomes"
+            accession = accession.lower()
         if field == "set_acc":
             fq = "!set_integrated:* && !set_db:kegg"
         ngroups = self.get_group_obj_of_field_by_query(

@@ -24,6 +24,7 @@ services:
 install:
   - pip install -r requirements.txt
   - pip install -r dev_requirements.txt
+  - pip install tblib
 before_script:
   - sleep 10
   - curl -XPUT 'localhost:9200/test?pretty' -d @config/elastic_mapping.json

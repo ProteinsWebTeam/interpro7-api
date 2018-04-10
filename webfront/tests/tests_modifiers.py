@@ -19,8 +19,7 @@ class GroupByModifierTest(InterproRESTTestCase):
     def test_can_get_the_entry_type_groups_proteins_by_tax_id(self):
         response = self.client.get("/api/protein?group_by=tax_id")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('40296', response.data)
-        self.assertEqual(2, response.data['40296'])
+        self.assertEqual({}, response.data)
 
     def test_can_group_interpro_entries_with_member_databases(self):
         response = self.client.get("/api/entry/interpro?group_by=member_databases")

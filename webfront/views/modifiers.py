@@ -4,24 +4,28 @@ from webfront.views.custom import is_single_endpoint
 from django.db.models import Count
 from webfront.models import Entry, EntryAnnotation
 
+from django.conf import settings
 
-go_terms = [
-    "GO:0003824",
-    "GO:0003677",
-    "GO:0008152",
-    "GO:0055114",
-    "GO:0019867",
-    "GO:0005524",
-    "GO:0016491",
-    "GO:0006810",
-    "GO:0006260",
-    "GO:0016021",
-    "GO:0048037",
-    "GO:0042575",
-    "GO:0030031",
-    "GO:0016043",
-    "GO:0016049",
-]
+go_terms = settings.INTERPRO_CONFIG.get('key_go_terms', {})
+organisms = settings.INTERPRO_CONFIG.get('key_organisms', {})
+
+# go_terms = [
+#     "GO:0003824",
+#     "GO:0003677",
+#     "GO:0008152",
+#     "GO:0055114",
+#     "GO:0019867",
+#     "GO:0005524",
+#     "GO:0016491",
+#     "GO:0006810",
+#     "GO:0006260",
+#     "GO:0016021",
+#     "GO:0048037",
+#     "GO:0042575",
+#     "GO:0030031",
+#     "GO:0016043",
+#     "GO:0016049",
+# ]
 
 
 def group_by_member_databases(general_handler):
@@ -59,19 +63,10 @@ def group_by_go_terms(general_handler):
         general_handler.queryset_manager.main_endpoint, 'entry_go_terms', q, size=1000
     )
     return [
-        (r['key'], r['unique']['value'])
+        (r['key'], {'value': r['unique']['value'], 'title': go_terms[r['key']]})
         for r in result['groups']['buckets']
         if r['key'] in go_terms
     ]
-    #
-    # template = '"identifier": "{}"'
-    # if is_single_endpoint(general_handler):
-    #     qs = [(term, general_handler.queryset_manager.get_queryset()
-    #                     .filter(go_terms__contains=template.format(term))
-    #                     .count())
-    #           for term in go_terms
-    #           ]
-    #     return qs
 
 
 def get_queryset_to_group(general_handler, endpoint_queryset):
@@ -82,16 +77,21 @@ def get_queryset_to_group(general_handler, endpoint_queryset):
 
 
 def group_by_organism(general_handler, endpoint_queryset):
-    # if general_handler.queryset_manager.main_endpoint == "protein":
-    #     qs = get_queryset_to_group(general_handler, endpoint_queryset)
-    #     return qs.values_list("tax_id").annotate(total=Count("tax_id")).order_by('-total').distinct()[:30]
-    # else:
-    # Running this always on elastic for performance reasons
-        searcher = general_handler.searcher
-        result = searcher.get_grouped_object(
-            general_handler.queryset_manager.main_endpoint, "tax_id", size=20
-        )
-        return result
+        # searcher = general_handler.searcher
+        # result = searcher.get_grouped_object(
+        #     general_handler.queryset_manager.main_endpoint, "tax_id", size=20
+        # )
+        # return result
+    q = "({})".format(" OR ".join("lineage:{}".format(org) for org in organisms))
+    searcher = general_handler.searcher
+    result = searcher.get_grouped_object(
+        general_handler.queryset_manager.main_endpoint, 'tax_id', q, size=1000
+    )
+    return [
+        (str(r['key']), {'value': r['unique']['value'], 'title': organisms[str(r['key'])]})
+        for r in result['groups']['buckets']
+        if str(r['key']) in organisms
+    ]
 
 def group_by_annotations(general_handler):
     if is_single_endpoint(general_handler):
@@ -120,9 +120,9 @@ def group_by(endpoint_queryset, fields):
             return group_by_go_categories(general_handler)
         if "annotation" == field:
             return group_by_annotations(general_handler)
+        if "tax_id" == field:
+            return group_by_organism(general_handler, endpoint_queryset)
         if is_single_endpoint(general_handler) and general_handler.queryset_manager.main_endpoint != "protein":
-            if "tax_id" == field:
-                return group_by_organism(general_handler, endpoint_queryset)
             qs = get_queryset_to_group(general_handler, endpoint_queryset)
             return qs.values_list(field).annotate(total=Count(field))
         else:

@@ -23,7 +23,8 @@ class EntrySerializer(ModelContentSerializer):
 
     def endpoint_representation(self, representation, instance, detail):
         if detail == SerializerDetail.ALL or detail == SerializerDetail.ENTRY_DETAIL:
-            representation["metadata"] = self.to_metadata_representation(instance, self.searcher)
+            sq = self.queryset_manager.get_searcher_query()
+            representation["metadata"] = self.to_metadata_representation(instance, self.searcher, sq)
         elif detail == SerializerDetail.ENTRY_OVERVIEW:
             representation = self.to_counter_representation(instance, self.detail_filters)
         elif detail == SerializerDetail.ENTRY_HEADERS:
@@ -47,17 +48,20 @@ class EntrySerializer(ModelContentSerializer):
             representation["sets"] = self.to_set_count_representation(instance)
 
         if detail != SerializerDetail.ENTRY_OVERVIEW:
+            sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = EntrySerializer.to_proteins_detail_representation(
                     instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()),
-                    for_entry=True
+                    for_entry=True,
+                    base_query=sq
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
                     instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()),
-                    include_chain=SerializerDetail.STRUCTURE_DETAIL not in detail_filters
+                    include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters,
+                    base_query=sq
                 )
             if SerializerDetail.ORGANISM_DB in detail_filters or \
                     SerializerDetail.ORGANISM_DETAIL in detail_filters:
@@ -80,40 +84,42 @@ class EntrySerializer(ModelContentSerializer):
     def reformat_cross_references(cross_references):
         DEFAULT_DESCRIPTION = "Description of data source (to be defined in API)"
         DEFAULT_URL_PATTERN = "https://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query={accession}"
+        DEFAULT_RANK = 1000
         xrefSettings = settings.CROSS_REFERENCES
 
         reformattedCrossReferences = {}
         for database in cross_references.keys():
             accessions = cross_references[database]
-            reformattedCrossReferences[database] = {}
+            reformattedCrossReferences[database] = {
+                "displayName": database,
+                "description": DEFAULT_DESCRIPTION,
+                "rank": DEFAULT_RANK,
+                "accessions": []
+            }
 
-            if database in xrefSettings and 'displayName' in xrefSettings[database]:
-                reformattedCrossReferences[database]['displayName'] =  xrefSettings[database]['displayName']
-            else:
-                reformattedCrossReferences[database]['displayName'] = database
+            if database in xrefSettings:
+                if 'displayName' in xrefSettings[database]:
+                    reformattedCrossReferences[database]['displayName'] = xrefSettings[database]['displayName']
+                if 'description' in xrefSettings[database]:
+                    reformattedCrossReferences[database]['description'] = xrefSettings[database]['description']
+                if 'rank' in xrefSettings[database]:
+                    reformattedCrossReferences[database]['rank'] = xrefSettings[database]['rank']
 
-            if database in xrefSettings and 'description' in xrefSettings[database]:
-                reformattedCrossReferences[database]['description'] =  xrefSettings[database]['description']
-            else:
-                reformattedCrossReferences[database]['description'] = DEFAULT_DESCRIPTION
-
-            reformattedCrossReferences[database]['rank'] =  xrefSettings[database]['rank']
-
-            reformattedCrossReferences[database]['accessions'] = []
             for accession in accessions:
-                accessionObj = {}
-                accessionObj['accession'] = accession
+                accessionObj = {
+                    'accession': accession,
+                    'url': DEFAULT_URL_PATTERN
+                }
 
                 if database in xrefSettings and 'urlPattern' in xrefSettings[database]:
-                    accessionObj['url'] =  xrefSettings[database]['urlPattern']
-                else:
-                    accessionObj['url'] = DEFAULT_URL_PATTERN
+                    accessionObj['url'] = xrefSettings[database]['urlPattern']
+
                 accessionObj['url'] = accessionObj['url'].replace('{accession}', accession)
                 reformattedCrossReferences[database]['accessions'].append(accessionObj)
         return reformattedCrossReferences
 
     @staticmethod
-    def to_metadata_representation(instance, solr):
+    def to_metadata_representation(instance, searcher, sq):
         # recategorise_go_terms(instance.go_terms)
         results = EntryAnnotation.objects.filter(accession=instance.accession).only("type")
         annotation_types = map(lambda x: x.type, results)
@@ -135,10 +141,10 @@ class EntrySerializer(ModelContentSerializer):
             "wikipedia": instance.wikipedia,
             "literature": instance.literature,
             "counters": {
-                "proteins": solr.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession),
-                "structures": solr.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession),
-                "organisms": solr.get_number_of_field_by_endpoint("entry", "tax_id", instance.accession),
-                "sets": solr.get_number_of_field_by_endpoint("entry", "set_acc", instance.accession),
+                "proteins": searcher.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession, sq),
+                "structures": searcher.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession, sq),
+                "organisms": searcher.get_number_of_field_by_endpoint("entry", "tax_id", instance.accession, sq),
+                "sets": searcher.get_number_of_field_by_endpoint("entry", "set_acc", instance.accession, sq),
             },
             "entry_annotations": annotation_types,
             "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)
@@ -321,7 +327,7 @@ class EntrySerializer(ModelContentSerializer):
         )["sets"]
 
     @staticmethod
-    def get_entry_header_from_solr_object(obj, for_structure=False, include_entry=False, solr=None):
+    def get_entry_header_from_search_object(obj, for_structure=False, include_entry=False, searcher=None, sq=None):
         header = {
             "accession": obj["entry_acc"],
             "entry_protein_locations": obj["entry_protein_locations"],
@@ -336,7 +342,7 @@ class EntrySerializer(ModelContentSerializer):
             header["protein_structure_locations"] = obj["protein_structure_locations"]
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(
-                Entry.objects.get(accession=obj["entry_acc"].upper()), solr
+                Entry.objects.get(accession=obj["entry_acc"].upper()), searcher, sq
             )
 
         return header

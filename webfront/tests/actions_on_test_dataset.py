@@ -398,7 +398,7 @@ def extend_obj_with_other_endpoints(data, endpoints, dbs, accs, instance, ep):
         else:
             instance[plurals[current_ep]] = get_payload_list(
                 data, current_ep, current_db, False,
-                (ep == "structure" or current_ep == "structure") and current_acc is None
+                ep == "structure" or current_ep == "structure" # and current_acc is None
             )[:10]  # the API only returns up to 10 items in a sublist
 
 

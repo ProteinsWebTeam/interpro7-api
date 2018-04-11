@@ -50,16 +50,19 @@ class ProteinSerializer(ModelContentSerializer):
         if SerializerDetail.SET_OVERVIEW in detail_filters:
             representation["sets"] = self.to_set_count_representation(instance)
         if detail != SerializerDetail.PROTEIN_OVERVIEW:
+            sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.ENTRY_DB in detail_filters or \
                     SerializerDetail.ENTRY_DETAIL in detail_filters:
                 representation["entries"] = self.to_entries_detail_representation(
-                    instance, s, "protein_acc:" + escape(instance.accession.lower())
+                    instance, s, "protein_acc:" + escape(instance.accession.lower()),
+                    base_query=sq
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
                     instance, s, "protein_acc:" + escape(instance.accession.lower()),
-                    include_chain=SerializerDetail.STRUCTURE_DETAIL not in detail_filters
+                    include_chain=True,
+                    base_query=sq
                 )
             if SerializerDetail.ORGANISM_DB in detail_filters or \
                     SerializerDetail.ORGANISM_DETAIL in detail_filters:
@@ -77,8 +80,9 @@ class ProteinSerializer(ModelContentSerializer):
         return representation
 
     def to_full_representation(self, instance):
+        sq = self.queryset_manager.get_searcher_query()
         return {
-            "metadata": self.to_metadata_representation(instance, self.searcher),
+            "metadata": self.to_metadata_representation(instance, self.searcher, sq),
         }
 
     @staticmethod
@@ -94,7 +98,7 @@ class ProteinSerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def to_metadata_representation(instance, searcher):
+    def to_metadata_representation(instance, searcher, sq):
         # recategorise_go_terms(instance.go_terms)
         
         protein = {
@@ -115,9 +119,10 @@ class ProteinSerializer(ModelContentSerializer):
             "source_database": instance.source_database,
             'fragment': instance.fragment,
             "counters": {
-                "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession),
-                "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession),
-                "organisms": searcher.get_number_of_field_by_endpoint("protein", "tax_id", instance.accession)
+                "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession, sq),
+                "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession, sq),
+                "organisms": searcher.get_number_of_field_by_endpoint("protein", "tax_id", instance.accession, sq),
+                "sets": searcher.get_number_of_field_by_endpoint("protein", "set_acc", instance.accession, sq),
             }
         }
         return protein
@@ -183,7 +188,7 @@ class ProteinSerializer(ModelContentSerializer):
         )["sets"]
 
     @staticmethod
-    def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, solr=None, include_coordinates=True):
+    def get_protein_header_from_search_object(obj, for_entry=True, include_protein=False, searcher=None, include_coordinates=True, sq="*:*"):
         header = {
             "accession": obj["protein_acc"],
             "protein_length": obj["protein_length"],
@@ -197,7 +202,7 @@ class ProteinSerializer(ModelContentSerializer):
             header[key_coord] = obj[key_coord] if key_coord in obj else None
         if include_protein:
             header["protein"] = ProteinSerializer.to_metadata_representation(
-                Protein.objects.get(accession__iexact=obj["protein_acc"]), solr
+                Protein.objects.get(accession__iexact=obj["protein_acc"]), searcher, sq
             )
         return header
 

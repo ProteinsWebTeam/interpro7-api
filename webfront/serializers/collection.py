@@ -40,19 +40,21 @@ class SetSerializer(ModelContentSerializer):
             representation["organisms"] = self.to_organism_count_representation(instance)
         if detail != SerializerDetail.SET_OVERVIEW:
             q = "set_acc:" + escape(instance.accession.lower())
+            sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.ENTRY_DB in detail_filters or \
                     SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = self.to_entries_detail_representation(instance, s, q)
+                representation["entries"] = self.to_entries_detail_representation(instance, s, q, base_query=sq)
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
                     instance, s, q,
-                    include_chain=SerializerDetail.STRUCTURE_DETAIL not in detail_filters
+                    include_chain=True,
+                    base_query=sq
                 )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = self.to_proteins_detail_representation(
-                    instance, self.searcher, q
+                    instance, self.searcher, q, base_query=sq
                 )
             if SerializerDetail.ORGANISM_DB in detail_filters or \
                     SerializerDetail.ORGANISM_DETAIL in detail_filters:
@@ -83,6 +85,7 @@ class SetSerializer(ModelContentSerializer):
 
     def to_full_representation(self, instance):
         s = self.searcher
+        sq = self.queryset_manager.get_searcher_query()
         obj = {
             "metadata": {
                 "accession": instance.accession,
@@ -94,10 +97,10 @@ class SetSerializer(ModelContentSerializer):
                 "integrated": instance.integrated,
                 "relationships": instance.relationships,
                 "counters": {
-                    "entries": s.get_number_of_field_by_endpoint("set", "entry_acc", instance.accession),
-                    "structures": s.get_number_of_field_by_endpoint("set", "structure_acc", instance.accession),
-                    "proteins": s.get_number_of_field_by_endpoint("set", "protein_acc", instance.accession),
-                    "organisms": s.get_number_of_field_by_endpoint("set", "tax_id", instance.accession),
+                    "entries": s.get_number_of_field_by_endpoint("set", "entry_acc", instance.accession, sq),
+                    "structures": s.get_number_of_field_by_endpoint("set", "structure_acc", instance.accession, sq),
+                    "proteins": s.get_number_of_field_by_endpoint("set", "protein_acc", instance.accession, sq),
+                    "organisms": s.get_number_of_field_by_endpoint("set", "tax_id", instance.accession, sq),
                 }
             },
         }

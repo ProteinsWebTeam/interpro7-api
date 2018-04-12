@@ -41,6 +41,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+import django_redis.cache
+import django_redis.client
 
 # Application definition
 
@@ -188,8 +190,6 @@ DB_MEMBERS = INTERPRO_CONFIG.get('members', {})
 ENTRY_SETS = INTERPRO_CONFIG.get('sets', {})
 CROSS_REFERENCES = INTERPRO_CONFIG.get('cross_references', {})
 
-import django_redis.cache
-import django_redis.client
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -199,16 +199,6 @@ CACHES = {
         },
     }
 }
-
-#DJANGO_REDIS_LOGGER = 'django.redis'
-
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#        'LOCATION': '127.0.0.1:11211',
-#    }
-#}
-
 
 import logging
 l = logging.getLogger('django.db.backends')

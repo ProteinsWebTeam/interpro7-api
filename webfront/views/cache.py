@@ -5,8 +5,8 @@ from webfront.response import Response
 
 class InterProCache:
     def set(self, key, response):
-        if response.status_code == status.HTTP_200_OK and 'metadata' not in response.data:
-            #
+        if response.status_code == status.HTTP_200_OK \
+            and not hasattr(response.data, 'serializer'):
             value = {
                 'data': response.data,
                 'status': response.status_code,
@@ -18,7 +18,6 @@ class InterProCache:
                     'interpro-version': response['interpro-version'],
                     'Original-Server-Timing': response['server-timing'],
                     'Cached': 'true'
-
                 }
             }
             cache.set(key, value)

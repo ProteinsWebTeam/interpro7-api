@@ -93,7 +93,8 @@ class GeneralHandler(CustomView):
     def get(self, request, url='', *args, **kwargs):
         if url.strip() == '' or url.strip() == '/':
             return Response(getDataForRoot(self.available_endpoint_handlers))
-        response = self.cache.get(url)
+        full_path = request.get_full_path()
+        response = self.cache.get(full_path)
         if response != None:
             return response
 
@@ -113,7 +114,7 @@ class GeneralHandler(CustomView):
                 general_handler=self,
                 *args, **kwargs
             )
-            self.cache.set(url, response)
+            self.cache.set(full_path, response)
             return response
         except ReferenceError as e:
             if settings.DEBUG:

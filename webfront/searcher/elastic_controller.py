@@ -227,7 +227,7 @@ class ElasticsearchController(SearchController):
                     }
                 },
             },
-            "size": 1
+            "size": 0
         }
         if inner_field_to_count is not None:
             facet["aggs"]["groups"]["aggs"]["unique"] = {"cardinality": {"field": inner_field_to_count}}
@@ -309,7 +309,7 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs)
         return [ch["_source"] for ch in response["hits"]["hits"]]
 
-    # TODO: check if this could be replaced by the following "_elastic_json_query()"
+    # TODO: Used only for the tests... Move it there
     def execute_query(self, query, fq=None, rows=0, start=0):
         logger = logging.getLogger("interpro.elastic")
         q = query = self.queryset_manager.get_searcher_query() if query is None else query.lower()

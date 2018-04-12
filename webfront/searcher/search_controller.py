@@ -58,11 +58,11 @@ class SearchController(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def add(self, docs):
-        raise NotImplementedError('users must define execute_query to use this base class')
+        raise NotImplementedError('users must define add to use this base class')
 
     @abc.abstractmethod
     def clear_all_docs(self):
-        raise NotImplementedError('users must define execute_query to use this base class')
+        raise NotImplementedError('users must define clear_all_docs to use this base class')
 
     # TODO: check if we can do that only once when building the data instead, to remove it here
     @staticmethod

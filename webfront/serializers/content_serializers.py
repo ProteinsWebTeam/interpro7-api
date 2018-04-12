@@ -60,15 +60,19 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return output
 
     @staticmethod
-    def to_organisms_detail_representation(instance, solr, query, include_chains=False):
-        response = list({"{}_{}".format(r['tax_id'], r['chain']) if include_chains else r['tax_id']:
+    def to_organisms_detail_representation(instance, searcher, query, include_chains=False):
+        fields = ["tax_id", "structure_chain"] if include_chains else "tax_id"
+
+        response = [
             webfront.serializers.taxonomy.OrganismSerializer.get_organism_from_search_object(
                 r, include_chain=include_chains
             )
-            for r in solr.execute_query(None, fq=query, rows=10)
-        }.values())
+            for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
+            ]
+
+
         if len(response) == 0:
-            raise ReferenceError('There are not structures for this request')
+            raise ReferenceError('There are not organisms for this request')
         return response
 
     @staticmethod

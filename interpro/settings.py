@@ -201,12 +201,6 @@ if ENABLE_CACHING:
             },
         }
     }
-else:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
-    }
 
 import logging
 l = logging.getLogger('django.db.backends')

@@ -190,15 +190,23 @@ DB_MEMBERS = INTERPRO_CONFIG.get('members', {})
 ENTRY_SETS = INTERPRO_CONFIG.get('sets', {})
 CROSS_REFERENCES = INTERPRO_CONFIG.get('cross_references', {})
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
+ENABLE_CACHING = INTERPRO_CONFIG.get('enable_caching', False)
+if ENABLE_CACHING:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": INTERPRO_CONFIG.get('redis', "redis://127.0.0.1:6379/1"),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+        }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
 
 import logging
 l = logging.getLogger('django.db.backends')

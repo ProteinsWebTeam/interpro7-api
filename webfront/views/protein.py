@@ -8,7 +8,7 @@ from webfront.views.modifiers import \
     filter_by_contains_field, filter_by_field_or_field_range, add_extra_fields
 from webfront.models import Protein
 from django.conf import settings
-
+from django.core.cache import cache
 
 entry_db_members = '|'.join(settings.DB_MEMBERS)
 

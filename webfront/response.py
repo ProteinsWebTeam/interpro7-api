@@ -19,7 +19,7 @@ class Response(R):
                 ),
                 # 'filesystem;dur=0;desc="Filesystem"',
                 'es;dur={:0.2f};desc="Elasticsearch"'.format(
-                    sum(query['took'] for query in es_results)
+                    sum(query['took'] for query in es_results if 'took' in query)
                 ),
                 # 'django;dur={:0.2f};desc=Django'.format(
                 #     (datetime.now().timestamp() - django_time['time']) * 1000

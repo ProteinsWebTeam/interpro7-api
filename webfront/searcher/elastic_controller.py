@@ -316,7 +316,7 @@ class ElasticsearchController(SearchController):
         if fq is not None:
             q = query+" && "+fq.lower()
         q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
-        path = "/"+self.index+"/"+self.type+"/_search?pretty&q="+q+"&size="+str(rows)
+        path = "/"+self.index+"/"+self.type+"/_search?request_cache=true&q="+q+"&size="+str(rows)
         logger.debug("URL:"+path)
         self.connection.request(
             "GET",
@@ -334,7 +334,7 @@ class ElasticsearchController(SearchController):
         if query_obj is None:
             query_obj = {"from": 0}
         q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20").replace(" or ", "%20OR%20")
-        path = "/"+self.index+"/"+self.type+"/_search?pretty&q="+q
+        path = "/"+self.index+"/"+self.type+"/_search?request_cache=true&q="+q
         logger.debug("URL:"+path)
         logger.debug("JSON:"+json.dumps(query_obj))
         self.connection.request(

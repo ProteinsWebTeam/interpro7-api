@@ -1,12 +1,16 @@
 import re
 from django.conf import settings
 from rest_framework.generics import GenericAPIView
-from webfront.response import Response
+from django.http import HttpResponse
+import logging
 
+from webfront.response import Response
 from webfront.constants import SerializerDetail
 from webfront.models import Entry
 from webfront.pagination import CustomPagination
-from django.http import HttpResponse
+
+logger = logging.getLogger("interpro.request")
+
 
 def is_single_endpoint(general_handler):
     return general_handler.filter_serializers == {}
@@ -40,6 +44,7 @@ class CustomView(GenericAPIView):
         if len(endpoint_levels) == level:
             searcher = general_handler.searcher
             has_payload = general_handler.modifiers.execute(request)
+            logger.debug(request.get_full_path())
             if has_payload or general_handler.modifiers.serializer is not None:
                 self.serializer_detail = general_handler.modifiers.serializer
             if has_payload:

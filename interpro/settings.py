@@ -207,6 +207,11 @@ if DEBUG and ("TRAVIS" not in os.environ):
                 'class': 'logging.FileHandler',
                 'filename': '../elastic.log',
             },
+            'file_request': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '../requests.log',
+            },
         },
         'loggers': {
             'django.db.backends': {
@@ -216,6 +221,10 @@ if DEBUG and ("TRAVIS" not in os.environ):
             'interpro.elastic': {
                 'level': 'DEBUG',
                 'handlers': ['file_elastic'],
+            },
+            'interpro.request': {
+                'level': 'DEBUG',
+                'handlers': ['file_request'],
             },
         },
     }

@@ -6,6 +6,7 @@ from django.conf import settings
 
 class InterProCache:
     def set(self, key, response):
+        key = key.replace("//", "/")
         if settings.INTERPRO_CONFIG.get('enable_caching', False)\
             and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
             if response.status_code == status.HTTP_200_OK :
@@ -25,10 +26,9 @@ class InterProCache:
                 }
                 cache.set(key, value)
                 cache.persist(key)
-            else:
-                pass
 
     def get(self, key):
+        key = key.replace("//", "/")
         if settings.INTERPRO_CONFIG.get('enable_caching', False):
             value = cache.get(key)
             if (value != None):

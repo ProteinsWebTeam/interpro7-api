@@ -29,7 +29,7 @@ before_script:
   - sleep 10
   - curl -XPUT 'localhost:9200/test?pretty' -d @config/elastic_mapping.json
 script:
-  - coverage run --source='.' manage.py test --parallel=4
+  - coverage run --source='.' manage.py test
 after_success:
   coveralls
 notifications:

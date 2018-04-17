@@ -16,7 +16,7 @@ class InterProCache:
                     'template_name': response.template_name,
                     'exception': response.exception,
                     'content_type': response.content_type,
-                    'headers': {.
+                    'headers': {
                         'content-type': response.get('content-type', ""),
                         'interpro-version': response.get('interpro-version', ""),
                         'Original-Server-Timing': response.get('server-timing', ""),

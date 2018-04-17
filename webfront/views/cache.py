@@ -8,15 +8,15 @@ class InterProCache:
     def set(self, key, response):
         if settings.INTERPRO_CONFIG.get('enable_caching', False)\
             and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
-            if response.status_code == status.HTTP_200_OK \
-                and not hasattr(response.data, 'serializer'):
+            if response.status_code == status.HTTP_200_OK :
+                #print("Caching {}".format(key))
                 value = {
-                    'data': response.data,
+                    'data': {x:response.data for x in response.data},
                     'status': response.status_code,
                     'template_name': response.template_name,
                     'exception': response.exception,
                     'content_type': response.content_type,
-                    'headers': {
+                    'headers': {.
                         'content-type': response.get('content-type', ""),
                         'interpro-version': response.get('interpro-version', ""),
                         'Original-Server-Timing': response.get('server-timing', ""),
@@ -25,11 +25,14 @@ class InterProCache:
                 }
                 cache.set(key, value)
                 cache.persist(key)
+            else:
+                pass
 
     def get(self, key):
         if settings.INTERPRO_CONFIG.get('enable_caching', False):
             value = cache.get(key)
             if (value != None):
+                #print("Found {}".format(key))
                 value = Response(
                     value.get('data'),
                     value.get('status', 200),

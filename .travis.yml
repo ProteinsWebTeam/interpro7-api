@@ -2,17 +2,13 @@ sudo: required
 dist: trusty
 language: python
 python:
-  - "3.5"
+  - "3.4"
 addons:
   chrome: stable
 before_install:
   - jdk_switcher use oraclejdk8
-  - "wget https://www.ebi.ac.uk/~luciani/Oracle/oracle.zip && unzip oracle.zip -d oracle"
   - "sh -e /etc/init.d/xvfb start"
   - "export DISPLAY=:99.0"
-  - "export ORACLE_HOME=$(pwd)/oracle/"
-  - "export LD_LIBRARY_PATH=$(pwd)/oracle/"
-  - "export DYLD_LIBRARY_PATH=$(pwd)/oracle/"
   - "export BROWSER_TEST=chrome"
   - wget http://chromedriver.storage.googleapis.com/2.30/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
@@ -25,6 +21,7 @@ install:
   - pip install -r requirements.txt
   - pip install -r dev_requirements.txt
   - pip install tblib
+  - pip freeze
 before_script:
   - sleep 10
   - curl -XPUT 'localhost:9200/test?pretty' -d @config/elastic_mapping.json
@@ -42,3 +39,4 @@ branches:
   only:
     - master
     - dev
+    - django2

@@ -22,10 +22,6 @@ try:
 except FileNotFoundError:
     INTERPRO_CONFIG = {}
 try:
-    ORACLE_CONFIG = yaml.safe_load(open('{}/config/oracle.yml'.format(BASE_DIR)))
-except FileNotFoundError:
-    ORACLE_CONFIG = None
-try:
     MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
 except FileNotFoundError:
     MYSQL_CONFIG = {}
@@ -55,7 +51,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # added
     'webfront',
-    'release',
     # third-party added libraries
     'rest_framework'
 )
@@ -124,24 +119,6 @@ if sys.argv[1:2] == ['test'] or INTERPRO_CONFIG.get('use_test_db', True):
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '../database/db.sqlite3',
     }
-if ORACLE_CONFIG is not None:
-    DATABASES['interpro_ro'] = {
-        # 'ENGINE': ORACLE_CONFIG.get('engine', 'django.db.backends.oracle'),
-        'USER': ORACLE_CONFIG.get('user', 'USER'),
-        'PASSWORD': ORACLE_CONFIG.get('password'),
-    }
-    if ORACLE_CONFIG.get('sid', None) is not None:
-        DATABASES['interpro_ro']['NAME'] = ORACLE_CONFIG.get('sid')
-        DATABASES['interpro_ro']['HOST'] = ORACLE_CONFIG.get('host', 'localhost')
-        DATABASES['interpro_ro']['PORT'] = ORACLE_CONFIG.get('port', 1540)
-    elif ORACLE_CONFIG.get('name', None) is not None:
-        DATABASES['interpro_ro']['NAME'] = "{}:{}/{}".format(
-            ORACLE_CONFIG.get('host', 'localhost'),
-            ORACLE_CONFIG.get('port', 1540),
-            ORACLE_CONFIG.get('name')
-        )
-    else:
-        del DATABASES['interpro_ro']
 
 
 SEARCHER_URL = INTERPRO_CONFIG.get('searcher_path', 'http://127.0.0.1:9200/interpro_sp/relationship')

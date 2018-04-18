@@ -17,7 +17,7 @@ def canonical(url):
     # order querystring, lowercase keys
     query = OrderedDict(sorted(((key.lower(), value) for key, value in query.items())))
     # handle page_size
-    if query['page_size'] == settings.INTERPRO_CONFIG.get('default_page_size', 20):
+    if query.get('page_size') == settings.INTERPRO_CONFIG.get('default_page_size', 20):
         query.pop('page_size', None)
     # generate new canonical ParseResult
     canonical_parsed = parsed._replace(

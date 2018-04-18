@@ -8,7 +8,6 @@ from webfront.views.custom import CustomView
 from webfront.views.modifier_manager import ModifierManager
 from webfront.views.queryset_manager import QuerysetManager
 from webfront.searcher.elastic_controller import ElasticsearchController
-from webfront.searcher.solr_controller import SolrController
 from webfront.views.entry import EntryHandler
 from webfront.views.protein import ProteinHandler
 from webfront.views.structure import StructureHandler
@@ -157,7 +156,4 @@ class GeneralHandler(CustomView):
 
     @staticmethod
     def get_search_controller(queryset_manager=None):
-        if "solr" in settings.SEARCHER_URL:
-            return SolrController(queryset_manager)
-        else:
-            return ElasticsearchController(queryset_manager)
+        return ElasticsearchController(queryset_manager)

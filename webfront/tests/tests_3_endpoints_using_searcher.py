@@ -758,6 +758,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                 self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_acc_endpoint_db(self):
+        print("test_acc_endpoint_db")
         for endpoint1 in tqdm(api_test_map, desc="AED - Endpoint"):
             for db1 in tqdm(api_test_map[endpoint1], desc="AED - DB"):
                 for acc1 in api_test_map[endpoint1][db1]:
@@ -802,6 +803,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_acc_endpoint_acc(self):
+        print("test_acc_endpoint_acc")
         for endpoint1 in tqdm(api_test_map, desc="AEA - Endpoint"):
             for db1 in tqdm(api_test_map[endpoint1], desc="AEA - DB"):
                 for acc1 in api_test_map[endpoint1][db1]:
@@ -847,6 +849,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         )
 
     def test_acc_db_db(self):
+        print("test_acc_db_db")
         for endpoint1 in tqdm(api_test_map, desc="ADD - Endpoint"):
             for db1 in tqdm(api_test_map[endpoint1], desc="ADD - DB"):
                 for acc1 in api_test_map[endpoint1][db1]:
@@ -883,6 +886,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                         self.assert_chain_urls(data, eps, dbs, accs)
 
     def test_acc_db_acc(self):
+        print("test_acc_db_acc")
         for endpoint1 in tqdm(api_test_map, desc="ADA - Endpoint"):
             for db1 in tqdm(api_test_map[endpoint1], desc="ADA - DB"):
                 for acc1 in api_test_map[endpoint1][db1]:
@@ -929,6 +933,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                             )
 
     def test_acc_acc_acc(self):
+        print("test_acc_acc_acc")
         for endpoint1 in tqdm(api_test_map, desc="AAA - Endpoint"):
             for db1 in tqdm(api_test_map[endpoint1], desc="AAA - DB"):
                 for acc1 in api_test_map[endpoint1][db1]:

@@ -36,7 +36,10 @@ def pagination_information(request):
     # Extracts the pagination parameters out of the URL and returns a dictionary.
     return {
         "index": int(request.GET.get("page", 1)),
-        "size":  int(request.GET.get("page_size", 10)),
+        "size":  int(request.GET.get(
+            "page_size",
+            settings.INTERPRO_CONFIG.get('default_page_size', 20)
+        )),
     }
 
 

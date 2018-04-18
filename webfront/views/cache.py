@@ -1,13 +1,36 @@
+import re
+from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
+from collections import OrderedDict
+
 from django.core.cache import cache
 from django.shortcuts import render
 from rest_framework import status
 from webfront.response import Response
 from django.conf import settings
 
+multiple_slashes = re.compile('/+')
+
+def canonical(url):
+    parsed = urlparse(url)
+    # process query
+    query = parse_qs(parsed.query)
+    # order querystring, lowercase keys
+    query = OrderedDict(sorted(((key.lower(), value) for key, value in query.items())))
+    # handle page_size
+    if query['page_size'] == settings.INTERPRO_CONFIG.get('default_page_size', 20):
+        query.pop('page_size', None)
+    # generate new canonical ParseResult
+    canonical_parsed = parsed._replace(
+      path=multiple_slashes.sub('/', parsed.path + '/'),
+      query=urlencode(query)
+    )
+    # stringify and return
+    return urlunparse(canonical_parsed)
+
 class InterProCache:
     def set(self, key, response):
         try:
-            key = key.replace("//", "/")
+            key = canonical(key)
             if settings.INTERPRO_CONFIG.get('enable_caching', False)\
                 and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
                 if response.status_code == status.HTTP_200_OK :
@@ -31,7 +54,7 @@ class InterProCache:
             pass
 
     def get(self, key):
-        key = key.replace("//", "/")
+        key = canonical(key)
         if settings.INTERPRO_CONFIG.get('enable_caching', False):
             value = cache.get(key)
             if (value != None):

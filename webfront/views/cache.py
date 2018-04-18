@@ -6,26 +6,29 @@ from django.conf import settings
 
 class InterProCache:
     def set(self, key, response):
-        key = key.replace("//", "/")
-        if settings.INTERPRO_CONFIG.get('enable_caching', False)\
-            and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
-            if response.status_code == status.HTTP_200_OK :
-                #print("Caching {}".format(key))
-                value = {
-                    'data': {x:response.data for x in response.data},
-                    'status': response.status_code,
-                    'template_name': response.template_name,
-                    'exception': response.exception,
-                    'content_type': response.content_type,
-                    'headers': {
-                        'content-type': response.get('content-type', ""),
-                        'interpro-version': response.get('interpro-version', ""),
-                        'Original-Server-Timing': response.get('server-timing', ""),
-                        'Cached': 'true'
+        try:
+            key = key.replace("//", "/")
+            if settings.INTERPRO_CONFIG.get('enable_caching', False)\
+                and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
+                if response.status_code == status.HTTP_200_OK :
+                    #print("Caching {}".format(key))
+                    value = {
+                        'data': {x: response.data[x] for x in response.data},
+                        'status': response.status_code,
+                        'template_name': response.template_name,
+                        'exception': response.exception,
+                        'content_type': response.content_type,
+                        'headers': {
+                            'content-type': response.get('content-type', ""),
+                            'interpro-version': response.get('interpro-version', ""),
+                            'Original-Server-Timing': response.get('server-timing', ""),
+                            'Cached': 'true'
+                        }
                     }
-                }
-                cache.set(key, value)
-                cache.persist(key)
+                    cache.set(key, value)
+                    cache.persist(key)
+        except:
+            pass
 
     def get(self, key):
         key = key.replace("//", "/")

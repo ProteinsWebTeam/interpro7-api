@@ -3,7 +3,7 @@ from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from collections import OrderedDict
 
 from django.core.cache import cache
-from django.shortcuts import render
+
 from rest_framework import status
 from webfront.response import Response
 from django.conf import settings
@@ -21,7 +21,6 @@ def canonical(url):
         )
     )
     # handle page_size
-    print(query)
     if query.get('page_size') == [str(settings.INTERPRO_CONFIG.get('default_page_size', 20))]:
         query.pop('page_size', None)
     # handle page

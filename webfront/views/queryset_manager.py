@@ -66,7 +66,7 @@ class QuerysetManager:
                         main_ep = "organism"
                     q += " && text_{}:*{}*".format(main_ep, escape(v))
                 elif k == "source_database__isnull":
-                    q += " && {}{}_db:*".format("!" if v else "", ep)
+                    q += " && {}_exists_:{}_db".format("!" if v else "", ep)
                 elif k == "accession" or k == "accession__iexact":
                     if ep == 'taxonomy':
                         q += " && lineage:{}".format(escape(v))
@@ -78,13 +78,13 @@ class QuerysetManager:
                     # elasticsearch perform better if the "give me all" query runs over a
                     # low cardinality field such as the _db ones
                     if ep == 'structure':
-                        q += " && {}{}_acc:*".format("!" if v else "", ep)
+                        q += " && {}_exists_:{}_acc".format("!" if v else "", ep)
                     elif ep == 'taxonomy':
-                        q += " && {}tax_id:[1 to *]".format("!" if v else "")
+                        q += " && {}_exists_:tax_id".format("!" if v else "")
                     elif ep == 'proteome':
-                        q += " && {}proteomes:*".format("!" if v else "")
+                        q += " && {}_exists_:proteomes".format("!" if v else "")
                     else:
-                        q += " && {}{}_db:*".format("!" if v else "", ep)
+                        q += " && {}_exists_:{}_db".format("!" if v else "", ep)
                 elif k == "integrated" or k == "integrated__iexact" or k == "integrated__contains":
                     if ep == 'set':
                         if not v:
@@ -95,9 +95,9 @@ class QuerysetManager:
                         q += " && integrated:{}".format(escape(v))
                 elif k == "integrated__isnull":
                     if ep == 'set':
-                        q += " && {}set_integrated:*".format("!" if v else "")
+                        q += " && {}_exists_:set_integrated".format("!" if v else "")
                     else:
-                        q += " && {}integrated:*".format("!entry_db:interpro && !" if v else "")
+                        q += " && {}_exists_:integrated".format("!entry_db:interpro && !" if v else "")
                 elif k == "type" or k == "type__iexact":
                     q += " && {}_type:{}".format(ep, escape(v))
                 elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":

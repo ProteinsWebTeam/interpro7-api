@@ -21,10 +21,11 @@ def canonical(url):
         )
     )
     # handle page_size
-    if query.get('page_size') == settings.INTERPRO_CONFIG.get('default_page_size', 20):
+    print(query)
+    if query.get('page_size') == [str(settings.INTERPRO_CONFIG.get('default_page_size', 20))]:
         query.pop('page_size', None)
     # handle page
-    if query.get('page') == 1:
+    if query.get('page') == ['1']:
         query.pop('page', None)
     # generate new canonical ParseResult
     canonical_parsed = parsed._replace(

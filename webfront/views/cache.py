@@ -13,16 +13,23 @@ multiple_slashes = re.compile('/+')
 def canonical(url):
     parsed = urlparse(url)
     # process query
-    query = parse_qs(parsed.query)
+    query = parse_qs(parsed.query, keep_blank_values=True)
     # order querystring, lowercase keys
-    query = OrderedDict(sorted(((key.lower(), value) for key, value in query.items())))
+    query = OrderedDict(
+        sorted(
+            ((key.lower(), sorted(value)) for key, value in query.items())
+        )
+    )
     # handle page_size
     if query.get('page_size') == settings.INTERPRO_CONFIG.get('default_page_size', 20):
         query.pop('page_size', None)
+    # handle page
+    if query.get('page') == 1:
+        query.pop('page', None)
     # generate new canonical ParseResult
     canonical_parsed = parsed._replace(
       path=multiple_slashes.sub('/', parsed.path + '/'),
-      query=urlencode(query)
+      query=urlencode(query, doseq=True)
     )
     # stringify and return
     return urlunparse(canonical_parsed)
@@ -33,8 +40,7 @@ class InterProCache:
             key = canonical(key)
             if settings.INTERPRO_CONFIG.get('enable_caching', False)\
                 and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
-                if response.status_code == status.HTTP_200_OK :
-                    #print("Caching {}".format(key))
+                if response.status_code == status.HTTP_200_OK or response.status_code == status.HTTP_204_NO_CONTENT:
                     value = {
                         'data': {x: response.data[x] for x in response.data},
                         'status': response.status_code,
@@ -42,9 +48,9 @@ class InterProCache:
                         'exception': response.exception,
                         'content_type': response.content_type,
                         'headers': {
-                            'content-type': response.get('content-type', ""),
-                            'interpro-version': response.get('interpro-version', ""),
-                            'Original-Server-Timing': response.get('server-timing', ""),
+                            'Content-Type': response.get('Content-Type', ""),
+                            'InterPro-Version': response.get('InterPro-Version', ""),
+                            'Server-Timing': response.get('Server-Timing', ""),
                             'Cached': 'true'
                         }
                     }

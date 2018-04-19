@@ -2,7 +2,5 @@
 omit =
     # omit anything in a release directory anywhere
     */release/*
-    # omit solr because all the tests are running elastic
-    webfront/searcher/solr_controller.py
     # not using wsgi for testing
     interpro/wsgi.py

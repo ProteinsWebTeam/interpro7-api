@@ -158,22 +158,6 @@ class StructureSerializer(ModelContentSerializer):
             self.searcher.get_counter_object("set", query, self.get_extra_endpoints_to_count())
         )["sets"]
 
-    # @staticmethod
-    # def to_proteins_detail_representation(instance, searcher, is_full=False):
-    #     query = "structure_acc:" + escape(instance.accession.lower())
-    #     response = [
-    #         webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
-    #             r,
-    #             for_entry=False,
-    #             include_protein=is_full,
-    #             solr=searcher
-    #         )
-    #         for r in searcher.get_group_obj_of_field_by_query(None, "structure_chain", fq=query, rows=10)["groups"]
-    #         ]
-    #     if len(response) == 0:
-    #         raise ReferenceError('There are not structures for this request')
-    #     return response
-
     @staticmethod
     def to_chains_representation(chains):
         if len(chains) < 1:
@@ -243,21 +227,6 @@ class StructureSerializer(ModelContentSerializer):
             }
 
         return instance
-
-    # @staticmethod
-    # def serialize_counter_bucket(bucket):
-    #     output = bucket["unique"]
-    #     is_solr = True
-    #     if isinstance(output, dict):
-    #         output = output["value"]
-    #         is_solr = False
-    #     if "entry" in bucket or "protein" in bucket:
-    #         output = {"structures": output}
-    #         if "entry" in bucket:
-    #             output["entries"] = bucket["entry"] if is_solr else bucket["entry"]["value"]
-    #         if "protein" in bucket:
-    #             output["proteins"] = bucket["protein"] if is_solr else bucket["protein"]["value"]
-    #     return output
 
     class Meta:
         model = Structure

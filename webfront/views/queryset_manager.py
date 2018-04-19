@@ -28,7 +28,7 @@ class QuerysetManager:
         self.endpoints = endpoint_levels
         self.filters = {
             "search": {},
-            "solr": {},
+            "searcher": {},
             "entry": {},
             "structure": {},
             "protein": {},
@@ -58,7 +58,7 @@ class QuerysetManager:
         q = ""
         for ep in self.filters:
             for k, v in self.filters[ep].items():
-                if ep == "solr":
+                if ep == "searcher":
                     q += " && {}:{}".format(k, escape(v))
                 elif include_search and ep == "search":
                     main_ep = self.main_endpoint
@@ -147,7 +147,7 @@ class QuerysetManager:
     def get_current_filters(filters, endpoint, only_main_endpoint):
         current_filters = {}
         for ep in filters:
-            if ep == "search" or ep == "solr":
+            if ep == "search" or ep == "searcher":
                 continue
             if ep == endpoint:
                 current_filters = merge_two_dicts(

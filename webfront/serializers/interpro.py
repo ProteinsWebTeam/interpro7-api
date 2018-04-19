@@ -303,27 +303,27 @@ class EntrySerializer(ModelContentSerializer):
         return False
 
     def to_proteins_count_representation(self, instance):
-        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.uniprot.ProteinSerializer.to_counter_representation(
-            self.searcher.get_counter_object("protein", solr_query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("protein", query, self.get_extra_endpoints_to_count())
         )["proteins"]
 
     def to_structures_count_representation(self, instance):
-        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.pdb.StructureSerializer.to_counter_representation(
-            self.searcher.get_counter_object("structure", solr_query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
         )["structures"]
 
     def to_organism_count_representation(self, instance):
-        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.taxonomy.OrganismSerializer.to_counter_representation(
-            self.searcher.get_counter_object("organism", solr_query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("organism", query, self.get_extra_endpoints_to_count())
         )["organisms"]
 
     def to_set_count_representation(self, instance):
-        solr_query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.collection.SetSerializer.to_counter_representation(
-            self.searcher.get_counter_object("set", solr_query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("set", query, self.get_extra_endpoints_to_count())
         )["sets"]
 
     @staticmethod

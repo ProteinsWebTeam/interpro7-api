@@ -223,7 +223,7 @@ class CustomView(GenericAPIView):
         r = 100 if s <= 100 else s
         st = r*((s*i)//r)
         qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
-        res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st, solr_query=qs)
+        res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st, query=qs)
         self.queryset = general_handler.queryset_manager\
             .get_base_queryset(ep)\
             .filter(accession__in=res)

@@ -37,11 +37,11 @@ def canonical(url):
 class InterProCache:
     def set(self, key, response):
         try:
-            key = canonical(key)
             if settings.INTERPRO_CONFIG.get('enable_caching', False)\
                 and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
                 if response.status_code == status.HTTP_200_OK:
                     if response.data:
+                        key = canonical(key)
                         value = {
                             'data': {x: response.data[x] for x in response.data},
                             'status': response.status_code,

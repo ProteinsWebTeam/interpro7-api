@@ -40,31 +40,30 @@ class InterProCache:
             key = canonical(key)
             if settings.INTERPRO_CONFIG.get('enable_caching', False)\
                 and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
-                if response.status_code == status.HTTP_200_OK or response.status_code == status.HTTP_204_NO_CONTENT:
-                    value = {
-                        'data': {x: response.data[x] for x in response.data},
-                        'status': response.status_code,
-                        'template_name': response.template_name,
-                        'exception': response.exception,
-                        'content_type': response.content_type,
-                        'headers': {
-                            'Content-Type': response.get('Content-Type', ""),
-                            'InterPro-Version': response.get('InterPro-Version', ""),
-                            'Server-Timing': response.get('Server-Timing', ""),
-                            'Cached': 'true'
+                if response.status_code == status.HTTP_200_OK:
+                    if response.data:
+                        value = {
+                            'data': {x: response.data[x] for x in response.data},
+                            'status': response.status_code,
+                            'template_name': response.template_name,
+                            'exception': response.exception,
+                            'content_type': response.content_type,
+                            'headers': {
+                                'Content-Type': response.get('Content-Type', ""),
+                                'InterPro-Version': response.get('InterPro-Version', ""),
+                                'Server-Timing': response.get('Server-Timing', ""),
+                                'Cached': 'true'
+                            }
                         }
-                    }
-                    cache.set(key, value)
-                    cache.persist(key)
+                        cache.set(key, value, timeout=None)
         except:
             pass
 
     def get(self, key):
-        key = canonical(key)
         if settings.INTERPRO_CONFIG.get('enable_caching', False):
+            key = canonical(key)
             value = cache.get(key)
-            if (value != None):
-                #print("Found {}".format(key))
+            if value:
                 value = Response(
                     value.get('data'),
                     value.get('status', 200),

@@ -93,11 +93,11 @@ class GeneralHandler(CustomView):
     cache = InterProCache()
 
     def get(self, request, url='', *args, **kwargs):
-        if url.strip() == '' or url.strip() == '/':
+        clean_url = url.strip()
+        if clean_url == '' or clean_url == '/':
             return Response(getDataForRoot(self.available_endpoint_handlers))
-        full_path = request.get_full_path()
-        response = self.cache.get(full_path)
-        if response != None:
+        response = self.cache.get(clean_url)
+        if response:
             return response
 
         self.filter_serializers = {}
@@ -116,7 +116,7 @@ class GeneralHandler(CustomView):
                 general_handler=self,
                 *args, **kwargs
             )
-            self.cache.set(full_path, response)
+            self.cache.set(clean_url, response)
             return response
         except ReferenceError as e:
             if settings.DEBUG:

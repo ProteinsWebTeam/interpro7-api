@@ -202,7 +202,7 @@ class ProteinSerializer(ModelContentSerializer):
             header[key_coord] = obj[key_coord] if key_coord in obj else None
         if include_protein:
             header["protein"] = ProteinSerializer.to_metadata_representation(
-                Protein.objects.get(accession__iexact=obj["protein_acc"]), searcher, sq
+                Protein.objects.get(accession=obj["protein_acc"].lower()), searcher, sq
             )
         return header
 

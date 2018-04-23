@@ -3,7 +3,7 @@
     "model": "webfront.Entry",
     "fields": {
       "entry_id" : "id1",
-      "accession" : "IPR003165",
+      "accession" : "ipr003165",
       "type" : "domain",
       "name" : "Piwi domain",
       "short_name" : "Piwi",
@@ -11,19 +11,19 @@
       "entry_date": "2001-04-21",
       "is_featured": "y",
       "member_databases" : {
-        "smart": ["SM00950"],
-        "profile": ["PS50822"],
-        "pfam": ["PF02171"]
+        "smart": ["sm00950"],
+        "profile": ["ps50822"],
+        "pfam": ["pf02171"]
       },
       "integrated" : null,
       "hierarchy": {
           "children": [
               {
                   "children": [],
-                  "accession": "IPR001165"
+                  "accession": "ipr001165"
               }
           ],
-          "accession": "IPR003165"
+          "accession": "ipr003165"
       },
       "go_terms" : [
         {
@@ -151,7 +151,7 @@
     "model": "webfront.Entry",
     "fields": {
       "entry_id" : "id10",
-      "accession" : "IPR001165",
+      "accession" : "ipr001165",
       "type" : "domain",
       "name" : "Qiwi domain",
       "short_name" : "Qiwi",
@@ -164,10 +164,10 @@
           "children": [
               {
                   "children": [],
-                  "accession": "IPR001165"
+                  "accession": "ipr001165"
               }
           ],
-          "accession": "IPR003165"
+          "accession": "ipr003165"
       },
       "go_terms" : [
         {
@@ -221,7 +221,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": "id2",
-      "accession": "PF02171",
+      "accession": "pf02171",
       "type": "domain",
       "name": "Piwi domain",
       "is_featured": "y",
@@ -236,7 +236,7 @@
       ],
       "source_database": "pfam",
       "member_databases": null,
-      "integrated": "IPR003165",
+      "integrated": "ipr003165",
       "description": ["This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."],
       "wikipedia": "Piwi",
       "literature": {
@@ -285,7 +285,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": "SM00950",
-      "accession": "SM00950",
+      "accession": "sm00950",
       "type": "domain",
       "name": "Piwi domain",
       "entry_date": "2004-04-21",
@@ -303,7 +303,7 @@
       ],
       "source_database": "smart",
       "member_databases": null,
-      "integrated": "IPR003165",
+      "integrated": "ipr003165",
       "description": ["This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."],
       "wikipedia": "Piwi",
       "literature": {},
@@ -314,7 +314,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": "PS50822",
-      "accession": "PS50822",
+      "accession": "ps50822",
       "type": "MATRIX",
       "entry_date": "2001-04-21",
       "name": "PIWI",
@@ -323,7 +323,7 @@
       "go_terms": [],
       "source_database": "profile",
       "member_databases": null,
-      "integrated": "IPR003165",
+      "integrated": "ipr003165",
       "description": ["The Piwi box (or Sting domain) is an about 40 to 80 amino-acid conserved region, which was first identified in the C-terminal part of Drosophila Piwi and Sting proteins, and of related proteins from human, Caenorhabditis elegans, Arabidopsis thaliana, fission yeast and Dictyostelium discoideum."],
       "wikipedia": "Piwi",
       "literature": {},
@@ -333,7 +333,7 @@
   {
     "model": "webfront.Entry",
     "fields":{
-      "accession": "PF17180",
+      "accession": "pf17180",
       "entry_id": "id3",
       "type": "domain",
       "is_featured": "y",
@@ -353,7 +353,7 @@
   {
     "model": "webfront.Entry",
     "fields":{
-      "accession": "PF17176",
+      "accession": "pf17176",
       "entry_id": "id4",
       "type": "domain",
       "entry_date": "2002-04-21",
@@ -375,7 +375,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": "SM00002",
-      "accession": "SM00002",
+      "accession": "sm00002",
       "type": "family",
       "name": "Myelin family",
       "entry_date": "2003-04-21",
@@ -404,7 +404,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": null,
-      "accession": "PS01031",
+      "accession": "ps01031",
       "type": "MATRIX",
       "name": "HSP20",
       "short_name": "HSP20",

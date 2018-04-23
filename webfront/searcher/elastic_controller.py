@@ -302,7 +302,7 @@ class ElasticsearchController(SearchController):
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "proteomes"
             facet["aggs"]["rscount"]["terms"]["field"] = "proteomes"
         response = self._elastic_json_query(qs, facet)
-        return [str(x['key']).upper() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
+        return [str(x['key']).lower() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()

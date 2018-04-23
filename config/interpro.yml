@@ -1,10 +1,10 @@
 hmmer_path: "/Users/gsalazar/Downloads/hmmer-3.1b2-macosx-intel/binaries/"
 tmp_path: "/tmp/"
 django_cors: true
-searcher_path: "http://hmmer-prod-db01:9200/interpro/relationship"
+searcher_path: "http://hmmer-prod-db03:9200/interpro1/relationship"
 searcher_test_path: "http://localhost:9200/test/relationship"
 api_url: "https://wwwdev.ebi.ac.uk/interpro7/api/"
-use_test_db: false
+use_test_db: true
 enable_caching: false
 enable_cache_write: false
 redis: "redis://127.0.0.1:6379/1"

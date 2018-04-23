@@ -42,7 +42,7 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertIn("results", response.data)
         for result in response.data["results"]:
-            self.assertEqual(result["metadata"]["integrated"], acc)
+            self.assertEqual(result["metadata"]["integrated"].lower(), acc.lower())
 
     def test_fails_filtering_interpro_by_integrated(self):
         self._check_HTTP_response_code(
@@ -87,11 +87,11 @@ class SortByModifierTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/pfam?sort_by=integrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.data)
-        payload_accs = [r["metadata"]["accession"] for r in response.data["results"]]
+        payload_accs = [r["metadata"]["integrated"] for r in response.data["results"]]
         response = self.client.get("/api/entry/pfam?sort_by=-integrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.data)
-        payload_accs_rev = [r["metadata"]["accession"] for r in response.data["results"]]
+        payload_accs_rev = [r["metadata"]["integrated"] for r in response.data["results"]]
         self.assertEqual(payload_accs_rev, list(reversed(payload_accs)))
 
 
@@ -141,7 +141,7 @@ class IDAModifiersTest(InterproRESTTestCase):
         self.assertIn("results", response.data)
         self.assertIn("count", response.data)
         self.assertEqual(response.data["count"], 1)
-        self.assertEqual("A1CUJ5", response.data["results"][0]["metadata"]["accession"])
+        self.assertEqual("a1cuj5", response.data["results"][0]["metadata"]["accession"].lower())
 
 
 class ExtraFieldsModifierTest(InterproRESTTestCase):

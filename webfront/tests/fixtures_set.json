@@ -2,66 +2,66 @@
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "CL0001",
+      "accession": "cl0001",
       "name": "The Clan",
       "description": "An example of a pfam clan",
       "source_database": "pfam",
       "integrated": [],
       "relationships": {
         "nodes": [
-          {"accession": "PF02171", "type": "entry", "score": 0.6},
-          {"accession": "PF17180", "type": "entry", "score": 0.9}
+          {"accession": "pf02171", "type": "entry", "score": 0.6},
+          {"accession": "pf17180", "type": "entry", "score": 0.9}
         ],
-        "links": [{"source": "PF17180", "target": "PF02171", "score": 0.4}]
+        "links": [{"source": "pf17180", "target": "pf02171", "score": 0.4}]
       }
     }
   },
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "CL0002",
+      "accession": "cl0002",
       "name": "A Clan",
       "description": "Another example of a pfam clan",
       "source_database": "pfam",
       "integrated": [],
       "relationships": {
         "nodes": [
-          {"accession": "PF02171", "type": "entry", "score": 0.2},
-          {"accession": "PF17176", "type": "entry", "score": 0.8}
+          {"accession": "pf02171", "type": "entry", "score": 0.2},
+          {"accession": "pf17176", "type": "entry", "score": 0.8}
         ],
-        "links": [{"source": "PF17176", "target": "PF02171", "score": 0.6}]
+        "links": [{"source": "pf17176", "target": "pf02171", "score": 0.6}]
       }
     }
   },
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "KEGG01",
+      "accession": "kegg01",
       "name": "A Pathway",
       "description": "Example of a pathway",
       "source_database": "kegg",
       "integrated": [],
       "relationships": {
         "nodes": [
-          {"accession": "KEGG01.1", "type": "node", "score": 0.5},
-          {"accession": "KEGG01.2", "type": "node", "score": 0.5}
+          {"accession": "kegg01.1", "type": "node", "score": 0.5},
+          {"accession": "kegg01.2", "type": "node", "score": 0.5}
         ],
-        "links": [{"source": "KEGG01.1", "target": "KEGG01.2", "score": 0.5}]
+        "links": [{"source": "kegg01.1", "target": "kegg01.2", "score": 0.5}]
       }
     }
   },
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "KEGG01-1",
+      "accession": "kegg01-1",
       "name": "First Node",
       "description": "Example of a step in a pathway",
       "source_database": "node",
-      "integrated": ["KEGG01"],
+      "integrated": ["kegg01"],
       "relationships": {
         "nodes": [
-          {"accession": "IPR003165", "type": "entry", "score": 0.5},
-          {"accession": "PF02171", "type": "entry", "score": 0.5}
+          {"accession": "ipr003165", "type": "entry", "score": 0.5},
+          {"accession": "pf02171", "type": "entry", "score": 0.5}
         ],
         "links": []
       }
@@ -70,15 +70,15 @@
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "KEGG01-2",
+      "accession": "kegg01-2",
       "name": "Second Node",
       "description": "yet another Example of a step in a pathway",
       "source_database": "node",
-      "integrated": ["KEGG01"],
+      "integrated": ["kegg01"],
       "relationships": {
         "nodes": [
-          {"accession": "IPR001165", "type": "entry", "score": 0.5},
-          {"accession": "PS50822", "type": "entry", "score": 0.5}
+          {"accession": "ipr001165", "type": "entry", "score": 0.5},
+          {"accession": "ps50822", "type": "entry", "score": 0.5}
         ],
         "links": []
       }

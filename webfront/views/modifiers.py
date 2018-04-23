@@ -30,7 +30,7 @@ organisms = settings.INTERPRO_CONFIG.get('key_organisms', {})
 
 def group_by_member_databases(general_handler):
     if is_single_endpoint(general_handler):
-        holder = general_handler.queryset_manager.remove_filter('entry', 'source_database__iexact')
+        holder = general_handler.queryset_manager.remove_filter('entry', 'source_database')
         dbs = Entry.objects.get_queryset().values('source_database').distinct()
         qs = {db['source_database']:
                   general_handler.queryset_manager.get_queryset()
@@ -39,7 +39,7 @@ def group_by_member_databases(general_handler):
               for db in dbs
               }
 
-        general_handler.queryset_manager.add_filter('entry', source_database__iexact=holder)
+        general_handler.queryset_manager.add_filter('entry', source_database=holder)
         return qs
 
 

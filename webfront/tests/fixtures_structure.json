@@ -2,7 +2,7 @@
   {
     "model": "webfront.Structure",
     "fields": {
-      "accession": "1JM7",
+      "accession": "1jm7",
       "name": "Solution structure of the BRCA1/BARD1 RING-domain heterodimer",
       "other_names": [],
       "experiment_type": "Solution NMR",
@@ -47,7 +47,7 @@
   {
     "model": "webfront.Structure",
     "fields": {
-      "accession": "1T2V",
+      "accession": "1t2v",
       "resolution": 2.9,
       "name": "Structural basis of phospho-peptide recognition by the brct domain of brca1, structure with phosphopeptide",
       "other_names": [],
@@ -61,7 +61,7 @@
   {
     "model": "webfront.Structure",
     "fields": {
-      "accession": "2BKM",
+      "accession": "2bkm",
       "resolution": 9.2,
       "name": "Crystal structure of the truncated hemoglobin from geobacillus stearothermophilus",
       "other_names": [],
@@ -91,7 +91,7 @@
   {
     "model": "webfront.Structure",
     "fields": {
-      "accession": "1JZ8",
+      "accession": "1jz8",
       "resolution": 59.2,
       "name": "E. COLI (lacZ) BETA-GALACTOSIDASE (E537Q) IN COMPLEX WITH ALLOLACTOSE",
       "other_names": [],

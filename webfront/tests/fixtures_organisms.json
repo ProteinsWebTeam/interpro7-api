@@ -90,7 +90,7 @@
   {
     "model": "webfront.Proteome",
     "fields": {
-      "accession": "UP000006701",
+      "accession": "up000006701",
       "name": "Aspergillus clavatus NRRL 1 ",
       "is_reference": true,
       "strain": "ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1",
@@ -101,7 +101,7 @@
   {
     "model": "webfront.Proteome",
     "fields": {
-      "accession": "UP000030104",
+      "accession": "up000030104",
       "name": "Penicillium italicum Blue mold",
       "is_reference": true,
       "strain": "PHI-1",
@@ -112,7 +112,7 @@
   {
     "model": "webfront.Proteome",
     "fields": {
-      "accession": "UP000012042",
+      "accession": "up000012042",
       "name": "Lactobacillus brevis KB290",
       "is_reference": false,
       "strain": "KB290",

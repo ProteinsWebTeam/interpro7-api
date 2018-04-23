@@ -193,7 +193,7 @@ class StructureSerializer(ModelContentSerializer):
         output["source_database"] = "pdb"
         if include_structure:
             output["structure"] = StructureSerializer.to_metadata_representation(
-                Structure.objects.get(accession__iexact=obj["structure_acc"]), search, base_query
+                Structure.objects.get(accession=obj["structure_acc"].lower()), search, base_query
             )
         return output
 

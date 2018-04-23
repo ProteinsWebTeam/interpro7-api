@@ -39,4 +39,4 @@ branches:
   only:
     - master
     - dev
-    - django2
+    - optimising_queries

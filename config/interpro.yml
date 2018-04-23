@@ -5,8 +5,8 @@ searcher_path: "http://hmmer-prod-db01:9200/current/relationship"
 searcher_test_path: "http://localhost:9200/test/relationship"
 api_url: "https://wwwdev.ebi.ac.uk/interpro7/api/"
 use_test_db: false
-enable_caching: false
-enable_cache_write: false
+enable_caching: true
+enable_cache_write: true
 redis: "redis://127.0.0.1:6379/1"
 default_page_size: 20
 

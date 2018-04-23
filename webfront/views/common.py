@@ -1,4 +1,5 @@
 import re
+import os
 
 from rest_framework import status
 from webfront.response import Response
@@ -97,10 +98,13 @@ class GeneralHandler(CustomView):
         if clean_url == '' or clean_url == '/':
             return Response(getDataForRoot(self.available_endpoint_handlers))
         full_path = request.get_full_path()
-        if settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', ''):
-            response = None
-        else:
-            response = self.cache.get(full_path)
+        response = None
+        if not settings.DEBUG or 'no-cache' not in request.META.get('HTTP_CACHE_CONTROL', ''):
+            try:
+                response = self.cache.get(full_path)
+            except:
+                if "TRAVIS" not in os.environ:
+                    print('Failed getting {} from cache'.format(full_path))
         if response:
             return response
 
@@ -121,7 +125,11 @@ class GeneralHandler(CustomView):
                 *args, **kwargs
             )
             if not(settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', '')):
-                self.cache.set(full_path, response)
+                try:
+                    self.cache.set(full_path, response)
+                except:
+                    if "TRAVIS" not in os.environ:
+                        print('Failed setting {} into cache'.format(full_path))
             return response
         except ReferenceError as e:
             if settings.DEBUG:

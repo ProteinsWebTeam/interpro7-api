@@ -96,7 +96,11 @@ class GeneralHandler(CustomView):
         clean_url = url.strip()
         if clean_url == '' or clean_url == '/':
             return Response(getDataForRoot(self.available_endpoint_handlers))
-        response = self.cache.get(clean_url)
+        full_path = request.get_full_path()
+        if settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', ''):
+            response = None
+        else:
+            response = self.cache.get(full_path)
         if response:
             return response
 
@@ -116,7 +120,8 @@ class GeneralHandler(CustomView):
                 general_handler=self,
                 *args, **kwargs
             )
-            self.cache.set(clean_url, response)
+            if not(settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', '')):
+                self.cache.set(full_path, response)
             return response
         except ReferenceError as e:
             if settings.DEBUG:

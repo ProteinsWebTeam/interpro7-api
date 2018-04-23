@@ -10,7 +10,7 @@ from django.conf import settings
 
 multiple_slashes = re.compile('/+')
 
-def canonical(url):
+def canonical(url, remove_all_page_size=False):
     parsed = urlparse(url)
     # process query
     query = parse_qs(parsed.query, keep_blank_values=True)
@@ -21,7 +21,8 @@ def canonical(url):
         )
     )
     # handle page_size
-    if query.get('page_size') == [str(settings.INTERPRO_CONFIG.get('default_page_size', 20))]:
+    if remove_all_page_size\
+        or query.get('page_size') == [str(settings.INTERPRO_CONFIG.get('default_page_size', 20))]:
         query.pop('page_size', None)
     # handle page
     if query.get('page') == ['1']:

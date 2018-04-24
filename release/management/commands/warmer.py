@@ -84,7 +84,7 @@ class Command(BaseCommand):
             help="log files with requests to execute"
         )
         parser.add_argument(
-            "--root", "-r", type=str, nargs=1,
+            "--root", "-r", type=str,
             help="URL root", default="http://wp-np3-ac.ebi.ac.uk/interpro7{}"
         )
         parser.add_argument(

@@ -1,6 +1,8 @@
 from collections import OrderedDict
-from tqdm import tqdm
 import requests
+from tqdm import tqdm
+
+requests.adapters.DEFAULT_RETRIES = 5
 
 from django.core.management import BaseCommand
 from webfront.views.cache import canonical

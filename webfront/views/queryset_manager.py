@@ -107,16 +107,18 @@ class QuerysetManager:
                 elif "experiment_type__iexact" in k:
                     q += " && structure_evidence:{}".format(escape(v).strip())
                 elif "__gt" in k:
+                    filter_k = "protein_"+k if k.startswith("length_") else k
                     q += " && {}:{}{} TO *]".format(
-                        re.sub(r"__gte?", "", k),
-                        "[" if "__gte" in k else "{",
+                        re.sub(r"__gte?", "", filter_k),
+                        "[" if "__gte" in filter_k else "{",
                         escape(v)
                     )
                 elif "__lt" in k:
+                    filter_k = "protein_"+k if k.startswith("length_") else k
                     q += " && {}:[* TO {}{}".format(
-                        re.sub(r"__lte?", "", k),
+                        re.sub(r"__lte?", "", filter_k),
                         escape(v),
-                        "]" if "__lte" in k else "}"
+                        "]" if "__lte" in filter_k else "}"
                     )
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":

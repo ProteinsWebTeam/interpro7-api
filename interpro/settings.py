@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # added
     'webfront',
+    'release',
     # third-party added libraries
     'rest_framework'
 )

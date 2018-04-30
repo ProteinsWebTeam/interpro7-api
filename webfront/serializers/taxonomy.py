@@ -124,7 +124,7 @@ class OrganismSerializer(ModelContentSerializer):
                 "strain": instance.strain,
                 "assembly": instance.assembly,
                 "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
-                "counters, sq": {
+                "counters": {
                     "entries": s.get_number_of_field_by_endpoint("proteome", "entry_acc", instance.accession, sq),
                     "structures": s.get_number_of_field_by_endpoint("proteome", "structure_acc", instance.accession, sq),
                     "proteins": s.get_number_of_field_by_endpoint("proteome", "protein_acc", instance.accession, sq),

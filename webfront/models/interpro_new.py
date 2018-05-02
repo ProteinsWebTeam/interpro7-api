@@ -59,6 +59,7 @@ class Protein(models.Model):
     structure = JSONField(default={})
     fragment = models.CharField(max_length=1, null=False)
     tax_id = models.IntegerField(null=False, default=0)
+    size = models.CharField(max_length=10, null=True)
     # Domain arch string e.g. 275/UPI0004FEB881#29021:2-66~20422&29021&340&387:103-266#
     # domain_architectures = models.TextField(null=True)
 

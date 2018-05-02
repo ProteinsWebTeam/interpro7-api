@@ -90,6 +90,7 @@ class FixtureReader:
                 "proteomes": [pm.lower() for pm in self.proteins[p]["proteomes"]],
                 "entry_protein_locations": ep["coordinates"],
                 "protein_length": self.proteins[p]["length"],
+                "protein_size": self.proteins[p]["size"],
                 "id": get_id(e, p)
             }
             obj["text_organism"] = str(obj["tax_id"]) +" "+(" ".join(obj["lineage"]))+" "+(" ".join(obj["proteomes"]))
@@ -146,6 +147,7 @@ class FixtureReader:
                         "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxid"]],
                         "proteomes": [pm.lower() for pm in self.proteins[p]["proteomes"]],
                         "protein_length": self.proteins[p]["length"],
+                        "protein_size": self.proteins[p]["size"],
                         "id": get_id(None, p, sp["structure"], sp["chain"]),
                         "structure_acc": sp["structure"],
                         "structure_evidence": self.structures[sp["structure"]]["experiment_type"],

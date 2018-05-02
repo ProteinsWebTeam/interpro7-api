@@ -143,7 +143,7 @@ class ProteinHandler(CustomView):
             "length": "length",
             "id": "identifier"
         }))
-        general_handler.modifiers.register("length", filter_by_field_or_field_range("protein", "length"))
+        general_handler.modifiers.register("size", filter_by_field("protein", "size"))
         general_handler.modifiers.register("id", filter_by_field("protein", "identifier"))
         general_handler.modifiers.register("tax_id", filter_by_field("protein", "tax_id"))
         general_handler.modifiers.register("protein_evidence", filter_by_field("protein", "evidence_code"))

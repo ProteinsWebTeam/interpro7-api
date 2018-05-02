@@ -60,6 +60,59 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
             for result in response.data["results"]:
                 self.assertEqual(result["metadata"]["type"], entry_type)
 
+    def _get_size_group(self, length):
+        l = int(length)
+        if l < 300:
+            return "small"
+        elif l < 600:
+            return "medium"
+        return "long"
+
+    def test_can_filter_protein_by_size(self):
+        sizes = ["small", "medium", "long"]
+        for size in sizes:
+            response = self.client.get("/api/protein/uniprot?size="+size)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("results", response.data)
+            for result in response.data["results"]:
+                size_g = self._get_size_group(result["metadata"]["length"])
+                self.assertEqual(size_g, size)
+
+    def test_can_filter_reviewed_protein_by_size(self):
+        sizes = ["small", "medium", "long"]
+        for size in sizes:
+            response = self.client.get("/api/protein/reviewed?size="+size)
+            if response.status_code == status.HTTP_204_NO_CONTENT:
+                self.assertEqual("long", size)
+            else:
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertIn("results", response.data)
+                for result in response.data["results"]:
+                    size_g = self._get_size_group(result["metadata"]["length"])
+                    self.assertEqual(size_g, size)
+
+    def test_can_filter_unreviewed_protein_by_size(self):
+        sizes = ["small", "medium", "long"]
+        for size in sizes:
+            response = self.client.get("/api/protein/unreviewed?size="+size)
+            if response.status_code == status.HTTP_204_NO_CONTENT:
+                self.assertEqual("small", size)
+            else:
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertIn("results", response.data)
+                for result in response.data["results"]:
+                    size_g = self._get_size_group(result["metadata"]["length"])
+                    self.assertEqual(size_g, size)
+
+    def test_can_filter_by_size_protein_with_entry_filter(self):
+        sizes = ["small", "medium", "long"]
+        for size in sizes:
+            response = self.client.get("/api/protein/uniprot/entry?size="+size)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("results", response.data)
+            for result in response.data["results"]:
+                size_g = self._get_size_group(result["metadata"]["length"])
+                self.assertEqual(size_g, size)
 
 class FilterByContainsFieldModifierTest(InterproRESTTestCase):
 
@@ -216,3 +269,4 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
                 url = "/api{}/{}?extra_fields=name,ERROR".format(self.list_url[endpoint], ep)
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+

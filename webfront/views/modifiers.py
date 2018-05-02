@@ -152,7 +152,7 @@ def filter_by_field(endpoint, field):
     def x(value, general_handler):
         general_handler.queryset_manager.add_filter(
             endpoint,
-            **{"{}__iexact".format(field): value}
+            **{"{}__exact".format(field): value.lower()}
         )
     return x
 

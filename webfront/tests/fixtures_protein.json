@@ -7,7 +7,7 @@
       "tax_id": 344612,
       "organism": {
         "name": "Aspergillus clavatus (strain ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1)",
-        "taxid": 344612
+        "taxId": 344612
       },
       "name": "Carboxypeptidase Y homolog A",
       "other_names": [],
@@ -32,7 +32,7 @@
       "tax_id": 1001583,
       "organism": {
         "name": "Lactobacillus brevis KB290",
-        "taxid": 1001583
+        "taxId": 1001583
       },
       "name": "Band 7 protein",
       "other_names": [],
@@ -103,7 +103,7 @@
       "tax_id": 40296,
       "organism": {
         "name": "Penicillium italicum",
-        "taxid": 40296
+        "taxId": 40296
       },
       "name": "Propeptide, carboxypeptidase Y",
       "other_names": [],
@@ -128,7 +128,7 @@
       "tax_id": 40296,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 40296
+        "taxId": 40296
       },
       "name": "Lutropin-choriogonadotropic hormone receptor",
       "other_names": ["Luteinizing hormone receptor", "LSH-R"],

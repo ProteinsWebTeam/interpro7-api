@@ -82,7 +82,7 @@
       "length": 53,
       "organism": {
         "name": "Homo sapiens (Human)",
-        "taxid": 9606
+        "taxId": 9606
       },
       "coordinates": [{"fragments" : [{"start" : 1, "end" : 53}]}]
     }
@@ -96,7 +96,7 @@
       "length": 117,
       "organism": {
         "name": "Homo sapiens (Human)",
-        "taxid": 9606
+        "taxId": 9606
       },
       "coordinates": [{"fragments" : [{"start" : 1, "end" : 114}]}]
     }
@@ -110,7 +110,7 @@
       "length": 117,
       "organism": {
         "name": "Homo sapiens (Human)",
-        "taxid": 9606
+        "taxId": 9606
       },
       "coordinates": [{"fragments" : [{"start" : 1, "end" : 74}]}]
     }
@@ -124,7 +124,7 @@
       "length": 128,
       "organism": {
         "name": "Geobacillus kaustophilus (strain HTA426)",
-        "taxid": 235909
+        "taxId": 235909
       },
       "coordinates": [{"fragments" : [{"start" : 10, "end" : 137}]}]
     }
@@ -138,7 +138,7 @@
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -152,7 +152,7 @@
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -166,7 +166,7 @@
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -180,7 +180,7 @@
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -194,7 +194,7 @@
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -208,7 +208,7 @@
       "length": 228,
       "organism": {
         "name": "Geobacillus kaustophilus (strain HTA426)",
-        "taxid": 235909
+        "taxId": 235909
       },
       "coordinates": [{"fragments" : [{"start" : 137, "end" : 600}]}]
     }
@@ -222,7 +222,7 @@
       "length": 228,
       "organism": {
         "name": "Geobacillus kaustophilus (strain HTA426)",
-        "taxid": 235909
+        "taxId": 235909
       },
       "coordinates": [{"fragments" : [{"start" : 137, "end" : 600}]}]
     }

@@ -2,10 +2,55 @@
   {
     "model": "webfront.Database",
     "fields": {
-      "name": "INTERPRO",
+      "name": "interpro",
       "name_long": "InterPro",
       "type": "entry",
       "version": "66.0"
+    }
+  },
+  {
+    "model": "webfront.Database",
+    "fields": {
+      "name": "pfam",
+      "name_long": "PFam",
+      "type": "entry",
+      "version": "21.0"
+    }
+  },
+  {
+    "model": "webfront.Database",
+    "fields": {
+      "name": "smart",
+      "name_long": "SMART",
+      "type": "entry",
+      "version": "2.0"
+    }
+  },
+  {
+    "model": "webfront.Database",
+    "fields": {
+      "name": "profile",
+      "name_long": "Prosite Profiles",
+      "type": "entry",
+      "version": "1.0"
+    }
+  },
+  {
+    "model": "webfront.Database",
+    "fields": {
+      "name": "uniprot",
+      "name_long": "UniProt",
+      "type": "protein",
+      "version": "61.0"
+    }
+  },
+  {
+    "model": "webfront.Database",
+    "fields": {
+      "name": "pdb",
+      "name_long": "PDB",
+      "type": "structure",
+      "version": "14.0"
     }
   }
 ]

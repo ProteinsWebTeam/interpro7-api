@@ -131,6 +131,7 @@ class ProteinHandler(CustomView):
                 "protein_evidence": None,
                 "source_database": "protein_db",
                 "go_terms": "text",
+                "size": "protein_size",
             }),
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY

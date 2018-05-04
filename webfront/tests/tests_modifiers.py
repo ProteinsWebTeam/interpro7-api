@@ -28,6 +28,26 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertIn("smart", response.data)
         self.assertIn("profile", response.data)
 
+    def test_can_get_the_protein_size_groups(self):
+        response = self.client.get("/api/protein?group_by=size")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("long", response.data)
+        self.assertIn("small", response.data)
+        self.assertIn("medium", response.data)
+        self.assertEqual(response.data["small"], 1)
+        self.assertEqual(response.data["medium"], 2)
+        self.assertEqual(response.data["long"], 1)
+
+    def test_can_get_the_integrated_protein_size_groups(self):
+        response = self.client.get("/api/protein/entry?group_by=size")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("long", response.data)
+        self.assertIn("small", response.data)
+        self.assertIn("medium", response.data)
+        self.assertEqual(response.data["small"], 1)
+        self.assertEqual(response.data["medium"], 1)
+        self.assertEqual(response.data["long"], 1)
+
     def test_wrong_field_for_group_by_should_fail(self):
         self._check_HTTP_response_code("/api/entry?group_by=entry_type", code=status.HTTP_404_NOT_FOUND)
 

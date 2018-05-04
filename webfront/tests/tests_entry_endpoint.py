@@ -12,7 +12,9 @@ class ModelTest(InterproRESTTestCase):
 
     def test_content_of_a_json_attribute(self):
         entry = Entry.objects.get(accession="ipr003165")
-        self.assertEqual(entry.member_databases["pfam"][0], "pf02171")
+        self.assertTrue("pfam" in entry.member_databases)
+        self.assertTrue("pf02171" in entry.member_databases["pfam"])
+        self.assertTrue("Piwi domain" in entry.member_databases["pfam"]["pf02171"])
 
     def test_url_mapper(self):
         urls = {

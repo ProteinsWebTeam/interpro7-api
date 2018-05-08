@@ -92,6 +92,8 @@ Assume we have a user account at /home/username
 
     To run functional tests use ```../virtualenv/bin/python manage.py test functional_tests```
 
+*   As a reference [HERE](https://docs.google.com/presentation/d/13_a6IbTq8KPGRH5AhsauEDJt4jEXNsT7DFdg1PNn4_I/edit?usp=sharing) is a graphic describing the fixtures.
+
 All the test can be run at the same time:
 
 ```../virtualenv/bin/python manage.py test```

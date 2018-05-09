@@ -86,7 +86,7 @@ class OrganismSerializer(ModelContentSerializer):
                 "accession": str(instance.accession),
                 "lineage": instance.lineage,
                 "rank": instance.rank,
-                "children": [str(c)for c in instance.children],
+                "children": self.get_children(instance),
                 "source_database": "taxonomy",
                 "parent": str(instance.parent.accession) if instance.parent is not None else None,
                 "name": {
@@ -216,6 +216,23 @@ class OrganismSerializer(ModelContentSerializer):
         elif isinstance(instance, Proteome):
             return "proteomes:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
         return None
+
+    def isChildInQuery(self, instance):
+        query = self.queryset_manager.get_searcher_query()
+
+        def filter_children(child):
+            q = "{} && lineage:{}".format(query, child)
+            response = self.searcher._elastic_json_query(q, {"size": 0})
+            return response["hits"]["total"] > 0
+        return filter_children
+
+    def get_children(self, instance):
+        filter_children = lambda x: True
+        if len(self.detail_filters) > 0:
+            filter_children = self.isChildInQuery(instance)
+        return [str(c)for c in instance.children if filter_children(c)]
+
+
 
     def to_entries_count_representation(self, instance):
         query = self.get_searcher_query(instance)

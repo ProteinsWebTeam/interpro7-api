@@ -69,7 +69,7 @@ class PDBHandler(CustomView):
         general_handler.queryset_manager.add_filter("structure", source_database="pdb")
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Structure),
+            add_extra_fields(Structure, "counters"),
         )
         return super(PDBHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

@@ -44,7 +44,7 @@ class ProteomeHandler(CustomView):
         general_handler.modifiers.unregister("with_names")
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Proteome),
+            add_extra_fields(Proteome, "counters"),
         )
 
         if "accession" in general_handler.queryset_manager.filters["taxonomy"]:
@@ -116,7 +116,7 @@ class TaxonomyHandler(CustomView):
         general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Taxonomy),
+            add_extra_fields(Taxonomy, "counters"),
         )
         return super(TaxonomyHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

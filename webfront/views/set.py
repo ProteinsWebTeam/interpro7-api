@@ -111,7 +111,7 @@ class SetTypeHandler(CustomView):
             general_handler.queryset_manager.add_filter("set", source_database=db)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Set),
+            add_extra_fields(Set, "counters"),
         )
         return super(SetTypeHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

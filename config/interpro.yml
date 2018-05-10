@@ -4,7 +4,7 @@ django_cors: true
 searcher_path: "http://hmmer-prod-db03:9200/v68_small/relationship"
 searcher_test_path: "http://localhost:9200/test/relationship"
 api_url: "https://wwwdev.ebi.ac.uk/interpro7/api/"
-use_test_db: false
+use_test_db: true
 enable_caching: false
 enable_cache_write: false
 redis: "redis://127.0.0.1:6379/1"

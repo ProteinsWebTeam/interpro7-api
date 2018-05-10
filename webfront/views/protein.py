@@ -78,7 +78,7 @@ class UniprotHandler(CustomView):
             use_model_as_payload=True, serializer=SerializerDetail.PROTEIN_HEADERS, many=True)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Protein),
+            add_extra_fields(Protein, "counters"),
         )
         return super(UniprotHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

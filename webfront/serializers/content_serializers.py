@@ -148,9 +148,13 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return key
 
     @staticmethod
-    def add_other_fields(representation, instance, other_fields):
+    def add_other_fields(representation, instance, other_fields, functions):
         representation["extra_fields"] = {
             f: instance.__getattribute__(f)
             for f in other_fields
+            if f not in functions
         }
+        for f in functions:
+            if f in other_fields:
+                representation["extra_fields"][f] = functions[f]()
         return representation

@@ -76,7 +76,7 @@ class MemberHandler(CustomView):
         )
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
 
         general_handler.modifiers.register(
@@ -146,7 +146,7 @@ class UnintegratedHandler(CustomView):
                                                     source_database__iregex=db_members)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
         return super(UnintegratedHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -181,7 +181,7 @@ class IntegratedHandler(CustomView):
                                                     source_database__iregex=db_members)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
         return super(IntegratedHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -227,7 +227,7 @@ class InterproHandler(CustomView):
         )
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
         general_handler.modifiers.register("signature_in", filter_by_contains_field("entry", "member_databases"))
         return super(InterproHandler, self).get(
@@ -257,7 +257,7 @@ class AllHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry", source_database__isnull=False)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
         return super(AllHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

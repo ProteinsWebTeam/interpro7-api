@@ -241,8 +241,9 @@ def get_entry_annotation(field, general_handler):
     return(annotation)
 
 
-def add_extra_fields(endpoint):
-    supported_fields = [f.name for f in endpoint._meta.get_fields() if not f.is_relation]
+def add_extra_fields(endpoint, *argv):
+    supported_fields = [f.name for f in endpoint._meta.get_fields() if not f.is_relation] + list(argv)
+
     def x(fields, general_handler):
         fs = fields.split(',')
         for field in fs:

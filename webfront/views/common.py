@@ -17,6 +17,8 @@ from webfront.views.set import SetHandler
 from webfront.views.cache import InterProCache
 
 from webfront.models import Database
+from concurrent.futures import ThreadPoolExecutor
+from time import sleep
 
 
 def map_url_to_levels(url):
@@ -116,14 +118,35 @@ class GeneralHandler(CustomView):
         self.queryset_manager = QuerysetManager()
         self.searcher = self.get_search_controller(self.queryset_manager)
         try:
-            response = super(GeneralHandler, self).get(
-                request, endpoint_levels,
-                available_endpoint_handlers=self.available_endpoint_handlers,
-                level=0,
-                parent_queryset=self.queryset,
-                general_handler=self,
-                *args, **kwargs
-            )
+            def execute_response(args):
+                self, request, endpoint_levels = args
+                print("Executing")
+                response = super(GeneralHandler, self).get(
+                    request, endpoint_levels,
+                    available_endpoint_handlers=self.available_endpoint_handlers,
+                    level=0,
+                    parent_queryset=self.queryset,
+                    general_handler=self
+                )
+                print("done")
+                return response
+
+            def timeout_response():
+                print("before")
+                sleep(5)
+                print("after")
+                c = {'detail': 'just sleeping'}
+                return c
+
+            pool = ThreadPoolExecutor(2)
+
+            future = pool.submit(execute_response, (self, request, endpoint_levels))
+            # future = pool.submit(timeout_response)
+            print(future.done())
+            sleep(5)
+            print(future.done())
+            response = future.result()
+
             if not(settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', '')):
                 try:
                     self.cache.set(full_path, response)

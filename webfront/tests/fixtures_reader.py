@@ -94,9 +94,9 @@ class FixtureReader:
                 "id": get_id(e, p)
             }
             obj["text_organism"] = str(obj["tax_id"]) +" "+(" ".join(obj["lineage"]))+" "+(" ".join(obj["proteomes"]))
-            if "IDA" in ep:
-                obj["IDA"] = ep["IDA"]
-                obj["IDA_FK"] = ep["IDA_FK"]
+            if "ida" in ep:
+                obj["ida"] = ep["ida"]
+                obj["ida_id"] = ep["ida_id"]
 
             if p in self.protein_structure_list:
                 for sp in self.protein_structure_list[p]:

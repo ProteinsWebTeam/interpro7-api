@@ -222,10 +222,10 @@ def get_domain_architectures(field, general_handler):
     index = general_handler.pagination["index"] if "index" in general_handler.pagination else 1
     if field is None or field.strip() == "":
         return searcher.get_group_obj_of_field_by_query(
-            None, "IDA_FK", rows=rows, start=index*rows-rows,
+            None, "ida_id", rows=rows, start=index*rows-rows,
             inner_field_to_count="protein_acc")
     else:
-        query = general_handler.queryset_manager.get_searcher_query() + " && IDA_FK:" + field
+        query = general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
         res, length = searcher.get_list_of_endpoint("protein", query, rows, index*rows-rows)
         return general_handler.queryset_manager\
             .get_base_queryset("protein")\

@@ -164,7 +164,7 @@ class EntrySerializer(ModelContentSerializer):
             "structures": searcher.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession, sq),
             "organisms": searcher.get_number_of_field_by_endpoint("entry", "tax_id", instance.accession, sq),
             "sets": searcher.get_number_of_field_by_endpoint("entry", "set_acc", instance.accession, sq),
-            "domain_architectures": searcher.get_number_of_field_by_endpoint("entry", "IDA_FK", instance.accession, sq),
+            "domain_architectures": searcher.get_number_of_field_by_endpoint("entry", "ida_id", instance.accession, sq),
         }
 
     def to_headers_representation(self, instance):
@@ -369,7 +369,7 @@ class EntrySerializer(ModelContentSerializer):
         return {
             "count": obj["ngroups"]["value"],
             "results": [
-                {"IDA": o["IDA"], "IDA_FK": o["IDA_FK"], "unique_proteins": o["unique"]["value"]}
+                {"ida": o["ida"], "ida_id": o["ida_id"], "unique_proteins": o["unique"]["value"]}
                 for o in obj['groups']
             ]
         }

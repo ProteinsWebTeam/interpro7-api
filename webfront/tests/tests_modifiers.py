@@ -203,10 +203,10 @@ class IDAModifiersTest(InterproRESTTestCase):
         self.assertIn("results", response.data)
         self.assertIn("count", response.data)
         self.assertGreater(response.data["count"], len(response.data["results"]))
-        first_ida_fk = response.data["results"][0]["IDA_FK"]
+        first_ida_fk = response.data["results"][0]["ida_id"]
         response = self.client.get("/api/entry/interpro/IPR003165?ida&page_size=1&page=2")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertNotEqual(first_ida_fk, response.data["results"][0]["IDA_FK"])
+        self.assertNotEqual(first_ida_fk, response.data["results"][0]["ida_id"])
 
     def test_filter_by_ida_modifier(self):
         response = self.client.get("/api/protein/uniprot?ida=50134")

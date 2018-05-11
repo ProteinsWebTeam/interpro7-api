@@ -206,7 +206,7 @@ class ElasticsearchController(SearchController):
         }
 
     def get_group_obj_of_field_by_query(self, query, fields, fq=None, rows=1, start=0, inner_field_to_count=None):
-        query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
+        query = self.queryset_manager.get_searcher_query() if query is None else query
         check_multiple_fields = type(fields) is list
         field = fields[0] if check_multiple_fields else fields
         facet = {

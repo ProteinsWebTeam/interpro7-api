@@ -17,7 +17,7 @@ from webfront.views.set import SetHandler
 from webfront.views.cache import InterProCache
 
 from webfront.models import Database
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from time import sleep
 
 
@@ -96,6 +96,7 @@ class GeneralHandler(CustomView):
     cache = InterProCache()
 
     def get(self, request, url='', *args, **kwargs):
+        print("GET")
         clean_url = url.strip()
         if clean_url == '' or clean_url == '/':
             return Response(getDataForRoot(self.available_endpoint_handlers))
@@ -121,6 +122,7 @@ class GeneralHandler(CustomView):
             def execute_response(args):
                 self, request, endpoint_levels = args
                 print("Executing")
+                sleep(10)
                 response = super(GeneralHandler, self).get(
                     request, endpoint_levels,
                     available_endpoint_handlers=self.available_endpoint_handlers,
@@ -133,19 +135,21 @@ class GeneralHandler(CustomView):
 
             def timeout_response():
                 print("before")
-                sleep(5)
+                sleep(3)
                 print("after")
                 c = {'detail': 'just sleeping'}
-                return c
+                return Response(c, status=status.HTTP_408_REQUEST_TIMEOUT)
 
             pool = ThreadPoolExecutor(2)
 
-            future = pool.submit(execute_response, (self, request, endpoint_levels))
-            # future = pool.submit(timeout_response)
-            print(future.done())
-            sleep(5)
-            print(future.done())
-            response = future.result()
+            futures = [
+                pool.submit(execute_response, (self, request, endpoint_levels)),
+                # pool.submit(timeout_response),
+            ]
+            print("SUBMITED")
+            result = wait(futures, return_when=FIRST_COMPLETED)
+            print("FIRST_COMPLETED")
+            response = result.done.pop().result()
 
             if not(settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', '')):
                 try:
@@ -153,6 +157,7 @@ class GeneralHandler(CustomView):
                 except:
                     if "TRAVIS" not in os.environ:
                         print('Failed setting {} into cache'.format(full_path))
+            print("return")
             return response
         except ReferenceError as e:
             if settings.DEBUG:

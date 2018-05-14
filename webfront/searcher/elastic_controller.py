@@ -206,7 +206,7 @@ class ElasticsearchController(SearchController):
         }
 
     def get_group_obj_of_field_by_query(self, query, fields, fq=None, rows=1, start=0, inner_field_to_count=None):
-        query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
+        query = self.queryset_manager.get_searcher_query() if query is None else query
         check_multiple_fields = type(fields) is list
         field = fields[0] if check_multiple_fields else fields
         facet = {
@@ -302,7 +302,7 @@ class ElasticsearchController(SearchController):
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "proteomes"
             facet["aggs"]["rscount"]["terms"]["field"] = "proteomes"
         response = self._elastic_json_query(qs, facet)
-        return [str(x['key']).upper() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
+        return [str(x['key']).lower() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()

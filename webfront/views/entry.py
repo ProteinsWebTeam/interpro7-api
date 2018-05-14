@@ -21,7 +21,8 @@ class MemberAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("entry", accession=endpoint_levels[level - 1].upper())
+        general_handler.queryset_manager.add_filter(
+            "entry", accession=endpoint_levels[level - 1].lower())
 
         general_handler.modifiers.register(
             "annotation",
@@ -36,7 +37,7 @@ class MemberAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("entry", accession=level_name.upper())
+        general_handler.queryset_manager.add_filter("entry", accession=level_name.lower())
         return queryset
 
 
@@ -52,14 +53,14 @@ class MemberHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
-        general_handler.queryset_manager.add_filter("entry", source_database__iexact=endpoint_levels[level - 1])
+        general_handler.queryset_manager.add_filter("entry", source_database=endpoint_levels[level - 1].lower())
 
         if endpoint_levels[level - 2] == "unintegrated":
             general_handler.queryset_manager.add_filter("entry", integrated__isnull=True)
         if endpoint_levels[level - 2] == "interpro":
             general_handler.queryset_manager.add_filter("entry", integrated__isnull=False)
         if level - 3 >= 0 and endpoint_levels[level - 3] == "interpro":
-            general_handler.queryset_manager.add_filter("entry", integrated=endpoint_levels[level - 2])
+            general_handler.queryset_manager.add_filter("entry", integrated=endpoint_levels[level - 2].lower())
             general_handler.queryset_manager.remove_filter("entry", "accession")
         general_handler.modifiers.register(
             "group_by",
@@ -75,7 +76,7 @@ class MemberHandler(CustomView):
         )
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
 
         general_handler.modifiers.register(
@@ -92,7 +93,7 @@ class MemberHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.update_integrated_filter("entry")
-        general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
+        general_handler.queryset_manager.add_filter("entry", source_database=level_name.lower())
         return queryset
 
 
@@ -110,7 +111,7 @@ class AccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
-        general_handler.queryset_manager.add_filter("entry", accession=endpoint_levels[level - 1].upper())
+        general_handler.queryset_manager.add_filter("entry", accession=endpoint_levels[level - 1].lower())
         general_handler.modifiers.register(
             "ida", get_domain_architectures,
             use_model_as_payload=True,
@@ -123,13 +124,13 @@ class AccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("entry", accession=level_name.upper())
+        general_handler.queryset_manager.add_filter("entry", accession=level_name.lower())
 
 
 class UnintegratedHandler(CustomView):
     level_description = 'unintegrated level'
     queryset = Entry.objects.all() \
-        .exclude(source_database__iexact="interpro") \
+        .exclude(source_database="interpro") \
         .filter(integrated__isnull=True)
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
@@ -145,7 +146,7 @@ class UnintegratedHandler(CustomView):
                                                     source_database__iregex=db_members)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
         return super(UnintegratedHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -164,7 +165,7 @@ class UnintegratedHandler(CustomView):
 class IntegratedHandler(CustomView):
     level_description = 'integrated level'
     queryset = Entry.objects.all() \
-        .exclude(source_database__iexact="interpro") \
+        .exclude(source_database="interpro") \
         .filter(integrated__isnull=False)
     serializer_class = EntrySerializer
     serializer_detail = SerializerDetail.ENTRY_HEADERS
@@ -180,7 +181,7 @@ class IntegratedHandler(CustomView):
                                                     source_database__iregex=db_members)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
         return super(IntegratedHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -198,7 +199,7 @@ class IntegratedHandler(CustomView):
 
 class InterproHandler(CustomView):
     level_description = 'interpro level'
-    queryset = Entry.objects.filter(source_database__iexact="interpro")
+    queryset = Entry.objects.filter(source_database="interpro")
     child_handlers = [
         (r'IPR\d{6}', AccessionHandler),
         (db_members, MemberHandler),
@@ -210,7 +211,7 @@ class InterproHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("entry",
-                                                    source_database__iexact=endpoint_levels[level - 1])
+                                                    source_database=endpoint_levels[level - 1].lower())
 
         general_handler.modifiers.register(
             "group_by",
@@ -226,7 +227,7 @@ class InterproHandler(CustomView):
         )
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
         general_handler.modifiers.register("signature_in", filter_by_contains_field("entry", "member_databases"))
         return super(InterproHandler, self).get(
@@ -236,7 +237,7 @@ class InterproHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("entry", source_database__iexact=level_name)
+        general_handler.queryset_manager.add_filter("entry", source_database=level_name.lower())
         return queryset
 
 
@@ -256,7 +257,7 @@ class AllHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry", source_database__isnull=False)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Entry),
+            add_extra_fields(Entry, "counters"),
         )
         return super(AllHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -299,7 +300,7 @@ class EntryHandler(CustomView):
                 output["member_databases"][source_database.lower()] = total
 
         output["unintegrated"] = qs \
-            .exclude(**{'source_database__iexact': "interpro"}) \
+            .exclude(**{'source_database': "interpro"}) \
             .filter(**{'integrated__isnull': True}).count()
         output["all"] = qs.count()
         return {"entries": output}

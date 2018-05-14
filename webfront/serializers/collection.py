@@ -15,7 +15,18 @@ class SetSerializer(ModelContentSerializer):
         representation = self.endpoint_representation(representation, instance)
         representation = self.filter_representation(representation, instance, self.detail_filters, self.detail)
         if self.queryset_manager.other_fields is not None:
-            representation = self.add_other_fields(representation, instance, self.queryset_manager.other_fields)
+            def counter_function():
+                return SetSerializer.get_counters(
+                    instance,
+                    self.searcher,
+                    self.queryset_manager.get_searcher_query()
+                )
+            representation = self.add_other_fields(
+                representation,
+                instance,
+                self.queryset_manager.other_fields,
+                {"counters": counter_function}
+            )
         return representation
 
     def endpoint_representation(self, representation, instance):
@@ -84,7 +95,7 @@ class SetSerializer(ModelContentSerializer):
         return instance
 
     def to_full_representation(self, instance):
-        s = self.searcher
+        searcher = self.searcher
         sq = self.queryset_manager.get_searcher_query()
         obj = {
             "metadata": {
@@ -96,15 +107,19 @@ class SetSerializer(ModelContentSerializer):
                 "description": instance.description,
                 "integrated": instance.integrated,
                 "relationships": instance.relationships,
-                "counters": {
-                    "entries": s.get_number_of_field_by_endpoint("set", "entry_acc", instance.accession, sq),
-                    "structures": s.get_number_of_field_by_endpoint("set", "structure_acc", instance.accession, sq),
-                    "proteins": s.get_number_of_field_by_endpoint("set", "protein_acc", instance.accession, sq),
-                    "organisms": s.get_number_of_field_by_endpoint("set", "tax_id", instance.accession, sq),
-                }
+                "counters": SetSerializer.get_counters(instance, searcher, sq)
             },
         }
         return obj
+
+    @staticmethod
+    def get_counters(instance, searcher, sq):
+        return {
+            "entries": searcher.get_number_of_field_by_endpoint("set", "entry_acc", instance.accession, sq),
+            "structures": searcher.get_number_of_field_by_endpoint("set", "structure_acc", instance.accession, sq),
+            "proteins": searcher.get_number_of_field_by_endpoint("set", "protein_acc", instance.accession, sq),
+            "organisms": searcher.get_number_of_field_by_endpoint("set", "tax_id", instance.accession, sq),
+        }
 
     @staticmethod
     def to_headers_representation(instance):

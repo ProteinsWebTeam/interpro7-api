@@ -24,7 +24,7 @@ class UniprotAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("protein", accession=endpoint_levels[level - 1].upper())
+        general_handler.queryset_manager.add_filter("protein", accession=endpoint_levels[level - 1].lower())
         general_handler.modifiers.register(
             "residues",
             get_single_value("residues"),
@@ -42,7 +42,7 @@ class UniprotAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("protein", accession=level_name.upper())
+        general_handler.queryset_manager.add_filter("protein", accession=level_name.lower())
         return queryset
 
 
@@ -73,12 +73,12 @@ class UniprotHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         ds = endpoint_levels[level - 1].lower()
         if ds != "uniprot":
-            general_handler.queryset_manager.add_filter("protein", source_database__iexact=ds)
+            general_handler.queryset_manager.add_filter("protein", source_database=ds)
         general_handler.modifiers.register("ida", get_domain_architectures,
             use_model_as_payload=True, serializer=SerializerDetail.PROTEIN_HEADERS, many=True)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Protein),
+            add_extra_fields(Protein, "counters"),
         )
         return super(UniprotHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -88,7 +88,7 @@ class UniprotHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         if level_name.lower() != "uniprot":
-            general_handler.queryset_manager.add_filter("protein", source_database__iexact=level_name)
+            general_handler.queryset_manager.add_filter("protein", source_database=level_name.lower())
         else:
             general_handler.queryset_manager.add_filter("protein", source_database__isnull=False)
         return queryset
@@ -131,6 +131,7 @@ class ProteinHandler(CustomView):
                 "protein_evidence": None,
                 "source_database": "protein_db",
                 "go_terms": "text",
+                "size": "protein_size",
             }),
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY
@@ -143,7 +144,7 @@ class ProteinHandler(CustomView):
             "length": "length",
             "id": "identifier"
         }))
-        general_handler.modifiers.register("length", filter_by_field_or_field_range("protein", "length"))
+        general_handler.modifiers.register("size", filter_by_field("protein", "size"))
         general_handler.modifiers.register("id", filter_by_field("protein", "identifier"))
         general_handler.modifiers.register("tax_id", filter_by_field("protein", "tax_id"))
         general_handler.modifiers.register("protein_evidence", filter_by_field("protein", "evidence_code"))

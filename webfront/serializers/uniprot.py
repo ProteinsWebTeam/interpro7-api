@@ -23,7 +23,18 @@ class ProteinSerializer(ModelContentSerializer):
         representation = self.endpoint_representation(representation, instance, self.detail)
         representation = self.filter_representation(representation, instance, self.detail_filters, self.detail)
         if self.queryset_manager.other_fields is not None:
-            representation = self.add_other_fields(representation, instance, self.queryset_manager.other_fields)
+            def counter_function():
+                return ProteinSerializer.get_counters(
+                    instance,
+                    self.searcher,
+                    self.queryset_manager.get_searcher_query()
+                )
+            representation = self.add_other_fields(
+                representation,
+                instance,
+                self.queryset_manager.other_fields,
+                {"counters": counter_function}
+            )
         return representation
 
     def endpoint_representation(self, representation, instance, detail):
@@ -118,14 +129,18 @@ class ProteinSerializer(ModelContentSerializer):
             "protein_evidence": 4,  # TODO
             "source_database": instance.source_database,
             'fragment': instance.fragment,
-            "counters": {
-                "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession, sq),
-                "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession, sq),
-                "organisms": searcher.get_number_of_field_by_endpoint("protein", "tax_id", instance.accession, sq),
-                "sets": searcher.get_number_of_field_by_endpoint("protein", "set_acc", instance.accession, sq),
-            }
+            "counters": ProteinSerializer.get_counters(instance, searcher, sq)
         }
         return protein
+
+    @staticmethod
+    def get_counters(instance, searcher, sq):
+        return {
+            "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession, sq),
+            "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession, sq),
+            "organisms": searcher.get_number_of_field_by_endpoint("protein", "tax_id", instance.accession, sq),
+            "sets": searcher.get_number_of_field_by_endpoint("protein", "set_acc", instance.accession, sq),
+        }
 
     @staticmethod
     def to_group_representation(instance):
@@ -202,7 +217,7 @@ class ProteinSerializer(ModelContentSerializer):
             header[key_coord] = obj[key_coord] if key_coord in obj else None
         if include_protein:
             header["protein"] = ProteinSerializer.to_metadata_representation(
-                Protein.objects.get(accession__iexact=obj["protein_acc"]), searcher, sq
+                Protein.objects.get(accession=obj["protein_acc"].lower()), searcher, sq
             )
         return header
 

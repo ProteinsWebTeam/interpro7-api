@@ -3,18 +3,19 @@
     "model": "webfront.Protein",
     "fields": {
       "identifier": "CBPYA_ASPCL",
-      "accession": "A1CUJ5",
+      "accession": "a1cuj5",
       "tax_id": 344612,
       "organism": {
         "name": "Aspergillus clavatus (strain ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1)",
-        "taxid": 344612
+        "taxId": 344612
       },
       "name": "Carboxypeptidase Y homolog A",
       "other_names": [],
       "description": ["Vacuolar carboxypeptidase involved in degradation of small peptides. Digests preferentially peptides containing an aliphatic or hydrophobic residue in P1' position, as well as methionine, leucine or phenylalanine in P1 position of ester substrate (By similarity)."],
       "sequence": "MRVLPATLLVGAATAAVPPFQQILGLPKKGADTLSKPLHDFQEQLKTLSDDARRLWDEVAKHFPDSMDHNPVFSLPKKHTRRPDSHWDHIVRGADVQSVWVTGANGEKEREVDGKLEAYDLRVKTTDPGALGIDPGVKQYTGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFLELGPSSIDSKIKPVYNDFAWNSNASVIFLDQPVNVGYSYSGSAVSDTVAAGKDVYALLTLFFKQFPEYAKQDFHIAGESYAGHYIPVFASEILSHKKRNINLKSVLIGNGLTDPLTQYDHYRPMACGDGGYPAVLDEASCQSMDNALPRCKSMIESCYNTESSWVCVPASIYCNNALIGPYQRTGQNVYDVRGKCEDESNLCYKGMGYVSEYLNKREVREAVGAEVDGYDSCNFDINRNFLFHGDWMKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEYASAELEDLVIEQNEHQGKKIGQIKSHGNFTFMRLYGGGHMVPMDQPEASLEFFNRWIGGEWF",
       "length" : "543",
-      "proteomes": ["UP000006701"],
+      "size" : "medium",
+      "proteomes": ["up000006701"],
       "gene": "cpyA",
       "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 3,
@@ -27,18 +28,19 @@
     "model": "webfront.Protein",
     "fields": {
       "identifier": "M5ADK6_LACBR",
-      "accession": "M5ADK6",
+      "accession": "m5adk6",
       "tax_id": 1001583,
       "organism": {
         "name": "Lactobacillus brevis KB290",
-        "taxid": 1001583
+        "taxId": 1001583
       },
       "name": "Band 7 protein",
       "other_names": [],
       "description": [],
       "sequence": "MESGIIEILIRNGVSHMTEKPVFHINGYLGLILVLVILGLGVYLSVVGWGVLGVILVVLAVLAASSLTIIEPNQSKVLTFFGRYIGTIKESGLYLTVPLTTKTTVSLRVRNFNSAILKVNDLQGNPVEIAAVIVFKVVDTSKALFAVEDYEKFVEIQSESAIRHVASEYAYDNFGDHQALTLRSNPTEVSNHLTEELQARLEVAGVQIIETRLTHLAYATEIASAMLQRQQSQAILSARKIIVEGAVSITEGAIEQLAAETDLHLTDNQKLQLINNMMVSIINERGSQPVINTGKVE",
       "length" : 297,
-      "proteomes": ["UP000012042"],
+      "size" : "small",
+      "proteomes": ["up000012042"],
       "gene": "LVISKB_0797",
       "go_terms": [
         {
@@ -97,18 +99,19 @@
     "model": "webfront.Protein",
     "fields": {
       "identifier": "A0A0A2L2G2_PENIT",
-      "accession": "A0A0A2L2G2",
+      "accession": "a0a0a2l2g2",
       "tax_id": 40296,
       "organism": {
         "name": "Penicillium italicum",
-        "taxid": 40296
+        "taxId": 40296
       },
       "name": "Propeptide, carboxypeptidase Y",
       "other_names": [],
       "description": [],
       "sequence": "MRVLSTTLLVGAASAAAPSFQQVLGAHSEHAENVAQQGADAFKPLQHLQDQFKSLSSEARQLWEEVSNYFPESMGSAPMLSLPKKHTRRPDSHWDYHVSGAKVQDIWVSGAEGTKEREVDGKLEDYALRAKKVDPSALGIDPGVKQYSGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFMELGPSSIGANIKPIYNDFSWNNNASVIFLDQPINVGYSYSGSSVSDTVAAGKDVYALLTLFFKQFPEYATQDFHIAGESYAGHYIPVMASEILSHKKRNINLKSVLIGNGLTDGLTQYEYYRPMACGEGGYPAVLDESTCQSMDNALSRCQSMIQSCYNSESPWVCVPASIYCNNAMLGPYQRTGQNVYDVRGKCEDESNLCYKGLGYVSEYLGQESVREAVGAEVDGYDSCNFDINRNFLFNGDWFKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEFASAELEDLKIVQNEHVGKKIGQIKSHGNFTFMRIFGGGHMVPMDQPESGLEFFNRWIGGEWF",
       "length" : "550",
-      "proteomes": ["UP000030104"],
+      "size" : "medium",
+      "proteomes": ["up000030104"],
       "gene": "PITC_084940",
       "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 1,
@@ -121,18 +124,19 @@
     "model": "webfront.Protein",
     "fields": {
       "identifier": "LSHR_PIG",
-      "accession": "P16582",
+      "accession": "p16582",
       "tax_id": 40296,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 40296
+        "taxId": 40296
       },
       "name": "Lutropin-choriogonadotropic hormone receptor",
       "other_names": ["Luteinizing hormone receptor", "LSH-R"],
       "description": ["Receptor for lutropin-choriogonadotropic hormone. The activity of this receptor is mediated by G proteins which activate adenylate cyclase."],
       "sequence": "MRRRSLALRLLLALLLLPPPLPQTLLGAPCPEPCSCRPDGALRCPGPRAGLSRLSLTYLPIKVIPSQAFRGLNEVVKIEISQSDSLEKIEANAFDNLLNLSEILIQNTKNLVYIEPGAFTNLPRLKYLSICNTGIRKLPDVTKIFSSEFNFILEICDNLHITTVPANAFQGMNNESITLKLYGNGFEEIQSHAFNGTTLISLELKENAHLKKMHNDAFRGARGPSILDISSTKLQALPSYGLESIQTLIATSSYSLKKLPSREKFTNLLDATLTYPSHCCAFRNLPTKEQNFSFSIFKNFSKQCESTARRPNNETLYSAIFAESELSDWDYDYGFCSPKTLQCAPEPDAFNPCEDIMGYDFLRVLIWLINILAIMGNVTVLFVLLTSHYKLTVPRFLMCNLSFADFCMGLYLLLIASVDAQTKGQYYNHAIDWQTGNGCSVAGFFTVFASELSVYTLTVITLERWHTITYAIQLDQKLRLRHAIPIMLGGWLFSTLIAMLPLVGVSSYMKVSICLPMDVETTLSQVYILTILILNVVAFIIICACYIKIYFAVQNPELMATNKDTKIAKKMAVLIFTDFTCMAPISFFAISAALKVPLITVTNSKVLLVLFYPVNSCANPFLYAIFTKAFRRDFFLLLSKSGCCKHQAELYRRKDFSAYCKNGFTGSNKPSRSTLKLTTLQCQYSTVMDKTCYKDC",
       "length" : 696,
-      "proteomes": ["UP000030104"],
+      "size" : "long",
+      "proteomes": ["up000030104"],
       "gene": "LHCGR",
       "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 4,

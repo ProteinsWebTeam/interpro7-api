@@ -40,7 +40,7 @@ class PDBAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("structure", accession=endpoint_levels[level - 1].upper())
+        general_handler.queryset_manager.add_filter("structure", accession=endpoint_levels[level - 1].lower())
         return super(PDBAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -48,7 +48,7 @@ class PDBAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("structure", accession=level_name.upper())
+        general_handler.queryset_manager.add_filter("structure", accession=level_name.lower())
         return queryset
 
 
@@ -69,7 +69,7 @@ class PDBHandler(CustomView):
         general_handler.queryset_manager.add_filter("structure", source_database="pdb")
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Structure),
+            add_extra_fields(Structure, "counters"),
         )
         return super(PDBHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

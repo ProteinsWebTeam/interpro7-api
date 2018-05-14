@@ -3,7 +3,6 @@ from jsonfield import JSONField
 
 class Database(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
-    code = models.CharField(max_length=1)
     name_long = models.CharField(max_length=100)
     description = models.TextField(null=True)
     version = models.CharField(max_length=100, null=True)
@@ -60,6 +59,7 @@ class Protein(models.Model):
     structure = JSONField(default={})
     fragment = models.CharField(max_length=1, null=False)
     tax_id = models.IntegerField(null=False, default=0)
+    size = models.CharField(max_length=10, null=True)
     # Domain arch string e.g. 275/UPI0004FEB881#29021:2-66~20422&29021&340&387:103-266#
     # domain_architectures = models.TextField(null=True)
 

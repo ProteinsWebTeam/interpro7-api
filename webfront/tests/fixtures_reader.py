@@ -85,17 +85,18 @@ class FixtureReader:
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
                 "text_protein": p+" "+self.proteins[p]["source_database"]+" "+(" ".join(self.proteins[p]["description"])),
-                "tax_id": self.proteins[p]["organism"]["taxid"],
-                "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxid"]],
+                "tax_id": self.proteins[p]["organism"]["taxId"],
+                "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
                 "proteomes": [pm.lower() for pm in self.proteins[p]["proteomes"]],
                 "entry_protein_locations": ep["coordinates"],
                 "protein_length": self.proteins[p]["length"],
+                "protein_size": self.proteins[p]["size"],
                 "id": get_id(e, p)
             }
             obj["text_organism"] = str(obj["tax_id"]) +" "+(" ".join(obj["lineage"]))+" "+(" ".join(obj["proteomes"]))
-            if "IDA" in ep:
-                obj["IDA"] = ep["IDA"]
-                obj["IDA_FK"] = ep["IDA_FK"]
+            if "ida" in ep:
+                obj["ida"] = ep["ida"]
+                obj["ida_id"] = ep["ida_id"]
 
             if p in self.protein_structure_list:
                 for sp in self.protein_structure_list[p]:
@@ -142,10 +143,11 @@ class FixtureReader:
                         "protein_acc": p,
                         "protein_db": self.proteins[p]["source_database"],
                         "text_protein": p + " " + self.proteins[p]["source_database"] + " " + (" ".join(self.proteins[p]["description"])),
-                        "tax_id": self.proteins[p]["organism"]["taxid"],
-                        "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxid"]],
+                        "tax_id": self.proteins[p]["organism"]["taxId"],
+                        "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
                         "proteomes": [pm.lower() for pm in self.proteins[p]["proteomes"]],
                         "protein_length": self.proteins[p]["length"],
+                        "protein_size": self.proteins[p]["size"],
                         "id": get_id(None, p, sp["structure"], sp["chain"]),
                         "structure_acc": sp["structure"],
                         "structure_evidence": self.structures[sp["structure"]]["experiment_type"],

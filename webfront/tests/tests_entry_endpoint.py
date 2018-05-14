@@ -8,11 +8,13 @@ class ModelTest(InterproRESTTestCase):
 
     def test_dummy_dataset_is_loaded(self):
         self.assertGreater(Entry.objects.all().count(), 0, "The dataset has to have at least one Entry")
-        self.assertIn(Entry.objects.filter(source_database="interpro").first().accession, ["IPR003165", "IPR001165"])
+        self.assertIn(Entry.objects.filter(source_database="interpro").first().accession.upper(), ["IPR003165", "IPR001165"])
 
     def test_content_of_a_json_attribute(self):
-        entry = Entry.objects.get(accession="IPR003165")
-        self.assertEqual(entry.member_databases["pfam"][0], "PF02171")
+        entry = Entry.objects.get(accession="ipr003165")
+        self.assertTrue("pfam" in entry.member_databases)
+        self.assertTrue("pf02171" in entry.member_databases["pfam"])
+        self.assertTrue("Piwi domain" in entry.member_databases["pfam"]["pf02171"])
 
     def test_url_mapper(self):
         urls = {
@@ -101,7 +103,7 @@ class EntryRESTTest(InterproRESTTestCase):
         pfam = "PF02171"
         response = self.client.get("/api/entry/interpro/"+acc+"/pfam/"+pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(acc, response.data["metadata"]["integrated"])
+        self.assertEqual(acc.lower(), response.data["metadata"]["integrated"].lower())
         self._check_entry_details(response.data["metadata"])
 
     def test_cant_read_entry_interpro_id_pfam_id_not_in_entry(self):

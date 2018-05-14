@@ -2,12 +2,12 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 data_in_fixtures = {
-    "A0A0A2L2G2": ["2BKM", "1JZ8", "1JZ8"],
-    "M5ADK6": ["2BKM", "1JM7"],
-    "P16582": ["1T2V", "1T2V", "1T2V", "1T2V", "1T2V"],
-    "A1CUJ5": ["1JM7"],
+    "a0a0a2l2g2": ["2bkm", "1jz8", "1jz8"],
+    "m5adk6": ["2bkm", "1jm7"],
+    "p16582": ["1t2v", "1t2v", "1t2v", "1t2v", "1t2v"],
+    "a1cuj5": ["1jm7"],
 }
-data_reviewed = ["A1CUJ5", "M5ADK6"]
+data_reviewed = ["a1cuj5", "m5adk6"]
 
 
 import unittest
@@ -65,7 +65,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
                              len(data_in_fixtures[result["metadata"]["accession"]]),
                              "failing for "+result["metadata"]["accession"])
             for match in result["structures"]:
-                self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"].lower(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_reviewed_from_pdb_structures(self):
@@ -77,7 +77,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
                              "failing for "+result["metadata"]["accession"])
             self.assertIn(result["metadata"]["accession"], data_reviewed)
             for match in result["structures"]:
-                self.assertIn(match["accession"].upper(), data_in_fixtures[result["metadata"]["accession"]])
+                self.assertIn(match["accession"].lower(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
     def test_can_get_uniprot_matches_from_structures(self):
@@ -113,7 +113,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
 
 class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_proteins_from_pdb_id_protein_id(self):
-        pdb = "1JM7"
+        pdb = "1jm7"
         prot_a = "A1CUJ5"
         prot_b = "M5ADK6"
 
@@ -130,12 +130,12 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
             self.assertEqual(len(response.data["structures"]), len(tests[url]), "URL: "+url)
             for match in response.data["structures"]:
                 self._check_structure_chain_details(match)
-            ids = [x["accession"].upper() for x in response.data["structures"]]
+            ids = [x["accession"].lower() for x in response.data["structures"]]
             self.assertEqual(tests[url], ids)
 
     def test_can_get_proteins_from_structure_db_protein_id(self):
-        pdb_1 = "1T2V"
-        pdb_2 = "2BKM"
+        pdb_1 = "1t2v"
+        pdb_2 = "2bkm"
 
         tests = {
             "/api/protein/uniprot/structure/pdb/"+pdb_1: ["P16582", "P16582", "P16582", "P16582", "P16582"],
@@ -158,15 +158,15 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
             self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_can_get_proteins_from_structure_protein_id(self):
-        pdb_1 = "1T2V"
+        pdb_1 = "1t2v"
         response = self.client.get("/api/protein/structure/pdb/"+pdb_1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_protein_count_overview(response.data)
         # TODO: improve this test
 
     def test_urls_that_should_fails_with_no_content(self):
-        pdb_1 = "1JM7"
-        # pdb_2 = "2BKM"
+        pdb_1 = "1jm7"
+        # pdb_2 = "2bkm"
         # TODO: the one with pdb_2 has been commented, as it doesn't give error but rather an empty array
         # So evalluate what is the best approach
         prot_s1 = "A1CUJ5"
@@ -181,8 +181,8 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
             self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
 
     def test_urls_that_should_fail(self):
-        pdb_1 = "1JM7"
-        # pdb_2 = "2BKM"
+        pdb_1 = "1jm7"
+        # pdb_2 = "2bkm"
         # TODO: the one with pdb_2 has been commented, as it doesn't give error but rather an empty array
         # So evalluate what is the best approach
         prot_s1 = "A1CUJ5"

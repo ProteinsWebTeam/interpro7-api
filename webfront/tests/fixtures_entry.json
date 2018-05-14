@@ -3,7 +3,7 @@
     "model": "webfront.Entry",
     "fields": {
       "entry_id" : "id1",
-      "accession" : "IPR003165",
+      "accession" : "ipr003165",
       "type" : "domain",
       "name" : "Piwi domain",
       "short_name" : "Piwi",
@@ -11,19 +11,19 @@
       "entry_date": "2001-04-21",
       "is_featured": "y",
       "member_databases" : {
-        "smart": ["SM00950"],
-        "profile": ["PS50822"],
-        "pfam": ["PF02171"]
+        "smart": {"sm00950": "Piwi domain"},
+        "profile": {"ps50822": "PIWI"},
+        "pfam": {"pf02171": "Piwi domain"}
       },
       "integrated" : null,
       "hierarchy": {
           "children": [
               {
                   "children": [],
-                  "accession": "IPR001165"
+                  "accession": "ipr001165"
               }
           ],
-          "accession": "IPR003165"
+          "accession": "ipr003165"
       },
       "go_terms" : [
         {
@@ -82,7 +82,7 @@
           "raw_pages": "1434-7",
           "medline_journal": "Science",
           "ISO_journal": "Science",
-          "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
+          "authors": ["Song JJ", "Smith SK", "Hannon GJ", "Joshua-Tor L."],
           "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
         },
         "PUB00018283": {
@@ -97,44 +97,8 @@
           "raw_pages": "481-2",
           "medline_journal": "Trends Biochem Sci",
           "ISO_journal": "Trends Biochem. Sci.",
-          "authors": "Cerutti L, Mian N, Bateman A.",
+          "authors": ["Cerutti L", "Mian N", "Bateman A."],
           "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
-        },
-        "PUB00050034": {
-          "PMID": 19187762
-        },
-        "PUB00033445": {
-          "PMID": 14749716
-        },
-        "PUB00033483": {
-          "PMID": 12526743
-        },
-        "PUB00053929": {
-          "PMID": 20211138
-        },
-        "PUB00006604": {
-          "PMID": 9851978
-        },
-        "PUB00018289": {
-          "PMID": 9927466
-        },
-        "PUB00036180": {
-          "PMID": 16815998
-        },
-        "PUB00018290": {
-          "PMID": 10631171
-        },
-        "PUB00040580": {
-          "PMID": 17027504
-        },
-        "PUB00042042": {
-          "PMID": 17130125
-        },
-        "PUB00032750": {
-          "PMID": 15800628
-        },
-        "PUB00038628": {
-          "PMID": 15800629
         }
       },
       "cross_references": {
@@ -151,7 +115,7 @@
     "model": "webfront.Entry",
     "fields": {
       "entry_id" : "id10",
-      "accession" : "IPR001165",
+      "accession" : "ipr001165",
       "type" : "domain",
       "name" : "Qiwi domain",
       "short_name" : "Qiwi",
@@ -164,10 +128,10 @@
           "children": [
               {
                   "children": [],
-                  "accession": "IPR001165"
+                  "accession": "ipr001165"
               }
           ],
-          "accession": "IPR003165"
+          "accession": "ipr003165"
       },
       "go_terms" : [
         {
@@ -221,7 +185,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": "id2",
-      "accession": "PF02171",
+      "accession": "pf02171",
       "type": "domain",
       "name": "Piwi domain",
       "is_featured": "y",
@@ -236,7 +200,7 @@
       ],
       "source_database": "pfam",
       "member_databases": null,
-      "integrated": "IPR003165",
+      "integrated": "ipr003165",
       "description": ["This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."],
       "wikipedia": "Piwi",
       "literature": {
@@ -252,7 +216,7 @@
           "raw_pages": "1434-7",
           "medline_journal": "Science",
           "ISO_journal": "Science",
-          "authors": "Song JJ, Smith SK, Hannon GJ, Joshua-Tor L.",
+          "authors": ["Song JJ", "Smith SK", "Hannon GJ", "Joshua-Tor L."],
           "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
         },
         "PUB00018283": {
@@ -267,7 +231,7 @@
           "raw_pages": "481-2",
           "medline_journal": "Trends Biochem Sci",
           "ISO_journal": "Trends Biochem. Sci.",
-          "authors": "Cerutti L, Mian N, Bateman A.",
+          "authors": ["Cerutti L", "Mian N", "Bateman A."],
           "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
         }
       },
@@ -285,7 +249,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": "SM00950",
-      "accession": "SM00950",
+      "accession": "sm00950",
       "type": "domain",
       "name": "Piwi domain",
       "entry_date": "2004-04-21",
@@ -303,7 +267,7 @@
       ],
       "source_database": "smart",
       "member_databases": null,
-      "integrated": "IPR003165",
+      "integrated": "ipr003165",
       "description": ["This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."],
       "wikipedia": "Piwi",
       "literature": {},
@@ -314,7 +278,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": "PS50822",
-      "accession": "PS50822",
+      "accession": "ps50822",
       "type": "MATRIX",
       "entry_date": "2001-04-21",
       "name": "PIWI",
@@ -323,7 +287,7 @@
       "go_terms": [],
       "source_database": "profile",
       "member_databases": null,
-      "integrated": "IPR003165",
+      "integrated": "ipr003165",
       "description": ["The Piwi box (or Sting domain) is an about 40 to 80 amino-acid conserved region, which was first identified in the C-terminal part of Drosophila Piwi and Sting proteins, and of related proteins from human, Caenorhabditis elegans, Arabidopsis thaliana, fission yeast and Dictyostelium discoideum."],
       "wikipedia": "Piwi",
       "literature": {},
@@ -333,7 +297,7 @@
   {
     "model": "webfront.Entry",
     "fields":{
-      "accession": "PF17180",
+      "accession": "pf17180",
       "entry_id": "id3",
       "type": "domain",
       "is_featured": "y",
@@ -353,7 +317,7 @@
   {
     "model": "webfront.Entry",
     "fields":{
-      "accession": "PF17176",
+      "accession": "pf17176",
       "entry_id": "id4",
       "type": "domain",
       "entry_date": "2002-04-21",
@@ -375,7 +339,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": "SM00002",
-      "accession": "SM00002",
+      "accession": "sm00002",
       "type": "family",
       "name": "Myelin family",
       "entry_date": "2003-04-21",
@@ -404,7 +368,7 @@
     "model": "webfront.Entry",
     "fields":{
       "entry_id": null,
-      "accession": "PS01031",
+      "accession": "ps01031",
       "type": "MATRIX",
       "name": "HSP20",
       "short_name": "HSP20",

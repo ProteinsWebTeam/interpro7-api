@@ -13,7 +13,7 @@ class ProteomeAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("proteome", accession=endpoint_levels[level - 1].upper())
+        general_handler.queryset_manager.add_filter("proteome", accession=endpoint_levels[level - 1].lower())
         self.serializer_detail = SerializerDetail.ORGANISM_PROTEOME
         return super(ProteomeAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
@@ -22,7 +22,7 @@ class ProteomeAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("proteome", accession=level_name.upper())
+        general_handler.queryset_manager.add_filter("proteome", accession=level_name.lower())
         return queryset
 
 
@@ -44,7 +44,7 @@ class ProteomeHandler(CustomView):
         general_handler.modifiers.unregister("with_names")
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Proteome),
+            add_extra_fields(Proteome, "counters"),
         )
 
         if "accession" in general_handler.queryset_manager.filters["taxonomy"]:
@@ -83,7 +83,7 @@ class TaxonomyAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("taxonomy", accession=endpoint_levels[level - 1].upper())
+        general_handler.queryset_manager.add_filter("taxonomy", accession=endpoint_levels[level - 1].lower())
         general_handler.modifiers.register(
             "with_names", passing, serializer=SerializerDetail.ORGANISM_DETAIL_NAMES
         )
@@ -95,7 +95,7 @@ class TaxonomyAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("taxonomy", accession=level_name.upper())
+        general_handler.queryset_manager.add_filter("taxonomy", accession=level_name.lower())
         return queryset
 
 
@@ -116,7 +116,7 @@ class TaxonomyHandler(CustomView):
         general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
         general_handler.modifiers.register(
             "extra_fields",
-            add_extra_fields(Taxonomy),
+            add_extra_fields(Taxonomy, "counters"),
         )
         return super(TaxonomyHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

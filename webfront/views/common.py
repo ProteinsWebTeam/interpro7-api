@@ -47,7 +47,7 @@ def getDataForRoot(handlers):
     return {
         "endpoints": [x[0] for x in handlers],
         "databases": {
-            db["name"].upper(): {
+            db["name"].lower(): {
                 "canonical": db["name"],
                 "name": db["name_long"],
                 "description": db["description"],

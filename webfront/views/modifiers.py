@@ -30,7 +30,7 @@ organisms = settings.INTERPRO_CONFIG.get('key_organisms', {})
 
 def group_by_member_databases(general_handler):
     if is_single_endpoint(general_handler):
-        holder = general_handler.queryset_manager.remove_filter('entry', 'source_database__iexact')
+        holder = general_handler.queryset_manager.remove_filter('entry', 'source_database')
         dbs = Entry.objects.get_queryset().values('source_database').distinct()
         qs = {db['source_database']:
                   general_handler.queryset_manager.get_queryset()
@@ -39,7 +39,7 @@ def group_by_member_databases(general_handler):
               for db in dbs
               }
 
-        general_handler.queryset_manager.add_filter('entry', source_database__iexact=holder)
+        general_handler.queryset_manager.add_filter('entry', source_database=holder)
         return qs
 
 
@@ -152,7 +152,7 @@ def filter_by_field(endpoint, field):
     def x(value, general_handler):
         general_handler.queryset_manager.add_filter(
             endpoint,
-            **{"{}__iexact".format(field): value}
+            **{"{}__exact".format(field): value.lower()}
         )
     return x
 
@@ -222,10 +222,10 @@ def get_domain_architectures(field, general_handler):
     index = general_handler.pagination["index"] if "index" in general_handler.pagination else 1
     if field is None or field.strip() == "":
         return searcher.get_group_obj_of_field_by_query(
-            None, "IDA_FK", rows=rows, start=index*rows-rows,
+            None, "ida_id", rows=rows, start=index*rows-rows,
             inner_field_to_count="protein_acc")
     else:
-        query = general_handler.queryset_manager.get_searcher_query() + " && IDA_FK:" + field
+        query = general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
         res, length = searcher.get_list_of_endpoint("protein", query, rows, index*rows-rows)
         return general_handler.queryset_manager\
             .get_base_queryset("protein")\
@@ -241,8 +241,9 @@ def get_entry_annotation(field, general_handler):
     return(annotation)
 
 
-def add_extra_fields(endpoint):
-    supported_fields = [f.name for f in endpoint._meta.get_fields() if not f.is_relation]
+def add_extra_fields(endpoint, *argv):
+    supported_fields = [f.name for f in endpoint._meta.get_fields() if not f.is_relation] + list(argv)
+
     def x(fields, general_handler):
         fs = fields.split(',')
         for field in fs:

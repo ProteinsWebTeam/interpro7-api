@@ -104,8 +104,10 @@ class QuerysetManager:
                     q += " && tax_id:{}".format(escape(v))
                 elif "lineage__contains" in k:
                     q += " && lineage:{}".format(escape(v).strip())
-                elif "experiment_type__iexact" in k:
+                elif "experiment_type__" in k:
                     q += " && structure_evidence:{}".format(escape(v).strip())
+                elif ep == "protein" and "size__" in k:
+                    q += " && protein_size:{}".format(escape(v).strip())
                 elif "__gt" in k:
                     filter_k = "protein_"+k if k.startswith("length_") else k
                     q += " && {}:{}{} TO *]".format(
@@ -197,5 +199,5 @@ class QuerysetManager:
                     self.filters[endpoint]["integrated__isnull"] = False
                     del self.filters[endpoint][k]
             elif k == "accession" or k == "accession__iexact":
-                self.filters[endpoint]["integrated__iexact"] = f
+                self.filters[endpoint]["integrated"] = f.lower()
                 del self.filters[endpoint][k]

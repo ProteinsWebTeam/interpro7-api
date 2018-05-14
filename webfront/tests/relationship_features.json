@@ -2,45 +2,45 @@
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
-      "entry": "IPR003165",
-      "protein": "A1CUJ5",
+      "entry": "ipr003165",
+      "protein": "a1cuj5",
       "coordinates":
       [{"fragments" : [{"start" : 27, "end" : 80}]}],
-      "IDA" : "274/upi00014fb1c3#12340&22666:124-270~14726:197-273#",
-      "IDA_FK" : 50134
+      "ida" : "274/upi00014fb1c3#12340&22666:124-270~14726:197-273#",
+      "ida_id" : 50134
     }
   },
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
-      "entry": "PF02171",
-      "protein": "A1CUJ5",
+      "entry": "pf02171",
+      "protein": "a1cuj5",
       "coordinates": [{"fragments" : [{"start" : 17, "end" : 70}, {"start" : 92, "end" : 110}]}]
     }
   },
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
-      "entry": "SM00950",
-      "protein": "A1CUJ5",
+      "entry": "sm00950",
+      "protein": "a1cuj5",
       "coordinates": [{"fragments" : [{"start" : 37, "end" : 90}]}]
     }
   },
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
-      "entry": "IPR003165",
-      "protein": "P16582",
+      "entry": "ipr003165",
+      "protein": "p16582",
       "coordinates": [{"fragments" : [{"start" : 48, "end" : 101}]}],
-      "IDA" : "274/upi00014fb1c3#12340&22666:2-125~14722:119-195~22669&8991:124-270~14726:197-273#",
-      "IDA_FK" : 590134
+      "ida" : "274/upi00014fb1c3#12340&22666:2-125~14722:119-195~22669&8991:124-270~14726:197-273#",
+      "ida_id" : 590134
     }
   },
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
-      "entry": "PS50822",
-      "protein": "P16582",
+      "entry": "ps50822",
+      "protein": "p16582",
       "coordinates": [
         {"fragments" : [{"start" : 48, "end" : 91}, {"start" : 95, "end" : 99}]},
         {"fragments" : [{"start" : 148, "end" : 191}, {"start" : 195, "end" : 199}]}
@@ -50,39 +50,39 @@
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
-      "entry": "PF17180",
-      "protein": "M5ADK6",
+      "entry": "pf17180",
+      "protein": "m5adk6",
       "coordinates": [{"fragments" : [{"start" : 48, "end" : 10}]}]
     }
   },
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
-      "entry": "IPR001165",
-      "protein": "A1CUJ5",
+      "entry": "ipr001165",
+      "protein": "a1cuj5",
       "coordinates": [{"fragments" : [{"start" : 148, "end" : 201}]}],
-      "IDA" : "274/upi00014fb1c3#12340&1165:2-125#",
-      "IDA_FK" : 59013
+      "ida" : "274/upi00014fb1c3#12340&1165:2-125#",
+      "ida_id" : 59013
     }
   },
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
-      "entry": "PF17176",
-      "protein": "A1CUJ5",
+      "entry": "pf17176",
+      "protein": "a1cuj5",
       "coordinates": [{"fragments" : [{"start" : 48, "end" : 101}]}]
     }
   },
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "A1CUJ5",
-      "structure": "1JM7",
+      "protein": "a1cuj5",
+      "structure": "1jm7",
       "chain": "A",
       "length": 53,
       "organism": {
         "name": "Homo sapiens (Human)",
-        "taxid": 9606
+        "taxId": 9606
       },
       "coordinates": [{"fragments" : [{"start" : 1, "end" : 53}]}]
     }
@@ -90,13 +90,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "M5ADK6",
-      "structure": "1JM7",
+      "protein": "m5adk6",
+      "structure": "1jm7",
       "chain": "B",
       "length": 117,
       "organism": {
         "name": "Homo sapiens (Human)",
-        "taxid": 9606
+        "taxId": 9606
       },
       "coordinates": [{"fragments" : [{"start" : 1, "end" : 114}]}]
     }
@@ -104,13 +104,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "M5ADK6",
-      "structure": "2BKM",
+      "protein": "m5adk6",
+      "structure": "2bkm",
       "chain": "B",
       "length": 117,
       "organism": {
         "name": "Homo sapiens (Human)",
-        "taxid": 9606
+        "taxId": 9606
       },
       "coordinates": [{"fragments" : [{"start" : 1, "end" : 74}]}]
     }
@@ -118,13 +118,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "A0A0A2L2G2",
-      "structure": "2BKM",
+      "protein": "a0a0a2l2g2",
+      "structure": "2bkm",
       "chain": "A",
       "length": 128,
       "organism": {
         "name": "Geobacillus kaustophilus (strain HTA426)",
-        "taxid": 235909
+        "taxId": 235909
       },
       "coordinates": [{"fragments" : [{"start" : 10, "end" : 137}]}]
     }
@@ -132,13 +132,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "P16582",
-      "structure": "1T2V",
+      "protein": "p16582",
+      "structure": "1t2v",
       "chain": "A",
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -146,13 +146,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "P16582",
-      "structure": "1T2V",
+      "protein": "p16582",
+      "structure": "1t2v",
       "chain": "B",
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -160,13 +160,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "P16582",
-      "structure": "1T2V",
+      "protein": "p16582",
+      "structure": "1t2v",
       "chain": "C",
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -174,13 +174,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "P16582",
-      "structure": "1T2V",
+      "protein": "p16582",
+      "structure": "1t2v",
       "chain": "D",
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -188,13 +188,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "P16582",
-      "structure": "1T2V",
+      "protein": "p16582",
+      "structure": "1t2v",
       "chain": "E",
       "length": 214,
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxid": 9823
+        "taxId": 9823
       },
       "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
     }
@@ -202,13 +202,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "A0A0A2L2G2",
-      "structure": "1JZ8",
+      "protein": "a0a0a2l2g2",
+      "structure": "1jz8",
       "chain": "A",
       "length": 228,
       "organism": {
         "name": "Geobacillus kaustophilus (strain HTA426)",
-        "taxid": 235909
+        "taxId": 235909
       },
       "coordinates": [{"fragments" : [{"start" : 137, "end" : 600}]}]
     }
@@ -216,13 +216,13 @@
   {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
-      "protein": "A0A0A2L2G2",
-      "structure": "1JZ8",
+      "protein": "a0a0a2l2g2",
+      "structure": "1jz8",
       "chain": "B",
       "length": 228,
       "organism": {
         "name": "Geobacillus kaustophilus (strain HTA426)",
-        "taxid": 235909
+        "taxId": 235909
       },
       "coordinates": [{"fragments" : [{"start" : 137, "end" : 600}]}]
     }
@@ -232,8 +232,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "IPR001165",
-      "structure": "1JM7",
+      "entry": "ipr001165",
+      "structure": "1jm7",
       "chain": "A",
       "coordinates": [{"entry":[30,60], "structure":[1,53]}]
     }
@@ -241,8 +241,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "IPR003165",
-      "structure": "1T2V",
+      "entry": "ipr003165",
+      "structure": "1t2v",
       "chain": "A",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -250,8 +250,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "IPR003165",
-      "structure": "1T2V",
+      "entry": "ipr003165",
+      "structure": "1t2v",
       "chain": "B",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -259,8 +259,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "IPR003165",
-      "structure": "1T2V",
+      "entry": "ipr003165",
+      "structure": "1t2v",
       "chain": "C",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -268,8 +268,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "IPR003165",
-      "structure": "1T2V",
+      "entry": "ipr003165",
+      "structure": "1t2v",
       "chain": "D",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -277,8 +277,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "IPR003165",
-      "structure": "1T2V",
+      "entry": "ipr003165",
+      "structure": "1t2v",
       "chain": "E",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -286,8 +286,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "IPR003165",
-      "structure": "1JM7",
+      "entry": "ipr003165",
+      "structure": "1jm7",
       "chain": "A",
       "coordinates": [{"entry":[20,50], "structure":[1,53]}]
     }
@@ -295,8 +295,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PS50822",
-      "structure": "1T2V",
+      "entry": "ps50822",
+      "structure": "1t2v",
       "chain": "A",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -304,8 +304,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PS50822",
-      "structure": "1T2V",
+      "entry": "ps50822",
+      "structure": "1t2v",
       "chain": "B",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -313,8 +313,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PS50822",
-      "structure": "1T2V",
+      "entry": "ps50822",
+      "structure": "1t2v",
       "chain": "C",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -322,8 +322,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PS50822",
-      "structure": "1T2V",
+      "entry": "ps50822",
+      "structure": "1t2v",
       "chain": "D",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -331,8 +331,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PS50822",
-      "structure": "1T2V",
+      "entry": "ps50822",
+      "structure": "1t2v",
       "chain": "E",
       "coordinates": [{"entry":[1,213], "structure":[146,359]}]
     }
@@ -340,8 +340,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PF02171",
-      "structure": "1JM7",
+      "entry": "pf02171",
+      "structure": "1jm7",
       "chain": "A",
       "coordinates": [{"entry":[30,50], "structure":[20,40]}]
     }
@@ -349,8 +349,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "SM00950",
-      "structure": "1JM7",
+      "entry": "sm00950",
+      "structure": "1jm7",
       "chain": "A",
       "coordinates": [{"entry":[20,50], "structure":[20,50]}]
     }
@@ -358,8 +358,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PF17180",
-      "structure": "2BKM",
+      "entry": "pf17180",
+      "structure": "2bkm",
       "chain": "B",
       "coordinates": [{"entry":[6,30], "structure":[46,70]}]
     }
@@ -367,8 +367,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PF17180",
-      "structure": "1JM7",
+      "entry": "pf17180",
+      "structure": "1jm7",
       "chain": "B",
       "coordinates": [{"entry":[1,40], "structure":[21,60]}]
     }
@@ -376,8 +376,8 @@
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
-      "entry": "PF17176",
-      "structure": "1JM7",
+      "entry": "pf17176",
+      "structure": "1jm7",
       "chain": "A",
       "coordinates": [{"entry":[2,32], "structure":[22,52]}]
     }

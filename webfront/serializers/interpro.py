@@ -18,7 +18,18 @@ class EntrySerializer(ModelContentSerializer):
         representation = self.endpoint_representation(representation, instance, self.detail)
         representation = self.filter_representation(representation, instance, self.detail_filters, self.detail)
         if self.queryset_manager.other_fields is not None:
-            representation = self.add_other_fields(representation, instance, self.queryset_manager.other_fields)
+            def counter_function():
+                return EntrySerializer.get_counters(
+                    instance,
+                    self.searcher,
+                    self.queryset_manager.get_searcher_query()
+                )
+            representation = self.add_other_fields(
+                representation,
+                instance,
+                self.queryset_manager.other_fields,
+                {"counters": counter_function}
+            )
         return representation
 
     def endpoint_representation(self, representation, instance, detail):
@@ -140,16 +151,21 @@ class EntrySerializer(ModelContentSerializer):
             "description": instance.description,
             "wikipedia": instance.wikipedia,
             "literature": instance.literature,
-            "counters": {
-                "proteins": searcher.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession, sq),
-                "structures": searcher.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession, sq),
-                "organisms": searcher.get_number_of_field_by_endpoint("entry", "tax_id", instance.accession, sq),
-                "sets": searcher.get_number_of_field_by_endpoint("entry", "set_acc", instance.accession, sq),
-            },
+            "counters": EntrySerializer.get_counters(instance, searcher, sq),
             "entry_annotations": annotation_types,
             "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)
         }
         return obj
+
+    @staticmethod
+    def get_counters(instance, searcher, sq):
+        return {
+            "proteins": searcher.get_number_of_field_by_endpoint("entry", "protein_acc", instance.accession, sq),
+            "structures": searcher.get_number_of_field_by_endpoint("entry", "structure_acc", instance.accession, sq),
+            "organisms": searcher.get_number_of_field_by_endpoint("entry", "tax_id", instance.accession, sq),
+            "sets": searcher.get_number_of_field_by_endpoint("entry", "set_acc", instance.accession, sq),
+            "domain_architectures": searcher.get_number_of_field_by_endpoint("entry", "ida_id", instance.accession, sq),
+        }
 
     def to_headers_representation(self, instance):
         headers = {
@@ -353,7 +369,7 @@ class EntrySerializer(ModelContentSerializer):
         return {
             "count": obj["ngroups"]["value"],
             "results": [
-                {"IDA": o["IDA"], "IDA_FK": o["IDA_FK"], "unique_proteins": o["unique"]["value"]}
+                {"ida": o["ida"], "ida_id": o["ida_id"], "unique_proteins": o["unique"]["value"]}
                 for o in obj['groups']
             ]
         }

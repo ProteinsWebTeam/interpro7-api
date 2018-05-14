@@ -36,7 +36,7 @@ def canonical(url, remove_all_page_size=False):
     return urlunparse(canonical_parsed)
 
 class InterProCache:
-    def set(self, key, response):
+    def set(self, key, response, overwrite=True, timeout=None):
         try:
             if settings.INTERPRO_CONFIG.get('enable_caching', False)\
                 and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
@@ -56,7 +56,10 @@ class InterProCache:
                                 'Cached': 'true'
                             }
                         }
-                        cache.set(key, value, timeout=None)
+                        if overwrite:
+                            cache.set(key, value, timeout=timeout)
+                        else:
+                            cache.get_or_set(key, value, timeout=timeout)
         except:
             pass
 

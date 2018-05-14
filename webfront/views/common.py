@@ -20,8 +20,8 @@ from webfront.models import Database
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from time import sleep
 
-TIMEOUT = 5 # settings.INTERPRO_CONFIG.get('timeout', 120)
-TIMEOUT_IN_CACHE = settings.INTERPRO_CONFIG.get('timeout_response_in_cache', 1800)
+TIMEOUT = 5  # settings.INTERPRO_CONFIG.get('timeout', 120)
+TIMEOUT_IN_CACHE = 60  # settings.INTERPRO_CONFIG.get('timeout_response_in_cache', 1800)
 
 
 def map_url_to_levels(url):
@@ -174,9 +174,10 @@ class GeneralHandler(CustomView):
     current_filter_endpoint = None
 
     def _set_in_cache(self, request, full_path, response, overwrite=True, timeout=None):
-        print("{}: {}".format("OVERWRITE" if overwrite else "WRITE", full_path))
-        if not (settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', '')):
+        # TODO: Uncomment before merging this to master
+        # if not (settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', '')):
             try:
+                print("{}: {}".format("OVERWRITE" if overwrite else "WRITE", full_path))
                 self.cache.set(full_path, response, overwrite, timeout)
             except:
                 if "TRAVIS" not in os.environ:

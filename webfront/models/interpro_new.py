@@ -3,6 +3,7 @@ from jsonfield import JSONField
 
 class Database(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
+    code = models.CharField(max_length=1)
     name_long = models.CharField(max_length=100)
     description = models.TextField(null=True)
     version = models.CharField(max_length=100, null=True)

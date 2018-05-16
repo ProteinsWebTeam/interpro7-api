@@ -1,11 +1,16 @@
 from collections import OrderedDict
 import requests
 from tqdm import tqdm
+from argparse import FileType
+import sys
 
-requests.adapters.DEFAULT_RETRIES = 5
+import rest_framework
 
 from django.core.management import BaseCommand
 from webfront.views.cache import canonical
+
+requests.adapters.DEFAULT_RETRIES = 5
+
 
 def get_unique_lines(logfiles):
     files = tqdm(logfiles, unit="files", leave=True, desc="reading files")
@@ -14,31 +19,56 @@ def get_unique_lines(logfiles):
         with open(file, "r") as handle:
             for line in tqdm(handle, desc="reading {}".format(file), unit="lines", leave=False):
                 line = line.strip()
-                if line:
+                if line and not line.startswith('#'):
                     line = canonical(line, remove_all_page_size=True)
                     lut[line] = lut.get(line, 0) + 1
     return sorted(lut, key=lut.get, reverse=True)
 
+
 def send_query(url):
-    return requests.get(url)
+    return (
+        # first request
+        requests.get(url),
+        # second request (to make sure it's in cache)
+        requests.get(url),
+    )
+
+
+def stat_message(responses):
+    return (
+        # total request time
+        responses[0].elapsed.total_seconds(),
+        # return status code from the server
+        responses[0].status_code,
+        # URL for this request
+        responses[0].url,
+        # was the URL already in the cache somehow? (from previous run maybe?)
+        responses[0].headers.get("Cached", "false"),
+        # is the URL now in the cache?
+        responses[1].headers.get("Cached", "false"),
+    )
+
 
 def send_queries(root, page_sizes, queries):
-    times = []
     wrapped = tqdm(unit="queries", desc="sending queries", total=len(queries))
     for query in queries:
-        url = root.format(query)
+        url = root + query
         wrapped.update()
         wrapped.set_description(url, True)
         try:
-            response = send_query(url)
-            times.append((response.elapsed.total_seconds(), url))
-            results = response.json().get('results')
+            responses = send_query(url)
+            yield stat_message(responses)
+            if responses[1].status_code is not rest_framework.status.HTTP_200_OK:
+                continue
+            # check to see if the result content contains an array of results
+            # if so, we need to also trigger the caching for other page sizes
+            results = responses[1].json().get("results")
             if results and len(results):
                 for size in page_sizes:
                     extra_url = canonical(
-                        '{}{}page_size={}'.format(
+                        "{}{}page_size={}".format(
                             url,
-                            '?' if url.endswith('/') else '&',
+                            "?" if url.endswith("/") else "&",
                             size
                         )
                     )
@@ -46,34 +76,53 @@ def send_queries(root, page_sizes, queries):
                     wrapped.total += 1
                     wrapped.set_description(extra_url, True)
                     try:
-                        response = send_query(extra_url)
-                        times.append((response.elapsed.total_seconds(), extra_url))
+                        responses = send_query(extra_url)
+                        yield stat_message(responses)
                     except KeyboardInterrupt:
                         raise
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e, file=sys.stderr)
+                        raise
         except KeyboardInterrupt:
             raise
-        except:
-            pass
-    wrapped.set_description('sent all {} queries'.format(wrapped.total), True)
-    return times
+        except Exception as e:
+            print(e, file=sys.stderr)
+            raise
+    wrapped.set_description("sent all {} queries".format(wrapped.total), True)
+    return
 
-def print_stats(times, n):
-    times.sort(key=lambda t: t[0], reverse=True)
-    print(' - Here are the {} longest queries'.format(n))
-    for (time, url) in times[:n]:
+
+def analyze_stats(stats, n, output):
+    stats.sort(key=lambda t: t[0], reverse=True)
+    print(" - Here are the {} longest queries\n".format(n), file=sys.stderr)
+    for (time, status, url, was_cached, is_cached) in stats[:n]:
         if time < 1:
-            log_time = '{}ms'.format(int(time * 1000))
+            log_time = "{}ms".format(int(time * 1000))
         else:
-            log_time = '{:.3f}s'.format(round(time, 3))
-        print('{}: {}'.format(log_time, url))
+            log_time = "{:.3f}s".format(round(time, 3))
+        print("{}: {}{}".format(log_time, url, " (was cached)" if was_cached else ""), file=sys.stderr)
+    print("time", "status", "url", "was cached", "got cached", sep="\t", file=output)
+    failed = 0
+    for (time, status, url, was_cached, is_cached) in stats:
+        if status is not rest_framework.status.HTTP_200_OK:
+            failed += 1
+        print(time, status, url, was_cached, is_cached, sep="\t", file=output)
+    if failed:
+        print(
+            "❌ {} URL{} failed to be processed".format(failed, 's' if failed > 1 else ''),
+            file=sys.stderr
+        )
+    else:
+        print("✅ all URLs were processed successfully", file=sys.stderr)
+    return failed
+        
 
-def main(logfiles, root, page_sizes, top, *args, **kwargs):
+def main(logfiles, root, page_sizes, top, output, *args, **kwargs):
     queries = get_unique_lines(logfiles)
-    print('- Found {} unique URLs'.format(len(queries)))
-    times = send_queries(root, page_sizes, queries)
-    print_stats(times, top)
+    print("- Found {} unique URLs".format(len(queries)), file=sys.stderr)
+    stats = list(send_queries(root, page_sizes, queries))
+    return analyze_stats(stats, top, output)
+
 
 class Command(BaseCommand):
     help = "warms up the API"
@@ -85,16 +134,21 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--root", "-r", type=str,
-            help="URL root", default="http://wp-np3-ac.ebi.ac.uk/interpro7{}"
+            help="URL root", default="http://wp-np3-ac.ebi.ac.uk/interpro7"
         )
         parser.add_argument(
             "--page_sizes", "-p", type=int, nargs="+",
             help="extra page size to query", default=[100, 50]
         )
         parser.add_argument(
-            "--top", "-t", type=int, nargs=1,
+            "--top", "-t", type=int,
             help="display the top n longest queries", default=10
         )
+        parser.add_argument(
+            "--output", "-o", type=FileType("w"),
+            help="output file for logs (defaults to stdout)", default=sys.stdout
+         )
 
     def handle(self, *args, **options):
-        main(**options)
+        failed = main(**options)
+        sys.exit(1 if failed else 0)

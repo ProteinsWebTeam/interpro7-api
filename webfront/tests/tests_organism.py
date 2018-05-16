@@ -1,11 +1,10 @@
 from rest_framework import status
 
-from webfront.models import Taxonomy
+from webfront.models import Taxonomy, Proteome
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
-class OrganismFixturesTest(InterproRESTTestCase):
-
+class TaxonomyFixturesTest(InterproRESTTestCase):
     def test_the_fixtures_are_loaded(self):
         taxa = Taxonomy.objects.all()
         self.assertEqual(taxa.count(), 6)
@@ -14,22 +13,37 @@ class OrganismFixturesTest(InterproRESTTestCase):
         self.assertNotIn("unicorn", names)
 
     def test_can_get_the_taxonomy_count(self):
-        response = self.client.get("/api/organism")
+        response = self.client.get("/api/taxonomy")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("organisms", response.data)
-        self.assertIn("taxonomy", response.data["organisms"])
-        self.assertIn("proteome", response.data["organisms"])
+        self.assertIn("taxa", response.data)
+        self.assertIn("uniprot", response.data["taxa"])
+        # self.assertIn("proteome", response.data["organisms"])
 
     def test_can_read_taxonomy_list(self):
-        response = self.client.get("/api/organism/taxonomy")
+        response = self.client.get("/api/taxonomy/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
         self.assertEqual(len(response.data["results"]), 6)
 
     def test_can_read_taxonomy_id(self):
-        response = self.client.get("/api/organism/taxonomy/2")
+        response = self.client.get("/api/taxonomy/uniprot/2")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_taxonomy_details(response.data["metadata"])
+
+
+class ProteomeFixturesTest(InterproRESTTestCase):
+    def test_the_fixtures_are_loaded(self):
+        proteomes = Proteome.objects.all()
+        self.assertEqual(proteomes.count(), 3)
+        names = [t.name for t in proteomes]
+        self.assertIn("Lactobacillus brevis KB290", names)
+        self.assertNotIn("unicorn", names)
+
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/proteome")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("proteomes", response.data)
+        self.assertIn("uniprot", response.data["proteomes"])
 
     def test_can_read_proteome_list(self):
         response = self.client.get("/api/organism/proteome")
@@ -41,6 +55,10 @@ class OrganismFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/organism/proteome/UP000012042")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_proteome_details(response.data["metadata"])
+
+
+class OrganismFixturesTest(InterproRESTTestCase):
+
 
     def test_can_read_taxonomy_with_proteome_list(self):
         response = self.client.get("/api/organism/taxonomy/proteome")

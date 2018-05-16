@@ -198,7 +198,8 @@ class CustomView(GenericAPIView):
                      for k, v in general_handler.filter_serializers.items()
                      if v["filter_serializer"] in [SerializerDetail.PROTEIN_DB,
                                                    SerializerDetail.ENTRY_DB,
-                                                   SerializerDetail.ORGANISM_DB,
+                                                   SerializerDetail.TAXONOMY_DB,
+                                                   SerializerDetail.PROTEOME_DB,
                                                    SerializerDetail.SET_DB,
                                                    SerializerDetail.STRUCTURE_DB]
                      ]

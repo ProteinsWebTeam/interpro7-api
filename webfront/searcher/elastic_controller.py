@@ -171,9 +171,9 @@ class ElasticsearchController(SearchController):
             facet["aggs"]["databases"]["aggs"]["unique"] = {
                 "cardinality": {"field": "tax_id"}
             }
-            facet["aggs"]["databases"]["aggs"]["proteomes"] = {
-                "cardinality": {"field": "proteomes"}
-            }
+            # facet["aggs"]["databases"]["aggs"]["proteomes"] = {
+            #     "cardinality": {"field": "proteomes"}
+            # }
             del facet["aggs"]["databases"]["terms"]
             self.add_extra_counters(facet, "databases", extra_counters)
 

@@ -53,8 +53,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 output["proteins"] = bucket["protein"] if is_search_payload else bucket["protein"]["value"]
             if "structure" in bucket:
                 output["structures"] = bucket["structure"] if is_search_payload else bucket["structure"]["value"]
-            if "organism" in bucket:
-                output["organisms"] = bucket["organism"] if is_search_payload else bucket["organism"]["value"]
+            if "taxa" in bucket:
+                output["taxa"] = bucket["taxa"] if is_search_payload else bucket["taxa"]["value"]
             if "set" in bucket:
                 output["sets"] = bucket["set"] if is_search_payload else bucket["set"]["value"]
         return output

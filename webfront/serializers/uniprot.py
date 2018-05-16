@@ -56,8 +56,8 @@ class ProteinSerializer(ModelContentSerializer):
             representation["entries"] = self.to_entries_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = self.to_structures_count_representation(instance)
-        if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
-            representation["organisms"] = self.to_organism_count_representation(instance)
+        # if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
+        #     representation["organisms"] = self.to_organism_count_representation(instance)
         if SerializerDetail.SET_OVERVIEW in detail_filters:
             representation["sets"] = self.to_set_count_representation(instance)
         if detail != SerializerDetail.PROTEIN_OVERVIEW:
@@ -75,12 +75,12 @@ class ProteinSerializer(ModelContentSerializer):
                     include_chain=True,
                     base_query=sq
                 )
-            if SerializerDetail.ORGANISM_DB in detail_filters or \
-                    SerializerDetail.ORGANISM_DETAIL in detail_filters:
-                representation["organisms"] = self.to_organisms_detail_representation(
-                    instance,
-                    self.searcher, "protein_acc:" + escape(instance.accession.lower())
-                )
+            # if SerializerDetail.ORGANISM_DB in detail_filters or \
+            #         SerializerDetail.ORGANISM_DETAIL in detail_filters:
+            #     representation["organisms"] = self.to_organisms_detail_representation(
+            #         instance,
+            #         self.searcher, "protein_acc:" + escape(instance.accession.lower())
+            #     )
             if SerializerDetail.SET_DB in detail_filters or \
                     SerializerDetail.SET_DETAIL in detail_filters:
                 representation["sets"] = self.to_set_detail_representation(

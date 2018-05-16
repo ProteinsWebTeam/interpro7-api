@@ -53,8 +53,8 @@ class EntrySerializer(ModelContentSerializer):
             representation["proteins"] = self.to_proteins_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = self.to_structures_count_representation(instance)
-        if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
-            representation["organisms"] = self.to_organism_count_representation(instance)
+        # if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
+        #     representation["organisms"] = self.to_organism_count_representation(instance)
         if SerializerDetail.SET_OVERVIEW in detail_filters:
             representation["sets"] = self.to_set_count_representation(instance)
 
@@ -74,13 +74,13 @@ class EntrySerializer(ModelContentSerializer):
                     include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters,
                     base_query=sq
                 )
-            if SerializerDetail.ORGANISM_DB in detail_filters or \
-                    SerializerDetail.ORGANISM_DETAIL in detail_filters:
-                representation["organisms"] = self.to_organisms_detail_representation(
-                    instance,
-                    self.searcher,
-                    "entry_acc:" + escape(instance.accession.lower())
-                )
+            # if SerializerDetail.ORGANISM_DB in detail_filters or \
+            #         SerializerDetail.ORGANISM_DETAIL in detail_filters:
+            #     representation["organisms"] = self.to_organisms_detail_representation(
+            #         instance,
+            #         self.searcher,
+            #         "entry_acc:" + escape(instance.accession.lower())
+            #     )
             if SerializerDetail.SET_DB in detail_filters or \
                     SerializerDetail.SET_DETAIL in detail_filters:
                 representation["sets"] = self.to_set_detail_representation(
@@ -212,8 +212,7 @@ class EntrySerializer(ModelContentSerializer):
             }
             if SerializerDetail.PROTEIN_DB in filters or\
                     SerializerDetail.STRUCTURE_DB in filters or\
-                    SerializerDetail.SET_DB in filters or\
-                    SerializerDetail.ORGANISM_DB in filters:
+                    SerializerDetail.SET_DB in filters:
                 result["entries"]["integrated"] = {"entries": 0}
                 result["entries"]["unintegrated"] = {"entries": 0}
                 result["entries"]["interpro"] = {"entries": 0}
@@ -229,11 +228,11 @@ class EntrySerializer(ModelContentSerializer):
                 result["entries"]["unintegrated"]["structures"] = 0
                 result["entries"]["interpro"]["structures"] = 0
                 result["entries"]["all"]["structures"] = 0
-            if SerializerDetail.ORGANISM_DB in filters:
-                result["entries"]["integrated"]["organisms"] = 0
-                result["entries"]["unintegrated"]["organisms"] = 0
-                result["entries"]["interpro"]["organisms"] = 0
-                result["entries"]["all"]["organisms"] = 0
+            # if SerializerDetail.ORGANISM_DB in filters:
+            #     result["entries"]["integrated"]["organisms"] = 0
+            #     result["entries"]["unintegrated"]["organisms"] = 0
+            #     result["entries"]["interpro"]["organisms"] = 0
+            #     result["entries"]["all"]["organisms"] = 0
             if SerializerDetail.SET_DB in filters:
                 result["entries"]["integrated"]["sets"] = 0
                 result["entries"]["unintegrated"]["sets"] = 0

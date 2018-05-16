@@ -284,10 +284,13 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertIn("strain", obj, msg)
             self.assertIn("assembly", obj, msg)
 
-    def _check_organism_count_overview(self, main_obj, msg=""):
-        self.assertIn("organisms", main_obj, msg)
-        self.assertIn("taxonomy", main_obj["organisms"], msg)
-        self.assertIn("proteome", main_obj["organisms"], msg)
+    def _check_taxonomy_count_overview(self, main_obj, msg=""):
+        self.assertIn("taxa", main_obj, msg)
+        self.assertIn("uniprot", main_obj["taxa"], msg)
+
+    def _check_proteome_count_overview(self, main_obj, msg=""):
+        self.assertIn("proteomes", main_obj, msg)
+        self.assertIn("uniprot", main_obj["proteomes"], msg)
 
     def _check_set_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)

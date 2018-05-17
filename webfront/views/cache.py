@@ -36,32 +36,30 @@ def canonical(url, remove_all_page_size=False):
     return urlunparse(canonical_parsed)
 
 class InterProCache:
-    def set(self, key, response, overwrite=True, timeout=None):
-        try:
-            if settings.INTERPRO_CONFIG.get('enable_caching', False)\
-                and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
-                if response.status_code == status.HTTP_200_OK:
-                    if response.data:
-                        key = canonical(key)
-                        value = {
-                            'data': {x: response.data[x] for x in response.data},
-                            'status': response.status_code,
-                            'template_name': response.template_name,
-                            'exception': response.exception,
-                            'content_type': response.content_type,
-                            'headers': {
-                                'Content-Type': response.get('Content-Type', ""),
-                                'InterPro-Version': response.get('InterPro-Version', ""),
-                                'Server-Timing': response.get('Server-Timing', ""),
-                                'Cached': 'true'
-                            }
+    def set(self, key, response, timeout=None):
+        if settings.INTERPRO_CONFIG.get('enable_caching', False)\
+            and settings.INTERPRO_CONFIG.get('enable_cache_write', False):
+                if response.data and (response.status_code == status.HTTP_200_OK
+                         or response.status_code == status.HTTP_408_REQUEST_TIMEOUT):
+                    key = canonical(key)
+                    value = {
+                        'data': {x: response.data[x] for x in response.data},
+                        'status': response.status_code,
+                        'template_name': response.template_name,
+                        'exception': response.exception,
+                        'content_type': response.content_type,
+                        'headers': {
+                            'Content-Type': response.get('Content-Type', ""),
+                            'InterPro-Version': response.get('InterPro-Version', ""),
+                            'Server-Timing': response.get('Server-Timing', ""),
+                            'Cached': 'true'
                         }
-                        if overwrite:
-                            cache.set(key, value, timeout=timeout)
-                        else:
-                            cache.get_or_set(key, value, timeout=timeout)
-        except:
-            pass
+                    }
+                    if timeout == None:
+                        cache.set(key, value)
+                        cache.persist(key)
+                    else:
+                        cache.add(key, value, timeout=timeout)
 
     def get(self, key):
         if settings.INTERPRO_CONFIG.get('enable_caching', False):

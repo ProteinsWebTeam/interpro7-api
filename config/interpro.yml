@@ -5,11 +5,11 @@ searcher_path: "http://hmmer-prod-db03:9200/next/relationship"
 searcher_test_path: "http://localhost:9200/test/relationship"
 api_url: "https://wwwdev.ebi.ac.uk/interpro7/api/"
 use_test_db: false
-enable_caching: true
-enable_cache_write: true
+enable_caching: false
+enable_cache_write: false
 redis: "redis://127.0.0.1:6379/1"
-timeout: 60
-timeout_response_in_cache: 3600
+query_timeout: 60
+cache_volatile_key_ttl: 3600
 default_page_size: 20
 
 members:

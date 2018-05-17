@@ -133,7 +133,8 @@ class EntrySerializer(ModelContentSerializer):
     def to_metadata_representation(instance, searcher, sq):
         # recategorise_go_terms(instance.go_terms)
         results = EntryAnnotation.objects.filter(accession=instance.accession).only("type")
-        annotation_types = map(lambda x: x.type, results)
+        # annotation_types = map(lambda x: x.type, results)
+        annotation_types = [x.type for x in results]
         obj = {
             "accession": instance.accession,
             "entry_id": instance.entry_id,

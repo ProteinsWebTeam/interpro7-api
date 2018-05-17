@@ -1,5 +1,6 @@
 import re
 import os
+import logging
 
 from rest_framework import status
 from webfront.response import Response
@@ -20,9 +21,9 @@ from webfront.models import Database
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from time import sleep
 
-TIMEOUT = 5  # settings.INTERPRO_CONFIG.get('timeout', 120)
-TIMEOUT_IN_CACHE = 60  # settings.INTERPRO_CONFIG.get('timeout_response_in_cache', 1800)
-
+QUERY_TIMEOUT = settings.INTERPRO_CONFIG.get('query_timeout', 90)
+CACHE_TIMEOUT = settings.INTERPRO_CONFIG.get('cache_volatile_key_ttl', 1800)
+logger = logging.getLogger(__name__)
 
 def map_url_to_levels(url):
     parts = [x.strip("/") for x in re.compile("(entry|protein|structure|organism|set)").split(url)]
@@ -95,22 +96,24 @@ class GeneralHandler(CustomView):
     # The modifier manager for the current request
     modifiers = ModifierManager()
     searcher = None
+    filter_serializers = {}
+    current_filter_endpoint = None
 
     cache = InterProCache()
 
     def get(self, request, url='', *args, **kwargs):
-        print("GET")
         clean_url = url.strip()
         if clean_url == '' or clean_url == '/':
             return Response(getDataForRoot(self.available_endpoint_handlers))
         full_path = request.get_full_path()
         response = None
-        if not settings.DEBUG or 'no-cache' not in request.META.get('HTTP_CACHE_CONTROL', ''):
+        caching_allowed = settings.INTERPRO_CONFIG.get('enable_caching', False) or 'no-cache' not in request.META.get('HTTP_CACHE_CONTROL', '')
+        if caching_allowed:
             try:
                 response = self.cache.get(full_path)
-            except:
+            except Exception as e:
                 if "TRAVIS" not in os.environ:
-                    print('Failed getting {} from cache'.format(full_path))
+                    logger.error('Failed getting {} from cache: {}'.format(full_path, e))
         if response:
             return response
 
@@ -122,66 +125,54 @@ class GeneralHandler(CustomView):
         self.queryset_manager = QuerysetManager()
         self.searcher = self.get_search_controller(self.queryset_manager)
         try:
-            def execute_response(args):
-                self, request, endpoint_levels, full_path = args
-                print("Executing")
-                sleep(10)
-                response = super(GeneralHandler, self).get(
+            def query(args):
+                self, request, endpoint_levels, full_path, caching_allowed = args
+                response = super(GeneralHandler, self, ).get(
                     request, endpoint_levels,
                     available_endpoint_handlers=self.available_endpoint_handlers,
                     level=0,
                     parent_queryset=self.queryset,
                     general_handler=self
                 )
-                print("done")
-                self._set_in_cache(request, full_path, response)
+                self._set_in_cache(caching_allowed, full_path, response)
                 return response
 
-            def timeout_response():
-                print("before")
-                sleep(TIMEOUT)
-                print("after")
-                c = {'detail': 'just sleeping'}
-                r = Response(c, status=status.HTTP_408_REQUEST_TIMEOUT)
-                self._set_in_cache(request, full_path, response, overwrite=False, timeout=TIMEOUT_IN_CACHE)
-                return r
+            def timer(caching_allowed):
+                sleep(QUERY_TIMEOUT)
+                content = {'detail': 'Query timed out'}
+                response = Response(content, status=status.HTTP_408_REQUEST_TIMEOUT)
+                self._set_in_cache(caching_allowed, full_path, response, timeout=CACHE_TIMEOUT)
+                return response
 
-            pool = ThreadPoolExecutor(2)
-
-            futures = [
-                pool.submit(execute_response, (self, request, endpoint_levels,full_path)),
-                pool.submit(timeout_response),
-            ]
-            print("SUBMITED")
-            result = wait(futures, return_when=FIRST_COMPLETED)
-            print("FIRST_COMPLETED")
-            response = result.done.pop().result()
-
-            print("return")
-            return response
+            if caching_allowed:
+                pool = ThreadPoolExecutor(2)
+                futures = [
+                    pool.submit(query, (self, request, endpoint_levels,full_path, caching_allowed)),
+                    pool.submit(timer, caching_allowed),
+                ]
+                result = wait(futures, return_when=FIRST_COMPLETED)
+                response = result.done.pop().result()
+            else:
+                response = query((self, request, endpoint_levels, full_path, caching_allowed))
         except ReferenceError as e:
             if settings.DEBUG:
                 raise
             content = {'detail': e.args[0]}
-            return Response(content, status=status.HTTP_204_NO_CONTENT)
+            response = Response(content, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             if settings.DEBUG:
                 raise
             content = {'Error': e.args[0]}
-            return Response(content, status=status.HTTP_404_NOT_FOUND)
+            response = Response(content, status=status.HTTP_404_NOT_FOUND)
+        return response
 
-    filter_serializers = {}
-    current_filter_endpoint = None
-
-    def _set_in_cache(self, request, full_path, response, overwrite=True, timeout=None):
-        # TODO: Uncomment before merging this to master
-        # if not (settings.DEBUG and 'no-cache' in request.META.get('HTTP_CACHE_CONTROL', '')):
+    def _set_in_cache(self, caching_allowed, full_path, response, timeout=None):
+        if caching_allowed:
             try:
-                print("{}: {}".format("OVERWRITE" if overwrite else "WRITE", full_path))
-                self.cache.set(full_path, response, overwrite, timeout)
-            except:
+                self.cache.set(full_path, response, timeout)
+            except Exception as e:
                 if "TRAVIS" not in os.environ:
-                    print('Failed setting {} into cache'.format(full_path))
+                    logger.error('Failed setting {} into cache: {}'.format(full_path, e))
 
     def register_filter_serializer(self, filter_serializer, value):
         if value in [e[0] for e in self.available_endpoint_handlers]:

@@ -53,8 +53,10 @@ class EntrySerializer(ModelContentSerializer):
             representation["proteins"] = self.to_proteins_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = self.to_structures_count_representation(instance)
-        # if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
-        #     representation["organisms"] = self.to_organism_count_representation(instance)
+        if SerializerDetail.TAXONOMY_OVERVIEW in detail_filters:
+            representation["taxa"] = self.to_taxonomy_count_representation(instance)
+        if SerializerDetail.PROTEOME_OVERVIEW in detail_filters:
+            representation["proteomes"] = self.to_proteome_count_representation(instance)
         if SerializerDetail.SET_OVERVIEW in detail_filters:
             representation["sets"] = self.to_set_count_representation(instance)
 
@@ -74,13 +76,19 @@ class EntrySerializer(ModelContentSerializer):
                     include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters,
                     base_query=sq
                 )
-            # if SerializerDetail.ORGANISM_DB in detail_filters or \
-            #         SerializerDetail.ORGANISM_DETAIL in detail_filters:
-            #     representation["organisms"] = self.to_organisms_detail_representation(
-            #         instance,
-            #         self.searcher,
-            #         "entry_acc:" + escape(instance.accession.lower())
-            #     )
+            if SerializerDetail.TAXONOMY_DB in detail_filters or \
+                    SerializerDetail.TAXONOMY_DETAIL in detail_filters:
+                representation["taxa"] = self.to_taxonomy_detail_representation(
+                    instance,
+                    self.searcher,
+                    "entry_acc:" + escape(instance.accession.lower())
+                )
+            if SerializerDetail.PROTEOME_DB in detail_filters or \
+                    SerializerDetail.PROTEOME_DETAIL in detail_filters:
+                representation["proteomes"] = self.to_proteomes_detail_representation(
+                    self.searcher,
+                    "entry_acc:" + escape(instance.accession.lower())
+                )
             if SerializerDetail.SET_DB in detail_filters or \
                     SerializerDetail.SET_DETAIL in detail_filters:
                 representation["sets"] = self.to_set_detail_representation(
@@ -212,7 +220,9 @@ class EntrySerializer(ModelContentSerializer):
             }
             if SerializerDetail.PROTEIN_DB in filters or\
                     SerializerDetail.STRUCTURE_DB in filters or\
-                    SerializerDetail.SET_DB in filters:
+                    SerializerDetail.SET_DB in filters or\
+                    SerializerDetail.TAXONOMY_DB in filters or\
+                    SerializerDetail.PROTEOME_DB in filters:
                 result["entries"]["integrated"] = {"entries": 0}
                 result["entries"]["unintegrated"] = {"entries": 0}
                 result["entries"]["interpro"] = {"entries": 0}
@@ -228,11 +238,16 @@ class EntrySerializer(ModelContentSerializer):
                 result["entries"]["unintegrated"]["structures"] = 0
                 result["entries"]["interpro"]["structures"] = 0
                 result["entries"]["all"]["structures"] = 0
-            # if SerializerDetail.ORGANISM_DB in filters:
-            #     result["entries"]["integrated"]["organisms"] = 0
-            #     result["entries"]["unintegrated"]["organisms"] = 0
-            #     result["entries"]["interpro"]["organisms"] = 0
-            #     result["entries"]["all"]["organisms"] = 0
+            if SerializerDetail.TAXONOMY_DB in filters:
+                result["entries"]["integrated"]["taxa"] = 0
+                result["entries"]["unintegrated"]["taxa"] = 0
+                result["entries"]["interpro"]["taxa"] = 0
+                result["entries"]["all"]["taxa"] = 0
+            if SerializerDetail.PROTEOME_DB in filters:
+                result["entries"]["integrated"]["proteomes"] = 0
+                result["entries"]["unintegrated"]["proteomes"] = 0
+                result["entries"]["interpro"]["proteomes"] = 0
+                result["entries"]["all"]["proteomes"] = 0
             if SerializerDetail.SET_DB in filters:
                 result["entries"]["integrated"]["sets"] = 0
                 result["entries"]["unintegrated"]["sets"] = 0
@@ -329,11 +344,17 @@ class EntrySerializer(ModelContentSerializer):
             self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
         )["structures"]
 
-    def to_organism_count_representation(self, instance):
+    def to_taxonomy_count_representation(self, instance):
         query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
-        return webfront.serializers.taxonomy.OrganismSerializer.to_counter_representation(
-            self.searcher.get_counter_object("organism", query, self.get_extra_endpoints_to_count())
-        )["organisms"]
+        return webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
+            self.searcher.get_counter_object("taxonomy", query, self.get_extra_endpoints_to_count())
+        )["taxa"]
+
+    def to_proteome_count_representation(self, instance):
+        query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+            self.searcher.get_counter_object("taxonomy", query, self.get_extra_endpoints_to_count())
+        )["proteomes"]
 
     def to_set_count_representation(self, instance):
         query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None

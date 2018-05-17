@@ -204,6 +204,16 @@ class TaxonomySerializer(ModelContentSerializer):
             self.searcher.get_counter_object("set", query, self.get_extra_endpoints_to_count())
         )["sets"]
 
+    @staticmethod
+    def get_taxonomy_from_search_object(obj, include_chain=False):
+        header = {
+            "accession": obj["tax_id"],
+            "lineage": obj["lineage"],
+            "source_database": "uniprot"
+        }
+        if include_chain:
+            header["chain"] = obj["chain"]
+        return header
 
 
 class OrganismSerializer(ModelContentSerializer):

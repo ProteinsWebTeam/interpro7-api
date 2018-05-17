@@ -81,10 +81,10 @@ class ProteomeSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_counter_representation(instance):
-        if "taxa" not in instance:
+        if "proteomes" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise ReferenceError('There are not structures for this request')
+                raise ReferenceError('There are not proteomes for this request')
             instance = {
                 "proteomes": {
                     "uniprot": ProteomeSerializer.serialize_counter_bucket(instance["databases"], "proteomes"),
@@ -96,7 +96,6 @@ class ProteomeSerializer(ModelContentSerializer):
     def get_proteome_header_from_search_object(obj, include_chain=False):
         header = {
             "taxonomy": obj["tax_id"],
-            "lineage": obj["lineage"],
             "accession": obj["proteomes"][0],
             "source_database": "uniprot"
         }

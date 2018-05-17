@@ -270,10 +270,15 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertIn("lineage", obj, msg)
             self.assertIn("rank", obj, msg)
 
-    def _check_organism_from_searcher(self, obj, msg=""):
+    def _check_taxonomy_from_searcher(self, obj, msg=""):
         self.assertIn("accession", obj, msg)
         self.assertIn("lineage", obj, msg)
-        self.assertIn("proteomes", obj, msg)
+        self.assertIn("source_database", obj, msg)
+
+    def _check_proteome_from_searcher(self, obj, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("taxonomy", obj, msg)
+        self.assertIn("source_database", obj, msg)
 
     def _check_proteome_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)

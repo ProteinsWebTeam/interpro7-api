@@ -6,7 +6,6 @@ import webfront.serializers.uniprot
 import webfront.serializers.pdb
 import webfront.serializers.taxonomy
 import webfront.serializers.collection
-# from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
 
 
@@ -353,7 +352,7 @@ class EntrySerializer(ModelContentSerializer):
     def to_proteome_count_representation(self, instance):
         query = "entry_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
         return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
-            self.searcher.get_counter_object("taxonomy", query, self.get_extra_endpoints_to_count())
+            self.searcher.get_counter_object("proteome", query, self.get_extra_endpoints_to_count())
         )["proteomes"]
 
     def to_set_count_representation(self, instance):

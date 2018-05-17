@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('webfront', '0002_removing_db_code'),
+        ('webfront', '0002_remove_database_code'),
     ]
 
     operations = [

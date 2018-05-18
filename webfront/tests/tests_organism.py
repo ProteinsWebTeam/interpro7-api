@@ -421,193 +421,266 @@ class StructureTaxonomyTest(InterproRESTTestCase):
             for org in response.data["taxa"]:
                 self._check_taxonomy_from_searcher(org)
 
-#
-# class TaxonomyEntryTest(InterproRESTTestCase):
-#     def test_can_get_the_taxonomy_count(self):
-#         response = self.client.get("/api/taxonomy/entry")
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self._check_taxonomy_count_overview(response.data)
-#         self._check_entry_count_overview(response.data)
-#
-#     def test_can_get_the_entry_count_on_a_list(self):
-#         urls = [
-#             "/api/taxonomy/uniprot/entry",
-#             "/api/proteome/uniprot/entry",
-#             "/api/taxonomy/uniprot/proteome/entry",
-#             "/api/taxonomy/uniprot/2/proteome/entry",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
-#             for result in response.data["results"]:
-#                 self._check_entry_count_overview(result)
-#
-#     def test_a_more_inclusive_taxon_has_more_items(self):
-#         response1 = self.client.get("/api/taxonomy/uniprot/2579/proteome/entry")
-#         response2 = self.client.get("/api/taxonomy/uniprot/1001583/proteome/entry")
-#         self.assertEqual(response1.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response2.status_code, status.HTTP_200_OK)
-#         self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))
-#
-#     def test_urls_that_return_taxonomy_with_entry_count(self):
-#         urls = [
-#             "/api/taxonomy/uniprot/40296/entry",
-#             "/api/taxonomy/uniprot/2/entry",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_taxonomy_details(response.data["metadata"])
-#             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-#             self._check_entry_count_overview(response.data)
-#
-#     def test_urls_that_return_proteome_with_entry_count(self):
-#         urls = [
-#             "/api/proteome/uniprot/UP000012042/entry",
-#             "/api/taxonomy/uniprot/proteome/UP000006701/entry",
-#             "/api/taxonomy/uniprot/2/proteome/UP000030104/entry",
-#             "/api/taxonomy/uniprot/40296/proteome/UP000030104/entry",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_proteome_details(response.data["metadata"])
-#             self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-#             self._check_entry_count_overview(response.data)
-#
-#     def test_can_filter_taxonomycounter_with_entry_db(self):
-#         acc = "IPR003165"
-#         urls = [
-#             "/api/taxonomy/entry/interpro",
-#             "/api/taxonomy/entry/pfam",
-#             "/api/taxonomy/entry/unintegrated",
-#             "/api/taxonomy/entry/unintegrated/pfam",
-#             "/api/taxonomy/entry/interpro/pfam",
-#             "/api/taxonomy/entry/interpro/"+acc+"/pfam",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self.assertIsInstance(response.data, dict)
-#             self.assertIn("taxonomy", response.data["taxa"],
-#                           "'taxonomy' should be one of the keys in the response")
-#             self.assertIn("proteome", response.data["taxa"],
-#                           "'proteome' should be one of the keys in the response")
-#             self.assertIn("entries", response.data["taxa"]["taxonomy"],
-#                           "'entries' should be one of the keys in the response")
-#             self.assertIn("entries", response.data["taxa"]["proteome"],
-#                           "'entries' should be one of the keys in the response")
-#
-#     def test_can_get_a_list_from_the_taxonomy_list(self):
-#         urls = [
-#             "/api/taxonomy/uniprot/entry/interpro",
-#             "/api/proteome/uniprot/entry/pfam",
-#             "/api/taxonomy/uniprot/proteome/entry/unintegrated",
-#             "/api/taxonomy/uniprot/proteome/entry/interpro/pfam",
-#             "/api/taxonomy/uniprot/2579/proteome/entry/unintegrated/pfam",
-#             "/api/taxonomy/uniprot/344612/proteome/entry/unintegrated/pfam",
-#             "/api/proteome/uniprot/entry/interpro/IPR003165/pfam",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
-#             for result in response.data["results"]:
-#                 if "proteome" in url:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 else:
-#                     self._check_taxonomy_details(result["metadata"], False)
-#                 for st in result["entries"]:
-#                     self._check_entry_from_searcher(st)
-#
-#     def test_can_get_a_list_from_the_taxonomy_object(self):
-#         urls = [
-#             "/api/taxonomy/uniprot/40296/entry/interpro",
-#             "/api/proteome/uniprot/UP000006701/entry/pfam",
-#             "/api/taxonomy/uniprot/proteome/UP000006701/entry/unintegrated",
-#             "/api/taxonomy/uniprot/1/proteome/UP000006701/entry/interpro/pfam",
-#             "/api/taxonomy/uniprot/2579/proteome/UP000006701/entry/unintegrated/pfam",
-#             "/api/taxonomy/uniprot/344612/proteome/UP000006701/entry/unintegrated/pfam",
-#             "/api/proteome/uniprot/UP000006701/entry/interpro/IPR003165/smart",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             if "proteome" in url:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             else:
-#                 self._check_taxonomy_details(response.data["metadata"], False)
-#             self.assertIn("entries", response.data)
-#             for st in response.data["entries"]:
-#                 self._check_entry_from_searcher(st)
-#
-#     def test_can_filter_taxonomy_counter_with_acc(self):
-#         acc = "IPR003165"
-#         pfam = "PF02171"
-#         pfam_un = "PF17176"
-#         urls = [
-#             "/api/taxonomy/entry/interpro/"+acc,
-#             "/api/taxonomy/entry/pfam/"+pfam,
-#             "/api/taxonomy/entry/pfam/"+pfam_un,
-#             "/api/taxonomy/entry/interpro/"+acc+"/pfam/"+pfam,
-#             "/api/taxonomy/entry/interpro/pfam/"+pfam,
-#             "/api/taxonomy/entry/unintegrated/pfam/"+pfam_un,
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_taxonomy_count_overview(response.data)
-#
-#     def test_can_get_object_on_a_taxonomy_list(self):
-#         acc = "IPR003165"
-#         pfam = "PF02171"
-#         pfam_un = "PF17176"
-#         urls = [
-#             "/api/taxonomy/uniprot/entry/interpro/"+acc,
-#             "/api/proteome/uniprot/entry/pfam/"+pfam,
-#             "/api/taxonomy/uniprot/entry/unintegrated/pfam/"+pfam_un,
-#             "/api/taxonomy/uniprot/proteome/entry/unintegrated/pfam/"+pfam_un,
-#             "/api/taxonomy/uniprot/proteome/entry/interpro/pfam/"+pfam,
-#             "/api/taxonomy/uniprot/2579/proteome/entry/unintegrated/pfam/"+pfam_un,
-#             "/api/taxonomy/uniprot/344612/proteome/entry/unintegrated/pfam/"+pfam_un,
-#             "/api/proteome/uniprot/entry/interpro/IPR003165/pfam/"+pfam,
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
-#             for result in response.data["results"]:
-#                 if "proteome" in url:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 else:
-#                     self._check_taxonomy_details(result["metadata"], False)
-#                 for st in result["entries"]:
-#                     self._check_entry_from_searcher(st)
-#
-#     def test_can_get_an_object_from_the_taxonomy_object(self):
-#         urls = [
-#             "/api/taxonomy/uniprot/40296/entry/interpro/ipr003165",
-#             "/api/proteome/uniprot/UP000006701/entry/pfam/pf02171",
-#             "/api/taxonomy/uniprot/proteome/UP000006701/entry/unintegrated/pfam/pf17176",
-#             "/api/taxonomy/uniprot/1/proteome/UP000006701/entry/interpro/pfam/pf02171",
-#             "/api/taxonomy/uniprot/2579/proteome/UP000006701/entry/unintegrated/pfam/pf17176",
-#             "/api/taxonomy/uniprot/344612/proteome/UP000006701/entry/unintegrated/pfam/pf17176",
-#             "/api/proteome/uniprot/UP000006701/entry/interpro/IPR003165/smart/sm00950",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             if "proteome" in url:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             else:
-#                 self._check_taxonomy_details(response.data["metadata"], False)
-#             self.assertIn("entries", response.data)
-#             for st in response.data["entries"]:
-#                 self._check_entry_from_searcher(st)
+
+class SetTaxonomyTest(InterproRESTTestCase):
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/set/taxonomy")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_set_count_overview(response.data)
+        self._check_taxonomy_count_overview(response.data)
+
+    def test_can_get_the_taxonomy_count_on_a_list(self):
+        urls = [
+            "/api/set/pfam/taxonomy",
+            "/api/set/kegg/taxonomy",
+            "/api/set/kegg/KEGG01/node/taxonomy",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "taxa")
+            for result in response.data["results"]:
+                self._check_taxonomy_count_overview(result)
+
+    def test_can_get_the_taxonomy_count_on_a_set(self):
+        urls = [
+            "/api/set/pfam/CL0001/taxonomy",
+            "/api/set/kegg/KEGG01/taxonomy",
+            "/api/set/kegg/KEGG01/node/KEGG01-1/taxonomy",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"])
+            self.assertIn("taxa", response.data, "'taxa' should be one of the keys in the response")
+            self._check_taxonomy_count_overview(response.data)
+
+    def test_can_filter_set_counter_with_structure_db(self):
+        url = "/api/set/taxonomy/uniprot"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+        self.assertIsInstance(response.data, dict)
+        if "kegg" in response.data["sets"]:
+            self.assertIn("taxa", response.data["sets"]["kegg"],
+                          "'taxa' should be one of the keys in the response")
+            self.assertIn("sets", response.data["sets"]["kegg"],
+                          "'sets' should be one of the keys in the response")
+        if "pfam" in response.data["sets"]:
+            self.assertIn("taxa", response.data["sets"]["pfam"],
+                          "'taxa' should be one of the keys in the response")
+            self.assertIn("sets", response.data["sets"]["pfam"],
+                          "'sets' should be one of the keys in the response")
+
+    def test_can_get_the_set_list_on_a_list(self):
+        urls = [
+            "/api/set/kegg/taxonomy/uniprot",
+            "/api/set/kegg/kegg01/node/taxonomy/uniprot",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "taxa")
+            for result in response.data["results"]:
+                for s in result["taxa"]:
+                    self._check_taxonomy_from_searcher(s)
+
+    def test_can_get_a_list_from_the_set_object(self):
+        urls = [
+            "/api/set/pfam/Cl0001/taxonomy/uniprot",
+            "/api/set/kegg/kegg01/node/KEGG01-1/taxonomy/uniprot/",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"], True)
+            self.assertIn("taxa", response.data)
+            for st in response.data["taxa"]:
+                self._check_taxonomy_from_searcher(st)
+
+    def test_can_filter_set_counter_with_acc(self):
+        urls = [
+            "/api/set/taxonomy/uniprot/2",
+            "/api/set/taxonomy/uniprot/40296",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_count_overview(response.data)
+
+    def test_can_get_object_on_a_set_list(self):
+        urls = [
+            "/api/set/kegg/taxonomy/uniprot/2579",
+            "/api/set/kegg/taxonomy/uniprot/344612",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "taxa")
+            for result in response.data["results"]:
+                self._check_set_details(result["metadata"], False)
+                for st in result["taxa"]:
+                    self._check_taxonomy_from_searcher(st)
+
+    def test_can_get_an_object_from_the_set_object(self):
+        urls = [
+            "/api/set/kegg/kegg01/taxonomy/uniprot/2",
+            "/api/set/kegg/kegg01/taxonomy/uniprot/40296",
+            "/api/set/kegg/kegg01/node/kegg01-1/taxonomy/uniprot/40296",
+            "/api/set/pfam/Cl0001/taxonomy/uniprot/344612",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_set_details(response.data["metadata"])
+            self.assertIn("taxa", response.data)
+            for s in response.data["taxa"]:
+                self._check_taxonomy_from_searcher(s)
+
+
+class TaxonomyEntryTest(InterproRESTTestCase):
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/taxonomy/entry")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_taxonomy_count_overview(response.data)
+        self._check_entry_count_overview(response.data)
+
+    def test_can_get_the_entry_count_on_a_list(self):
+        url = "/api/taxonomy/uniprot/entry"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        self._check_is_list_of_objects_with_key(response.data["results"], "entries")
+        for result in response.data["results"]:
+            self._check_entry_count_overview(result)
+
+    def test_a_more_inclusive_taxon_has_more_items(self):
+        response1 = self.client.get("/api/taxonomy/uniprot/2579/entry")
+        response2 = self.client.get("/api/taxonomy/uniprot/1001583/proteome/entry")
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertGreater(response1.data["entries"]["all"], response2.data["entries"]["all"])
+
+    def test_urls_that_return_taxonomy_with_entry_count(self):
+        urls = [
+            "/api/taxonomy/uniprot/40296/entry",
+            "/api/taxonomy/uniprot/2/entry",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_taxonomy_details(response.data["metadata"])
+            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self._check_entry_count_overview(response.data)
+
+
+    def test_can_filter_taxonomy_counter_with_entry_db(self):
+        acc = "IPR003165"
+        urls = [
+            "/api/taxonomy/entry/interpro",
+            "/api/taxonomy/entry/pfam",
+            "/api/taxonomy/entry/unintegrated",
+            "/api/taxonomy/entry/unintegrated/pfam",
+            "/api/taxonomy/entry/interpro/pfam",
+            "/api/taxonomy/entry/interpro/"+acc+"/pfam",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertIsInstance(response.data, dict)
+            self.assertIn("uniprot", response.data["taxa"],
+                          "'uniprot' should be one of the keys in the response")
+            self.assertIn("taxa", response.data["taxa"]["uniprot"],
+                          "'proteome' should be one of the keys in the response")
+            self.assertIn("entries", response.data["taxa"]["uniprot"],
+                          "'entries' should be one of the keys in the response")
+
+    def test_can_get_a_list_from_the_taxonomy_list(self):
+        urls = [
+            "/api/taxonomy/uniprot/entry/interpro",
+            "/api/taxonomy/uniprot/entry/unintegrated",
+            "/api/taxonomy/uniprot/entry/interpro/pfam",
+            "/api/taxonomy/uniprot/entry/unintegrated/pfam",
+            "/api/taxonomy/uniprot/entry/interpro/IPR003165/pfam",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "entries")
+            for result in response.data["results"]:
+                self._check_taxonomy_details(result["metadata"], False)
+                for st in result["entries"]:
+                    self._check_entry_from_searcher(st)
+
+    def test_can_get_a_list_from_the_taxonomy_object(self):
+        urls = [
+            "/api/taxonomy/uniprot/40296/entry/interpro",
+            "/api/taxonomy/uniprot/1/entry/interpro/pfam",
+            "/api/taxonomy/uniprot/2579/entry/unintegrated/pfam",
+            "/api/taxonomy/uniprot/344612/entry/unintegrated/pfam",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_taxonomy_details(response.data["metadata"], False)
+            self.assertIn("entries", response.data)
+            for st in response.data["entries"]:
+                self._check_entry_from_searcher(st)
+
+    def test_can_filter_taxonomy_counter_with_acc(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_un = "PF17176"
+        urls = [
+            "/api/taxonomy/entry/interpro/"+acc,
+            "/api/taxonomy/entry/pfam/"+pfam,
+            "/api/taxonomy/entry/pfam/"+pfam_un,
+            "/api/taxonomy/entry/interpro/"+acc+"/pfam/"+pfam,
+            "/api/taxonomy/entry/interpro/pfam/"+pfam,
+            "/api/taxonomy/entry/unintegrated/pfam/"+pfam_un,
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_taxonomy_count_overview(response.data)
+
+    def test_can_get_object_on_a_taxonomy_list(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        pfam_un = "PF17176"
+        urls = [
+            "/api/taxonomy/uniprot/entry/interpro/"+acc,
+            "/api/taxonomy/uniprot/entry/unintegrated/pfam/"+pfam_un,
+            "/api/taxonomy/uniprot/entry/interpro/pfam/"+pfam,
+            "/api/taxonomy/uniprot/entry/interpro/IPR003165/pfam/"+pfam,
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "entries")
+            for result in response.data["results"]:
+                self._check_taxonomy_details(result["metadata"], False)
+                for st in result["entries"]:
+                    self._check_entry_from_searcher(st)
+
+    def test_can_get_an_object_from_the_taxonomy_object(self):
+        urls = [
+            "/api/taxonomy/uniprot/40296/entry/interpro/ipr003165",
+            "/api/taxonomy/uniprot/1/entry/interpro/pfam/pf02171",
+            "/api/taxonomy/uniprot/2579/entry/unintegrated/pfam/pf17176",
+            "/api/taxonomy/uniprot/344612/entry/unintegrated/pfam/pf17176",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_taxonomy_details(response.data["metadata"], False)
+            self.assertIn("entries", response.data)
+            for st in response.data["entries"]:
+                self._check_entry_from_searcher(st)
 #
 #
 # class TaxonomyProteinTest(InterproRESTTestCase):

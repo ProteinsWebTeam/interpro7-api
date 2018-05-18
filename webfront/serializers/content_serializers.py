@@ -19,6 +19,24 @@ class ModelContentSerializer(serializers.ModelSerializer):
         self.detail_filters = kwargs.pop('serializer_detail_filters', SerializerDetail.ALL)
 
         self.detail_filters = [self.detail_filters[x]["filter_serializer"] for x in self.detail_filters]
+
+        self.plurals ={
+            "entry": "entries",
+            "protein": "proteins",
+            "structure": "structures",
+            "proteome": "proteomes",
+            "taxonomy": "taxa",
+            "set": "sets",
+        }
+        self.serializers = {
+            "entry": webfront.serializers.interpro.EntrySerializer,
+            "protein": webfront.serializers.uniprot.ProteinSerializer,
+            "structure": webfront.serializers.pdb.StructureSerializer,
+            "taxonomy": webfront.serializers.taxonomy.TaxonomySerializer,
+            "proteome": webfront.serializers.proteome.ProteomeSerializer,
+            "set": webfront.serializers.collection.SetSerializer,
+        }
+
         super(ModelContentSerializer, self).__init__(*args, **kwargs)
         try:
             for to_be_removed in set(self.Meta.optionals) - set(content):

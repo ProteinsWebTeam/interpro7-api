@@ -107,7 +107,7 @@ class GeneralHandler(CustomView):
             return Response(getDataForRoot(self.available_endpoint_handlers))
         full_path = request.get_full_path()
         response = None
-        caching_allowed = settings.INTERPRO_CONFIG.get('enable_caching', False) or 'no-cache' not in request.META.get('HTTP_CACHE_CONTROL', '')
+        caching_allowed = settings.INTERPRO_CONFIG.get('enable_caching', False) and 'no-cache' not in request.META.get('HTTP_CACHE_CONTROL', '')
         if caching_allowed:
             try:
                 response = self.cache.get(full_path)
@@ -145,6 +145,7 @@ class GeneralHandler(CustomView):
                 return response
 
             if caching_allowed:
+                print("CACHING!!!!")
                 pool = ThreadPoolExecutor(2)
                 futures = [
                     pool.submit(query, (self, request, endpoint_levels,full_path, caching_allowed)),

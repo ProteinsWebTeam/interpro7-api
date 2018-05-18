@@ -145,7 +145,6 @@ class GeneralHandler(CustomView):
                 return response
 
             if caching_allowed:
-                print("CACHING!!!!")
                 pool = ThreadPoolExecutor(2)
                 futures = [
                     pool.submit(query, (self, request, endpoint_levels,full_path, caching_allowed)),

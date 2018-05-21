@@ -231,8 +231,11 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             'accession', 'name', 'short_name', 'other_names', 'experiment_type', 'release_date', 'literature', 'chains',
             'source_database', 'resolution'
         ],
-        'organism': [
+        'taxonomy': [
             'accession', 'scientific_name', 'full_name', 'lineage', 'rank', 'children', 'left_number', 'right_number'
+        ],
+        'proteome': [
+            'accession', 'strain', 'is_reference', 'assembly'
         ],
         'set': [
             'accession', 'name', 'description', 'source_database', 'integrated', 'relationships'
@@ -242,7 +245,8 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
         "entry": "/entry/interpro",
         "protein": "/protein/uniprot",
         "structure": "/structure/pdb",
-        "organism": "/organism/taxonomy",
+        "taxonomy": "/taxonomy/uniprot",
+        "proteome": "/proteome/uniprot",
         "set": "/set/pfam",
     }
 

@@ -75,7 +75,7 @@ class ProteomeSerializer(ModelContentSerializer):
                 )
             if SerializerDetail.TAXONOMY_DB in detail_filters or \
                     SerializerDetail.TAXONOMY_DETAIL in detail_filters:
-                representation["proteomes"] = self.to_taxonomy_detail_representation(
+                representation["taxa"] = self.to_taxonomy_detail_representation(None,
                     self.searcher, query_searcher
                 )
             if SerializerDetail.SET_DB in detail_filters or \

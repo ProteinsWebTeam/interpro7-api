@@ -9,6 +9,14 @@ import webfront.serializers  # .uniprot
 # import webfront.serializers.taxonomy
 
 class ModelContentSerializer(serializers.ModelSerializer):
+    plurals = {
+        "entry": "entries",
+        "protein": "proteins",
+        "structure": "structures",
+        "proteome": "proteomes",
+        "taxonomy": "taxa",
+        "set": "sets",
+    }
 
     def __init__(self, *args, **kwargs):
         content = kwargs.pop('content', [])
@@ -20,14 +28,6 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
         self.detail_filters = [self.detail_filters[x]["filter_serializer"] for x in self.detail_filters]
 
-        self.plurals ={
-            "entry": "entries",
-            "protein": "proteins",
-            "structure": "structures",
-            "proteome": "proteomes",
-            "taxonomy": "taxa",
-            "set": "sets",
-        }
         self.serializers = {
             "entry": webfront.serializers.interpro.EntrySerializer,
             "protein": webfront.serializers.uniprot.ProteinSerializer,

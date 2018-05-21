@@ -1,5 +1,7 @@
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
+from webfront.serializers.content_serializers import ModelContentSerializer
+
 
 api_test_map = {
     "entry": {
@@ -64,8 +66,8 @@ api_test_map = {
             "1JZ8",
         ]
     },
-    "organism": {
-        "taxonomy": [
+    "taxonomy": {
+        "uniprot": [
             "1",
             "2",
             "2579",
@@ -73,19 +75,16 @@ api_test_map = {
             "344612",
             "1001583",
         ],
-        "proteome": [
+    },
+    "proteome": {
+        "uniprot": [
             "UP000006701",
             "UP000012042",
             "UP000030104",
         ]
     }
 }
-plurals = {
-    "entry": "entries",
-    "protein": "proteins",
-    "structure": "structures",
-    "organism": "organisms",
-}
+plurals = ModelContentSerializer.plurals
 
 
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):

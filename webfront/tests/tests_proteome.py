@@ -638,346 +638,353 @@ class ProteomeEntryTest(InterproRESTTestCase):
                 self._check_entry_from_searcher(st)
 
 
-# class ProteomeProteinTest(InterproRESTTestCase):
-#     def test_can_get_the_proteome_count(self):
-#         response = self.client.get("/api/proteome/protein")
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self._check_proteome_count_overview(response.data)
-#         self._check_protein_count_overview(response.data)
-#
-#     def test_can_get_the_protein_count_on_a_list(self):
-#         urls = [
-#             "/api/proteome/uniprot/protein",
-#             "/api/proteome/uniprot/protein",
-#             "/api/proteome/uniprot/protein",
-#             "/api/proteome/uniprot/2/proteome/protein",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
-#             for result in response.data["results"]:
-#                 self._check_protein_count_overview(result)
-#
-#     def test_a_more_inclusive_taxon_has_more_items(self):
-#         response1 = self.client.get("/api/proteome/uniprot/2579/proteome/protein")
-#         response2 = self.client.get("/api/proteome/uniprot/1001583/proteome/protein")
-#         self.assertEqual(response1.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response2.status_code, status.HTTP_200_OK)
-#         self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))
-#
-#     def test_urls_that_return_proteome_with_entry_count(self):
-#         urls = [
-#             "/api/proteome/uniprot/40296/protein",
-#             "/api/proteome/uniprot/2/protein",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_proteome_details(response.data["metadata"])
-#             self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-#             self._check_protein_count_overview(response.data)
-#
-#     def test_urls_that_return_proteome_with_entry_count(self):
-#         urls = [
-#             "/api/proteome/uniprot/UP000012042/protein",
-#             "/api/proteome/uniprot/UP000006701/protein",
-#             "/api/proteome/uniprot/2/proteome/UP000030104/protein",
-#             "/api/proteome/uniprot/40296/proteome/UP000030104/protein",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_proteome_details(response.data["metadata"])
-#             self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-#             self._check_protein_count_overview(response.data)
-#
-#     def test_can_filter_protein_counter_with_proteome_db(self):
-#         urls = [
-#             "/api/proteome/protein/uniprot",
-#             "/api/proteome/protein/reviewed",
-#             "/api/proteome/protein/unreviewed",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self.assertIsInstance(response.data, dict)
-#             self.assertIn("proteome", response.data["proteomes"],
-#                           "'proteome' should be one of the keys in the response")
-#             self.assertIn("proteome", response.data["proteomes"],
-#                           "'proteome' should be one of the keys in the response")
-#             self.assertIn("proteins", response.data["proteomes"]["proteome"],
-#                           "'entries' should be one of the keys in the response")
-#             self.assertIn("proteins", response.data["proteomes"]["proteome"],
-#                           "'entries' should be one of the keys in the response")
-#
-#     def test_can_get_a_list_from_the_proteome_list(self):
-#         urls = [
-#             "/api/proteome/uniprot/protein/uniprot",
-#             "/api/proteome/uniprot/protein/uniprot",
-#             "/api/proteome/uniprot/protein/unreviewed",
-#             "/api/proteome/uniprot/2579/proteome/protein/reviewed",
-#             "/api/proteome/uniprot/344612/proteome/protein/reviewed",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
-#             for result in response.data["results"]:
-#                 if "proteome" in url:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 else:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 for st in result["proteins"]:
-#                     self._check_match(st, include_coordinates=False)
-#
-#     def test_can_get_a_list_from_the_proteome_object(self):
-#         urls = [
-#             "/api/proteome/uniprot/40296/protein/uniprot",
-#             "/api/proteome/uniprot/UP000006701/protein/uniprot",
-#             "/api/proteome/uniprot/UP000030104/protein/unreviewed",
-#             "/api/proteome/uniprot/UP000030104/protein/unreviewed",
-#             "/api/proteome/uniprot/1/proteome/UP000006701/protein/reviewed",
-#             "/api/proteome/uniprot/2579/proteome/UP000006701/protein/reviewed",
-#             "/api/proteome/uniprot/344612/proteome/UP000006701/protein/reviewed",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             if "proteome" in url:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             else:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             self.assertIn("proteins", response.data)
-#             for st in response.data["proteins"]:
-#                 self._check_match(st, include_coordinates=False)
-#
-#     def test_can_filter_proteome_counter_with_acc(self):
-#         urls = [
-#             "/api/proteome/protein/uniprot/M5ADK6",
-#             "/api/proteome/protein/unreviewed/A0A0A2L2G2",
-#             "/api/proteome/protein/reviewed/M5ADK6",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_proteome_count_overview(response.data)
-#
-#     def test_can_get_object_on_a_proteome_list(self):
-#         urls = [
-#             "/api/proteome/uniprot/protein/uniprot/P16582",
-#             "/api/proteome/uniprot/protein/uniprot/P16582",
-#             "/api/proteome/uniprot/protein/unreviewed/A0A0A2L2G2",
-#             "/api/proteome/uniprot/protein/unreviewed/A0A0A2L2G2",
-#             "/api/proteome/uniprot/protein/unreviewed/A0A0A2L2G2",
-#             "/api/proteome/uniprot/2579/proteome/protein/reviewed/M5ADK6",
-#             "/api/proteome/uniprot/344612/proteome/protein/reviewed/a1cuj5",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
-#             for result in response.data["results"]:
-#                 if "proteome" in url:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 else:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 for st in result["proteins"]:
-#                     self._check_match(st, include_coordinates=False)
-#
-#     def test_can_get_an_object_from_the_proteome_object(self):
-#         urls = [
-#             "/api/proteome/uniprot/40296/protein/uniprot/p16582",
-#             "/api/proteome/uniprot/UP000006701/protein/uniprot/a1cuj5",
-#             "/api/proteome/uniprot/UP000030104/protein/unreviewed/A0A0A2L2G2",
-#             "/api/proteome/uniprot/UP000030104/protein/unreviewed/A0A0A2L2G2",
-#             "/api/proteome/uniprot/1/proteome/UP000006701/protein/reviewed/a1cuj5",
-#             "/api/proteome/uniprot/2579/proteome/UP000006701/protein/reviewed/a1cuj5",
-#             "/api/proteome/uniprot/344612/proteome/UP000006701/protein/reviewed/a1cuj5",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             if "proteome" in url:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             else:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             self.assertIn("proteins", response.data)
-#             for st in response.data["proteins"]:
-#                 self._check_match(st, include_coordinates=False)
-#
-#
-# class ProteomeStructureTest(InterproRESTTestCase):
-#     def test_can_get_the_proteome_count(self):
-#         response = self.client.get("/api/proteome/structure")
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self._check_proteome_count_overview(response.data)
-#         self._check_structure_count_overview(response.data)
-#
-#     def test_can_get_the_protein_count_on_a_list(self):
-#         urls = [
-#             "/api/proteome/uniprot/structure",
-#             "/api/proteome/uniprot/structure",
-#             "/api/proteome/uniprot/structure",
-#             "/api/proteome/uniprot/2/proteome/structure",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "structures")
-#             for result in response.data["results"]:
-#                 self._check_structure_count_overview(result)
-#
-#     def test_a_more_inclusive_taxon_has_more_items(self):
-#         response1 = self.client.get("/api/proteome/uniprot/2579/proteome/structure")
-#         response2 = self.client.get("/api/proteome/uniprot/1001583/proteome/structure")
-#         self.assertEqual(response1.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response2.status_code, status.HTTP_200_OK)
-#         self.assertGreater(len(response1.data["results"]), len(response2.data["results"]))
-#
-#     def test_urls_that_return_proteome_with_entry_count(self):
-#         urls = [
-#             "/api/proteome/uniprot/40296/structure",
-#             "/api/proteome/uniprot/2/structure",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_proteome_details(response.data["metadata"])
-#             self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
-#             self._check_structure_count_overview(response.data)
-#
-#     def test_urls_that_return_proteome_with_entry_count(self):
-#         urls = [
-#             "/api/proteome/uniprot/UP000012042/structure",
-#             "/api/proteome/uniprot/UP000006701/structure",
-#             "/api/proteome/uniprot/2/proteome/UP000030104/structure",
-#             "/api/proteome/uniprot/40296/proteome/UP000030104/structure",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_proteome_details(response.data["metadata"])
-#             self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
-#             self._check_structure_count_overview(response.data)
-#
-#     def test_can_filter_structure_counter_with_proteome_db(self):
-#         urls = [
-#             "/api/proteome/structure/pdb",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self.assertIsInstance(response.data, dict)
-#             self.assertIn("proteome", response.data["proteomes"],
-#                           "'proteome' should be one of the keys in the response")
-#             self.assertIn("proteome", response.data["proteomes"],
-#                           "'proteome' should be one of the keys in the response")
-#             self.assertIn("structures", response.data["proteomes"]["proteome"],
-#                           "'structures' should be one of the keys in the response")
-#             self.assertIn("structures", response.data["proteomes"]["proteome"],
-#                           "'structures' should be one of the keys in the response")
-#
-#     def test_can_get_a_list_from_the_proteome_list(self):
-#         urls = [
-#             "/api/proteome/uniprot/structure/pdb",
-#             "/api/proteome/uniprot/structure/pdb",
-#             "/api/proteome/uniprot/structure/pdb",
-#             "/api/proteome/uniprot/2579/proteome/structure/pdb",
-#             "/api/proteome/uniprot/344612/proteome/structure/pdb",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "structures")
-#             for result in response.data["results"]:
-#                 if "proteome" in url:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 else:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 for st in result["structures"]:
-#                     self._check_structure_chain_details(st)
-#
-#     def test_can_get_a_list_from_the_proteome_object(self):
-#         urls = [
-#             "/api/proteome/uniprot/40296/structure/pdb",
-#             "/api/proteome/uniprot/UP000006701/structure/pdb",
-#             "/api/proteome/uniprot/UP000030104/structure/pdb",
-#             "/api/proteome/uniprot/UP000030104/structure/pdb",
-#             "/api/proteome/uniprot/1/proteome/UP000006701/structure/pdb",
-#             "/api/proteome/uniprot/2579/proteome/UP000006701/structure/pdb",
-#             "/api/proteome/uniprot/344612/proteome/UP000006701/structure/pdb",
-#             "/api/proteome/uniprot/1/structure/pdb",
-#             "/api/proteome/uniprot/2579/structure/pdb",
-#             "/api/proteome/uniprot/344612/structure/pdb",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             if "proteome" in url:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             else:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             self.assertIn("structures", response.data)
-#             for st in response.data["structures"]:
-#                 self._check_structure_chain_details(st)
-#
-#     def test_can_filter_proteome_counter_with_acc(self):
-#         urls = [
-#             "/api/proteome/structure/pdb/1JM7",
-#             "/api/proteome/structure/pdb/1JZ8",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_proteome_count_overview(response.data)
-#
-#     def test_can_get_object_on_a_proteome_list(self):
-#         urls = [
-#             "/api/proteome/uniprot/structure/pdb/1JM7",
-#             "/api/proteome/uniprot/structure/pdb/1JZ8",
-#             "/api/proteome/uniprot/structure/pdb/1JZ8",
-#             "/api/proteome/uniprot/2579/proteome/structure/pdb/1JM7",
-#             "/api/proteome/uniprot/344612/proteome/structure/pdb/1JM7",
-#             ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-#             self._check_is_list_of_objects_with_key(response.data["results"], "structures")
-#             for result in response.data["results"]:
-#                 if "proteome" in url:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 else:
-#                     self._check_proteome_details(result["metadata"], False)
-#                 for st in result["structures"]:
-#                     self._check_structure_chain_details(st)
-#
-#     def test_can_get_an_object_from_the_proteome_object(self):
-#         urls = [
-#             "/api/proteome/uniprot/40296/structure/pdb/1t2v",
-#             "/api/proteome/uniprot/UP000006701/structure/pdb/1jm7",
-#             "/api/proteome/uniprot/UP000030104/structure/pdb/1t2v",
-#             "/api/proteome/uniprot/UP000030104/structure/pdb/1t2v",
-#             "/api/proteome/uniprot/1/proteome/UP000006701/structure/pdb/1jm7",
-#             "/api/proteome/uniprot/2579/proteome/UP000006701/structure/pdb/1jm7",
-#             "/api/proteome/uniprot/344612/proteome/UP000006701/structure/pdb/1jm7",
-#             "/api/proteome/uniprot/1/structure/pdb/1jm7",
-#             "/api/proteome/uniprot/2579/structure/pdb/1jm7",
-#             "/api/proteome/uniprot/344612/structure/pdb/1jm7",
-#         ]
-#         for url in urls:
-#             response = self.client.get(url)
-#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-#             if "proteome" in url:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             else:
-#                 self._check_proteome_details(response.data["metadata"], False)
-#             self.assertIn("structures", response.data)
-#             for st in response.data["structures"]:
-#                 self._check_structure_chain_details(st)
+class ProteomeProteinTest(InterproRESTTestCase):
+    def test_can_get_the_proteome_count(self):
+        response = self.client.get("/api/proteome/protein")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_proteome_count_overview(response.data)
+        self._check_protein_count_overview(response.data)
+
+    def test_can_get_the_protein_count_on_a_list(self):
+        url = "/api/proteome/uniprot/protein"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+        for result in response.data["results"]:
+            self._check_protein_count_overview(result)
+
+    def test_urls_that_return_proteome_with_entry_count(self):
+        urls = [
+            "/api/proteome/uniprot/UP000012042/protein",
+            "/api/proteome/uniprot/UP000006701/protein",
+            "/api/proteome/uniprot/UP000030104/protein",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+            self._check_protein_count_overview(response.data)
+
+    def test_can_filter_protein_counter_with_proteome_db(self):
+        urls = [
+            "/api/proteome/protein/uniprot",
+            "/api/proteome/protein/reviewed",
+            "/api/proteome/protein/unreviewed",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertIsInstance(response.data, dict)
+            self.assertIn("uniprot", response.data["proteomes"],
+                          "'proteuniprotome' should be one of the keys in the response")
+            self.assertIn("proteomes", response.data["proteomes"]["uniprot"],
+                          "'proteomes' should be one of the keys in the response")
+            self.assertIn("proteins", response.data["proteomes"]["uniprot"],
+                          "'entries' should be one of the keys in the response")
+
+    def test_can_get_a_list_from_the_proteome_list(self):
+        urls = [
+            "/api/proteome/uniprot/protein/uniprot",
+            "/api/proteome/uniprot/protein/unreviewed",
+            "/api/proteome/uniprot/protein/reviewed",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            for result in response.data["results"]:
+                self._check_proteome_details(result["metadata"], False)
+                for st in result["proteins"]:
+                    self._check_match(st, include_coordinates=False)
+
+    def test_can_get_a_list_from_the_proteome_object(self):
+        urls = [
+            "/api/proteome/uniprot/UP000006701/protein/uniprot",
+            "/api/proteome/uniprot/UP000030104/protein/unreviewed",
+            "/api/proteome/uniprot/UP000006701/protein/reviewed",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"], False)
+            self.assertIn("proteins", response.data)
+            for st in response.data["proteins"]:
+                self._check_match(st, include_coordinates=False)
+
+    def test_can_filter_proteome_counter_with_acc(self):
+        urls = [
+            "/api/proteome/protein/uniprot/M5ADK6",
+            "/api/proteome/protein/unreviewed/A0A0A2L2G2",
+            "/api/proteome/protein/reviewed/M5ADK6",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_count_overview(response.data)
+
+    def test_can_get_object_on_a_proteome_list(self):
+        urls = [
+            "/api/proteome/uniprot/protein/uniprot/P16582",
+            "/api/proteome/uniprot/protein/unreviewed/A0A0A2L2G2",
+            "/api/proteome/uniprot/protein/reviewed/M5ADK6",
+            "/api/proteome/uniprot/protein/reviewed/a1cuj5",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            for result in response.data["results"]:
+                self._check_proteome_details(result["metadata"], False)
+                for st in result["proteins"]:
+                    self._check_match(st, include_coordinates=False)
+
+    def test_can_get_an_object_from_the_proteome_object(self):
+        urls = [
+            "/api/proteome/uniprot/UP000006701/protein/uniprot/a1cuj5",
+            "/api/proteome/uniprot/UP000030104/protein/unreviewed/A0A0A2L2G2",
+            "/api/proteome/uniprot/UP000030104/protein/unreviewed/A0A0A2L2G2",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"], False)
+            self.assertIn("proteins", response.data)
+            for st in response.data["proteins"]:
+                self._check_match(st, include_coordinates=False)
+
+
+class ProteomeStructureTest(InterproRESTTestCase):
+    def test_can_get_the_proteome_count(self):
+        response = self.client.get("/api/proteome/structure")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_proteome_count_overview(response.data)
+        self._check_structure_count_overview(response.data)
+
+    def test_can_get_the_protein_count_on_a_list(self):
+        url = "/api/proteome/uniprot/structure"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+        for result in response.data["results"]:
+            self._check_structure_count_overview(result)
+
+    def test_urls_that_return_proteome_with_entry_count(self):
+        urls = [
+            "/api/proteome/uniprot/40296/structure",
+            "/api/proteome/uniprot/2/structure",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
+            self._check_structure_count_overview(response.data)
+
+    def test_urls_that_return_proteome_with_entry_count(self):
+        urls = [
+            "/api/proteome/uniprot/UP000012042/structure",
+            "/api/proteome/uniprot/UP000006701/structure",
+            "/api/proteome/uniprot/UP000030104/structure",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
+            self._check_structure_count_overview(response.data)
+
+    def test_can_filter_structure_counter_with_proteome_db(self):
+        url = "/api/proteome/structure/pdb"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+        self.assertIsInstance(response.data, dict)
+        self.assertIn("uniprot", response.data["proteomes"],
+                      "'uniprot' should be one of the keys in the response")
+        self.assertIn("proteomes", response.data["proteomes"]["uniprot"],
+                      "'proteomes' should be one of the keys in the response")
+        self.assertIn("structures", response.data["proteomes"]["uniprot"],
+                      "'structures' should be one of the keys in the response")
+
+    def test_can_get_a_list_from_the_proteome_list(self):
+        url = "/api/proteome/uniprot/structure/pdb"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+        for result in response.data["results"]:
+            self._check_proteome_details(result["metadata"], False)
+            for st in result["structures"]:
+                self._check_structure_chain_details(st)
+
+    def test_can_get_a_list_from_the_proteome_object(self):
+        urls = [
+            "/api/proteome/uniprot/UP000006701/structure/pdb",
+            "/api/proteome/uniprot/UP000030104/structure/pdb",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"], False)
+            self.assertIn("structures", response.data)
+            for st in response.data["structures"]:
+                self._check_structure_chain_details(st)
+
+    def test_can_filter_proteome_counter_with_acc(self):
+        urls = [
+            "/api/proteome/structure/pdb/1JM7",
+            "/api/proteome/structure/pdb/1JZ8",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_count_overview(response.data)
+
+    def test_can_get_object_on_a_proteome_list(self):
+        urls = [
+            "/api/proteome/uniprot/structure/pdb/1JM7",
+            "/api/proteome/uniprot/structure/pdb/1JZ8",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            for result in response.data["results"]:
+                self._check_proteome_details(result["metadata"], False)
+                for st in result["structures"]:
+                    self._check_structure_chain_details(st)
+
+    def test_can_get_an_object_from_the_proteome_object(self):
+        urls = [
+            "/api/proteome/uniprot/UP000006701/structure/pdb/1jm7",
+            "/api/proteome/uniprot/UP000030104/structure/pdb/1t2v",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"], False)
+            self.assertIn("structures", response.data)
+            for st in response.data["structures"]:
+                self._check_structure_chain_details(st)
+
+
+class ProteomeSetTest(InterproRESTTestCase):
+    def test_can_get_the_taxonomy_count(self):
+        response = self.client.get("/api/proteome/set")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_set_count_overview(response.data)
+        self._check_proteome_count_overview(response.data)
+
+    def test_can_get_the_set_count_on_a_list(self):
+        url = "/api/proteome/uniprot/set"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        self._check_is_list_of_objects_with_key(response.data["results"], "sets")
+        for result in response.data["results"]:
+            self._check_set_count_overview(result)
+
+    def test_urls_that_return_proteome_with_set_count(self):
+        urls = [
+            "/api/proteome/uniprot/UP000012042/set",
+            "/api/proteome/uniprot/UP000006701/set",
+            "/api/proteome/uniprot/UP000030104/set",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self._check_set_count_overview(response.data)
+
+    def test_can_filter_proteome_counter_with_proteome_db(self):
+        urls = [
+            "/api/proteome/set/pfam",
+            "/api/proteome/set/kegg",
+            "/api/proteome/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertIn("uniprot", response.data["proteomes"],
+                          "'uniprot' should be one of the keys in the response")
+            self.assertIn("sets", response.data["proteomes"]["uniprot"],
+                          "'sets' should be one of the keys in the response")
+            self.assertIn("proteomes", response.data["proteomes"]["uniprot"],
+                          "'proteomes' should be one of the keys in the response")
+
+    def test_can_get_the_set_list_on_a_list(self):
+        urls = [
+            "/api/proteome/uniprot/set/pfam",
+            "/api/proteome/uniprot/set/kegg",
+            "/api/proteome/uniprot/set/kegg/kegg01/node",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "sets")
+            for result in response.data["results"]:
+                for s in result["sets"]:
+                    self._check_set_from_searcher(s)
+
+
+    def test_can_get_the_set_list_on_a_proteome_object(self):
+        urls = [
+            "/api/proteome/uniprot/UP000006701/set/pfam",
+            "/api/proteome/uniprot/UP000006701/set/kegg",
+            "/api/proteome/uniprot/UP000006701/set/kegg/kegg01/node",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("sets", response.data)
+            for s in response.data["sets"]:
+                self._check_set_from_searcher(s)
+
+    def test_can_filter_counter_with_set_acc(self):
+        urls = [
+            "/api/proteome/set/pfam/Cl0001",
+            "/api/proteome/set/kegg/kegg01",
+            "/api/proteome/set/kegg/kegg01/node/KEGG01-1",
+            "/api/proteome/set/kegg/kegg01/node/KEGG01-2",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_count_overview(response.data)
+
+    def test_can_get_the_set_object_on_a_list(self):
+        urls = [
+            "/api/proteome/uniprot/set/kegg/kegg01",
+            "/api/proteome/uniprot/set/kegg/kegg01/node/kegg01-1",
+            "/api/proteome/uniprot/set/pfam/Cl0001",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(response.data["results"], "sets")
+            for result in response.data["results"]:
+                for org in result["sets"]:
+                    self._check_set_from_searcher(org)
+
+    def test_can_get_the_object_on_an_object(self):
+        urls = [
+            "/api/proteome/uniprot/UP000006701/set/kegg/kegg01",
+            "/api/proteome/uniprot/UP000006701/set/kegg/kegg01/node/kegg01-1",
+            "/api/proteome/uniprot/UP000006701/set/pfam/Cl0001",
+            ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self._check_proteome_details(response.data["metadata"])
+            self.assertIn("sets", response.data)
+            for s in response.data["sets"]:
+                self._check_set_from_searcher(s)

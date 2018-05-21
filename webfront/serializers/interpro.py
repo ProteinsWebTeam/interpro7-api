@@ -201,7 +201,9 @@ class EntrySerializer(ModelContentSerializer):
             return {field_value: total for field_value, total in instance}
 
     @staticmethod
-    def to_counter_representation(instance, filters=[]):
+    def to_counter_representation(instance, filters=None):
+        if filters is None:
+            filters = []
         if "entries" not in instance:
             if EntrySerializer.counter_is_empty(instance):
                 raise ReferenceError('There are not entries for this request')
@@ -268,7 +270,7 @@ class EntrySerializer(ModelContentSerializer):
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]
-            vals = list(result["entries"]["member_databases"].values())
+            # vals = list(result["entries"]["member_databases"].values())
             # if len(vals) > 0:
             #     unintegrated = result["entries"]["unintegrated"]
             #     if type(unintegrated) != int and "entries" in unintegrated:

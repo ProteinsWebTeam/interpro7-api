@@ -165,7 +165,9 @@ class ProteinSerializer(ModelContentSerializer):
             return {formatMemberDBName(field_value): total for field_value, total in instance}
 
     @staticmethod
-    def to_counter_representation(instance):
+    def to_counter_representation(instance, filters=None):
+        if filters is None:
+            filters = []
         if "proteins" not in instance:
             if ProteinSerializer.grouper_is_empty(instance, "databases"):
                 raise ReferenceError('There are not entries for this request')

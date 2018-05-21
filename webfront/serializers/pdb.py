@@ -243,7 +243,7 @@ class StructureSerializer(ModelContentSerializer):
                ("buckets" in instance[field] and len(instance[field]["buckets"]) == 0)
 
     @staticmethod
-    def to_counter_representation(instance):
+    def to_counter_representation(instance, filters=None):
         if "structures" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):

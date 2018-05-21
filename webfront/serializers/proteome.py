@@ -40,7 +40,6 @@ class ProteomeSerializer(ModelContentSerializer):
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
-        s = self.searcher
         serializer2endpoint = {
             SerializerDetail.ENTRY_OVERVIEW: "entry",
             SerializerDetail.PROTEIN_OVERVIEW: "protein",
@@ -58,20 +57,20 @@ class ProteomeSerializer(ModelContentSerializer):
             if SerializerDetail.ENTRY_DB in detail_filters or \
                     SerializerDetail.ENTRY_DETAIL in detail_filters:
                 representation["entries"] = self.to_entries_detail_representation(
-                    instance, s, query_searcher,
+                    instance, self.searcher, query_searcher,
                     base_query=sq
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
-                    instance, s, query_searcher,
+                    instance, self.searcher, query_searcher,
                     include_chain=True,
                     base_query=sq
                 )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
                     SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = self.to_proteins_detail_representation(
-                    instance, query_searcher,
+                    instance, self.searcher, query_searcher,
                     base_query=sq
                 )
             if SerializerDetail.TAXONOMY_DB in detail_filters or \

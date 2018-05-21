@@ -82,7 +82,7 @@ class SetSerializer(ModelContentSerializer):
         return representation
 
     @staticmethod
-    def to_counter_representation(instance):
+    def to_counter_representation(instance, filters=None):
         if "sets" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \

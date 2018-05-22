@@ -86,13 +86,15 @@ class StructureSerializer(ModelContentSerializer):
                 representation["taxa"] = self.to_taxonomy_detail_representation(
                     instance,
                     self.searcher,
-                    "structure_acc:" + escape(instance.accession.lower())
+                    "structure_acc:" + escape(instance.accession.lower()),
+                    include_chains=True
                 )
             if SerializerDetail.PROTEOME_DB in detail_filters or \
                     SerializerDetail.PROTEOME_DETAIL in detail_filters:
                 representation["proteomes"] = self.to_proteomes_detail_representation(
                     self.searcher,
-                    "structure_acc:" + escape(instance.accession.lower())
+                    "structure_acc:" + escape(instance.accession.lower()),
+                    include_chains=True
                 )
             if SerializerDetail.SET_DB in detail_filters or \
                     SerializerDetail.SET_DETAIL in detail_filters:

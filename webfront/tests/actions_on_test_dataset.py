@@ -1,10 +1,6 @@
-plurals = {
-    "entry": "entries",
-    "protein": "proteins",
-    "structure": "structures",
-    "organism": "organisms",
-    "set": "sets",
-}
+from webfront.serializers.content_serializers import ModelContentSerializer
+
+plurals = ModelContentSerializer.plurals
 singular = {v: k for k, v in plurals.items()}
 
 
@@ -88,18 +84,24 @@ def count_unique(docs, fields):
 
 
 def get_field_to_check_for_endpoint(ep):
-    return "tax_id" if ep == "organism" else "{}_acc".format(ep)
+    if ep == "taxonomy":
+        return "tax_id"
+    if ep == "proteome":
+        return "proteomes"
+    return "{}_acc".format(ep)
 
 
 def get_db_field(ep):
-    if ep == "structure" or ep == "organism":
+    if ep in ["structure", "taxonomy", "proteome"]:
         return None
     return "{}_db".format(ep)
 
 
 def get_acc_field(ep, db=None):
-    if ep == "organism":
-        return "lineage" if db == "taxonomy" else "proteomes"
+    if ep == "taxonomy":
+        return "lineage"
+    if ep == "proteome":
+        return"proteomes"
     return "{}_acc".format(ep)
 
 
@@ -132,16 +134,27 @@ def filter_by_db_field(subset, db_field, db):
             subset = filter_by_value(subset, "set_integrated", [])
     return subset
 
+def spread_data_per_proteome(docs):
+    data = []
+    for doc in docs:
+        for proteome in doc['proteomes']:
+            new_doc = doc.copy()
+            new_doc['proteome_acc'] = proteome
+            data.append(new_doc)
+    return data
 
 def filter_by_endpoint(docs, ep, db=None, acc=None):
     field = get_field_to_check_for_endpoint(ep)
-    subset = filter_by_value(docs, field, "*")
+    subset = docs
+    if ep == 'proteome':
+        subset = spread_data_per_proteome(docs)
+    subset = filter_by_value(subset, field, "*")
     if db is not None:
         subset = filter_by_db_field(subset, get_db_field(ep), db)
         if acc is not None:
             acc = acc if type(acc) != str else acc.lower()
             acc_field = get_acc_field(ep, db)
-            if ep == "organism":
+            if ep in ["taxonomy", "proteome"]:
                 subset = filter_by_contain_value(subset, acc_field, acc)
             else:
                 subset = filter_by_value(subset, acc_field, acc)
@@ -234,18 +247,35 @@ def extend_structure_counter(counter, data, ep, db):
     )
 
 
-def get_organism_counter(data):
+def get_taxonomy_counter(data):
     return {
-        "taxonomy": count_unique(data, ["tax_id"]),
-        "proteome": count_unique(data, ["proteomes"])
+        "uniprot": count_unique(data, ["tax_id"]),
+    }
+def get_proteome_counter(data):
+    return {
+        "uniprot": count_unique(data, ["proteomes"])
     }
 
 
-def extend_organism_counter(counter, data, ep, db):
+def extend_taxonomy_counter(counter, data, ep, db):
     for member in counter:
         if type(counter[member]) == int:
             counter[member] = {
-                "organisms": counter[member]
+                "taxa": counter[member]
+            }
+        field_db = get_db_field(ep)
+        field_acc = get_acc_field(ep)
+        counter[member][plurals[ep]] = count_unique(
+            filter_by_db_field(data, field_db, db),
+            [field_acc]
+        )
+
+
+def extend_proteome_counter(counter, data, ep, db):
+    for member in counter:
+        if type(counter[member]) == int:
+            counter[member] = {
+                "proteomes": counter[member]
             }
         field_db = get_db_field(ep)
         field_acc = get_acc_field(ep)
@@ -281,7 +311,8 @@ get_endpoint_counter = {
     "entry": get_entry_counter,
     "protein": get_protein_counter,
     "structure": get_structure_counter,
-    "organism": get_organism_counter,
+    "taxonomy": get_taxonomy_counter,
+    "proteome": get_proteome_counter,
     "set": get_set_counter,
 }
 
@@ -289,7 +320,8 @@ extend_counter_with_db = {
     "entry": extend_entry_counter,
     "protein": extend_protein_counter,
     "structure": extend_structure_counter,
-    "organism": extend_organism_counter,
+    "taxonomy": extend_taxonomy_counter,
+    "proteome": extend_proteome_counter,
     "set": extend_set_counter,
 }
 
@@ -322,21 +354,24 @@ endpoint_attributes = {
     "entry": ["entry_acc", "entry_db", "entry_type", "integrated"],
     "protein": ["protein_acc", "protein_db", "protein_length"],
     "structure": ["structure_acc"],
-    "organism": ["tax_id", "proteomes"],
+    "taxonomy": ["tax_id"],
+    "proteome": ["proteome_acc"],
     "set": ["set_acc", "set_db"],
 }
 payload_attributes = {
     "entry": ["accession", "source_database", "type", "integrated"],
     "protein": ["accession", "source_database", "length"],
     "structure": ["accession"],
-    "organism": ["accession"],
+    "taxonomy": ["accession"],
+    "proteome": ["accession"],
     "set": ["accession", "source_database"],
 }
 sublist_attributes = {
     "entry": ["accession", "source_database", "entry_type", "entry_integrated"],
     "protein": ["accession", "source_database", "protein_length"],
     "structure": ["accession"],
-    "organism": ["accession", "proteomes"],
+    "taxonomy": ["accession"],
+    "proteome": ["accession"],
     "set": ["accession", "source_database"],
 }
 
@@ -349,19 +384,10 @@ def get_endpoint_payload(obj, endpoint, db, acc=None, replace_proteome_accession
     }
     if acc is not None:
         payload["accession"] = acc
-    if replace_proteome_accession and endpoint == "organism" and db == "proteome":
-        payload["accession"] = obj["proteomes"][0]
-        payload["taxonomy"] = obj["tax_id"]
+    # if replace_proteome_accession and endpoint == "organism" and db == "proteome":
+    #     payload["accession"] = obj["proteomes"][0]
+    #     payload["taxonomy"] = obj["tax_id"]
     return payload
-
-
-# get_endpoint_payload = {
-#     "entry": get_entry_payload,
-#     "protein": get_protein_payload,
-#     "structure": get_structure_payload,
-#     "organism": get_organism_payload,
-#     "set": get_set_payload,
-# }
 
 
 def get_payload_list(data, endpoint, db, embed_as_metadata=True, include_chains=False):

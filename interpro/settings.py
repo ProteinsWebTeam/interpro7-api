@@ -33,7 +33,7 @@ except FileNotFoundError:
 SECRET_KEY = '#*-7w_j1le-j(_#=g4ii!knr&w5!9ocpw*#7hq9+_osc5@19vs'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = INTERPRO_CONFIG.get('debug', False)
 
 ALLOWED_HOSTS = []
 

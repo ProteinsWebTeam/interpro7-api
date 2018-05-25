@@ -107,7 +107,7 @@ class GeneralHandler(CustomView):
             return Response(getDataForRoot(self.available_endpoint_handlers))
         full_path = request.get_full_path()
         response = None
-        caching_allowed = settings.INTERPRO_CONFIG.get('enable_caching', False) and 'no-cache' not in request.META.get('HTTP_CACHE_CONTROL', '')
+        caching_allowed = settings.INTERPRO_CONFIG.get('enable_caching', False)
         if caching_allowed:
             try:
                 response = self.cache.get(full_path)
@@ -134,14 +134,12 @@ class GeneralHandler(CustomView):
                     parent_queryset=self.queryset,
                     general_handler=self
                 )
-                self._set_in_cache(caching_allowed, full_path, response)
                 return response
 
             def timer(caching_allowed):
                 sleep(QUERY_TIMEOUT)
                 content = {'detail': 'Query timed out'}
                 response = Response(content, status=status.HTTP_408_REQUEST_TIMEOUT)
-                self._set_in_cache(caching_allowed, full_path, response, timeout=CACHE_TIMEOUT)
                 return response
 
             if caching_allowed:
@@ -152,6 +150,11 @@ class GeneralHandler(CustomView):
                 ]
                 result = wait(futures, return_when=FIRST_COMPLETED)
                 response = result.done.pop().result()
+                if response.status_code == status.HTTP_200_OK:
+                    self._set_in_cache(caching_allowed, full_path, response)
+                if response.status_code == status.HTTP_408_REQUEST_TIMEOUT:
+                    self._set_in_cache(caching_allowed, full_path, response, timeout=CACHE_TIMEOUT)
+
             else:
                 response = query((self, request, endpoint_levels, full_path, caching_allowed))
         except ReferenceError as e:

@@ -1,3 +1,6 @@
+import unittest
+import os
+
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from webfront.serializers.content_serializers import ModelContentSerializer
@@ -313,6 +316,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
+@unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
 class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
     def test_endpoint_endpoint_endpoint(self):
         for endpoint1 in api_test_map:

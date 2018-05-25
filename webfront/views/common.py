@@ -134,6 +134,7 @@ class GeneralHandler(CustomView):
                     parent_queryset=self.queryset,
                     general_handler=self
                 )
+                self._set_in_cache(caching_allowed, full_path, response)
                 return response
 
             def timer(caching_allowed):
@@ -150,8 +151,6 @@ class GeneralHandler(CustomView):
                 ]
                 result = wait(futures, return_when=FIRST_COMPLETED)
                 response = result.done.pop().result()
-                if response.status_code == status.HTTP_200_OK:
-                    self._set_in_cache(caching_allowed, full_path, response)
                 if response.status_code == status.HTTP_408_REQUEST_TIMEOUT:
                     self._set_in_cache(caching_allowed, full_path, response, timeout=CACHE_TIMEOUT)
 

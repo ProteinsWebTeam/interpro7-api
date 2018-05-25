@@ -147,7 +147,8 @@ class ProteinSerializer(ModelContentSerializer):
         return {
             "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession, sq),
             "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession, sq),
-            "organisms": searcher.get_number_of_field_by_endpoint("protein", "tax_id", instance.accession, sq),
+            "taxonomy": searcher.get_number_of_field_by_endpoint("protein", "tax_id", instance.accession, sq),
+            "proteome": searcher.get_number_of_field_by_endpoint("protein", "proteomes", instance.accession, sq),
             "sets": searcher.get_number_of_field_by_endpoint("protein", "set_acc", instance.accession, sq),
         }
 

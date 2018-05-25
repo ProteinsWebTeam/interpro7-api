@@ -142,7 +142,8 @@ class StructureSerializer(ModelContentSerializer):
         return {
             "entries": searcher.get_number_of_field_by_endpoint("structure", "entry_acc", instance.accession, base_query),
             "proteins": searcher.get_number_of_field_by_endpoint("structure", "protein_acc", instance.accession, base_query),
-            "organisms": searcher.get_number_of_field_by_endpoint("structure", "tax_id", instance.accession, base_query),
+            "taxa": searcher.get_number_of_field_by_endpoint("structure", "tax_id", instance.accession, base_query),
+            "proteomes": searcher.get_number_of_field_by_endpoint("structure", "proteomes", instance.accession, base_query),
             "sets": searcher.get_number_of_field_by_endpoint("structure", "set_acc", instance.accession, base_query),
         }
 

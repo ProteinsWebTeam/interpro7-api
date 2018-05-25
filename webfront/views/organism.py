@@ -85,7 +85,7 @@ class TaxonomyAccessionHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("taxonomy", accession=endpoint_levels[level - 1].lower())
         general_handler.modifiers.register(
-            "with_names", passing, serializer=SerializerDetail.ORGANISM_DETAIL_NAMES
+            "with_names", passing, serializer=SerializerDetail.TAXONOMY_DETAIL_NAMES
         )
 
         return super(TaxonomyAccessionHandler, self).get(

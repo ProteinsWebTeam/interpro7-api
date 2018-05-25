@@ -125,7 +125,8 @@ class SetSerializer(ModelContentSerializer):
             "entries": searcher.get_number_of_field_by_endpoint("set", "entry_acc", instance.accession, sq),
             "structures": searcher.get_number_of_field_by_endpoint("set", "structure_acc", instance.accession, sq),
             "proteins": searcher.get_number_of_field_by_endpoint("set", "protein_acc", instance.accession, sq),
-            "organisms": searcher.get_number_of_field_by_endpoint("set", "tax_id", instance.accession, sq),
+            "taxa": searcher.get_number_of_field_by_endpoint("set", "tax_id", instance.accession, sq),
+            "proteomes": searcher.get_number_of_field_by_endpoint("set", "proteomes", instance.accession, sq),
         }
 
     @staticmethod

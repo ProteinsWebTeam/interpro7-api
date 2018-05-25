@@ -98,7 +98,7 @@ class TaxonomySerializer(ModelContentSerializer):
                 "lineage": instance.lineage,
                 "rank": instance.rank,
                 "children": self.get_children(instance),
-                "source_database": "taxonomy",
+                "source_database": "uniprot",
                 "parent": str(instance.parent.accession) if instance.parent is not None else None,
                 "name": {
                     "name": instance.scientific_name,
@@ -132,7 +132,7 @@ class TaxonomySerializer(ModelContentSerializer):
                 "name": instance.full_name,
                 "children": instance.children,
                 "parent": instance.parent.accession if instance.parent is not None else None,
-                "source_database": "taxonomy"
+                "source_database": "uniprot"
             }
         }
         return obj
@@ -140,13 +140,11 @@ class TaxonomySerializer(ModelContentSerializer):
     @staticmethod
     def get_counters(instance, searcher, sq):
         return {
-            "entries": searcher.get_number_of_field_by_endpoint("organism", "entry_acc", instance.accession, sq),
-            "structures": searcher.get_number_of_field_by_endpoint("organism", "structure_acc", instance.accession, sq),
-            "proteins": searcher.get_number_of_field_by_endpoint("organism", "protein_acc", instance.accession, sq),
-            "sets": searcher.get_number_of_field_by_endpoint("organism", "set_acc", instance.accession, sq),
-            # "proteomes": Proteome.objects.filter(
-            #     taxonomy__in=Taxonomy.objects.filter(lineage__contains=" {} ".format(instance.accession))
-            # ).count()
+            "entries": searcher.get_number_of_field_by_endpoint("taxonomy", "entry_acc", instance.accession, sq),
+            "structures": searcher.get_number_of_field_by_endpoint("taxonomy", "structure_acc", instance.accession, sq),
+            "proteins": searcher.get_number_of_field_by_endpoint("taxonomy", "protein_acc", instance.accession, sq),
+            "sets": searcher.get_number_of_field_by_endpoint("taxonomy", "set_acc", instance.accession, sq),
+            "proteomes": searcher.get_number_of_field_by_endpoint("taxonomy", "proteomes", instance.accession, sq),
         }
 
     @staticmethod
@@ -215,6 +213,16 @@ class TaxonomySerializer(ModelContentSerializer):
             header["chain"] = obj["chain"]
         return header
 
+    @staticmethod
+    def get_names_map(instance):
+        qs = Taxonomy.objects.filter(accession__in=instance.lineage.strip().split()+instance.children)
+        return {
+            t.accession: {
+                "name": t.scientific_name,
+                "short": t.full_name,
+            }
+            for t in qs
+        }
 
 # class OrganismSerializer(ModelContentSerializer):
 #

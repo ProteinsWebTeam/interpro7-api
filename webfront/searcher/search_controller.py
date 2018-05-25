@@ -19,7 +19,7 @@ class SearchController(metaclass=abc.ABCMeta):
         elif field == "tax_id":
             db = "{}_db".format(endpoint)
         acc = "{}_acc".format(endpoint)
-        if endpoint == "organism":
+        if endpoint == "taxonomy":
             acc = "lineage"
         elif endpoint == "structure":
             db = "chain"

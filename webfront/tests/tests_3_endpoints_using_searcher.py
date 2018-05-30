@@ -52,8 +52,8 @@ api_test_map = {
             "1JZ8",
         ]
     },
-    "organism": {
-        "taxonomy": [
+    "taxonomy": {
+        "uniprot": [
             "1",
             "2",
             "2579",
@@ -61,7 +61,9 @@ api_test_map = {
             "344612",
             "1001583",
         ],
-        "proteome": [
+    },
+    "proteome": {
+        "uniprot": [
             "UP000006701",
             "UP000012042",
             "UP000030104",
@@ -257,14 +259,14 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                     )
 
     def test_endpoint_endpoint_db(self):
-        for endpoint1 in ['set']: #api_test_map:
-            for endpoint2 in ['entry']: # api_test_map:
+        for endpoint1 in api_test_map:
+            for endpoint2 in api_test_map:
                 if endpoint1 == endpoint2:
                     continue
-                for endpoint3 in ['protein']: # api_test_map:
+                for endpoint3 in api_test_map:
                     if endpoint1 == endpoint3 or endpoint2 == endpoint3:
                         continue
-                    for db3 in ["uniprot"]: #api_test_map[endpoint3]:
+                    for db3 in api_test_map[endpoint3]:
                         url = "/api/{}/{}/{}/{}".format(endpoint1, endpoint2, endpoint3, db3)
                         response = self._get_in_debug_mode(url)
                         data = filter_by_endpoint(self.all_docs, endpoint1)

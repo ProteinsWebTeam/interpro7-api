@@ -2,11 +2,21 @@ from rest_framework import serializers
 
 from webfront.views.custom import SerializerDetail, CustomView
 from webfront.views.queryset_manager import escape
-import webfront.serializers#.uniprot
+import webfront.serializers  # .uniprot
+
+
 # import webfront.serializers.pdb
 # import webfront.serializers.taxonomy
 
 class ModelContentSerializer(serializers.ModelSerializer):
+    plurals = {
+        "entry": "entries",
+        "protein": "proteins",
+        "structure": "structures",
+        "proteome": "proteomes",
+        "taxonomy": "taxa",
+        "set": "sets",
+    }
 
     def __init__(self, *args, **kwargs):
         content = kwargs.pop('content', [])
@@ -17,6 +27,16 @@ class ModelContentSerializer(serializers.ModelSerializer):
         self.detail_filters = kwargs.pop('serializer_detail_filters', SerializerDetail.ALL)
 
         self.detail_filters = [self.detail_filters[x]["filter_serializer"] for x in self.detail_filters]
+
+        self.serializers = {
+            "entry": webfront.serializers.interpro.EntrySerializer,
+            "protein": webfront.serializers.uniprot.ProteinSerializer,
+            "structure": webfront.serializers.pdb.StructureSerializer,
+            "taxonomy": webfront.serializers.taxonomy.TaxonomySerializer,
+            "proteome": webfront.serializers.proteome.ProteomeSerializer,
+            "set": webfront.serializers.collection.SetSerializer,
+        }
+
         super(ModelContentSerializer, self).__init__(*args, **kwargs)
         try:
             for to_be_removed in set(self.Meta.optionals) - set(content):
@@ -32,8 +52,10 @@ class ModelContentSerializer(serializers.ModelSerializer):
             extra.append("protein")
         if SerializerDetail.STRUCTURE_DB in self.detail_filters:
             extra.append("structure")
-        if SerializerDetail.ORGANISM_DB in self.detail_filters:
-            extra.append("organism")
+        if SerializerDetail.TAXONOMY_DB in self.detail_filters:
+            extra.append("taxonomy")
+        if SerializerDetail.PROTEOME_DB in self.detail_filters:
+            extra.append("proteome")
         if SerializerDetail.SET_DB in self.detail_filters:
             extra.append("set")
         return extra
@@ -45,31 +67,37 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if isinstance(output, dict):
             output = output["value"]
             is_search_payload = False
-        if "entry" in bucket or "protein" in bucket or "structure" in bucket or "organism" in bucket or "set" in bucket:
-            output = {plural: output}
-            if "entry" in bucket:
-                output["entries"] = bucket["entry"] if is_search_payload else bucket["entry"]["value"]
-            if "protein" in bucket:
-                output["proteins"] = bucket["protein"] if is_search_payload else bucket["protein"]["value"]
-            if "structure" in bucket:
-                output["structures"] = bucket["structure"] if is_search_payload else bucket["structure"]["value"]
-            if "organism" in bucket:
-                output["organisms"] = bucket["organism"] if is_search_payload else bucket["organism"]["value"]
-            if "set" in bucket:
-                output["sets"] = bucket["set"] if is_search_payload else bucket["set"]["value"]
+        if "entry" in bucket or \
+            "protein" in bucket or \
+            "structure" in bucket or \
+            "taxonomy" in bucket or \
+            "proteome" in bucket or \
+            "set" in bucket:
+                output = {plural: output}
+                if "entry" in bucket:
+                    output["entries"] = bucket["entry"] if is_search_payload else bucket["entry"]["value"]
+                if "protein" in bucket:
+                    output["proteins"] = bucket["protein"] if is_search_payload else bucket["protein"]["value"]
+                if "structure" in bucket:
+                    output["structures"] = bucket["structure"] if is_search_payload else bucket["structure"]["value"]
+                if "taxonomy" in bucket:
+                    output["taxa"] = bucket["taxonomy"] if is_search_payload else bucket["taxonomy"]["value"]
+                if "proteome" in bucket:
+                    output["proteomes"] = bucket["proteome"] if is_search_payload else bucket["proteome"]["value"]
+                if "set" in bucket:
+                    output["sets"] = bucket["set"] if is_search_payload else bucket["set"]["value"]
         return output
 
     @staticmethod
-    def to_organisms_detail_representation(instance, searcher, query, include_chains=False):
+    def to_taxonomy_detail_representation(instance, searcher, query, include_chains=False):
         fields = ["tax_id", "structure_chain"] if include_chains else "tax_id"
 
         response = [
-            webfront.serializers.taxonomy.OrganismSerializer.get_organism_from_search_object(
+            webfront.serializers.taxonomy.TaxonomySerializer.get_taxonomy_from_search_object(
                 r, include_chain=include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
-            ]
-
+        ]
 
         if len(response) == 0:
             raise ReferenceError('There are not organisms for this request')
@@ -81,14 +109,14 @@ class ModelContentSerializer(serializers.ModelSerializer):
         response = [
             webfront.serializers.collection.SetSerializer.get_set_from_search_object(r, include_chains)
             for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
-            ]
+        ]
         if len(response) == 0:
             raise ReferenceError('There are not sets for this request')
         return response
 
-
     @staticmethod
-    def to_structures_detail_representation(instance, searcher, query, include_structure=True, include_chain=True, base_query="*:*"):
+    def to_structures_detail_representation(instance, searcher, query, include_structure=True, include_chain=True,
+                                            base_query="*:*"):
         field = "structure_chain" if include_chain else "structure_acc"
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
@@ -98,16 +126,18 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 base_query=base_query
             )
             for r in searcher.get_group_obj_of_field_by_query(None, field, fq=query, rows=10)["groups"]
-            ]
+        ]
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
         return response
 
     @staticmethod
-    def to_entries_detail_representation(instance, searcher, searcher_query, include_chains=False, for_structure=False, base_query=None):
+    def to_entries_detail_representation(instance, searcher, searcher_query, include_chains=False, for_structure=False,
+                                         base_query=None):
         if include_chains:
             # search = searcher.execute_query(None, fq=searcher_query, rows=10)
-            search = searcher.get_group_obj_of_field_by_query(None, ["structure_chain","entry_acc"], fq=searcher_query, rows=10)["groups"]
+            search = searcher.get_group_obj_of_field_by_query(None, ["structure_chain", "entry_acc"], fq=searcher_query,
+                                                              rows=10)["groups"]
         else:
             search = searcher.get_group_obj_of_field_by_query(None, "entry_acc", fq=searcher_query, rows=10)["groups"]
 
@@ -116,7 +146,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, searcher=searcher, for_structure=for_structure, sq=base_query
             )
             for r in search
-            ]
+        ]
         if len(response) == 0:
             raise ReferenceError('There are not entries for this request')
 
@@ -126,7 +156,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def to_proteins_detail_representation(instance, searcher, searcher_query, include_chains=False, include_coordinates=True, for_entry=False, base_query="*:*"):
+    def to_proteins_detail_representation(instance, searcher, searcher_query, include_chains=False,
+                                          include_coordinates=True, for_entry=False, base_query="*:*"):
         field = "structure_chain" if include_chains else "protein_acc"
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
@@ -140,6 +171,19 @@ class ModelContentSerializer(serializers.ModelSerializer):
         ]
         if len(response) == 0:
             raise ReferenceError('There are not proteins for this request')
+        return response
+
+    @staticmethod
+    def to_proteomes_detail_representation(searcher, query, include_chains=False):
+        fields = ["proteomes", "structure_chain"] if include_chains else "proteomes"
+        response = [
+            webfront.serializers.proteome.ProteomeSerializer.get_proteome_header_from_search_object(
+                r, include_chain=include_chains
+            )
+            for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
+        ]
+        if len(response) == 0:
+            raise ReferenceError('There are not proteomes for this request')
         return response
 
     @staticmethod

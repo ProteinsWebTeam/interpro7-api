@@ -1,5 +1,10 @@
+import unittest
+import os
+
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
+from webfront.serializers.content_serializers import ModelContentSerializer
+
 
 api_test_map = {
     "entry": {
@@ -64,8 +69,8 @@ api_test_map = {
             "1JZ8",
         ]
     },
-    "organism": {
-        "taxonomy": [
+    "taxonomy": {
+        "uniprot": [
             "1",
             "2",
             "2579",
@@ -73,19 +78,16 @@ api_test_map = {
             "344612",
             "1001583",
         ],
-        "proteome": [
+    },
+    "proteome": {
+        "uniprot": [
             "UP000006701",
             "UP000012042",
             "UP000030104",
         ]
     }
 }
-plurals = {
-    "entry": "entries",
-    "protein": "proteins",
-    "structure": "structures",
-    "organism": "organisms",
-}
+plurals = ModelContentSerializer.plurals
 
 
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
@@ -314,6 +316,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
+@unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
 class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
     def test_endpoint_endpoint_endpoint(self):
         for endpoint1 in api_test_map:

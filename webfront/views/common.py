@@ -13,7 +13,8 @@ from webfront.searcher.elastic_controller import ElasticsearchController
 from webfront.views.entry import EntryHandler
 from webfront.views.protein import ProteinHandler
 from webfront.views.structure import StructureHandler
-from webfront.views.organism import OrganismHandler
+from webfront.views.taxonomy import TaxonomyHandler
+from webfront.views.proteome import ProteomeHandler
 from webfront.views.set import SetHandler
 from webfront.views.cache import InterProCache
 
@@ -86,7 +87,8 @@ class GeneralHandler(CustomView):
         ('entry', EntryHandler),
         ('protein', ProteinHandler),
         ('structure', StructureHandler),
-        ('organism', OrganismHandler),
+        ('taxonomy', TaxonomyHandler),
+        ('proteome', ProteomeHandler),
         ('set', SetHandler),
     ]
     # The queryset manager for the current request.

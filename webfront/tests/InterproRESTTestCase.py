@@ -131,11 +131,18 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check__organism_match(self, obj, msg=""):
         self.assertIn("accession", obj, msg)
         self.assertIn("lineage", obj, msg)
-        self.assertIn("proteomes", obj, msg)
+        self.assertIn("source_database", obj, msg)
+
+    def _check__proteome_match(self, obj, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("taxonomy", obj, msg)
+        self.assertIn("source_database", obj, msg)
 
     def _check_list_of_matches(self, obj, msg="", check_coordinates=True):
         for match in obj:
-            if "lineage" in match:
+            if "taxonomy" in match:
+                self._check__proteome_match(match, msg)
+            elif "lineage" in match:
                 self._check__organism_match(match, msg)
             else:
                 self._check_match(match, msg, include_coordinates=check_coordinates)
@@ -205,7 +212,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                     self.assertEqual(len(response_acc.data["metadata"]["chains"]), 1, msg)
                     if key is not None:
                         for ch2 in response_acc.data[key]:
-                            if "lineage" not in ch2:
+                            if "lineage" not in ch2 and "taxonomy" not in ch2:
                                 self.assertEqual(ch2["chain"].upper(), chain, msg)
                     self.assertIn(chain.lower(), response_acc.data["metadata"]["chains"], msg)
                     self._check_match(response_acc.data["metadata"]["chains"][chain.lower()], msg)
@@ -270,10 +277,15 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertIn("lineage", obj, msg)
             self.assertIn("rank", obj, msg)
 
-    def _check_organism_from_searcher(self, obj, msg=""):
+    def _check_taxonomy_from_searcher(self, obj, msg=""):
         self.assertIn("accession", obj, msg)
         self.assertIn("lineage", obj, msg)
-        self.assertIn("proteomes", obj, msg)
+        self.assertIn("source_database", obj, msg)
+
+    def _check_proteome_from_searcher(self, obj, msg=""):
+        self.assertIn("accession", obj, msg)
+        self.assertIn("taxonomy", obj, msg)
+        self.assertIn("source_database", obj, msg)
 
     def _check_proteome_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)
@@ -284,10 +296,13 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertIn("strain", obj, msg)
             self.assertIn("assembly", obj, msg)
 
-    def _check_organism_count_overview(self, main_obj, msg=""):
-        self.assertIn("organisms", main_obj, msg)
-        self.assertIn("taxonomy", main_obj["organisms"], msg)
-        self.assertIn("proteome", main_obj["organisms"], msg)
+    def _check_taxonomy_count_overview(self, main_obj, msg=""):
+        self.assertIn("taxa", main_obj, msg)
+        self.assertIn("uniprot", main_obj["taxa"], msg)
+
+    def _check_proteome_count_overview(self, main_obj, msg=""):
+        self.assertIn("proteomes", main_obj, msg)
+        self.assertIn("uniprot", main_obj["proteomes"], msg)
 
     def _check_set_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)

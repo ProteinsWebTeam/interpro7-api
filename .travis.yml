@@ -39,4 +39,4 @@ branches:
   only:
     - master
     - dev
-    - optimising_queries
+    - proteome_as_endpoint

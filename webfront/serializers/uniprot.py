@@ -56,8 +56,10 @@ class ProteinSerializer(ModelContentSerializer):
             representation["entries"] = self.to_entries_count_representation(instance)
         if SerializerDetail.STRUCTURE_OVERVIEW in detail_filters:
             representation["structures"] = self.to_structures_count_representation(instance)
-        if SerializerDetail.ORGANISM_OVERVIEW in detail_filters:
-            representation["organisms"] = self.to_organism_count_representation(instance)
+        if SerializerDetail.TAXONOMY_OVERVIEW in detail_filters:
+            representation["taxa"] = self.to_taxonomy_count_representation(instance)
+        if SerializerDetail.PROTEOME_OVERVIEW in detail_filters:
+            representation["proteomes"] = self.to_proteome_count_representation(instance)
         if SerializerDetail.SET_OVERVIEW in detail_filters:
             representation["sets"] = self.to_set_count_representation(instance)
         if detail != SerializerDetail.PROTEIN_OVERVIEW:
@@ -75,11 +77,18 @@ class ProteinSerializer(ModelContentSerializer):
                     include_chain=True,
                     base_query=sq
                 )
-            if SerializerDetail.ORGANISM_DB in detail_filters or \
-                    SerializerDetail.ORGANISM_DETAIL in detail_filters:
-                representation["organisms"] = self.to_organisms_detail_representation(
+            if SerializerDetail.TAXONOMY_DB in detail_filters or \
+                    SerializerDetail.TAXONOMY_DETAIL in detail_filters:
+                representation["taxa"] = self.to_taxonomy_detail_representation(
                     instance,
-                    self.searcher, "protein_acc:" + escape(instance.accession.lower())
+                    self.searcher,
+                    "protein_acc:" + escape(instance.accession.lower())
+                )
+            if SerializerDetail.PROTEOME_DB in detail_filters or \
+                    SerializerDetail.PROTEOME_DETAIL in detail_filters:
+                representation["proteomes"] = self.to_proteomes_detail_representation(
+                    self.searcher,
+                    "protein_acc:" + escape(instance.accession.lower())
                 )
             if SerializerDetail.SET_DB in detail_filters or \
                     SerializerDetail.SET_DETAIL in detail_filters:
@@ -138,7 +147,8 @@ class ProteinSerializer(ModelContentSerializer):
         return {
             "entries": searcher.get_number_of_field_by_endpoint("protein", "entry_acc", instance.accession, sq),
             "structures": searcher.get_number_of_field_by_endpoint("protein", "structure_acc", instance.accession, sq),
-            "organisms": searcher.get_number_of_field_by_endpoint("protein", "tax_id", instance.accession, sq),
+            "taxonomy": searcher.get_number_of_field_by_endpoint("protein", "tax_id", instance.accession, sq),
+            "proteome": searcher.get_number_of_field_by_endpoint("protein", "proteomes", instance.accession, sq),
             "sets": searcher.get_number_of_field_by_endpoint("protein", "set_acc", instance.accession, sq),
         }
 
@@ -156,7 +166,9 @@ class ProteinSerializer(ModelContentSerializer):
             return {formatMemberDBName(field_value): total for field_value, total in instance}
 
     @staticmethod
-    def to_counter_representation(instance):
+    def to_counter_representation(instance, filters=None):
+        if filters is None:
+            filters = []
         if "proteins" not in instance:
             if ProteinSerializer.grouper_is_empty(instance, "databases"):
                 raise ReferenceError('There are not entries for this request')
@@ -190,11 +202,18 @@ class ProteinSerializer(ModelContentSerializer):
             self.searcher.get_counter_object("structure", query, self.get_extra_endpoints_to_count())
         )["structures"]
 
-    def to_organism_count_representation(self, instance):
+    def to_taxonomy_count_representation(self, instance):
         query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
-        return webfront.serializers.taxonomy.OrganismSerializer.to_counter_representation(
-            self.searcher.get_counter_object("organism", query, self.get_extra_endpoints_to_count())
-        )["organisms"]
+        return webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
+            self.searcher.get_counter_object("taxonomy", query, self.get_extra_endpoints_to_count())
+        )["taxa"]
+
+    def to_proteome_count_representation(self, instance):
+        query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None
+        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+            self.searcher.get_counter_object("proteome", query, self.get_extra_endpoints_to_count())
+        )["proteomes"]
+
 
     def to_set_count_representation(self, instance):
         query = "protein_acc:"+escape(instance.accession) if hasattr(instance, 'accession') else None

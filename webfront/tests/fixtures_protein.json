@@ -4,10 +4,10 @@
     "fields": {
       "identifier": "CBPYA_ASPCL",
       "accession": "a1cuj5",
-      "tax_id": 344612,
+      "tax_id": "344612",
       "organism": {
         "name": "Aspergillus clavatus (strain ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1)",
-        "taxId": 344612
+        "taxId": "344612"
       },
       "name": "Carboxypeptidase Y homolog A",
       "other_names": [],
@@ -20,7 +20,7 @@
       "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 3,
       "source_database": "reviewed",
-      "fragment": "N",
+      "is_fragment": false,
       "residues": {}
     }
   },
@@ -29,10 +29,10 @@
     "fields": {
       "identifier": "M5ADK6_LACBR",
       "accession": "m5adk6",
-      "tax_id": 1001583,
+      "tax_id": "1001583",
       "organism": {
         "name": "Lactobacillus brevis KB290",
-        "taxId": 1001583
+        "taxId": "1001583"
       },
       "name": "Band 7 protein",
       "other_names": [],
@@ -91,7 +91,7 @@
       ],
       "evidence_code": 1,
       "source_database": "reviewed",
-      "fragment": "N",
+      "is_fragment": false,
       "residues": {}
     }
   },
@@ -100,10 +100,10 @@
     "fields": {
       "identifier": "A0A0A2L2G2_PENIT",
       "accession": "a0a0a2l2g2",
-      "tax_id": 40296,
+      "tax_id": "40296",
       "organism": {
         "name": "Penicillium italicum",
-        "taxId": 40296
+        "taxId": "40296"
       },
       "name": "Propeptide, carboxypeptidase Y",
       "other_names": [],
@@ -116,7 +116,7 @@
       "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 1,
       "source_database": "unreviewed",
-      "fragment": "N",
+      "is_fragment": false,
       "residues": {}
     }
   },
@@ -125,10 +125,10 @@
     "fields": {
       "identifier": "LSHR_PIG",
       "accession": "p16582",
-      "tax_id": 40296,
+      "tax_id": "40296",
       "organism": {
         "name": "Sus scrofa (Pig)",
-        "taxId": 40296
+        "taxId": "40296"
       },
       "name": "Lutropin-choriogonadotropic hormone receptor",
       "other_names": ["Luteinizing hormone receptor", "LSH-R"],
@@ -141,7 +141,7 @@
       "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 4,
       "source_database": "unreviewed",
-      "fragment": "N",
+      "is_fragment": false,
       "residues": {}
     }
   }

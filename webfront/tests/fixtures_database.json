@@ -5,7 +5,9 @@
       "name": "interpro",
       "name_long": "InterPro",
       "type": "entry",
-      "version": "66.0"
+      "version": "66.0",
+      "prev_version": "65.0",
+      "prev_release_date": "2018-02-21"
     }
   },
   {
@@ -14,7 +16,9 @@
       "name": "pfam",
       "name_long": "PFam",
       "type": "entry",
-      "version": "21.0"
+      "version": "21.0",
+      "prev_version": "21.0",
+      "prev_release_date": "2018-02-21"
     }
   },
   {
@@ -23,7 +27,9 @@
       "name": "smart",
       "name_long": "SMART",
       "type": "entry",
-      "version": "2.0"
+      "version": "2.0",
+      "prev_version": "1.8",
+      "prev_release_date": "2018-02-21"
     }
   },
   {
@@ -32,7 +38,9 @@
       "name": "profile",
       "name_long": "Prosite Profiles",
       "type": "entry",
-      "version": "1.0"
+      "version": "1.0",
+      "prev_version": "0.10",
+      "prev_release_date": "2017-02-21"
     }
   },
   {
@@ -41,7 +49,9 @@
       "name": "uniprot",
       "name_long": "UniProt",
       "type": "protein",
-      "version": "61.0"
+      "version": "61.0",
+      "prev_version": "62.0",
+      "prev_release_date": "2018-02-21"
     }
   },
   {
@@ -50,7 +60,9 @@
       "name": "pdb",
       "name_long": "PDB",
       "type": "structure",
-      "version": "14.0"
+      "version": "14.0",
+      "prev_version": "13.0",
+      "prev_release_date": "2018-01-21"
     }
   }
 ]

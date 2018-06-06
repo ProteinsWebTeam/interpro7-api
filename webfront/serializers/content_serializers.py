@@ -175,7 +175,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def to_proteomes_detail_representation(searcher, query, include_chains=False):
-        fields = ["proteomes", "structure_chain"] if include_chains else "proteomes"
+        fields = ["proteome_acc", "structure_chain"] if include_chains else "proteome_acc"
         response = [
             webfront.serializers.proteome.ProteomeSerializer.get_proteome_header_from_search_object(
                 r, include_chain=include_chains

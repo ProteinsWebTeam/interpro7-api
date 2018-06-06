@@ -62,27 +62,21 @@ class QuerysetManager:
                     q += " && {}:{}".format(k, escape(v))
                 elif include_search and ep == "search":
                     main_ep = self.main_endpoint
-                    if main_ep == "taxonomy" or main_ep == "proteome":
-                        main_ep = "organism"
                     q += " && text_{}:*{}*".format(main_ep, escape(v))
                 elif k == "source_database__isnull":
                     q += " && {}_exists_:{}_db".format("!" if v else "", ep)
                 elif k == "accession" or k == "accession__iexact":
                     if ep == 'taxonomy':
                         q += " && lineage:{}".format(escape(v))
-                    elif ep == 'proteome':
-                        q += " && proteomes:{}".format(escape(v))
                     else:
                         q += " && {}_acc:{}".format(ep, escape(v))
                 elif k == "accession__isnull":
-                    # elasticsearch perform better if the "give me all" query runs over a
-                    # low cardinality field such as the _db ones
                     if ep == 'structure':
                         q += " && {}_exists_:{}_acc".format("!" if v else "", ep)
                     elif ep == 'taxonomy':
                         q += " && {}_exists_:tax_id".format("!" if v else "")
                     elif ep == 'proteome':
-                        q += " && {}_exists_:proteomes".format("!" if v else "")
+                        q += " && {}_exists_:proteome_acc".format("!" if v else "")
                     else:
                         q += " && {}_exists_:{}_db".format("!" if v else "", ep)
                 elif k == "integrated" or k == "integrated__iexact" or k == "integrated__contains":

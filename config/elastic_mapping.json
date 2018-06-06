@@ -3,33 +3,42 @@
     "relationship": {
       "properties": {
         "entry_acc": {"type":  "keyword"},
+        "entry_db": {"type":  "keyword"},
+        "integrated": {"type":  "keyword"},
+        "entry_type": {"type":  "keyword"},
+        "entry_go_terms" : {"type" : "keyword"},
+        "ida_id": {"type":  "keyword"},
+        "ida": {"type":  "text"},
+
         "protein_acc": {"type":  "keyword"},
         "protein_length": {"type":  "long"},
         "protein_size": {"type":  "keyword"},
-        "structure_acc": {"type":  "keyword"},
-        "entry_db": {"type":  "keyword"},
         "protein_db": {"type":  "keyword"},
+
+        "structure_acc": {"type":  "keyword"},
         "chain": {"type":  "text", "analyzer": "keyword"},
-        "integrated": {"type":  "keyword"},
-        "entry_type": {"type":  "keyword"},
-        "proteomes": {"type":  "keyword"},
-        "lineage": {"type":  "keyword"},
-        "tax_id": {"type":  "long"},
         "structure_chain": {"type":  "keyword"},
         "structure_evidence": {"type":  "keyword"},
+
+        "proteome_acc": {"type":  "keyword"},
+        "proteome_is_reference": {"type":  "keyword"},
+
+        "tax_id": {"type":  "long"},
+        "lineage": {"type":  "keyword"},
+
         "protein_structure_locations": { "type": "object", "enabled" : false},
         "entry_protein_locations": { "type": "object", "enabled" : false},
-        "entry_text": {"type":  "text"},
-        "protein_text": {"type":  "text"},
-        "structure_text": {"type":  "text"},
-        "set_text": {"type":  "text"},
-        "organism_text": {"type":  "text"},
-        "ida_id": {"type":  "keyword"},
-        "ida": {"type":  "text"},
+
+        "text_entry": {"type":  "text"},
+        "text_protein": {"type":  "text"},
+        "text_structure": {"type":  "text"},
+        "text_set": {"type":  "text"},
+        "text_taxonomy": {"type":  "text"},
+        "text_proteome": {"type":  "text"},
+
         "set_acc": {"type":  "keyword"},
         "set_db": {"type":  "keyword"},
-        "set_integrated": {"type":  "keyword"},
-        "entry_go_terms" : {"type" : "keyword"}
+        "set_integrated": {"type":  "keyword"}
       }
     }
   }

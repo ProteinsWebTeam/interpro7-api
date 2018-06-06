@@ -2,12 +2,12 @@
   {
     "model": "webfront.Taxonomy",
     "fields": {
-      "accession": 1,
+      "accession": "1",
       "scientific_name": "ROOT",
       "full_name": "ROOT",
       "lineage": " 1 ",
       "rank": "no rank",
-      "children": [2579, 2],
+      "children": ["2579", "2"],
       "left_number": 0,
       "right_number": 6
     }
@@ -15,15 +15,15 @@
   {
     "model": "webfront.Taxonomy",
     "fields": {
-      "accession": 2579,
+      "accession": "2579",
       "scientific_name": "Eukaryota",
       "full_name": "Eucaryotae",
       "lineage": " 1 2579 ",
-      "parent": 1,
+      "parent": "1",
       "rank": "SUPERKINGDOM",
       "children": [
-        344612,
-        1001583
+        "344612",
+        "1001583"
       ],
       "left_number": 1,
       "right_number": 4
@@ -32,14 +32,14 @@
   {
     "model": "webfront.Taxonomy",
     "fields": {
-      "accession": 2,
+      "accession": "2",
       "scientific_name": "Bacteria",
       "full_name": "Prokaryota",
       "lineage": " 1 2 ",
-      "parent": 1,
+      "parent": "1",
       "rank": "SUPERKINGDOM",
       "children": [
-        40296
+        "40296"
       ],
       "left_number": 5,
       "right_number": 6
@@ -48,11 +48,11 @@
   {
     "model": "webfront.Taxonomy",
     "fields": {
-      "accession": 40296,
+      "accession": "40296",
       "scientific_name": "Penicillium italicum",
       "full_name": "Blue mold",
       "lineage": " 1 2 40296 ",
-      "parent": 2,
+      "parent": "2",
       "rank": "SPECIES",
       "children": [],
       "left_number": 3,
@@ -62,11 +62,11 @@
   {
     "model": "webfront.Taxonomy",
     "fields": {
-      "accession": 1001583,
+      "accession": "1001583",
       "scientific_name": "Lactobacillus brevis KB290",
       "full_name": "Lactobacillus brevis str. KB290",
       "lineage": " 1 2579 1001583 ",
-      "parent": 2579,
+      "parent": "2579",
       "rank": "SPECIES",
       "children": [],
       "left_number": 5,
@@ -76,11 +76,11 @@
   {
     "model": "webfront.Taxonomy",
     "fields": {
-      "accession": 344612,
+      "accession": "344612",
       "scientific_name": "Aspergillus clavatus",
       "full_name": "Aspergillus clavatus (strain ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1)",
       "lineage": " 1 2579 344612 ",
-      "parent": 2579,
+      "parent": "2579",
       "rank": "SPECIES",
       "children": [],
       "left_number": 1,
@@ -95,7 +95,7 @@
       "is_reference": true,
       "strain": "ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1",
       "assembly": "GCA_000002715.1 from ENA/EMBL",
-      "taxonomy": 344612
+      "taxonomy": "344612"
     }
   },
   {
@@ -106,7 +106,7 @@
       "is_reference": true,
       "strain": "PHI-1",
       "assembly": "GCA_000769765.1 from ENA/EMBL",
-      "taxonomy": 40296
+      "taxonomy": "40296"
     }
   },
   {
@@ -117,7 +117,7 @@
       "is_reference": false,
       "strain": "KB290",
       "assembly": "GCA_000359625.1 from ENA/EMBL",
-      "taxonomy": 1001583
+      "taxonomy": "1001583"
     }
   }
 ]

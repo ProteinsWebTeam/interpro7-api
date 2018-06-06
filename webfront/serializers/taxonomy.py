@@ -144,7 +144,7 @@ class TaxonomySerializer(ModelContentSerializer):
             "structures": searcher.get_number_of_field_by_endpoint("taxonomy", "structure_acc", instance.accession, sq),
             "proteins": searcher.get_number_of_field_by_endpoint("taxonomy", "protein_acc", instance.accession, sq),
             "sets": searcher.get_number_of_field_by_endpoint("taxonomy", "set_acc", instance.accession, sq),
-            "proteomes": searcher.get_number_of_field_by_endpoint("taxonomy", "proteomes", instance.accession, sq),
+            "proteomes": searcher.get_number_of_field_by_endpoint("taxonomy", "proteome_acc", instance.accession, sq),
         }
 
     @staticmethod

@@ -24,8 +24,8 @@ class SearchController(metaclass=abc.ABCMeta):
         elif endpoint == "structure":
             db = "chain"
         elif endpoint == "proteome":
-            db = "proteomes"
-            acc = "proteomes"
+            db = "proteome_acc"
+            acc = "proteome_acc"
             # accession = accession.lower()
         if field == "set_acc":
             fq = "!set_integrated:* && !set_db:kegg"

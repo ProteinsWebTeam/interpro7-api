@@ -47,7 +47,7 @@ class ProteomeSerializer(ModelContentSerializer):
             SerializerDetail.TAXONOMY_OVERVIEW: "taxonomy",
             SerializerDetail.SET_OVERVIEW: "set",
         }
-        query_searcher = "proteomes:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
+        query_searcher = "proteome_acc:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
         for df in detail_filters:
             if df in serializer2endpoint:
                 endpoint = serializer2endpoint[df]
@@ -144,7 +144,7 @@ class ProteomeSerializer(ModelContentSerializer):
     def get_proteome_header_from_search_object(obj, include_chain=False):
         header = {
             "taxonomy": obj["tax_id"],
-            "accession": obj["proteomes"][0],
+            "accession": obj["proteome_acc"],
             "source_database": "uniprot"
         }
         if include_chain:

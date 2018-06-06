@@ -130,10 +130,10 @@ class TwoEndpointsRESTSearchTest(InterproRESTTestCase):
             ("/api/taxonomy/uniprot/protein", "2579"),
             ("/api/taxonomy/uniprot/structure", "2579"),
             ("/api/taxonomy/uniprot/set", "2579"),
-            ("/api/proteome/uniprot/entry", "2579"),
-            ("/api/proteome/uniprot/protein", "2579"),
-            ("/api/proteome/uniprot/structure", "2579"),
-            ("/api/proteome/uniprot/set", "2579"),
+            ("/api/proteome/uniprot/entry", "penicillium"),
+            ("/api/proteome/uniprot/protein", "penicillium"),
+            ("/api/proteome/uniprot/structure", "penicillium"),
+            ("/api/proteome/uniprot/set", "penicillium"),
         ]
         for url in urls:
             filtered = self.client.get(

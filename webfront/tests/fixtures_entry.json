@@ -9,7 +9,7 @@
       "short_name" : "Piwi",
       "source_database" : "interpro",
       "entry_date": "2001-04-21",
-      "is_featured": "y",
+      "is_featured": true,
       "member_databases" : {
         "smart": {"sm00950": "Piwi domain"},
         "profile": {"ps50822": "PIWI"},
@@ -122,7 +122,7 @@
       "source_database" : "interpro",
       "member_databases" : {},
       "entry_date": "2002-04-21",
-      "is_featured": "n",
+      "is_featured": false,
       "integrated" : null,
       "hierarchy": {
           "children": [
@@ -188,7 +188,7 @@
       "accession": "pf02171",
       "type": "domain",
       "name": "Piwi domain",
-      "is_featured": "y",
+      "is_featured": true,
       "entry_date": "2003-04-21",
       "short_name": "Piwi",
       "go_terms": [
@@ -253,7 +253,7 @@
       "type": "domain",
       "name": "Piwi domain",
       "entry_date": "2004-04-21",
-      "is_featured": "y",
+      "is_featured": true,
       "short_name": "Piwi",
       "go_terms": [
         {
@@ -282,7 +282,7 @@
       "type": "MATRIX",
       "entry_date": "2001-04-21",
       "name": "PIWI",
-      "is_featured": "y",
+      "is_featured": true,
       "short_name": "Piwi",
       "go_terms": [],
       "source_database": "profile",
@@ -300,7 +300,7 @@
       "accession": "pf17180",
       "entry_id": "id3",
       "type": "domain",
-      "is_featured": "y",
+      "is_featured": true,
       "entry_date": "2002-04-21",
       "go_terms": [],
       "source_database": "pfam",
@@ -321,7 +321,7 @@
       "entry_id": "id4",
       "type": "domain",
       "entry_date": "2002-04-21",
-      "is_featured": "y",
+      "is_featured": true,
       "go_terms": [],
       "source_database": "pfam",
       "member_databases": {},
@@ -343,7 +343,7 @@
       "type": "family",
       "name": "Myelin family",
       "entry_date": "2003-04-21",
-      "is_featured": "y",
+      "is_featured": true,
       "short_name": "Myelin",
       "go_terms": [
         {
@@ -374,7 +374,7 @@
       "short_name": "HSP20",
       "go_terms": [],
       "entry_date": "2004-04-21",
-      "is_featured": "y",
+      "is_featured": true,
       "source_database": "profile",
       "member_databases": null,
       "integrated": null,

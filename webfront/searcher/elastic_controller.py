@@ -112,7 +112,7 @@ class ElasticsearchController(SearchController):
             if ec == "organism" or ec == "taxonomy":
                 field = "tax_id"
             elif ec == "proteome":
-                field = "proteomes"
+                field = "proteome_acc"
             facet["aggs"][agg_name]["aggs"][ec] = {"cardinality": {"field": field}}
 
     def tune_counter_facet_for_entry(self, facet, endpoint, extra_counters):
@@ -177,9 +177,9 @@ class ElasticsearchController(SearchController):
 
     def tune_counter_facet_for_proteome(self, facet, endpoint, extra_counters):
         if endpoint == "proteome":
-            facet["aggs"]["databases"]["filter"] = {"exists": {"field": "proteomes"}}
+            facet["aggs"]["databases"]["filter"] = {"exists": {"field": "proteome_acc"}}
             facet["aggs"]["databases"]["aggs"]["unique"] = {
-                "cardinality": {"field": "proteomes"}
+                "cardinality": {"field": "proteome_acc"}
             }
             del facet["aggs"]["databases"]["terms"]
             self.add_extra_counters(facet, "databases", extra_counters)
@@ -300,8 +300,8 @@ class ElasticsearchController(SearchController):
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "tax_id"
             facet["aggs"]["rscount"]["terms"]["field"] = "tax_id"
         elif endpoint == "proteome":
-            facet["aggs"]["ngroups"]["cardinality"]["field"] = "proteomes"
-            facet["aggs"]["rscount"]["terms"]["field"] = "proteomes"
+            facet["aggs"]["ngroups"]["cardinality"]["field"] = "proteome_acc"
+            facet["aggs"]["rscount"]["terms"]["field"] = "proteome_acc"
         response = self._elastic_json_query(qs, facet)
         return [str(x['key']).lower() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
 

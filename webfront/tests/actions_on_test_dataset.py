@@ -86,8 +86,6 @@ def count_unique(docs, fields):
 def get_field_to_check_for_endpoint(ep):
     if ep == "taxonomy":
         return "tax_id"
-    if ep == "proteome":
-        return "proteomes"
     return "{}_acc".format(ep)
 
 
@@ -100,8 +98,6 @@ def get_db_field(ep):
 def get_acc_field(ep, db=None):
     if ep == "taxonomy":
         return "lineage"
-    if ep == "proteome":
-        return"proteomes"
     return "{}_acc".format(ep)
 
 
@@ -146,8 +142,8 @@ def spread_data_per_proteome(docs):
 def filter_by_endpoint(docs, ep, db=None, acc=None):
     field = get_field_to_check_for_endpoint(ep)
     subset = docs
-    if ep == 'proteome':
-        subset = spread_data_per_proteome(docs)
+    # if ep == 'proteome':
+    #     subset = spread_data_per_proteome(docs)
     subset = filter_by_value(subset, field, "*")
     if db is not None:
         subset = filter_by_db_field(subset, get_db_field(ep), db)
@@ -251,9 +247,10 @@ def get_taxonomy_counter(data):
     return {
         "uniprot": count_unique(data, ["tax_id"]),
     }
+
 def get_proteome_counter(data):
     return {
-        "uniprot": count_unique(data, ["proteomes"])
+        "uniprot": count_unique(data, ["proteome_acc"])
     }
 
 
@@ -434,7 +431,7 @@ def get_db_payload(data, endpoints, dbs, accs=None):
     payload = get_payload_list(data, ep, db)
     for instance in payload:
         if db == "proteome":
-            filtered = filter_by_contain_value(data, "proteomes", instance["metadata"]["accession"])
+            filtered = filter_by_contain_value(data, "proteome_acc", instance["metadata"]["accession"])
         else:
             filtered = filter_by_value(data, endpoint_attributes[ep][0], instance["metadata"]["accession"])
         extend_obj_with_other_endpoints(filtered, endpoints, dbs, accs, instance, ep)

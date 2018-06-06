@@ -225,7 +225,7 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
         ],
         "protein": [
           'accession', 'identifier', 'organism', 'name', 'other_names', 'description', 'sequence', 'length', 'proteomes', 'gene', 'go_terms',
-          'evidence_code', 'source_database', 'residues', 'structure', 'fragment', 'tax_id'
+          'evidence_code', 'source_database', 'residues', 'structure', 'is_fragment', 'tax_id'
         ],
         'structure': [
             'accession', 'name', 'short_name', 'other_names', 'experiment_type', 'release_date', 'literature', 'chains',

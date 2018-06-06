@@ -558,7 +558,7 @@ class TaxonomyEntryTest(InterproRESTTestCase):
 
     def test_a_more_inclusive_taxon_has_more_items(self):
         response1 = self.client.get("/api/taxonomy/uniprot/2579/entry")
-        response2 = self.client.get("/api/taxonomy/uniprot/1001583/proteome/entry")
+        response2 = self.client.get("/api/taxonomy/uniprot/1001583/entry")
         self.assertEqual(response1.status_code, status.HTTP_200_OK)
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertGreater(response1.data["entries"]["all"], response2.data["entries"]["all"])

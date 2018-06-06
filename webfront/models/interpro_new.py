@@ -1,6 +1,7 @@
 from django.db import models
 from jsonfield import JSONField
 
+
 class Database(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
     name_long = models.CharField(max_length=100)
@@ -8,6 +9,8 @@ class Database(models.Model):
     version = models.CharField(max_length=100, null=True)
     release_date = models.DateField(null=True)
     type = models.CharField(max_length=100)
+    prev_version = models.CharField(max_length=100, null=True)
+    prev_release_date = models.DateField(null=True)
 
 
 class Entry(models.Model):
@@ -27,7 +30,8 @@ class Entry(models.Model):
     hierarchy = JSONField(null=True)
     cross_references = JSONField(null=True)
     entry_date = models.DateField(null=True)
-    is_featured = models.CharField(max_length=2)
+    is_featured = models.BooleanField(default=False)
+    overlap_with = JSONField(default=[])
 
 
 class EntryAnnotation(models.Model):
@@ -57,8 +61,8 @@ class Protein(models.Model):
     source_database = models.CharField(max_length=20, default="unreviewed", db_index=True)
     residues = JSONField(null=True)
     structure = JSONField(default={})
-    fragment = models.CharField(max_length=1, null=False)
-    tax_id = models.IntegerField(null=False, default=0)
+    is_fragment = models.BooleanField(default=False)
+    tax_id = models.CharField(max_length=20, null=False, default="")
     size = models.CharField(max_length=10, null=True)
     # Domain arch string e.g. 275/UPI0004FEB881#29021:2-66~20422&29021&340&387:103-266#
     # domain_architectures = models.TextField(null=True)
@@ -79,7 +83,7 @@ class Structure(models.Model):
 
 
 class Taxonomy(models.Model):
-    accession = models.IntegerField(primary_key=True)
+    accession = models.CharField(max_length=20, primary_key=True)
     scientific_name = models.CharField(max_length=255)
     full_name = models.CharField(max_length=512)
     lineage = models.CharField(max_length=512)
@@ -93,7 +97,7 @@ class Taxonomy(models.Model):
 class Proteome(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=512)
-    is_reference = models.CharField(max_length=1)
+    is_reference = models.BooleanField(default=False)
     strain = models.CharField(max_length=512)
     assembly = models.CharField(max_length=512)
     taxonomy = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)
@@ -106,3 +110,4 @@ class Set(models.Model):
     source_database = models.CharField(max_length=20, db_index=True)
     integrated = JSONField(null=True)
     relationships = JSONField(null=True)  # {nodes: [{accession:"", type: ""}], links:[source:"", target: ""]}
+    is_set = models.BooleanField(default=True)

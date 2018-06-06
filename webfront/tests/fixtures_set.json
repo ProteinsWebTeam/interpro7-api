@@ -7,6 +7,7 @@
       "description": "An example of a pfam clan",
       "source_database": "pfam",
       "integrated": [],
+      "is_set": true,
       "relationships": {
         "nodes": [
           {"accession": "pf02171", "type": "entry", "score": 0.6},
@@ -24,6 +25,7 @@
       "description": "Another example of a pfam clan",
       "source_database": "pfam",
       "integrated": [],
+      "is_set": true,
       "relationships": {
         "nodes": [
           {"accession": "pf02171", "type": "entry", "score": 0.2},
@@ -41,6 +43,7 @@
       "description": "Example of a pathway",
       "source_database": "kegg",
       "integrated": [],
+      "is_set": false,
       "relationships": {
         "nodes": [
           {"accession": "kegg01.1", "type": "node", "score": 0.5},
@@ -58,6 +61,7 @@
       "description": "Example of a step in a pathway",
       "source_database": "node",
       "integrated": ["kegg01"],
+      "is_set": false,
       "relationships": {
         "nodes": [
           {"accession": "ipr003165", "type": "entry", "score": 0.5},
@@ -74,6 +78,7 @@
       "name": "Second Node",
       "description": "yet another Example of a step in a pathway",
       "source_database": "node",
+      "is_set": false,
       "integrated": ["kegg01"],
       "relationships": {
         "nodes": [

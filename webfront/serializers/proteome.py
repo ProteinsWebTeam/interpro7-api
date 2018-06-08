@@ -101,6 +101,7 @@ class ProteomeSerializer(ModelContentSerializer):
                 "strain": instance.strain,
                 "assembly": instance.assembly,
                 "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
+                "lineage": instance.taxonomy.lineage if instance.taxonomy is not None else None,
                 "counters": ProteomeSerializer.get_counters(instance, searcher, sq)
             }
         }
@@ -113,6 +114,7 @@ class ProteomeSerializer(ModelContentSerializer):
                 "name": instance.name,
                 "is_reference": instance.is_reference,
                 "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
+                "lineage": instance.taxonomy.lineage if instance.taxonomy is not None else None,
                 "source_database": "uniprot",
             }
         }
@@ -144,6 +146,7 @@ class ProteomeSerializer(ModelContentSerializer):
     def get_proteome_header_from_search_object(obj, include_chain=False):
         header = {
             "taxonomy": obj["tax_id"],
+            "lineage": obj["lineage"],
             "accession": obj["proteomes"][0],
             "source_database": "uniprot"
         }

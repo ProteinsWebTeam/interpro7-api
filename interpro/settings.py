@@ -25,6 +25,13 @@ try:
     MYSQL_CONFIG = yaml.safe_load(open('{}/config/mysql.yml'.format(BASE_DIR)))
 except FileNotFoundError:
     MYSQL_CONFIG = {}
+try:
+    INTERPRO_CONFIG_LOCAL = yaml.safe_load(open('{}/config/interpro.local.yml'.format(BASE_DIR)))
+except FileNotFoundError:
+    INTERPRO_CONFIG_LOCAL = {}
+
+for key in INTERPRO_CONFIG_LOCAL:
+    INTERPRO_CONFIG[key] = INTERPRO_CONFIG_LOCAL.get(key, None)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -35,7 +42,7 @@ SECRET_KEY = '#*-7w_j1le-j(_#=g4ii!knr&w5!9ocpw*#7hq9+_osc5@19vs'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = INTERPRO_CONFIG.get('debug', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = INTERPRO_CONFIG.get('allowed_host', [])
 
 import django_redis.cache
 import django_redis.client

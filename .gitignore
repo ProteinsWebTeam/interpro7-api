@@ -9,6 +9,7 @@ unifam/settings-private.py
 config/~oracle.yml
 config/oracle.yml
 config/oracle_dw.yml
+config/interpro.local.yml
 config/mysql.yml
 config/mysql_rel.yml
 config/mysql_test.yml

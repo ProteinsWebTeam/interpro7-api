@@ -282,20 +282,6 @@ class ElasticsearchController(SearchController):
             },
             "size": 0
         }
-        # if self.queryset_manager.order_field is not None:
-        #     facet['aggs']['rscount']['aggs'] = {
-        #         "tops": {
-        #             "top_hits": {"size": 1}
-        #         },
-        #         "topSort": {
-        #             "max": {
-        #                 "field": self.queryset_manager.order_field
-        #             }
-        #         }
-        #     }
-        #     facet['aggs']['rscount']['terms']['order'] = {
-        #         "topSort": "asc"
-        #     }
         if endpoint == "organism" or endpoint == "taxonomy":
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "tax_id"
             facet["aggs"]["rscount"]["terms"]["field"] = "tax_id"
@@ -303,7 +289,11 @@ class ElasticsearchController(SearchController):
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "proteome_acc"
             facet["aggs"]["rscount"]["terms"]["field"] = "proteome_acc"
         response = self._elastic_json_query(qs, facet)
-        return [str(x['key']).lower() for x in response["aggregations"]["rscount"]["buckets"]], response["aggregations"]["ngroups"]["value"]
+        count = len(response["aggregations"]["rscount"]["buckets"])
+        if count == start + rows:
+            count = response["aggregations"]["ngroups"]["value"]
+        # TODO: return only the subset of interest [start:] This however requires to re think the way pagination works
+        return [str(x['key']).lower() for x in response["aggregations"]["rscount"]["buckets"]], count
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()

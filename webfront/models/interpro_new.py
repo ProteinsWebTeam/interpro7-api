@@ -31,7 +31,7 @@ class Entry(models.Model):
     cross_references = JSONField(null=True)
     entry_date = models.DateField(null=True)
     is_featured = models.BooleanField(default=False)
-    overlap_with = JSONField(default=[])
+    overlaps_with = JSONField(default=[])
 
 
 class EntryAnnotation(models.Model):

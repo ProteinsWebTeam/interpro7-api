@@ -113,7 +113,7 @@ class TaxonomySerializer(ModelContentSerializer):
         query = self.queryset_manager.get_searcher_query()
 
         def filter_children(child):
-            q = "{} && lineage:{}".format(query, child)
+            q = "{} && tax_lineage:{}".format(query, child)
             response = self.searcher._elastic_json_query(q, {"size": 0})
             return response["hits"]["total"] > 0
         return filter_children
@@ -163,12 +163,12 @@ class TaxonomySerializer(ModelContentSerializer):
     @staticmethod
     def get_searcher_query(instance):
         if isinstance(instance, Taxonomy):
-            return "lineage:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
+            return "tax_lineage:" + escape(instance.accession).lower() if hasattr(instance, 'accession') else None
         elif isinstance(instance, dict) and "metadata" in instance:
             if "taxonomy" in instance["metadata"]:
-                return "lineage:" + escape(instance["metadata"]["taxonomy"]).lower()
+                return "tax_lineage:" + escape(instance["metadata"]["taxonomy"]).lower()
             elif "accession" in instance["metadata"]:
-                return "lineage:" + escape(instance["metadata"]["accession"]).lower()
+                return "tax_lineage:" + escape(instance["metadata"]["accession"]).lower()
         return None
 
     def to_entries_count_representation(self, instance):
@@ -206,11 +206,11 @@ class TaxonomySerializer(ModelContentSerializer):
     def get_taxonomy_from_search_object(obj, include_chain=False):
         header = {
             "accession": obj["tax_id"],
-            "lineage": obj["lineage"],
+            "lineage": obj["tax_lineage"],
             "source_database": "uniprot"
         }
         if include_chain:
-            header["chain"] = obj["chain"]
+            header["chain"] = obj["structure_chain_acc"]
         return header
 
     @staticmethod

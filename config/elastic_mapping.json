@@ -4,8 +4,9 @@
       "properties": {
         "entry_acc": {"type":  "keyword"},
         "entry_db": {"type":  "keyword"},
-        "integrated": {"type":  "keyword"},
         "entry_type": {"type":  "keyword"},
+        "entry_date": {"type":  "date"},
+        "entry_integrated": {"type":  "keyword"},
         "entry_go_terms" : {"type" : "keyword"},
         "ida_id": {"type":  "keyword"},
         "ida": {"type":  "text"},
@@ -16,15 +17,20 @@
         "protein_db": {"type":  "keyword"},
 
         "structure_acc": {"type":  "keyword"},
-        "chain": {"type":  "text", "analyzer": "keyword"},
-        "structure_chain": {"type":  "keyword"},
+        "structure_resolution": {"type":  "float"},
+        "structure_date": {"type":  "date"},
+        "structure_chain_acc": {"type":  "text", "analyzer": "keyword"},
+        "structure_chain": {"type":  "text", "analyzer": "keyword", "fielddata": true},
         "structure_evidence": {"type":  "keyword"},
 
         "proteome_acc": {"type":  "keyword"},
+        "proteome_name": {"type":  "keyword"},
         "proteome_is_reference": {"type":  "keyword"},
 
         "tax_id": {"type":  "long"},
-        "lineage": {"type":  "keyword"},
+        "tax_name": {"type":  "keyword"},
+        "tax_lineage": {"type":  "keyword"},
+        "tax_rank": {"type":  "keyword"},
 
         "protein_structure_locations": { "type": "object", "enabled" : false},
         "entry_protein_locations": { "type": "object", "enabled" : false},

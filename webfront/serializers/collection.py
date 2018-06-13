@@ -180,5 +180,5 @@ class SetSerializer(ModelContentSerializer):
         if "set_integrated" in obj:
             header["integrated"] = obj["set_integrated"]
         if include_chain:
-            header["chain"] = obj["chain"]
+            header["chain"] = obj["structure_chain_acc"]
         return header

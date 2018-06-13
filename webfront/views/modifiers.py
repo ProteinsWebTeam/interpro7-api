@@ -82,7 +82,7 @@ def group_by_organism(general_handler, endpoint_queryset):
         #     general_handler.queryset_manager.main_endpoint, "tax_id", size=20
         # )
         # return result
-    q = "({})".format(" OR ".join("lineage:{}".format(org) for org in organisms))
+    q = "({})".format(" OR ".join("tax_lineage:{}".format(org) for org in organisms))
     searcher = general_handler.searcher
     result = searcher.get_grouped_object(
         general_handler.queryset_manager.main_endpoint, 'tax_id', q, size=1000

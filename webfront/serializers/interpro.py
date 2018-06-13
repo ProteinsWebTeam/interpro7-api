@@ -373,10 +373,10 @@ class EntrySerializer(ModelContentSerializer):
             "protein_length": obj["protein_length"],
             "source_database": obj["entry_db"],
             "entry_type": obj["entry_type"],
-            "entry_integrated": obj["integrated"],
+            "entry_integrated": obj["entry_integrated"],
         }
         if for_structure:
-            header["chain"] = obj["chain"]
+            header["chain"] = obj["structure_chain_acc"]
             header["protein"] = obj["protein_acc"]
             header["protein_structure_locations"] = obj["protein_structure_locations"]
         if include_entry:

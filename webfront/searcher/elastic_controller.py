@@ -122,7 +122,7 @@ class ElasticsearchController(SearchController):
                     "bool": {
                         "must_not": [
                             {"term": {"entry_db": "interpro"}},
-                            {"exists": {"field": "integrated"}}
+                            {"exists": {"field": "entry_integrated"}}
                         ]
                     }
                 },
@@ -142,7 +142,7 @@ class ElasticsearchController(SearchController):
                 "filter": {
                     "bool": {
                         "must": [
-                            {"exists": {"field": "integrated"}}
+                            {"exists": {"field": "entry_integrated"}}
                         ]
                     }
                 },

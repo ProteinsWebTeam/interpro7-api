@@ -91,7 +91,7 @@ chains = {
 class ActionsOnTestDocumentTest(InterproRESTTestCase):
     @classmethod
     def setUpClass(cls):
-        super(InterproRESTTestCase, cls).setUpClass()
+        super(ActionsOnTestDocumentTest, cls).setUpClass()
         search = ElasticsearchController()
         cls.all_docs = search.execute_query("*:*", rows=50)
 
@@ -142,12 +142,12 @@ class ActionsOnTestDocumentTest(InterproRESTTestCase):
             self.assertEqual(db_counts_unique[db], len(uni))
 
     def tests_contains_filter(self):
-        with_root = filter_by_contain_value(self.all_docs, "lineage", "1")
+        with_root = filter_by_contain_value(self.all_docs, "tax_lineage", "1")
         self.assertEqual(len(self.all_docs), len(with_root))
-        with_bacteria = filter_by_contain_value(self.all_docs, "lineage", "2")
+        with_bacteria = filter_by_contain_value(self.all_docs, "tax_lineage", "2")
         self.assertGreater(len(self.all_docs), len(with_bacteria))
         with_tax_id = filter_by_value(self.all_docs, "tax_id", 344612)
-        with_parent = filter_by_contain_value(with_tax_id, "lineage", "2579")
+        with_parent = filter_by_contain_value(with_tax_id, "tax_lineage", "2579")
         self.assertEqual(len(with_parent), len(with_tax_id))
 
 
@@ -210,7 +210,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                     accs_copy = accs.copy()
                     accs_copy[i] = accs_copy[i] + "/" + chain
                     url = get_url(endpoints, dbs, accs_copy)
-                    with_chain = filter_by_value(data, "chain", chain)
+                    with_chain = filter_by_value(data, "structure_chain_acc", chain)
                     self.assert_response_equal_to_expectd(
                         url, with_chain, payload_type, endpoints, dbs, accs
                     )
@@ -227,14 +227,14 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                 dbs_copy = dbs.copy()
                 dbs_copy[i] = "unintegrated/"+dbs_copy[i]
                 url = get_url(endpoints, dbs_copy, accs)
-                unintegrated = filter_by_value(data, "integrated", None)
+                unintegrated = filter_by_value(data, "entry_integrated", None)
                 unintegrated = exclude_by_value(unintegrated, "entry_db", "interpro")
                 self.assert_response_equal_to_expectd(url, unintegrated, payload_type, endpoints, dbs, accs)
 
                 dbs_copy = dbs.copy()
                 dbs_copy[i] = "integrated/"+dbs_copy[i]
                 url = get_url(endpoints, dbs_copy, accs)
-                integrated = filter_by_value(data, "integrated", "*")
+                integrated = filter_by_value(data, "entry_integrated", "*")
                 self.assert_response_equal_to_expectd(url, integrated, payload_type, endpoints, dbs, accs)
 
     def test_endpoint_endpoint_endpoint(self):
@@ -574,13 +574,13 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
             self.assert_obj_response_is_as_expected(obj_expected, obj_response, endpoint1, url)
 
     def test_db_db_endpoint(self):
-        for endpoint1 in api_test_map:
+        for endpoint1 in ["proteome"]: #api_test_map:
             for db1 in api_test_map[endpoint1]:
-                for endpoint2 in api_test_map:
+                for endpoint2 in ["structure"]: #api_test_map:
                     if endpoint1 == endpoint2:
                         continue
                     for db2 in api_test_map[endpoint2]:
-                        for endpoint3 in api_test_map:
+                        for endpoint3 in ["protein"]: #api_test_map:
                             if endpoint1 == endpoint3 or endpoint2 == endpoint3:
                                 continue
                             if not settings.DEBUG:

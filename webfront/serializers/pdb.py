@@ -154,7 +154,7 @@ class StructureSerializer(ModelContentSerializer):
             query = "structure_acc:" + escape(representation["metadata"]["accession"])
             if "chains" in representation["metadata"] and len(representation["metadata"]["chains"]) == 1:
                 query += " && ({})".format(" OR ".join(
-                    ["chain:"+x for x in representation["metadata"]["chains"]]
+                    ["structure_chain_acc:"+x for x in representation["metadata"]["chains"]]
                 ))
         return query
 
@@ -194,7 +194,7 @@ class StructureSerializer(ModelContentSerializer):
         if len(chains) < 1:
             raise ReferenceError('Trying to display an empty list of chains')
         return {
-            ch["chain"]: StructureSerializer.get_chain_from_search_object(ch)
+            ch["structure_chain_acc"]: StructureSerializer.get_chain_from_search_object(ch)
             for ch in chains
         }
 
@@ -206,7 +206,7 @@ class StructureSerializer(ModelContentSerializer):
                 "taxid": obj["tax_id"]
             },
             "accession": obj["protein_acc"],
-            "chain": obj["chain"],
+            "chain": obj["structure_chain_acc"],
             "protein_length": obj["protein_length"],
             "resolution": obj["structure_resolution"],
             "experiment_type": obj["structure_evidence"],

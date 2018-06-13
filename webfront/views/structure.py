@@ -16,7 +16,7 @@ class ChainPDBAccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("searcher",
-                                                    chain=endpoint_levels[level - 1])
+                                                    structure_chain_acc=endpoint_levels[level - 1])
         return super(ChainPDBAccessionHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,
             self.queryset, handler, general_handler, *args, **kwargs
@@ -24,7 +24,7 @@ class ChainPDBAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("searcher", chain=level_name)
+        general_handler.queryset_manager.add_filter("searcher", structure_chain_acc=level_name)
         return queryset
 
 

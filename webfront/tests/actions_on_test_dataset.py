@@ -97,19 +97,19 @@ def get_db_field(ep):
 
 def get_acc_field(ep, db=None):
     if ep == "taxonomy":
-        return "lineage"
+        return "tax_lineage"
     return "{}_acc".format(ep)
 
 
 def count_integrated(docs):
-    integrated = filter_by_value(docs, "integrated", "*")
+    integrated = filter_by_value(docs, "entry_integrated", "*")
     select = select_fields(integrated, ["entry_acc"])
     u = unique(select)
     return len(u)
 
 
 def count_unintegrated(docs):
-    unintegrated = filter_by_value(docs, "integrated", None)
+    unintegrated = filter_by_value(docs, "entry_integrated", None)
     unintegrated = exclude_by_value(unintegrated, "entry_db", "interpro")
     select = select_fields(unintegrated, ["entry_acc"])
     u = unique(select)
@@ -189,9 +189,9 @@ def extend_entry_db_counter(counter, data, member, ep, db):
     field_db = get_db_field(ep)
     field_acc = get_acc_field(ep)
     if member == "integrated":
-        just_member = filter_by_value(data, "integrated", "*")
+        just_member = filter_by_value(data, "entry_integrated", "*")
     elif member == "unintegrated":
-        just_member = filter_by_value(data, "integrated", None)
+        just_member = filter_by_value(data, "entry_integrated", None)
         just_member = exclude_by_value(just_member, "entry_db", "interpro")
     elif member == "all":
         just_member = data
@@ -348,7 +348,7 @@ def get_counter_payload(data, endpoints, dbs=None, accs=None):
     return payload
 
 endpoint_attributes = {
-    "entry": ["entry_acc", "entry_db", "entry_type", "integrated"],
+    "entry": ["entry_acc", "entry_db", "entry_type", "entry_integrated"],
     "protein": ["protein_acc", "protein_db", "protein_length"],
     "structure": ["structure_acc"],
     "taxonomy": ["tax_id"],
@@ -390,7 +390,7 @@ def get_endpoint_payload(obj, endpoint, db, acc=None, replace_proteome_accession
 def get_payload_list(data, endpoint, db, embed_as_metadata=True, include_chains=False):
     attrs = endpoint_attributes[endpoint].copy()
     if include_chains:
-        attrs.append("chain")
+        attrs.append("structure_chain_acc")
     group_values = unique(
         select_fields(data, attrs)
     )

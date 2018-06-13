@@ -2,8 +2,6 @@ import json
 
 import copy
 
-from webfront.searcher.search_controller import SearchController
-from webfront.views.custom import CustomView
 from webfront.searcher.elastic_controller import ElasticsearchController
 
 
@@ -18,6 +16,7 @@ class FixtureReader:
     entry_protein_list = []
     protein_structure_list = {}
     tax2lineage = {}
+    tax2rank = {}
     sets = {}
     proteomes = {}
     search = None
@@ -43,6 +42,7 @@ class FixtureReader:
                 self.protein_structure_list[fixture['fields']["protein"]].append(fixture['fields'])
             elif fixture['model'] == "webfront.Taxonomy":
                 self.tax2lineage[fixture['fields']["accession"]] = fixture['fields']['lineage'].split()
+                self.tax2rank[fixture['fields']["accession"]] = fixture['fields']['rank']
             elif fixture['model'] == "webfront.Proteome":
                 self.proteomes[fixture['fields']["accession"]] = fixture['fields']
             elif fixture['model'] == "webfront.Set":
@@ -84,22 +84,26 @@ class FixtureReader:
                     "entry_acc": e,
                     "entry_type": self.entries[e]["type"],
                     "entry_db": self.entries[e]["source_database"],
+                    "entry_integrated": self.entries[e]["integrated"],
+                    "entry_date": self.entries[e]["entry_date"],
                     "text_entry": e + " " + self.entries[e]["type"] + " " + (" ".join(self.entries[e]["description"])),
-                    "integrated": self.entries[e]["integrated"],
                     "protein_acc": p,
                     "protein_db": self.proteins[p]["source_database"],
                     "text_protein": p+" "+self.proteins[p]["source_database"]+" "+(" ".join(self.proteins[p]["description"])),
                     "tax_id": self.proteins[p]["organism"]["taxId"],
-                    "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
+                    "tax_name": self.proteins[p]["organism"]["name"],
+                    "tax_lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
+                    "tax_rank": self.tax2rank[self.proteins[p]["organism"]["taxId"]],
                     "proteome_acc": proteome,
                     "proteome_name": self.proteomes[proteome]["name"],
+                    "proteome_is_reference": self.proteomes[proteome]["is_reference"],
                     "text_proteome": proteome + " " + self.proteomes[proteome]["name"],
                     "entry_protein_locations": ep["coordinates"],
                     "protein_length": self.proteins[p]["length"],
                     "protein_size": self.proteins[p]["size"],
                     "id": get_id(e, p)
                 }
-                obj["text_taxonomy"] = obj["tax_id"] + " " + (" ".join(obj["lineage"]))
+                obj["text_taxonomy"] = obj["tax_id"] + " " + (" ".join(obj["tax_lineage"]))
 
                 if "ida" in ep:
                     obj["ida"] = ep["ida"]
@@ -111,9 +115,10 @@ class FixtureReader:
                         c["structure_acc"] = sp["structure"]
                         c["structure_evidence"] = self.structures[sp["structure"]]["experiment_type"]
                         c["structure_resolution"] = self.structures[sp["structure"]]["resolution"]
+                        c["structure_date"] = self.structures[sp["structure"]]["release_date"]
                         c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
-                        c["chain"] = sp["chain"]
-                        c["text_structure"] = c["structure_acc"] + " " + c["chain"]
+                        c["structure_chain_acc"] = sp["chain"]
+                        c["text_structure"] = c["structure_acc"] + " " + sp["chain"]
 
                         c["protein_structure_locations"] = sp["coordinates"]
                         if e in entry2set:
@@ -152,17 +157,21 @@ class FixtureReader:
                             "protein_db": self.proteins[p]["source_database"],
                             "text_protein": p + " " + self.proteins[p]["source_database"] + " " + (" ".join(self.proteins[p]["description"])),
                             "tax_id": self.proteins[p]["organism"]["taxId"],
-                            "lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
+                            "tax_name": self.proteins[p]["organism"]["name"],
+                            "tax_rank": self.tax2rank[self.proteins[p]["organism"]["taxId"]],
+                            "tax_lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
                             "proteome_acc": proteome,
                             "proteome_name": self.proteomes[proteome]["name"],
+                            "proteome_is_reference": self.proteomes[proteome]["is_reference"],
                             "protein_length": self.proteins[p]["length"],
                             "protein_size": self.proteins[p]["size"],
                             "id": get_id(None, p, sp["structure"], sp["chain"]),
                             "structure_acc": sp["structure"],
                             "structure_evidence": self.structures[sp["structure"]]["experiment_type"],
                             "structure_resolution": self.structures[sp["structure"]]["resolution"],
+                            "structure_date": self.structures[sp["structure"]]["release_date"],
                             "structure_chain": sp["structure"] + " - " + sp["chain"],
-                            "chain": sp["chain"],
+                            "structure_chain_acc": sp["chain"],
                             "text_structure": sp["structure"] + " " + sp["chain"],
                             "protein_structure_locations": sp["coordinates"],
                         })

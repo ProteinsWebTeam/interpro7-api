@@ -142,7 +142,7 @@ class InterproRESTTestCase(APITransactionTestCase):
         for match in obj:
             if "taxonomy" in match:
                 self._check__proteome_match(match, msg)
-            elif "lineage" in match:
+            elif "tax_lineage" in match:
                 self._check__organism_match(match, msg)
             else:
                 self._check_match(match, msg, include_coordinates=check_coordinates)

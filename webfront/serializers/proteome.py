@@ -147,11 +147,11 @@ class ProteomeSerializer(ModelContentSerializer):
         header = {
             "taxonomy": obj["tax_id"],
             "accession": obj["proteome_acc"],
-            "lineage": obj["lineage"],
+            "lineage": obj["tax_lineage"],
             "source_database": "uniprot"
         }
         if include_chain:
-            header["chain"] = obj["chain"]
+            header["chain"] = obj["structure_chain_acc"]
         return header
 
     def to_count_representation(self, endpoint, query):

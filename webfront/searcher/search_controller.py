@@ -20,9 +20,9 @@ class SearchController(metaclass=abc.ABCMeta):
             db = "{}_db".format(endpoint)
         acc = "{}_acc".format(endpoint)
         if endpoint == "taxonomy":
-            acc = "lineage"
+            acc = "tax_lineage"
         elif endpoint == "structure":
-            db = "chain"
+            db = "structure_chain_acc"
         elif endpoint == "proteome":
             db = "proteome_acc"
             acc = "proteome_acc"

@@ -31,7 +31,7 @@ class TaxonomyFixturesTest(InterproRESTTestCase):
         self._check_taxonomy_details(response.data["metadata"])
 
 
-class TaxonomyFixturesTest(InterproRESTTestCase):
+class TaxonomyProteomeFixturesTest(InterproRESTTestCase):
 
     def test_can_read_taxonomy_with_proteome_list(self):
         response = self.client.get("/api/taxonomy/uniprot/proteome")

@@ -224,7 +224,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                             for result in [x[plurals[endpoint2]] for x in response.data["results"]]:
                                 self._check_list_of_matches(
                                     result,
-                                    check_coordinates=endpoint1 != "organism",
+                                    check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                     msg="URL : [{}]".format(current))
 
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
@@ -248,7 +248,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                 for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
                                     self._check_list_of_matches(
                                         result,
-                                        check_coordinates=endpoint2 != "organism",
+                                        check_coordinates=endpoint1 != "taxonomy" and endpoint1 != "proteome",
                                         msg="URL : [{}]".format(current)
                                     )
                                 self._check_structure_chains_as_filter(endpoint1, db, acc,
@@ -276,7 +276,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                                                  "URL : [{}]".format(current))
                                 self._check_list_of_matches(
                                     response.data[plurals[endpoint2]],
-                                    check_coordinates=endpoint1 != "organism",
+                                    check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                     msg="URL : [{}]".format(current)
                                 )
                                 self._check_structure_and_chains(
@@ -304,7 +304,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                     self._check_object_by_accesssion(response.data)
                                     self._check_list_of_matches(
                                         response.data[plurals[endpoint2]],
-                                        check_coordinates=endpoint1 != "organism",
+                                        check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                         msg="URL : [{}]".format(current)
                                     )
                                     self._check_structure_and_chains(response, endpoint1, db, acc,
@@ -504,7 +504,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 for result in [x[plurals[endpoint2]] for x in response.data["results"]]:
                                     self._check_list_of_matches(
                                         result,
-                                        check_coordinates=endpoint1 != "organism",
+                                        check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                         msg="URL : [{}]".format(current))
                                 self._check_is_list_of_objects_with_key(response.data["results"],
                                                                         plurals[endpoint3],
@@ -534,7 +534,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 for result in [x[plurals[endpoint2]] for x in response.data["results"]]:
                                     self._check_list_of_matches(
                                         result,
-                                        check_coordinates=endpoint1 != "organism",
+                                        check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                         msg="URL : [{}]".format(current))
                                 self._check_is_list_of_objects_with_key(response.data["results"],
                                                                         plurals[endpoint3],
@@ -590,7 +590,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                                      "URL : [{}]".format(current))
                                     self._check_list_of_matches(
                                         response.data[plurals[endpoint2]],
-                                        check_coordinates=endpoint1 != "organism",
+                                        check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                         msg="URL : [{}]".format(current))
                                     self._check_counter_by_endpoint(endpoint3, response.data,
                                                                     "URL : [{}]".format(current))
@@ -619,7 +619,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     self._check_object_by_accesssion(response.data, "URL : [{}]".format(current))
                                     self._check_list_of_matches(
                                         response.data[plurals[endpoint2]],
-                                        check_coordinates=endpoint1 != "organism",
+                                        check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                         msg="URL : [{}]".format(current))
                                     self._check_counter_by_endpoint(endpoint3, response.data,
                                                                     "URL : [{}]".format(current))
@@ -649,7 +649,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
                                         self._check_list_of_matches(
                                             result,
-                                            check_coordinates=endpoint2!="organism",
+                                            check_coordinates=endpoint1 != "taxonomy" and endpoint1 != "proteome",
                                             msg="URL : [{}]".format(current))
                                     self._check_is_list_of_objects_with_key(response.data["results"],
                                                                             plurals[endpoint3],
@@ -681,7 +681,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
                                         self._check_list_of_matches(
                                             result,
-                                            check_coordinates=endpoint2 != "organism",
+                                            check_coordinates=endpoint1 != "taxonomy" and endpoint1 != "proteome",
                                             msg="URL : [{}]".format(current)
                                         )
                                     self._check_is_list_of_objects_with_key(response.data["results"],
@@ -790,7 +790,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         self._check_object_by_accesssion(response.data)
                                         self._check_list_of_matches(
                                             response.data[plurals[endpoint2]],
-                                            check_coordinates=endpoint1 != "organism",
+                                            check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                             msg="URL : [{}]".format(current))
                                         self._check_counter_by_endpoint(endpoint3, response.data,
                                                                         "URL : [{}]".format(current))
@@ -827,7 +827,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         self._check_object_by_accesssion(response.data)
                                         self._check_list_of_matches(
                                             response.data[plurals[endpoint2]],
-                                            check_coordinates=endpoint1 != "organism",
+                                            check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                             msg="URL : [{}]".format(current))
                                         self._check_counter_by_endpoint(endpoint3, response.data,
                                                                         "URL : [{}]".format(current))
@@ -907,7 +907,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     for result in [x[plurals[endpoint2]] for x in response.data["results"]]:
                                         self._check_list_of_matches(
                                             result,
-                                            check_coordinates=endpoint1!="organism",
+                                            check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                             msg="URL : [{}]".format(current))
                                     self._check_is_list_of_objects_with_key(response.data["results"],
                                                                             plurals[endpoint3],
@@ -915,7 +915,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     for result in [x[plurals[endpoint3]] for x in response.data["results"]]:
                                         self._check_list_of_matches(
                                             result,
-                                            check_coordinates=endpoint1!="organism",
+                                            check_coordinates=endpoint3 != "taxonomy" and endpoint3 != "proteome",
                                             msg="URL : [{}]".format(current))
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT,
@@ -944,11 +944,11 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                                          "URL : [{}]".format(current))
                                         self._check_list_of_matches(
                                             response.data[plurals[endpoint2]],
-                                            check_coordinates=endpoint1 != "organism",
+                                            check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                             msg="URL : [{}]".format(current))
                                         self._check_list_of_matches(
                                             response.data[plurals[endpoint3]],
-                                            check_coordinates=endpoint1 != "organism",
+                                            check_coordinates=endpoint3 != "taxonomy" and endpoint3 != "proteome",
                                             msg="URL : [{}]".format(current))
                                         self._check_structure_and_chains(
                                             response, endpoint1, db1, acc1,
@@ -979,12 +979,12 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
                                             self._check_list_of_matches(
                                                 result,
-                                                check_coordinates=endpoint2!="organism",
+                                                check_coordinates=endpoint1 != "taxonomy" and endpoint1 != "proteome",
                                                 msg="URL : [{}]".format(current))
                                         for result in [x[plurals[endpoint3]] for x in response.data["results"]]:
                                             self._check_list_of_matches(
                                                 result,
-                                                check_coordinates=endpoint2!="organism",
+                                                check_coordinates=endpoint3 != "taxonomy" and endpoint3 != "proteome",
                                                 msg="URL : [{}]".format(current))
 
                                         self._check_structure_chains_as_filter(
@@ -1016,12 +1016,12 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
                                             self._check_list_of_matches(
                                                 result,
-                                                check_coordinates=endpoint2!="organism",
+                                                check_coordinates=endpoint1 != "taxonomy" and endpoint1 != "proteome",
                                                 msg="URL : [{}]".format(current))
                                         for result in [x[plurals[endpoint3]] for x in response.data["results"]]:
                                             self._check_list_of_matches(
                                                 result,
-                                                check_coordinates=endpoint2!="organism",
+                                                check_coordinates=endpoint3 != "taxonomy" and endpoint3 != "proteome",
                                                 msg="URL : [{}]".format(current))
                                         self._check_structure_chains_as_filter(
                                             endpoint1, db1, acc1, endpoint2+"/"+db2+"/"+endpoint3+"/"+db3, "",
@@ -1053,11 +1053,11 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             self._check_object_by_accesssion(response.data)
                                             self._check_list_of_matches(
                                                 response.data[plurals[endpoint2]],
-                                                check_coordinates=endpoint1 != "organism",
+                                                check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                                 msg="URL : [{}]".format(current))
                                             self._check_list_of_matches(
                                                 response.data[plurals[endpoint3]],
-                                                check_coordinates=endpoint1 != "organism",
+                                                check_coordinates=endpoint3 != "taxonomy" and endpoint3 != "proteome",
                                                 msg="URL : [{}]".format(current))
                                             self._check_structure_and_chains(
                                                 response, endpoint1, db1, acc1,
@@ -1091,11 +1091,11 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             self._check_object_by_accesssion(response.data)
                                             self._check_list_of_matches(
                                                 response.data[plurals[endpoint2]],
-                                                check_coordinates=endpoint1 != "organism",
+                                                check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                                 msg="URL : [{}]".format(current))
                                             self._check_list_of_matches(
                                                 response.data[plurals[endpoint3]],
-                                                check_coordinates=endpoint1 != "organism",
+                                                check_coordinates=endpoint3 != "taxonomy" and endpoint3 != "proteome",
                                                 msg="URL : [{}]".format(current))
                                             self._check_structure_and_chains(
                                                 response, endpoint1, db1, acc1,
@@ -1131,12 +1131,12 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             for result in [x[plurals[endpoint1]] for x in response.data["results"]]:
                                                 self._check_list_of_matches(
                                                     result,
-                                                    check_coordinates=endpoint3!="organism",
+                                                    check_coordinates=endpoint1 != "taxonomy" and endpoint1 != "proteome",
                                                     msg="URL : [{}]".format(current))
                                             for result in [x[plurals[endpoint2]] for x in response.data["results"]]:
                                                 self._check_list_of_matches(
                                                     result,
-                                                    check_coordinates=endpoint3!="organism",
+                                                    check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                                     msg="URL : [{}]".format(current))
                                             self._check_structure_chains_as_filter(
                                                 endpoint1, db1, acc1, endpoint3+"/"+db3, "/"+endpoint2+"/"+db2+"/"+acc2,
@@ -1172,12 +1172,12 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 self._check_object_by_accesssion(response.data)
                                                 self._check_list_of_matches(
                                                     response.data[plurals[endpoint2]],
-                                                    check_coordinates=endpoint1 != "organism",
+                                                    check_coordinates=endpoint2 != "taxonomy" and endpoint2 != "proteome",
                                                     msg="URL : [{}]".format(current)
                                                 )
                                                 self._check_list_of_matches(
                                                     response.data[plurals[endpoint3]],
-                                                    check_coordinates=endpoint1 != "organism",
+                                                    check_coordinates=endpoint3 != "taxonomy" and endpoint3 != "proteome",
                                                     msg="URL : [{}]".format(current)
                                                 )
                                                 self._check_structure_and_chains(

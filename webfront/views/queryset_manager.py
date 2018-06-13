@@ -67,7 +67,7 @@ class QuerysetManager:
                     q += " && {}_exists_:{}_db".format("!" if v else "", ep)
                 elif k == "accession" or k == "accession__iexact":
                     if ep == 'taxonomy':
-                        q += " && lineage:{}".format(escape(v))
+                        q += " && tax_lineage:{}".format(escape(v))
                     else:
                         q += " && {}_acc:{}".format(ep, escape(v))
                 elif k == "accession__isnull":
@@ -86,18 +86,18 @@ class QuerysetManager:
                         else:
                             q += " && set_integrated:{}".format(escape(v))
                     else:
-                        q += " && integrated:{}".format(escape(v))
+                        q += " && entry_integrated:{}".format(escape(v))
                 elif k == "integrated__isnull":
                     if ep == 'set':
                         q += " && {}_exists_:set_integrated".format("!" if v else "")
                     else:
-                        q += " && {}_exists_:integrated".format("!entry_db:interpro && !" if v else "")
+                        q += " && {}_exists_:entry_integrated".format("!entry_db:interpro && !" if v else "")
                 elif k == "type" or k == "type__iexact":
                     q += " && {}_type:{}".format(ep, escape(v))
                 elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":
                     q += " && tax_id:{}".format(escape(v))
-                elif "lineage__contains" in k:
-                    q += " && lineage:{}".format(escape(v).strip())
+                elif "tax_lineage__contains" in k:
+                    q += " && tax_lineage:{}".format(escape(v).strip())
                 elif "experiment_type__" in k:
                     q += " && structure_evidence:{}".format(escape(v).strip())
                 elif ep == "protein" and "size__" in k:

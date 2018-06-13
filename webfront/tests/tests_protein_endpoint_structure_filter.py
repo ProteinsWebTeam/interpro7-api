@@ -118,10 +118,10 @@ class ProteinWithFilterStructurePDBAccessionRESTTest(InterproRESTTestCase):
         prot_b = "M5ADK6"
 
         tests = {
-            "/api/protein/uniprot/"+prot_a+"/structure/pdb/"+pdb: [pdb],
-            "/api/protein/uniprot/"+prot_b+"/structure/pdb/"+pdb: [pdb],
+            # "/api/protein/uniprot/"+prot_a+"/structure/pdb/"+pdb: [pdb],
+            # "/api/protein/uniprot/"+prot_b+"/structure/pdb/"+pdb: [pdb],
             "/api/protein/uniprot/"+prot_a+"/structure/pdb/"+pdb+"/A": [pdb],
-            "/api/protein/uniprot/"+prot_b+"/structure/pdb/"+pdb+"/B": [pdb],
+            # "/api/protein/uniprot/"+prot_b+"/structure/pdb/"+pdb+"/B": [pdb],
         }
         for url in tests:
             response = self.client.get(url)

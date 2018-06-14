@@ -88,8 +88,9 @@ class CustomView(GenericAPIView):
                 else:
                     self.queryset = self.get_queryset().first()
             else:
-                # if it gets here it is a endpoint request checking for database contributions.
-                self.queryset = self.get_counter_response(general_handler, searcher)
+                if endpoint_levels[0] != "utils":
+                    # if it gets here it is a endpoint request checking for database contributions.
+                    self.queryset = self.get_counter_response(general_handler, searcher)
 
             serialized = self.serializer_class(
                 # passed to DRF's view

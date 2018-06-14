@@ -44,6 +44,9 @@ class ModelContentSerializer(serializers.ModelSerializer):
         except AttributeError:
             pass
 
+    def to_representation(self, instance):
+        return instance
+
     def get_extra_endpoints_to_count(self):
         extra = []
         if SerializerDetail.ENTRY_DB in self.detail_filters:

@@ -16,7 +16,9 @@ from webfront.views.structure import StructureHandler
 from webfront.views.taxonomy import TaxonomyHandler
 from webfront.views.proteome import ProteomeHandler
 from webfront.views.set import SetHandler
+from webfront.views.utils import UtilsHandler
 from webfront.views.cache import InterProCache
+
 
 from webfront.models import Database
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
@@ -90,6 +92,7 @@ class GeneralHandler(CustomView):
         ('taxonomy', TaxonomyHandler),
         ('proteome', ProteomeHandler),
         ('set', SetHandler),
+        ('utils', UtilsHandler),
     ]
     # The queryset manager for the current request.
     queryset_manager = QuerysetManager()

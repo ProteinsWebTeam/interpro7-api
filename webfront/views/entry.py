@@ -315,7 +315,6 @@ class EntryHandler(CustomView):
                 "type": "entry_type",
                 "integrated": "integrated",
                 "source_database": "entry_db",
-                "annotation": "entry_annotation",
                 "tax_id": "tax_id",
                 "go_terms": "text",
             }),

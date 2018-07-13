@@ -1,0 +1,251 @@
+openapi: 3.0.0
+info:
+  title: InterPro7 API
+  description: Programatic access of all the InterPro entries and its related entities
+  version: 0.0.1
+servers:
+  - url: https://wwwdev.ebi.ac.uk/interpro7/api/
+    description: Dev server
+  - url: http://localhost:8007/api/
+    description: Local server
+paths:
+  /entry:
+    get:
+      summary: Returns the overview counters of the InterPro entries.
+      tags:
+        - entry
+      parameters:
+        - $ref: '#/components/parameters/entryGroupBy'
+      responses:
+        '200':    # status code
+          description: A JSON object with the number of entries per database
+          content:
+            application/json:
+              schema:
+                type: object
+  /entry/{sourceDB}:
+    get:
+      summary: Returns a list of the entries in the selected DB.
+      tags:
+        - entry
+      parameters:
+        - name: sourceDB
+          in: path
+          required: true
+          description: Either a member database, interpro or one of the wildcards (e.g. all)
+          schema:
+            $ref: '#/components/schemas/EntryDB'
+        - name: integrated
+          in: query
+          description: Filters the entries that are integrated with the given interPro accession
+          schema:
+            type: string
+        - name: go_category
+          in: query
+          description: Filter the entries tha belong to one of the high level GO categories. Use P for Biological Process, F for Molecular Function, and C for Cellular Component.
+          schema:
+            type: string
+            enum: ["P", "F", "C"]
+
+        - name: go_term
+          in: query
+          description: Filters the entries that have been annotated with the given GO term.
+          schema:
+            type: string
+        - name: annotation
+          in: query
+          description: Filters the entries matching the given type
+          schema:
+            type: string
+        - name: interpro_status
+          in: query
+          description: |
+            counts how many entries in the selection are integrated and how many are not.
+
+            **Note:** This only works if the sourceDB selected is a member Database.
+          schema:
+            type: boolean
+        - name: extra_fields
+          in: query
+          description: Filters the entries matching the given type
+          schema:
+            type: string
+            style: form
+            explode: false
+            enum:
+            - counters
+            - entry_id
+            - short_name
+            - description
+            - wikipedia
+            - literature
+            - hierarchy
+            - cross_references
+            - entry_date
+            - is_featured
+            - overlaps_with
+        - $ref: '#/components/parameters/entrySortBy'
+        - $ref: '#/components/parameters/entryGroupBy'
+      responses:
+        '200':    # status code
+          description: A JSON array with the overview objects of the entries of the selected DB
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /entry/{sourceDB}/{accession}:
+    get:
+      summary: Returns and object of the selected Entry
+      tags:
+        - entry
+      parameters:
+        - name: sourceDB
+          in: path
+          required: true
+          description: Either a member database, interpro or one of the wildcards (e.g. all)
+          schema:
+            $ref: '#/components/schemas/EntryDB'
+        - name: accession
+          in: path
+          required: true
+          description: The accession of the Entry to retrieve
+          schema:
+            type: string
+          example: "IPR000001"
+        - name: ida
+          in: query
+          description:
+          schema:
+            type: string
+      responses:
+        '200':    # status code
+          description: A JSON array with the overview objects of the entries of the selected DB
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /protein:
+    get:
+      summary: Returns the overview counters of the Proteins in our DB.
+      tags:
+        - protein
+      responses:
+        '200':    # status code
+          description: A JSON object with the number of proteins per database
+          content:
+            application/json:
+              schema:
+                type: object
+  /protein/{sourceDB}:
+    get:
+      summary: Returns a list of the proteins in the selected DB.
+      tags:
+        - protein
+      parameters:
+        - name: sourceDB
+          in: path
+          required: true
+          description: The wild card 'uniprot' shows all the proteins, or it can be filtered by reviewed or unreviewed.
+          schema:
+            $ref: '#/components/schemas/ProteinDB'
+      responses:
+        '200':    # status code
+          description: A JSON array with the overview objects of the proteins of the selected DB
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /protein/{sourceDB}/{accession}:
+    get:
+      summary: Returns and object of the selected protein
+      tags:
+        - protein
+      parameters:
+        - name: sourceDB
+          in: path
+          required: true
+          description: The wild card 'uniprot' shows all the proteins, or it can be filtered by reviewed or unreviewed.
+          schema:
+            $ref: '#/components/schemas/ProteinDB'
+        - name: accession
+          in: path
+          required: true
+          description: The accession of the protein to retrieve
+          schema:
+            type: string
+          example: "P99999"
+      responses:
+        '200':    # status code
+          description: A JSON array with the overview objects of the entries of the selected DB
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+components:
+  schemas:
+    EntryDB:
+      type: string
+      enum:
+        - InterPro
+        - all
+        - unintegrated
+        - integrated
+        - cathgene3d
+        - hamap
+        - panther
+        - pirsf
+        - prints
+        - prosite
+        - profile
+        - pfam
+        - prodom
+        - smart
+        - ssf
+        - tigrfams
+        - cdd
+        - mobidblt
+        - sfld
+    ProteinDB:
+      type: string
+      enum:
+        - uniprot
+        - reviewed
+        - unreviewed
+  parameters:
+    entryGroupBy:
+        name: group_by
+        in: query
+        description: |
+          Groups the current selection of entries by the given parameter, and counts the unique entries for each group.
+
+          **Note:** This parameter changes the output's format.
+
+          **Note:** This parameter might not play along with other parameters (e.g. sort_by)
+        schema:
+          type: string
+          enum:
+            - type
+            - integrated
+            - source_database
+            - tax_id
+            - go_terms
+    entrySortBy:
+        name: sort_by
+        in: query
+        description: Sorts te list by the given value
+        schema:
+          type: string
+          enum:
+            - accession
+            - integrated
+            - name

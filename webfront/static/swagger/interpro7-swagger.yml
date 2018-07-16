@@ -65,6 +65,7 @@ paths:
             **Note:** This only works if the sourceDB selected is a member Database.
           schema:
             type: boolean
+          allowEmptyValue: true
         - name: extra_fields
           in: query
           description: Filters the entries matching the given type
@@ -119,6 +120,8 @@ paths:
           description:
           schema:
             type: string
+            enum: ["", " "]
+          required: false
       responses:
         '200':    # status code
           description: A JSON array with the overview objects of the entries of the selected DB
@@ -134,6 +137,8 @@ paths:
       summary: Returns the overview counters of the Proteins in our DB.
       tags:
         - protein
+      parameters:
+        - $ref: '#/components/parameters/proteinGroupBy'
       responses:
         '200':    # status code
           description: A JSON object with the number of proteins per database
@@ -153,6 +158,59 @@ paths:
           description: The wild card 'uniprot' shows all the proteins, or it can be filtered by reviewed or unreviewed.
           schema:
             $ref: '#/components/schemas/ProteinDB'
+        - name: size
+          in: query
+          description: Filter the proteins that belong to one of the size categories - i.e. small, medium, large.
+          schema:
+            type: string
+            enum: ["small", "medium", "large"]
+        - name: id
+          in: query
+          description: Filters the proteins by its ID. e.g. CYC_HUMAN
+          schema:
+            type: string
+        - name: tax_id
+          in: query
+          description: Filters the proteins by its taxonomy ID. e.g. 9606
+          schema:
+            type: integer
+        - name: protein_evidence
+          in: query
+          description: Filters the proteins by its evidence code - 1 to 6
+          schema:
+            type: integer
+        - name: go_term
+          in: query
+          description: Filters the proteins that have been annotated with the given GO term. e.g. GO:0006122
+          schema:
+            type: string
+        - name: ida
+          in: query
+          description: Filters the proteins that follow the domain architecture of a given ida e.g. 44d74765435ca3c68b3d87ebbb680e5498d1a24a
+          schema:
+            type: string
+        - name: extra_fields
+          in: query
+          description: Include the extra fields in the  payload
+          schema:
+            type: string
+            style: form
+            explode: false
+            enum:
+            - counters
+            - identifier
+            - other_names
+            - description
+            - sequence
+            - gene
+            - go_terms
+            - evidence_code
+            - residues
+            - fragment
+            - tax_id
+            - size
+        - $ref: '#/components/parameters/proteinGroupBy'
+        - $ref: '#/components/parameters/proteinSortBy'
       responses:
         '200':    # status code
           description: A JSON array with the overview objects of the proteins of the selected DB
@@ -218,9 +276,9 @@ components:
     ProteinDB:
       type: string
       enum:
-        - uniprot
         - reviewed
         - unreviewed
+        - uniprot
   parameters:
     entryGroupBy:
         name: group_by
@@ -249,3 +307,28 @@ components:
             - accession
             - integrated
             - name
+    proteinGroupBy:
+        name: group_by
+        in: query
+        description: |
+          Groups the current selection of proteins by the given parameter, and counts the unique proteins for each group.
+
+          **Note:** This parameter changes the output's format.
+
+          **Note:** This parameter might not play along with other parameters (e.g. sort_by)
+        schema:
+          type: string
+          enum:
+            - tax_id
+            - source_database
+            - go_terms
+            - size
+    proteinSortBy:
+        name: sort_by
+        in: query
+        description: Sorts te list by the given value
+        schema:
+          type: string
+          enum:
+            - accession
+            - length

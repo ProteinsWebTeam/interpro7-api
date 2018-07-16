@@ -142,7 +142,6 @@ class ProteinHandler(CustomView):
         general_handler.modifiers.register("sort_by", sort_by({
             "accession": "protein_acc",
             "length": "length",
-            "id": "identifier"
         }))
         general_handler.modifiers.register("size", filter_by_field("protein", "size"))
         general_handler.modifiers.register("id", filter_by_field("protein", "identifier"))

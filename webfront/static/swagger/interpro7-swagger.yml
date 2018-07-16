@@ -417,7 +417,153 @@ paths:
           example: 9606
       responses:
         '200':    # status code
-          description: An object with the detailsof the selected structure.
+          description: An object with the details of the selected taxon.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /proteome:
+    get:
+      summary: Returns the overview counters of the Proteome in the database.
+      tags:
+        - Proteome
+      responses:
+        '200':    # status code
+          description: A JSON object with the number of Proteomes per database
+          content:
+            application/json:
+              schema:
+                type: object
+  /proteome/{sourceDB}:
+    get:
+      summary: Returns a list of the Proteomes in the selected DB.
+      tags:
+        - Proteome
+      parameters:
+        - name: sourceDB
+          in: path
+          required: true
+          description: The only supported database for Proteome is UniProt.
+          schema:
+            type: string
+            enum: ["uniprot"]
+        - name: extra_fields
+          in: query
+          description: Include the extra fields in the  payload
+          schema:
+            type: string
+            style: form
+            explode: false
+            enum:
+            - counters
+            - strain
+            - assembly
+      responses:
+        '200':    # status code
+          description: A JSON list with the basic dtails of the Proteome corresponding to th current selection.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /proteome/{sourceDB}/{accession}:
+    get:
+      summary: Returns an object with the details of the selected Proteome
+      tags:
+        - Proteome
+      parameters:
+        - name: sourceDB
+          in: path
+          required: true
+          description: The only supported database for Proteome is UniProt.
+          schema:
+            type: string
+            enum: ["uniprot"]
+        - name: accession
+          in: path
+          required: true
+          description: The accession of the Proteome to retrieve
+          schema:
+            type: string
+          example: "up000000211"
+      responses:
+        '200':    # status code
+          description: An object with the details of the selected Proteome.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /set:
+    get:
+      summary: Returns the overview counters of the set in the database.
+      tags:
+        - Sets
+      responses:
+        '200':    # status code
+          description: A JSON object with the number of sets per database
+          content:
+            application/json:
+              schema:
+                type: object
+  /set/{sourceDB}:
+    get:
+      summary: Returns a list of the sets in the selected DB.
+      tags:
+        - Sets
+      parameters:
+        - name: sourceDB
+          in: path
+          required: true
+          description: Currently we have sets of entries from pfam and cdd.
+          schema:
+            type: string
+            enum: ["all", "cdd", "pfam"]
+        - name: extra_fields
+          in: query
+          description: Include the extra fields in the  payload
+          schema:
+            type: string
+            style: form
+            explode: false
+            enum:
+            - counters
+            - description
+            - relationships
+      responses:
+        '200':    # status code
+          description: A JSON list with the basic dtails of the set corresponding to the current selection.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /set/{sourceDB}/{accession}:
+    get:
+      summary: Returns an object with the details of the selected set.
+      tags:
+        - Sets
+      parameters:
+        - name: sourceDB
+          in: path
+          required: true
+          description: Currently we have sets of entries from pfam and cdd.
+          schema:
+            type: string
+            enum: ["all", "cdd", "pfam"]
+        - name: accession
+          in: path
+          required: true
+          description: The accession of the set to retrieve
+          schema:
+            type: string
+          example: "cl0001"
+      responses:
+        '200':    # status code
+          description: An object with the details of the selected Set.
           content:
             application/json:
               schema:

@@ -300,6 +300,13 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs)
         return [ch["_source"] for ch in response["hits"]["hits"]]
 
+    def get_document_by_any_accession(self, accession):
+        q = "entry_acc:{} or protein_acc:{} or structure_acc:{} or proteome_acc:{} or set_acc:{}"\
+            .format(accession, accession, accession, accession, accession)
+        if accession.isnumeric():
+            q += " or tax_id:{}".format(accession)
+        return self._elastic_json_query(q, {"size":1})
+
     # TODO: Used only for the tests... Move it there
     def execute_query(self, query, fq=None, rows=0, start=0):
         logger = logging.getLogger("interpro.elastic")

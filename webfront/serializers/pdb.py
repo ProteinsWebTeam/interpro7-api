@@ -152,10 +152,10 @@ class StructureSerializer(ModelContentSerializer):
         query = None
         if "metadata" in representation:
             query = "structure_acc:" + escape(representation["metadata"]["accession"])
-            if "chains" in representation["metadata"] and len(representation["metadata"]["chains"]) == 1:
-                query += " && ({})".format(" OR ".join(
-                    ["chain:"+x for x in representation["metadata"]["chains"]]
-                ))
+            # if "chains" in representation["metadata"] and len(representation["metadata"]["chains"]) == 1:
+            #     query += " && ({})".format(" OR ".join(
+            #         ["chain:"+x for x in representation["metadata"]["chains"]]
+            #     ))
         return query
 
     def to_proteins_count_representation(self, representation):

@@ -300,6 +300,24 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs)
         return [ch["_source"] for ch in response["hits"]["hits"]]
 
+
+    def count_unique(self, query, field_to_count):
+        qs = self.queryset_manager.get_searcher_query() if query is None else query
+        if qs == '':
+            qs = '*:*'
+        facet = {
+            "aggs": {
+                "ngroups": {
+                    "cardinality": {
+                        "field": field_to_count
+                    }
+                },
+            },
+            "size": 0
+        }
+        response = self._elastic_json_query(qs, facet)
+        return response["aggregations"]["ngroups"]["value"]
+
     # TODO: Used only for the tests... Move it there
     def execute_query(self, query, fq=None, rows=0, start=0):
         logger = logging.getLogger("interpro.elastic")

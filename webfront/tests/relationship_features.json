@@ -42,8 +42,8 @@
       "entry": "ps50822",
       "protein": "p16582",
       "coordinates": [
-        {"fragments" : [{"start" : 48, "end" : 91}, {"start" : 95, "end" : 99}]},
-        {"fragments" : [{"start" : 148, "end" : 191}, {"start" : 195, "end" : 199}]}
+        {"fragments" : [{"start" : 48, "end" : 91, "bounds": "e"}, {"start" : 95, "end" : 99, "bounds": "se"}]},
+        {"fragments" : [{"start" : 148, "end" : 191, "bounds": "e"}, {"start" : 195, "end" : 199, "bounds": "s"}]}
       ]
     }
   },

@@ -51,6 +51,15 @@ class GroupByModifierTest(InterproRESTTestCase):
     def test_wrong_field_for_group_by_should_fail(self):
         self._check_HTTP_response_code("/api/entry?group_by=entry_type", code=status.HTTP_404_NOT_FOUND)
 
+    def test_can_get_the_match_presence_groups(self):
+        response = self.client.get("/api/protein?group_by=match_presence")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("match_presence", response.data)
+        self.assertIn("true", response.data["match_presence"])
+        self.assertIn("false", response.data["match_presence"])
+        self.assertEqual(response.data["match_presence"]["true"], 3)
+        self.assertEqual(response.data["match_presence"]["false"], 1)
+
 
 class FilterByFieldModifierTest(InterproRESTTestCase):
 
@@ -133,6 +142,19 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
             for result in response.data["results"]:
                 size_g = self._get_size_group(result["metadata"]["length"])
                 self.assertEqual(size_g, size)
+
+    def test_can_filter_proteins_by_match_presence(self):
+        options = ["true", "false"]
+        for option in options:
+            response = self.client.get("/api/protein/uniprot?extra_fields=counters&match_presence="+option)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("results", response.data)
+            for result in response.data["results"]:
+                entries = result["extra_fields"]["counters"]["entries"]
+                if option == "true":
+                    self.assertGreater(entries, 0)
+                else:
+                    self.assertEqual(entries, 0)
 
 class FilterByContainsFieldModifierTest(InterproRESTTestCase):
 

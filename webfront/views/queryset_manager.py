@@ -64,7 +64,8 @@ class QuerysetManager:
                     main_ep = self.main_endpoint
                     if main_ep == "taxonomy" or main_ep == "proteome":
                         main_ep = "organism"
-                    q += " && text_{}:*{}*".format(main_ep, escape(v))
+                    for token in v.split():
+                        q += " && text_{}:*{}*".format(main_ep, escape(token))
                 elif k == "source_database__isnull":
                     q += " && {}_exists_:{}_db".format("!" if v else "", ep)
                 elif k == "accession" or k == "accession__iexact":

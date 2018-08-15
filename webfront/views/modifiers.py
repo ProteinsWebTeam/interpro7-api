@@ -93,6 +93,16 @@ def group_by_organism(general_handler, endpoint_queryset):
         if str(r['key']) in organisms
     ]
 
+def group_by_match_presence(general_handler, endpoint_queryset):
+    searcher = general_handler.searcher
+    qs = general_handler.queryset_manager.get_searcher_query()
+    return {
+        "match_presence": {
+            "true": searcher.count_unique(qs + " && _exists_:entry_acc", "protein_acc"),
+            "false": searcher.count_unique(qs + " && !_exists_:entry_acc", "protein_acc"),
+        }
+    }
+
 def group_by_annotations(general_handler):
     if is_single_endpoint(general_handler):
         #queryset = Entry.objects.values('source_database', 'entryannotation__type').annotate(total=Count('entryannotation__type'))
@@ -122,6 +132,8 @@ def group_by(endpoint_queryset, fields):
             return group_by_annotations(general_handler)
         if "tax_id" == field:
             return group_by_organism(general_handler, endpoint_queryset)
+        if "match_presence" == field:
+            return group_by_match_presence(general_handler, endpoint_queryset)
         if is_single_endpoint(general_handler) and general_handler.queryset_manager.main_endpoint != "protein":
             qs = get_queryset_to_group(general_handler, endpoint_queryset)
             return qs.values_list(field).annotate(total=Count(field))
@@ -213,6 +225,13 @@ def get_interpro_status_counter(field, general_handler):
         "integrated": total - unintegrated,
         "unintegrated": unintegrated,
     }
+
+
+def filter_by_match_presence(value, general_handler):
+    general_handler.queryset_manager.add_filter(
+        "entry",
+        **{"source_database__isnull": value.lower() != "true"}
+    )
 
 
 

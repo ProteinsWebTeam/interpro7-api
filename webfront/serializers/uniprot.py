@@ -162,6 +162,8 @@ class ProteinSerializer(ModelContentSerializer):
                     ProteinSerializer.serialize_counter_bucket(bucket, "proteins")
                 for bucket in instance["groups"]["buckets"]
             }
+        elif "match_presence" in instance:
+            return instance
         else:
             return {formatMemberDBName(field_value): total for field_value, total in instance}
 

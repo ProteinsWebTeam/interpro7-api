@@ -13,7 +13,12 @@ logger = logging.getLogger("interpro.request")
 
 
 def is_single_endpoint(general_handler):
-    return general_handler.filter_serializers == {}
+    main_ep = general_handler.queryset_manager.main_endpoint
+    filters = [
+        f for f in general_handler.queryset_manager.filters
+        if f != main_ep and f != "search" and general_handler.queryset_manager.filters[f] != {}
+    ]
+    return len(filters) == 0
 
 
 class CustomView(GenericAPIView):

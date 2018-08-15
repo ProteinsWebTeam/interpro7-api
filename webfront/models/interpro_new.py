@@ -10,7 +10,7 @@ class Database(models.Model):
     release_date = models.DateTimeField(null=True)
     type = models.CharField(max_length=100)
     prev_version = models.CharField(max_length=100, null=True)
-    prev_release_date = models.DateField(null=True)
+    prev_release_date = models.DateTimeField(null=True)
 
 
 class Entry(models.Model):

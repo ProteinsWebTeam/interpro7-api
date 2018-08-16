@@ -6,7 +6,7 @@
       "name": "Solution structure of the BRCA1/BARD1 RING-domain heterodimer",
       "other_names": [],
       "experiment_type": "nmr",
-      "release_date": "2009-02-24 00:00Z",
+      "release_date": "2009-02-24T00:00:00Z",
       "resolution": 2.5,
       "literature": {
         "PUB00020128": {
@@ -52,7 +52,7 @@
       "name": "Structural basis of phospho-peptide recognition by the brct domain of brca1, structure with phosphopeptide",
       "other_names": [],
       "experiment_type": "x-ray",
-      "release_date": "2011-07-13 00:00Z",
+      "release_date": "2011-07-13T00:00:00Z",
       "literature": {},
       "chains": ["A", "B", "C", "D", "E"],
       "source_database": "pdb"
@@ -66,7 +66,7 @@
       "name": "Crystal structure of the truncated hemoglobin from geobacillus stearothermophilus",
       "other_names": [],
       "experiment_type": "x-ray",
-      "release_date": "2009-02-24 00:00Z",
+      "release_date": "2009-02-24T00:00:00Z",
       "literature": {
         "PUB00018283": {
           "PMID": 11050429,
@@ -96,7 +96,7 @@
       "name": "E. COLI (lacZ) BETA-GALACTOSIDASE (E537Q) IN COMPLEX WITH ALLOLACTOSE",
       "other_names": [],
       "experiment_type": "X-ray diffraction, resolution 1.50",
-      "release_date": "2009-02-24 00:00Z",
+      "release_date": "2009-02-24T00:00:00Z",
       "literature": {
         "PUB00020128": {
           "PMID": 15284453,

@@ -7,7 +7,7 @@
       "type": "entry",
       "version": "66.0",
       "prev_version": "65.0",
-      "prev_release_date": "2018-02-21 00:00Z"
+      "prev_release_date": "2018-02-21T00:00:00Z"
     }
   },
   {
@@ -18,7 +18,7 @@
       "type": "entry",
       "version": "21.0",
       "prev_version": "21.0",
-      "prev_release_date": "2018-02-21 00:00Z"
+      "prev_release_date": "2018-02-21T00:00:00Z"
     }
   },
   {
@@ -29,7 +29,7 @@
       "type": "entry",
       "version": "2.0",
       "prev_version": "1.8",
-      "prev_release_date": "2018-02-21 00:00Z"
+      "prev_release_date": "2018-02-21T00:00:00Z"
     }
   },
   {
@@ -40,7 +40,7 @@
       "type": "entry",
       "version": "1.0",
       "prev_version": "0.10",
-      "prev_release_date": "2017-02-21 00:00Z"
+      "prev_release_date": "2017-02-21T00:00:00Z"
     }
   },
   {
@@ -51,7 +51,7 @@
       "type": "protein",
       "version": "61.0",
       "prev_version": "62.0",
-      "prev_release_date": "2018-02-21 00:00Z"
+      "prev_release_date": "2018-02-21T00:00:00Z"
     }
   },
   {
@@ -62,7 +62,7 @@
       "type": "structure",
       "version": "14.0",
       "prev_version": "13.0",
-      "prev_release_date": "2018-01-21 00:00Z"
+      "prev_release_date": "2018-01-21T00:00:00Z"
     }
   }
 ]

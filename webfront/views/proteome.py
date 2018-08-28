@@ -73,17 +73,7 @@ class ProteomeHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-
-        params = request.query_params
-        if 'is_reference' in request.GET:
-            is_reference_param = request.GET.get('is_reference')
-            if is_reference_param.lower() == 'true':
-                is_reference_bool = True
-            elif is_reference_param.lower() == "false":
-                is_reference_bool = False
-            request.GET = request.GET.copy()
-            request.GET['is_reference'] = is_reference_bool
-            general_handler.modifiers.register("is_reference", filter_by_boolean_field("proteome",'is_reference'))
+        general_handler.modifiers.register("is_reference", filter_by_boolean_field("proteome",'is_reference'))
         general_handler.queryset_manager.reset_filters("proteome", endpoint_levels)
 
         return super(ProteomeHandler, self).get(

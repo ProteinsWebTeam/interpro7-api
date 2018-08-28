@@ -170,9 +170,13 @@ def filter_by_field(endpoint, field):
 
 def filter_by_boolean_field(endpoint, field):
     def x(value, general_handler):
+        if (value.lower() == "false"):
+            boolean_value = False
+        else:
+            boolean_value = True
         general_handler.queryset_manager.add_filter(
             endpoint,
-            **{"{}".format(field): value}
+            **{"{}".format(field): boolean_value}
         )
     return x
 

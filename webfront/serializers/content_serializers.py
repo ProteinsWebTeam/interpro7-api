@@ -103,7 +103,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         ]
 
         if len(response) == 0:
-            raise ReferenceError('There are not organisms for this request')
+            raise ReferenceError('No organisms found matching this request')
         return response
 
     @staticmethod
@@ -114,7 +114,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
         ]
         if len(response) == 0:
-            raise ReferenceError('There are not sets for this request')
+            raise ReferenceError('No sets found matching this request')
         return response
 
     @staticmethod
@@ -131,7 +131,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in searcher.get_group_obj_of_field_by_query(None, field, fq=query, rows=10)["groups"]
         ]
         if len(response) == 0:
-            raise ReferenceError('There are not entries for this request')
+            raise ReferenceError('No entries found matching this request')
         return response
 
     @staticmethod
@@ -151,7 +151,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in search
         ]
         if len(response) == 0:
-            raise ReferenceError('There are not entries for this request')
+            raise ReferenceError('No entries found matching this request')
 
         for entry in response:
             if hasattr(instance, 'residues') and entry['accession'] in instance.residues:
@@ -173,7 +173,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in searcher.get_group_obj_of_field_by_query(None, field, fq=searcher_query, rows=10)["groups"]
         ]
         if len(response) == 0:
-            raise ReferenceError('There are not proteins for this request')
+            raise ReferenceError('No proteins found matching this request')
         return response
 
     @staticmethod
@@ -186,7 +186,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
         ]
         if len(response) == 0:
-            raise ReferenceError('There are not proteomes for this request')
+            raise ReferenceError('No proteomes found matching this request')
         return response
 
     @staticmethod

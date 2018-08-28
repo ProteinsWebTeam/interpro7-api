@@ -134,7 +134,7 @@ class ProteomeSerializer(ModelContentSerializer):
         if "proteomes" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise ReferenceError('There are not proteomes for this request')
+                raise ReferenceError('No proteomes found matching this request')
             instance = {
                 "proteomes": {
                     "uniprot": ProteomeSerializer.serialize_counter_bucket(instance["databases"], "proteomes"),

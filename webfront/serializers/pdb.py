@@ -232,7 +232,7 @@ class StructureSerializer(ModelContentSerializer):
     def to_group_representation(instance):
         if "groups" in instance:
             if StructureSerializer.grouper_is_empty(instance):
-                raise ReferenceError('There are not entries for this request')
+                raise ReferenceError('No entries found matching this request')
             return {
                 StructureSerializer.get_key_from_bucket(bucket): StructureSerializer.serialize_counter_bucket(bucket, "structures")
                 for bucket in instance["groups"]["buckets"]
@@ -250,7 +250,7 @@ class StructureSerializer(ModelContentSerializer):
         if "structures" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise ReferenceError('There are not structures for this request')
+                raise ReferenceError('No structures found matching this request')
             instance = {
                 "structures": {
                     "pdb": StructureSerializer.serialize_counter_bucket(instance["databases"], "structures")

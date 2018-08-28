@@ -25,7 +25,7 @@ class AccessionHandler(CustomView):
         docs = general_handler.searcher.get_document_by_any_accession(acc)
 
         if len(docs["hits"]["hits"]) == 0:
-            raise ReferenceError("There are not accessions equal to {} in our data source"
+            raise ReferenceError("No accessions matching {} can be found in our data"
                                  .format(acc))
 
         hit = docs["hits"]["hits"][0]["_source"]

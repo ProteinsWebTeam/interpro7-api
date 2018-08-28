@@ -194,7 +194,7 @@ class EntrySerializer(ModelContentSerializer):
     def to_group_representation(instance):
         if "groups" in instance:
             if EntrySerializer.grouper_is_empty(instance):
-                raise ReferenceError('There are not entries for this request')
+                raise ReferenceError('No entries found matching this request')
             return {
                         EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket, "entries")
                         for bucket in instance["groups"]["buckets"]
@@ -208,7 +208,7 @@ class EntrySerializer(ModelContentSerializer):
             filters = []
         if "entries" not in instance:
             if EntrySerializer.counter_is_empty(instance):
-                raise ReferenceError('There are not entries for this request')
+                raise ReferenceError('No entries found matching this request')
             result = {
                 "entries": {
                     "member_databases": {

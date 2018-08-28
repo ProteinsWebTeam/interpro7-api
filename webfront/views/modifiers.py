@@ -168,6 +168,13 @@ def filter_by_field(endpoint, field):
         )
     return x
 
+def filter_by_boolean_field(endpoint, field):
+    def x(value, general_handler):
+        general_handler.queryset_manager.add_filter(
+            endpoint,
+            **{"{}".format(field): value}
+        )
+    return x
 
 def filter_by_contains_field(endpoint, field, value_template='{}'):
     def x(value, general_handler):

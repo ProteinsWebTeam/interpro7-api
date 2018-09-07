@@ -1,23 +1,60 @@
 
 [![Build Status](https://travis-ci.org/ProteinsWebTeam/interpro7-api.svg?branch=master)](https://travis-ci.org/ProteinsWebTeam/interpro7-api)
 [![Coverage Status](https://coveralls.io/repos/github/ProteinsWebTeam/interpro7-api/badge.svg?branch=master)](https://coveralls.io/github/ProteinsWebTeam/interpro7-api?branch=master)
+[![GitHub license](https://img.shields.io/badge/license-apache-blue.svg)](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/LICENSE)
 
-## Interpro 7
+![Logo InterPro7](https://github.com/ProteinsWebTeam/interpro7-client/raw/master/webfront/static/logo_178x178.pngs  "Logo InterPro7")
 
-This is the first prototype to create an API for the new version of Interpro.
+## Interpro 7 API
 
-The architecture of the URL it is defined as a set of endpoints that can be freely combined to describe filters for each of them. The initial set of point is:
+InterPro provides functional analysis of proteins by classifying them into families and predicting domains and important sites. 
+
+This is the repository for the source code running the InterPro Rest API, which is currently available at [https://www.ebi.ac.uk/interpro/beta/api].
+
+This API provides the data that the new InterPro website uses. You can explore the website at [www.ebi.ac.uk/interpro/beta].
+
+The repository for the InterPro Website can be found at [https://github.com/ProteinsWebTeam/interpro7-client].
+
+
+#### API URL Design
+
+The InterPro API can be accessed by any of its 6 endpoints: 
 
 * entry
 * protein
+* taxonomy
 * proteome
 * structure
+* structure
 
-The user can freely combine each of the endpoints. the only limitation is that a URL block describing an endpoint can only appears once in the URL. 
+if the URL only contains the name of the endpoint (e.g. `/structure`), the API returns an overview object with counters of the chosen entity grouped by its databases. 
 
-The google doc here contains more information about the design of this API: [Document](https://docs.google.com/document/d/1JkZAkGI6KjZdqwJFXYlTFPna82p68vom_CojYYaTAR0/edit?usp=sharing)
+For each endpoint the user can specify a database (e.g. `/entry/pfam`), and the API will return a list of the instance in such database.
+
+Similarly, the user can include an accession of an entity in that endpoint (e.g. `/protein/uniprot/P99999`), which will return an object with detailed metadata of such entity. 
+
+The user can freely combine the endpoint blocks (e.g. `http://wp-np3-ad.ebi.ac.uk/interpro7/api/entry/interpro/ipr000001/protein/reviewed`). The only limitation is that a block describing an endpoint can only appears once in the URL. 
+
+The google doc here contains more information about the URL design of this API: [Document](https://docs.google.com/document/d/1JkZAkGI6KjZdqwJFXYlTFPna82p68vom_CojYYaTAR0/edit?usp=sharing)
+
+
+#### Dependencies
+
+InterPro7 API runs on [Python3](https://docs.python.org/3/) and uses [Django](https://www.djangoproject.com/) as its web framework, 
+together with the [Django REST framework](http://www.django-rest-framework.org/) to implement the REST API logic.
+
+Another set of dependencies in the codebase are related to data access. Our data storage has 3 sources, a MySQL database for the metadata of all our entities, an elasticsearch instance for the links between them, and redis to cache responses of often used requests.
+The python clients used to communicate with th sources are:  mysqlclient, redis and django-redis. For elastic search we use regular http transactions, and therefore no client is rquired.
+
+The specific versions of these dependncies can be found in the file [requirements.txt](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/requirements.txt). Other minor dependencies are also included inthe file.
+
+An optional set of dependencies, not required to run the API, but useful for development purposes can be found in [dev_requirements.txt](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/dev_requirements.txt).
+
+
+#### Local Installation
 
 The procedure to install this project can be seen [HERE](deploy_tools/README.md).
 
-This project follows the recommendations and guidelines presented in the book:
+---
+This project followed some of the recommendations and guidelines presented in the book:
 [Test-Driven Development with Python](http://chimera.labs.oreilly.com/books/1234000000754/index.html)

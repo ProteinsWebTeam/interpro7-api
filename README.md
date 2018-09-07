@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/ProteinsWebTeam/interpro7-api/badge.svg?branch=master)](https://coveralls.io/github/ProteinsWebTeam/interpro7-api?branch=master)
 [![GitHub license](https://img.shields.io/badge/license-apache-blue.svg)](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/LICENSE)
 
-![Logo InterPro7](https://github.com/ProteinsWebTeam/interpro7-client/raw/master/webfront/static/logo_178x178.pngs  "Logo InterPro7")
+![Logo InterPro7](https://raw.githubusercontent.com/ProteinsWebTeam/interpro7-api/master/webfront/static/logo_178x178.png  "Logo InterPro7")
 
 ## Interpro 7 API
 

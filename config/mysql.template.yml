@@ -1,0 +1,6 @@
+engine: django.db.backends.mysql
+host: URL
+sid: DATABASE_NAME
+port: 4602
+user: USER
+password: PASSWORD

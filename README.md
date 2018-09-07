@@ -33,7 +33,7 @@ For each endpoint the user can specify a database (e.g. `/entry/pfam`), and the 
 
 Similarly, the user can include an accession of an entity in that endpoint (e.g. `/protein/uniprot/P99999`), which will return an object with detailed metadata of such entity. 
 
-The user can freely combine the endpoint blocks (e.g. `http://wp-np3-ad.ebi.ac.uk/interpro7/api/entry/interpro/ipr000001/protein/reviewed`). The only limitation is that a block describing an endpoint can only appears once in the URL. 
+The user can freely combine the endpoint blocks (e.g. `/entry/interpro/ipr000001/protein/reviewed`). The only limitation is that a block describing an endpoint can only appears once in the URL. 
 
 The google doc here contains more information about the URL design of this API: [Document](https://docs.google.com/document/d/1JkZAkGI6KjZdqwJFXYlTFPna82p68vom_CojYYaTAR0/edit?usp=sharing)
 
@@ -57,4 +57,4 @@ The procedure to install this project can be seen [HERE](deploy_tools/README.md)
 
 ---
 This project followed some of the recommendations and guidelines presented in the book:
-[Test-Driven Development with Python](http://chimera.labs.oreilly.com/books/1234000000754/index.html)
+[Test-Driven Development with Python](http://www.obeythetestinggoat.com/)

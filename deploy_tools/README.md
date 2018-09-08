@@ -65,7 +65,7 @@ Assume we have a user account at /home/username
         ```
 
 5.  Create a local configuration file in `config/interpro.local.yml`. 
-    In this fil you can overwite any of the settings included in the read-only file `config/interpro.yml`.
+    In this file you can overwite any of the settings included in the read-only file `config/interpro.yml`.
     Below is an example of the local config that will run in debug mode using the test DB with SQLite, a local instance of elasticsearch without redis:
     ```yaml
     use_test_db: true
@@ -79,7 +79,7 @@ Assume we have a user account at /home/username
 
     ```
     
-    *   This configuration assumes a running instance of elasticsearch in port 9200. For deatils on how to install elasticsearch go
+    *   This configuration assumes a running instance of elasticsearch in port 9200. For details on how to install elasticsearch go
         [HERE](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html)
  
 6.  Migrate the database models (For SQLite)
@@ -132,9 +132,9 @@ All the test can be run at the same time:
 For the next steps you need an installation of MySQL with a database compatible with the defined [model](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/webfront/models/interpro_new.py). 
 
 1.  Remove the line `use_test_db: true` from the `config/interpro.local.yml` file. 
-    You could also set the value to true, but given that true is the default value, you can just remove it.
+    You could also set the value to false, but given that false is the default value, you can just remove it.
 
-2.  Edit the same `config/interpro.local.yml` file, changing the `searcher_path` setting for one with the elastic search instance that correspond with the data in MySQL.
+2.  Edit the same `config/interpro.local.yml` file, changing the `searcher_path` setting for one with the elastic search instance that corresponds with the data in MySQL.
 
 3.  Copy the template mysql configuration file into `config/mysql.yml` and edit the file with your data.
     ```bash

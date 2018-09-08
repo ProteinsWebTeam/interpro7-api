@@ -22,10 +22,12 @@ The InterPro API can be accessed by any of its 6 endpoints:
 
 * entry
 * protein
+* structure
+* set
 * taxonomy
 * proteome
-* structure
-* structure
+
+
 
 if the URL only contains the name of the endpoint (e.g. `/structure`), the API returns an overview object with counters of the chosen entity grouped by its databases. 
 

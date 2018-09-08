@@ -48,7 +48,7 @@ together with the [Django REST framework](http://www.django-rest-framework.org/)
 Another set of dependencies in the codebase are related to data access. Our data storage has 3 sources, a MySQL database for the metadata of all our entities, an elasticsearch instance for the links between them, and, optionally, redis to cache responses of often used requests.
 The python clients used to communicate with the sources are: mysqlclient, redis and django-redis. For elastic search we use regular http transactions, and therefore no client is required.
 
-The specific versions of these dependncies can be found in the file [requirements.txt](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/requirements.txt). Other minor dependencies are also included inthe file.
+The specific versions of these dependencies can be found in the file [requirements.txt](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/requirements.txt). Other minor dependencies are also included in the file.
 
 An optional set of dependencies, not required to run the API, but useful for development purposes can be found in [dev_requirements.txt](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/dev_requirements.txt).
 

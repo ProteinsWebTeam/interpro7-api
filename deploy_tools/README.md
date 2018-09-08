@@ -44,7 +44,7 @@ Assume we have a user account at /home/username
     cd PROJECT/source
     ```
 
-    From now on all the command assume you ar in the ```PROJECT/source``` directory.
+    From now on all the command assume you are in the ```PROJECT/source``` directory.
 
 3.  Start the virtual env in the assigned folder:
 

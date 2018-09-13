@@ -22,10 +22,12 @@ The InterPro API can be accessed by any of its 6 endpoints:
 
 * entry
 * protein
+* structure
+* set
 * taxonomy
 * proteome
-* structure
-* structure
+
+
 
 if the URL only contains the name of the endpoint (e.g. `/structure`), the API returns an overview object with counters of the chosen entity grouped by its databases. 
 
@@ -43,10 +45,10 @@ The google doc here contains more information about the URL design of this API: 
 InterPro7 API runs on [Python3](https://docs.python.org/3/) and uses [Django](https://www.djangoproject.com/) as its web framework, 
 together with the [Django REST framework](http://www.django-rest-framework.org/) to implement the REST API logic.
 
-Another set of dependencies in the codebase are related to data access. Our data storage has 3 sources, a MySQL database for the metadata of all our entities, an elasticsearch instance for the links between them, and redis to cache responses of often used requests.
-The python clients used to communicate with th sources are:  mysqlclient, redis and django-redis. For elastic search we use regular http transactions, and therefore no client is rquired.
+Another set of dependencies in the codebase are related to data access. Our data storage has 3 sources, a MySQL database for the metadata of all our entities, an elasticsearch instance for the links between them, and, optionally, redis to cache responses of often used requests.
+The python clients used to communicate with the sources are: mysqlclient, redis and django-redis. For elastic search we use regular http transactions, and therefore no client is required.
 
-The specific versions of these dependncies can be found in the file [requirements.txt](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/requirements.txt). Other minor dependencies are also included inthe file.
+The specific versions of these dependencies can be found in the file [requirements.txt](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/requirements.txt). Other minor dependencies are also included in the file.
 
 An optional set of dependencies, not required to run the API, but useful for development purposes can be found in [dev_requirements.txt](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/dev_requirements.txt).
 

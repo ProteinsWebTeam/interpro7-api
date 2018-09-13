@@ -159,6 +159,7 @@ class EntrySerializer(ModelContentSerializer):
             "description": instance.description,
             "wikipedia": instance.wikipedia,
             "literature": instance.literature,
+            "overlaps_with": instance.overlaps_with,
             "counters": EntrySerializer.get_counters(instance, searcher, sq),
             "entry_annotations": annotation_types,
             "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)

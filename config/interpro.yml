@@ -13,6 +13,7 @@ cache_volatile_key_ttl: 3600
 default_page_size: 20
 debug: true
 allowed_host: []
+static_url: "/interpro7/api/static_files/"
 
 members:
   cathgene3d:

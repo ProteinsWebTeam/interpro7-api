@@ -63,12 +63,12 @@ INSTALLED_APPS = (
     'rest_framework'
 )
 
-MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    #'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -77,10 +77,15 @@ MIDDLEWARE_CLASSES = (
     #'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 if (INTERPRO_CONFIG.get('django_cors', False)):
-    INSTALLED_APPS = INSTALLED_APPS + ('corsheaders',)
-    MIDDLEWARE_CLASSES = ('corsheaders.middleware.CorsMiddleware',) + MIDDLEWARE_CLASSES
-    CORS_ORIGIN_ALLOW_ALL = True
+   INSTALLED_APPS = INSTALLED_APPS + ('corsheaders',)
+   MIDDLEWARE = ('corsheaders.middleware.CorsMiddleware',) + MIDDLEWARE
+   CORS_ORIGIN_ALLOW_ALL = True
+   CORS_ALLOW_CREDENTIALS = False
+
+
 
 ROOT_URLCONF = 'interpro.urls'
 

@@ -81,7 +81,7 @@ class ProteomeHandler(CustomView):
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY
         )
-        general_handler.modifiers.register("proteome_is_reference", filter_by_boolean_field("proteome",'proteome_is_reference'))
+        general_handler.modifiers.register("is_reference", filter_by_boolean_field("proteome",'is_reference'))
         general_handler.queryset_manager.reset_filters("proteome", endpoint_levels)
 
         return super(ProteomeHandler, self).get(

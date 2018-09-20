@@ -156,7 +156,7 @@ class ProteinSerializer(ModelContentSerializer):
     def to_group_representation(instance):
         if "groups" in instance:
             if ProteinSerializer.grouper_is_empty(instance):
-                raise ReferenceError('No entries found matching this request')
+                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Protein"))
             return {
                 ProteinSerializer.get_key_from_bucket(bucket):
                     ProteinSerializer.serialize_counter_bucket(bucket, "proteins")
@@ -173,7 +173,7 @@ class ProteinSerializer(ModelContentSerializer):
             filters = []
         if "proteins" not in instance:
             if ProteinSerializer.grouper_is_empty(instance, "databases"):
-                raise ReferenceError('No entries found matching this request')
+                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Protein"))
 
             ins2 = {"proteins": {
                        ProteinSerializer.get_key_from_bucket(bucket):

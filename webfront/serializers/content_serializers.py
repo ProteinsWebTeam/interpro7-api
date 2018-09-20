@@ -18,6 +18,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
         "set": "sets",
     }
 
+    NO_DATA_ERROR_MESSAGE = 'No {} data matched this request'
+
     def __init__(self, *args, **kwargs):
         content = kwargs.pop('content', [])
         self.queryset_manager = kwargs.pop('queryset_manager', None)

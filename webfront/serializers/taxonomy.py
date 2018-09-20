@@ -152,7 +152,7 @@ class TaxonomySerializer(ModelContentSerializer):
         if "taxa" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise ReferenceError('No structures found matching this request')
+                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy"))
             instance = {
                 "taxa": {
                     "uniprot": TaxonomySerializer.serialize_counter_bucket(instance["databases"], "taxa"),

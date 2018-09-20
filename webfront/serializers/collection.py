@@ -87,7 +87,7 @@ class SetSerializer(ModelContentSerializer):
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
                ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0) :
-                raise ReferenceError('No sets found matching this request')
+                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Set"))
             ins2 = {
                 "sets": {
                         SetSerializer.get_key_from_bucket(bucket): SetSerializer.serialize_counter_bucket(bucket, "sets")

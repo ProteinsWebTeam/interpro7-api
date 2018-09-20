@@ -1,7 +1,7 @@
 from webfront.models import Proteome
 from webfront.serializers.proteome import ProteomeSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.views.modifiers import passing, add_extra_fields, filter_by_field, filter_by_boolean_field
+from webfront.views.modifiers import group_by, add_extra_fields, filter_by_boolean_field
 
 
 class ProteomeAccessionHandler(CustomView):
@@ -73,7 +73,15 @@ class ProteomeHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.modifiers.register("is_reference", filter_by_boolean_field("proteome",'is_reference'))
+        general_handler.modifiers.register(
+            "group_by",
+            group_by(Proteome, {
+                "proteome_is_reference": "proteome_acc",
+            }),
+            use_model_as_payload=True,
+            serializer=SerializerDetail.GROUP_BY
+        )
+        general_handler.modifiers.register("proteome_is_reference", filter_by_boolean_field("proteome",'proteome_is_reference'))
         general_handler.queryset_manager.reset_filters("proteome", endpoint_levels)
 
         return super(ProteomeHandler, self).get(

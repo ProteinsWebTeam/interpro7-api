@@ -96,12 +96,24 @@ def group_by_organism(general_handler, endpoint_queryset):
 def group_by_match_presence(general_handler, endpoint_queryset):
     searcher = general_handler.searcher
     qs = general_handler.queryset_manager.get_searcher_query()
-    return {
+    response =  {
         "match_presence": {
             "true": searcher.count_unique(qs + " && _exists_:entry_acc", "protein_acc"),
             "false": searcher.count_unique(qs + " && !_exists_:entry_acc", "protein_acc"),
         }
     }
+    return response
+
+def group_by_is_reference(general_handler, endpoint_queryset):
+    searcher = general_handler.searcher
+    qs = general_handler.queryset_manager.get_searcher_query()
+    response = {
+        "proteome_is_reference": {
+            "true": searcher.count_unique(qs + " && proteome_is_reference:true", "proteome_acc"),
+            "false": searcher.count_unique(qs + " && proteome_is_reference:false", "proteome_acc"),
+        }
+    }
+    return response
 
 def group_by_annotations(general_handler):
     if is_single_endpoint(general_handler):
@@ -134,6 +146,8 @@ def group_by(endpoint_queryset, fields):
             return group_by_organism(general_handler, endpoint_queryset)
         if "match_presence" == field:
             return group_by_match_presence(general_handler, endpoint_queryset)
+        if "proteome_is_reference" == field:
+            return group_by_is_reference(general_handler, endpoint_queryset)
         if is_single_endpoint(general_handler) and general_handler.queryset_manager.main_endpoint != "protein":
             qs = get_queryset_to_group(general_handler, endpoint_queryset)
             return qs.values_list(field).annotate(total=Count(field))

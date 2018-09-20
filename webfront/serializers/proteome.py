@@ -37,6 +37,8 @@ class ProteomeSerializer(ModelContentSerializer):
             representation = self.to_counter_representation(instance)
         elif detail == SerializerDetail.PROTEOME_HEADERS:
             representation = self.to_headers_representation(instance)
+        elif detail == SerializerDetail.GROUP_BY:
+            representation = self.to_group_representation(instance)
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -134,7 +136,7 @@ class ProteomeSerializer(ModelContentSerializer):
         if "proteomes" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise ReferenceError('No proteomes found matching this request')
+                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome"))
             instance = {
                 "proteomes": {
                     "uniprot": ProteomeSerializer.serialize_counter_bucket(instance["databases"], "proteomes"),
@@ -153,6 +155,21 @@ class ProteomeSerializer(ModelContentSerializer):
         if include_chain:
             header["chain"] = obj["structure_chain_acc"]
         return header
+
+    @staticmethod
+    def to_group_representation(instance):
+        if "groups" in instance:
+            if ProteomeSerializer.grouper_is_empty(instance):
+                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome"))
+            return {
+                ProteomeSerializer.get_key_from_bucket(bucket): ProteomeSerializer.serialize_counter_bucket(bucket, "proteomes")
+                for bucket in instance["groups"]["buckets"]
+            }
+        elif "proteome_is_reference" in instance:
+            return instance
+        else:
+            return {field_value: total for field_value, total in instance}
+
 
     def to_count_representation(self, endpoint, query):
         return self.serializers[endpoint].to_counter_representation(

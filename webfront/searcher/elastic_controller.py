@@ -351,7 +351,6 @@ class ElasticsearchController(SearchController):
         q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20").replace(" or ", "%20OR%20")
         path = "/"+self.index+"/"+self.type+"/_search?request_cache=true&q="+q
         logger.debug("URL:"+path)
-        logger.debug("JSON:"+json.dumps(query_obj))
         self.connection.request(
             "GET",
             path,

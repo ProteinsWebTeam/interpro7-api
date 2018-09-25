@@ -60,6 +60,8 @@ class QuerysetManager:
             for k, v in self.filters[ep].items():
                 if ep == "searcher":
                     q += " && {}:{}".format(k, escape(v))
+                elif ep == "proteome" and k == "is_reference":
+                    q += " && proteome_is_reference:{}".format(escape(v).strip())
                 elif include_search and ep == "search":
                     main_ep = self.main_endpoint
                     for token in v.split():
@@ -120,6 +122,8 @@ class QuerysetManager:
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
                         q += " && {}_db:{}".format(ep, escape(v))
+
+
 
         q = q[4:].lower()
         if self.order_field is not None:

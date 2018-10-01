@@ -113,56 +113,56 @@ members:
     options: []
     options_per_family: []
 
-cross_references: 
-    'MODBASE': 
+cross_references:
+    'MODBASE':
         'rank': 32
-    'SFLD': 
+    'SFLD':
         'rank': 16
-    'PANDIT': 
+    'PANDIT':
         'displayName': 'PANDIT'
         'rank': 28
         'description': 'The Protein and Associated NucleotideDomains with Inferred Trees (PANDIT) database is a collection of multiple sequence alignments and phylogenetic trees covering many common protein domains.'
         'urlPattern': 'http://www.ebi.ac.uk/goldman-srv/pandit/pandit.cgi?action=browse&fam={accession}'
-    'ProDom': 
+    'ProDom':
         'rank': 5
-    'MSDsite': 
+    'MSDsite':
         'displayName': 'PDBeMotif'
         'rank': 29
         'description': 'PDBeMotif is an extremely fast and powerful search tool that facilitates exploration of the Protein Data Bank (PDB) by combining protein sequence, chemical structure and 3D data in a single search.'
         'urlPattern': 'http://www.ebi.ac.uk/pdbe-site/pdbemotif/barChartPattern?pattern1={accession}'
-    'PRINTS': 
+    'PRINTS':
         'rank': 4
-    'GO Classification': 
+    'GO Classification':
         'rank': 15
-    'Pfam': 
+    'Pfam':
         'rank': 2
-    'InterPro': 
+    'InterPro':
         'rank': 14
-    'CDD': 
+    'CDD':
         'rank': 43
-    'COMe': 
+    'COMe':
         'rank': 27
         'description': 'COMe is an attempt to classify metalloproteins and some other complex proteins using the concept of bioinorganic motif (a common structural feature of a class of functionally related, but not necessarily homologous, proteins, that includes the metal atom(s) and first coordination shell ligands).'
         'url': 'http://www.flymine.org/come/entry?gn={accession}'
-    'Blocks': 
+    'Blocks':
         'rank': 17
-    'PROSITE profiles': 
+    'PROSITE profiles':
         'rank': 7
-    'TIGRFAMs': 
+    'TIGRFAMs':
         'rank': 9
-    'COG': 
+    'COG':
         'rank': 23
-    'PROSITE patterns': 
+    'PROSITE patterns':
         'rank': 6
-    'HAMAP': 
+    'HAMAP':
         'rank': 36
-    'SMART': 
+    'SMART':
         'rank': 8
     'UniProtKB/Swiss-Prot':
         'rank': 12
     'UniProtKB/TrEMBL':
         'rank': 13
-    'PIRSF': 
+    'PIRSF':
         'rank': 3
     'PANTHER':
         'rank': 1

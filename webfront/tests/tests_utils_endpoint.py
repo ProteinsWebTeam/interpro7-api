@@ -1,14 +1,16 @@
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
+from webfront.models.interpro_new import Release_Note
 
 
-class UtilsTest(InterproRESTTestCase):
+class UtilsAccessionTest(InterproRESTTestCase):
 
     def test_can_read_structure_overview(self):
         response = self.client.get("/api/utils")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("available", response.data)
         self.assertIn("accession", response.data["available"])
+        self.assertIn("release", response.data["available"])
 
     def test_accession_endpoint_doesnt_fail(self):
         response = self.client.get("/api/utils/accession")
@@ -53,4 +55,54 @@ class UtilsTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["endpoint"], "taxonomy")
         self.assertEqual(response.data["source_database"], "uniprot")
+
+
+class UtilsReleaseTest(InterproRESTTestCase):
+
+    def test_can_read_structure_overview(self):
+        response = self.client.get("/api/utils")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("available", response.data)
+        self.assertIn("accession", response.data["available"])
+        self.assertIn("release", response.data["available"])
+
+    def test_release_endpoint_doesnt_fail(self):
+        response = self.client.get("/api/utils/release")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_release_version_endpoint_doesnt_fail(self):
+        response = self.client.get("/api/utils/release/current")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get("/api/utils/release/70.0")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_release_version_endpoint_fails(self):
+        response = self.client.get("/api/utils/release/x")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_the_fixtures_are_loaded(self):
+        notes = Release_Note.objects.all()
+        self.assertEqual(notes.count(), 2)
+
+    def test_release_endpoint_returns_the_fixtures(self):
+        notes = Release_Note.objects.all()
+        response = self.client.get("/api/utils/release")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), len(notes))
+        for note in notes:
+            self.assertIn(note.version, response.data)
+
+    def test_release_current_is_same_as_accession(self):
+        response1 = self.client.get("/api/utils/release/current")
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        response2 = self.client.get("/api/utils/release/70.0")
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertEqual(response1.data, response1.data)
+
+    def test_release_70_is_same_as_fixture(self):
+        note_version = "70.0"
+        note = Release_Note.objects.all().filter(version=note_version).first()
+        response = self.client.get("/api/utils/release/"+note_version)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["content"], note.content)
 

@@ -107,6 +107,7 @@ class EntrySerializer(ModelContentSerializer):
 
         reformattedCrossReferences = {}
         for database in cross_references.keys():
+            db_upper = database.upper()
             accessions = cross_references[database]
             reformattedCrossReferences[database] = {
                 "displayName": database,
@@ -115,13 +116,13 @@ class EntrySerializer(ModelContentSerializer):
                 "accessions": []
             }
 
-            if database in xrefSettings:
-                if 'displayName' in xrefSettings[database]:
-                    reformattedCrossReferences[database]['displayName'] = xrefSettings[database]['displayName']
-                if 'description' in xrefSettings[database]:
-                    reformattedCrossReferences[database]['description'] = xrefSettings[database]['description']
-                if 'rank' in xrefSettings[database]:
-                    reformattedCrossReferences[database]['rank'] = xrefSettings[database]['rank']
+            if db_upper in xrefSettings:
+                if 'displayName' in xrefSettings[db_upper]:
+                    reformattedCrossReferences[database]['displayName'] = xrefSettings[db_upper]['displayName']
+                if 'description' in xrefSettings[db_upper]:
+                    reformattedCrossReferences[database]['description'] = xrefSettings[db_upper]['description']
+                if 'rank' in xrefSettings[db_upper]:
+                    reformattedCrossReferences[database]['rank'] = xrefSettings[db_upper]['rank']
 
             for accession in accessions:
                 accessionObj = {
@@ -129,10 +130,12 @@ class EntrySerializer(ModelContentSerializer):
                     'url': DEFAULT_URL_PATTERN
                 }
 
-                if database in xrefSettings and 'urlPattern' in xrefSettings[database]:
-                    accessionObj['url'] = xrefSettings[database]['urlPattern']
+                if db_upper in xrefSettings and 'urlPattern' in xrefSettings[db_upper]:
+                    accessionObj['url'] = xrefSettings[db_upper]['urlPattern']
 
-                accessionObj['url'] = accessionObj['url'].replace('{accession}', accession)
+                accessionObj['url'] = accessionObj['url']\
+                    .replace('{accession}', accession)\
+                    .replace('{ACCESSION}', accession.upper())
                 reformattedCrossReferences[database]['accessions'].append(accessionObj)
         return reformattedCrossReferences
 

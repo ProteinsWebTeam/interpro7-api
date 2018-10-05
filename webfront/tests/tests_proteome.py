@@ -29,6 +29,45 @@ class ProteomeFixturesTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_proteome_details(response.data["metadata"])
 
+    def test_can_filter_by_is_reference_true(self):
+        response = self.client.get("/api/proteome/uniprot/entry/InterPro/?is_reference=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("count", response.data)
+        self.assertEqual(response.data["count"], 2)
+        self.assertIn("results", response.data)
+        self.assertEqual(len(response.data["results"]), 2)
+        for result in response.data["results"]:
+            self.assertIn("metadata", result)
+            self.assertIn("is_reference", result["metadata"])
+            self.assertEqual(result["metadata"]["is_reference"], True)
+
+    def test_can_filter_by_is_reference_false(self):
+        response = self.client.get("/api/proteome/uniprot/?is_reference=false")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("count", response.data)
+        self.assertEqual(response.data["count"], 1)
+        self.assertIn("results", response.data)
+        self.assertEqual(len(response.data["results"]), 1)
+        for result in response.data["results"]:
+            self.assertIn("metadata", result)
+            self.assertIn("is_reference", result["metadata"])
+            self.assertEqual(result["metadata"]["is_reference"], False)
+
+    def test_can_filter_by_entry_and_is_reference_true(self):
+        response = self.client.get("/api/proteome/uniprot/entry/InterPro/?is_reference=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("count", response.data)
+        self.assertEqual(response.data["count"], 2)
+        self.assertIn("results", response.data)
+        self.assertEqual(len(response.data["results"]), 2)
+        for result in response.data["results"]:
+            self.assertIn("metadata", result)
+            self.assertIn("is_reference", result["metadata"])
+            self.assertEqual(result["metadata"]["is_reference"], True)
+
+    def test_can_filter_by_is_reference_false(self):
+        response = self.client.get("/api/proteome/uniprot/entry/InterPro/?is_reference=false")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT) #Should consider adding a fixture to return an results for this query
 
 class EntryProteomeTest(InterproRESTTestCase):
     def test_can_get_the_proteome_count(self):

@@ -67,7 +67,8 @@ class ProteomeFixturesTest(InterproRESTTestCase):
 
     def test_can_filter_by_is_reference_false(self):
         response = self.client.get("/api/proteome/uniprot/entry/InterPro/?is_reference=false")
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT) #Should consider adding a fixture to return an results for this query
+        #Should consider adding a fixture to return some results for this query
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 class EntryProteomeTest(InterproRESTTestCase):
     def test_can_get_the_proteome_count(self):

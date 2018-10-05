@@ -114,6 +114,40 @@ members:
     options_per_family: []
 
 cross_references:
+    'EC':
+        'rank': 19
+        'description': 'ENZYME is a repository of information relative to the nomenclature of enzymes. It is primarily based on the recommendations of the Nomenclature Committee of the International Union of Biochemistry and Molecular Biology (IUBMB) and it describes each type of characterized enzyme for which an EC (Enzyme Commission) number has been provided.'
+        'urlPattern': 'http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec={accession}'
+    'COME':
+        'displayName': 'COMe'
+        'rank': 27
+        'description': 'COMe is an attempt to classify metalloproteins and some other complex proteins using the concept of bioinorganic motif (a common structural feature of a class of functionally related, but not necessarily homologous, proteins, that includes the metal atom(s) and first coordination shell ligands).'
+        'urlPattern': 'http://www.flymine.org/come/entry?gn={accession}'
+    'IUPHAR':
+        'displayName': 'IUPHAR receptor code'
+        'rank': 22
+        'description': 'The IUPHAR database incorporates detailed pharmacological, functional and pathophysiological information on G Protein-Coupled Receptors, Voltage-Gated Ion Channels, Ligand-Gated Ion Channels and Nuclear Hormone Receptors.'
+        'urlPattern': 'http://www.iuphar-db.org/GPCR/ReceptorDisplayForward?receptorID={accession}'
+    'CAZY':
+        'displayName': 'CAZy'
+        'rank': 20
+        'urlPattern': 'http://www.cazy.org/{ACCESSION}.html'
+    'CATH':
+        'rank': 25
+        'urlPattern': 'http://www.cathdb.info/version/latest/superfamily/{accession}'
+        'description': 'CATH is a classification of protein structures downloaded from the Protein Data Bank.'
+    'PROSITEDOC':
+        'rank': 18
+        'description': 'PROSITE is a database of protein families and domains.'
+        'urlPattern': 'http://prosite.expasy.org/{accession}'
+    'PRIAM':
+        'rank': 38
+        'description': "ENZYME-SPECIFIC PROFILES for metabolic pathway prediction."
+        'urlPattern': 'http://priam.prabi.fr/cgi-bin/ReqPRIAM_png.pl?priam_ac={accession}'
+    'SCOP':
+        'rank': 24
+        'urlPattern': 'http://scop.berkeley.edu/search/?ver=1.55&key={accession}'
+        'description': 'The SCOP database, created by manual inspection and abetted by a battery of automated methods, aims to provide a detailed and comprehensive description of the structural and evolutionary relationships between all proteins whose structure is known.'
     'MODBASE':
         'rank': 32
     'SFLD':
@@ -123,44 +157,49 @@ cross_references:
         'rank': 28
         'description': 'The Protein and Associated NucleotideDomains with Inferred Trees (PANDIT) database is a collection of multiple sequence alignments and phylogenetic trees covering many common protein domains.'
         'urlPattern': 'http://www.ebi.ac.uk/goldman-srv/pandit/pandit.cgi?action=browse&fam={accession}'
-    'ProDom':
-        'rank': 5
-    'MSDsite':
+    'MSDSITE':
         'displayName': 'PDBeMotif'
         'rank': 29
         'description': 'PDBeMotif is an extremely fast and powerful search tool that facilitates exploration of the Protein Data Bank (PDB) by combining protein sequence, chemical structure and 3D data in a single search.'
         'urlPattern': 'http://www.ebi.ac.uk/pdbe-site/pdbemotif/barChartPattern?pattern1={accession}'
+    'PRODOM':
+        'displayName': 'ProDom'
+        'rank': 5
     'PRINTS':
         'rank': 4
-    'GO Classification':
+    'GO CLASSIFICATION':
+        'displayName': 'GO Classification'
         'rank': 15
-    'Pfam':
+    'PFAM':
+        'displayName': 'Pfam'
         'rank': 2
-    'InterPro':
+    'INTERPRO':
+        'displayName': 'InterPro'
         'rank': 14
     'CDD':
         'rank': 43
-    'COMe':
-        'rank': 27
-        'description': 'COMe is an attempt to classify metalloproteins and some other complex proteins using the concept of bioinorganic motif (a common structural feature of a class of functionally related, but not necessarily homologous, proteins, that includes the metal atom(s) and first coordination shell ligands).'
-        'url': 'http://www.flymine.org/come/entry?gn={accession}'
-    'Blocks':
+    'BLOCKS':
+        'displayName': 'Blocks'
         'rank': 17
-    'PROSITE profiles':
+    'PROSITE PROFILES':
+        'displayName': 'PROSITE profiles'
         'rank': 7
-    'TIGRFAMs':
+    'TIGRFAMS':
         'rank': 9
     'COG':
         'rank': 23
-    'PROSITE patterns':
+    'PROSITE PATTERNS':
+        'displayName': 'PROSITE patterns'
         'rank': 6
     'HAMAP':
         'rank': 36
     'SMART':
         'rank': 8
-    'UniProtKB/Swiss-Prot':
+    'UNIPROTKB/SWISS-PROT':
+        'displayName': 'UniProtKB/Swiss-Prot'
         'rank': 12
-    'UniProtKB/TrEMBL':
+    'UNIPROTKB/TREMBL':
+        'displayName': 'UniProtKB/TrEMBL'
         'rank': 13
     'PIRSF':
         'rank': 3
@@ -172,7 +211,8 @@ cross_references:
         'rank': 10
     'SUPERFAMILY':
         'rank': 11
-    'IUPHAR receptor code':
+    'IUPHAR RECEPTOR CODE':
+        'displayName': 'IUPHAR receptor code'
         'rank': 22
         'description': 'The IUPHAR database incorporates detailed pharmacological, functional and pathophysiological information on G Protein-Coupled Receptors, Voltage-Gated Ion Channels, Ligand-Gated Ion Channels and Nuclear Hormone Receptors.'
         'urlPattern': 'http://www.iuphar-db.org/GPCR/ReceptorDisplayForward?receptorID={accession}'
@@ -180,44 +220,35 @@ cross_references:
         'rank': 33
     'PDB':
         'rank': 26
-    'CAZy':
-        'rank': 20
     'DBD':
         'rank': 34
     'ENZYME':
         'rank': 19
         'description': 'ENZYME is a repository of information relative to the nomenclature of enzymes. It is primarily based on the recommendations of the Nomenclature Committee of the International Union of Biochemistry and Molecular Biology (IUBMB) and it describes each type of characterized enzyme for which an EC (Enzyme Commission) number has been provided.'
         'urlPattern': 'http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec={accession}'
-    'MobiDB Lite':
+    'MOBIDB LITE':
         'rank': 44
-    'CATH':
-        'rank': 25
-    'PRIAM':
-        'rank': 38
-        'description': "ENZYME-SPECIFIC PROFILES for metabolic pathway prediction."
-        'urlPattern': 'http://priam.prabi.fr/cgi-bin/ReqPRIAM_png.pl?priam_ac={accession}'
     'KEGG':
         'rank': 39
-    'PfamClan':
+    'PFAMCLAN':
+        'displayName': 'PfamClan'
         'rank': 97
     'MEROPS':
         'rank': 21
     'OMIM':
         'rank': 31
-    'PROSITEDOC':
-        'rank': 18
-        'description': 'PROSITE is a database of protein families and domains.'
-        'url': 'http://prosite.expasy.org/{accession}'
-    'Reactome':
+    'REACTOME':
+        'displayName': 'Reactome'
         'rank': 42
-    'MetaCyc':
+    'METACYC':
+        'displayName': 'MetaCyc'
         'rank': 41
-    'UniProt':
+    'UNIPROT':
+        'displayName': 'UniProt'
         'rank': 35
-    'UniPathway':
+    'UNIPATHWAY':
+        'displayName': 'UniPathway'
         'rank': 40
-    'SCOP':
-        'rank': 24
 
 sets:
   'pfam':

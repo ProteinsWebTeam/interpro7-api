@@ -111,3 +111,9 @@ class Set(models.Model):
     integrated = JSONField(null=True)
     relationships = JSONField(null=True)  # {nodes: [{accession:"", type: ""}], links:[source:"", target: ""]}
     is_set = models.BooleanField(default=True)
+
+
+class Release_Note(models.Model):
+    version = models.CharField(max_length=20, primary_key=True)
+    release_date = models.DateTimeField(null=True)
+    content = JSONField(null=True)

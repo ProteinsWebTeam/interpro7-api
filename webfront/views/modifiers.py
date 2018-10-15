@@ -59,25 +59,19 @@ def get_queryset_to_group(general_handler, endpoint_queryset):
 
 
 def group_by_organism(general_handler, endpoint_queryset):
-    # q = "({})".format(" OR ".join("tax_lineage:{}".format(org) for org in organisms))
-    # searcher = general_handler.searcher
-    # result = searcher.get_grouped_object(
-    #     general_handler.queryset_manager.main_endpoint, 'tax_id', q, size=1000
-    # )
-    # return [
-    #     (str(r['key']), {'value': r['unique']['value'], 'title': organisms[str(r['key'])]})
-    #     for r in result['groups']['buckets']
-    #     if str(r['key']) in organisms
-    # ]
     searcher = general_handler.searcher
     qs = general_handler.queryset_manager.get_searcher_query()
-    return [
+    tmp = [
         (org,  {
-            'value': searcher.count_unique(qs + " && tax_lineage:{}".format(org), "{}_acc".format(general_handler.queryset_manager.main_endpoint)),
+            'value': searcher.count_unique(
+                qs + " && tax_lineage:{}".format(org),
+                "{}_acc".format(general_handler.queryset_manager.main_endpoint)
+            ),
             'title': organisms[org]
         })
         for org in organisms
     ]
+    return [t for t in tmp if t[1]['value'] > 0]
 
 def group_by_match_presence(general_handler, endpoint_queryset):
     searcher = general_handler.searcher

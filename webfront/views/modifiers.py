@@ -9,24 +9,6 @@ from django.conf import settings
 go_terms = settings.INTERPRO_CONFIG.get('key_go_terms', {})
 organisms = settings.INTERPRO_CONFIG.get('key_organisms', {})
 
-# go_terms = [
-#     "GO:0003824",
-#     "GO:0003677",
-#     "GO:0008152",
-#     "GO:0055114",
-#     "GO:0019867",
-#     "GO:0005524",
-#     "GO:0016491",
-#     "GO:0006810",
-#     "GO:0006260",
-#     "GO:0016021",
-#     "GO:0048037",
-#     "GO:0042575",
-#     "GO:0030031",
-#     "GO:0016043",
-#     "GO:0016049",
-# ]
-
 
 def group_by_member_databases(general_handler):
     if is_single_endpoint(general_handler):
@@ -77,20 +59,24 @@ def get_queryset_to_group(general_handler, endpoint_queryset):
 
 
 def group_by_organism(general_handler, endpoint_queryset):
-        # searcher = general_handler.searcher
-        # result = searcher.get_grouped_object(
-        #     general_handler.queryset_manager.main_endpoint, "tax_id", size=20
-        # )
-        # return result
-    q = "({})".format(" OR ".join("tax_lineage:{}".format(org) for org in organisms))
+    # q = "({})".format(" OR ".join("tax_lineage:{}".format(org) for org in organisms))
+    # searcher = general_handler.searcher
+    # result = searcher.get_grouped_object(
+    #     general_handler.queryset_manager.main_endpoint, 'tax_id', q, size=1000
+    # )
+    # return [
+    #     (str(r['key']), {'value': r['unique']['value'], 'title': organisms[str(r['key'])]})
+    #     for r in result['groups']['buckets']
+    #     if str(r['key']) in organisms
+    # ]
     searcher = general_handler.searcher
-    result = searcher.get_grouped_object(
-        general_handler.queryset_manager.main_endpoint, 'tax_id', q, size=1000
-    )
+    qs = general_handler.queryset_manager.get_searcher_query()
     return [
-        (str(r['key']), {'value': r['unique']['value'], 'title': organisms[str(r['key'])]})
-        for r in result['groups']['buckets']
-        if str(r['key']) in organisms
+        (org,  {
+            'value': searcher.count_unique(qs + " && tax_lineage:{}".format(org), "{}_acc".format(general_handler.queryset_manager.main_endpoint)),
+            'title': organisms[org]
+        })
+        for org in organisms
     ]
 
 def group_by_match_presence(general_handler, endpoint_queryset):

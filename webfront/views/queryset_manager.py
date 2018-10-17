@@ -82,6 +82,11 @@ class QuerysetManager:
                         q += " && {}_exists_:proteome_acc".format("!" if v else "")
                     else:
                         q += " && {}_exists_:{}_db".format("!" if v else "", ep)
+
+                elif k == 'accession__in' and ep == 'taxonomy' and isinstance(v, list) and len(v) > 0:
+                    q += " && ({})".format(
+                        " || ".join(["tax_id:{}".format(value) for value in v])
+                    )
                 elif k == "integrated" or k == "integrated__iexact" or k == "integrated__contains":
                     if ep == 'set':
                         if not v:

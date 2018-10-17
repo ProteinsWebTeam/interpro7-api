@@ -330,7 +330,7 @@ class ElasticsearchController(SearchController):
         q = query = self.queryset_manager.get_searcher_query() if query is None else query.lower()
         if fq is not None:
             q = query+" && "+fq.lower()
-        q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20")
+        q = q.replace(" && ", "%20AND%20").replace(" || ", "%20OR%20").replace(" to ", "%20TO%20")
         path = "/"+self.index+"/"+self.type+"/_search?request_cache=true&q="+q+"&size="+str(rows)
         logger.debug("URL:"+path)
         self.connection.request(
@@ -348,7 +348,7 @@ class ElasticsearchController(SearchController):
         logger = logging.getLogger("interpro.elastic")
         if query_obj is None:
             query_obj = {"from": 0}
-        q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20").replace(" or ", "%20OR%20")
+        q = q.replace(" && ", "%20AND%20").replace(" to ", "%20TO%20").replace(" or ", "%20OR%20").replace(" || ", "%20OR%20")
         path = "/"+self.index+"/"+self.type+"/_search?request_cache=true&q="+q
         logger.debug("URL:"+path)
         self.connection.request(

@@ -162,6 +162,12 @@ def filter_by_field(endpoint, field):
         )
     return x
 
+def filter_by_key_species(value, general_handler):
+    general_handler.queryset_manager.add_filter(
+        'taxonomy',
+        **{"accession__in": list(organisms.keys())}
+    )
+
 def filter_by_boolean_field(endpoint, field):
     def x(value, general_handler):
         if (value.lower() == "false"):

@@ -87,7 +87,7 @@ class ReleaseVersionEndpointHandler(CustomView):
         note_version = endpoint_levels[level - 1].lower()
         notes = Release_Note.objects.all()
         if note_version == "current":
-            notes = notes.order_by('release_date')
+            notes = notes.order_by('-release_date')
         else:
             notes = notes.filter(version=note_version)
         if notes.count() == 0:

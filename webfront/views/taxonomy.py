@@ -1,7 +1,7 @@
 from webfront.models import Taxonomy
 from webfront.serializers.taxonomy import TaxonomySerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.views.modifiers import passing, add_extra_fields
+from webfront.views.modifiers import passing, add_extra_fields, filter_by_key_species
 
 
 class TaxonomyAccessionHandler(CustomView):
@@ -46,6 +46,10 @@ class UniprotHandler(CustomView):
         general_handler.modifiers.register(
             "extra_fields",
             add_extra_fields(Taxonomy, "counters"),
+        )
+        general_handler.modifiers.register(
+            "key_species",
+            filter_by_key_species,
         )
         return super(UniprotHandler, self).get(
             request, endpoint_levels, available_endpoint_handlers, level,

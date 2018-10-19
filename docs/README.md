@@ -25,11 +25,11 @@ be made, '/'.
 
 [https://www.ebi.ac.uk/interpro/beta/api/](https://www.ebi.ac.uk/interpro/beta/api/)
 
-The JSON response from the API, amongst other attributes, includes a list of all supported  "endpoints". 
+The JSON response from the API, amongst other attributes, includes a list of all supported "endpoints". 
 
 
-### The main end points 
-defined above are the most important of these endpoints because they determine the type of data which will be returned from a query. The URLs below request some general information about each of the main data types. The response is a list of source databases together with a count of how many entities of that type from that datasource are stored in InterPro.
+### The main endpoints 
+The main data types (entry, protein, structure, set, proteome, taxonomy) are the most important of these endpoints because they determine the type of data which will be returned from a query. The URLs below request some general information about each of the main data types. The response is a list of source databases together with a count of how many entities of that type from that datasource are stored in InterPro.
 
 * [/api/entry](https://www.ebi.ac.uk/interpro/beta/api/entry)
 * [/api/protein](https://www.ebi.ac.uk/interpro/beta/api/protein)
@@ -62,7 +62,7 @@ The following table shows some examples of end point blocks and how the componen
 |[/api/entry/taxonomy/uniprot/9606](https://www.ebi.ac.uk/interpro/beta/api/taxonomy/uniprot/9606)|Detailed object|Data about Taxonomy ID 9606|
 
 ### Filtering data
-The first end point block in a request defines the data type which will be returned. Other end point blocks can be combined to filter the main dataset. This allows combinations of end points to be constructed to limit the types of lists returned by the API.
+The first end point block in a request defines the data type which will be returned. Additional end point blocks can be combined to filter the main dataset. This allows combinations of end points to be constructed to limit the data returned by the API.
 
 
 

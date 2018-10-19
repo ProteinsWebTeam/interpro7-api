@@ -59,9 +59,12 @@ The following table shows some examples of end point blocks and how the componen
 |[/api/proteome/uniprot](https://www.ebi.ac.uk/interpro/beta/api/proteome/uniprot)|List of entities|List of proteomes (there is only 1 source of proteomes)|
 |[/api/entry/interpro/ipr023411](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/ipr023411)|Detailed object|Data about InterPro entry IPR023411|
 |[/api/entry/pfam/pf06235](https://www.ebi.ac.uk/interpro/beta/api/entry/pfam/pf06235)|Detailed object|Data about Pfam entry pf06235|
-|[/api/entry/taxonomy/9606](https://www.ebi.ac.uk/interpro/beta/api/entry/taxonomy/9606)|Detailed object|Data about Taxonomy ID 9606|
+|[/api/entry/taxonomy/uniprot/9606](https://www.ebi.ac.uk/interpro/beta/api/taxonomy/uniprot/9606)|Detailed object|Data about Taxonomy ID 9606|
 
 ### Filtering data
+The first end point block in a request defines the data type which will be returned. Other end point blocks can be combined to filter the main dataset. This allows combinations of end points to be constructed to limit the types of lists returned by the API.
+
+
 
 ### Examples
 

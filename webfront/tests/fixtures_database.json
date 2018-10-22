@@ -79,7 +79,7 @@
     "model": "webfront.Release_Note",
     "fields": {
       "version": "70.0",
-      "release_date": "2018-01-21T00:00:00Z",
+      "release_date": "2018-01-22T00:00:00Z",
       "content": {
         "new_entries": [],
         "new_databases": [],

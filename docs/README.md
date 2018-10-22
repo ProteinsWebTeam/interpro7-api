@@ -1,9 +1,39 @@
 # InterPro API documentation
 
-This document aims to provide some guidance on how to use the InterPro API. Correctly formulating requests to filter data can be somewhat confusing but the rules described below should help ensure that the only the desired data is returned.
+This document aims to provide some guidance on how to use the InterPro API. The query syntax is very flexible and enables fetching and filtering of many different kinds of data from the InterPro databases. The documentation here defines some key concepts that should help with getting started.
 
 In addition the to information given here, the [InterPro website](https://www.ebi.ac.uk/interpro/beta) is built upon the API and therefore provides many practical examples of how the API is used to fetch different types of data.  
 
+## Getting started with some Examples
+### 1. How many entries are there in the InterPro API?
+This is a good starter query. InterPro integrates  data from all the member databases of the InterPro Consortium and contains both the original member database data and data for curated integrated entries. The following query returns a list of counts for all the different sources of entries in the InterPro dataset. In addition, there are also counts for the number of member database entries 'integrated' into InterPro and counts for those still 'unintegrated'.
+
+[/api/entry](https://www.ebi.ac.uk/interpro/beta/api/entry)
+
+### 2. How do I get a list of all CDD entries in the InterPro API?
+This query will return a paginatable list of summary information about CDD entries included in our dataset. The response returns first 20 hits and contains a link to the next 20 hits. Due to a limitation our databases, this list cannot be sorted.
+
+[/api/entry/cdd](https://www.ebi.ac.uk/interpro/beta/api/entry/cdd)
+
+### 3. How many entries match Human P53 protein in the different data sources (accession P04637)?
+This query returns a list of counts of entries linked to P53 in all datasources in InterPro
+
+[/api/entry/protein/uniprot/P04637](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/uniprot/P04637)
+
+### 4. How do I retrieve a list of all InterPro entries found in Human P53 protein (accession P04637)?
+This query returns a list of InterPro entries which map to Human P53 protein.
+
+[/api/entry/protein/uniprot/P04637](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/uniprot/P04637)
+
+### 5. How do I retrieve a list of UniProtKB reviewed proteins containing the entry IPR002117 domain?
+This query returns a list of proteins with IPR002117 domains together with the location of the domain in the protein sequence.
+
+[/api/protein/reviewed/entry/interpro/ipr002117](https://www.ebi.ac.uk/interpro/beta/api/protein/reviewed/entry/interpro/ipr002117)
+
+### 6. How do I retrieve a list of organisms which possess RNA-directed RNA polymerase (IPR026381)?
+This query returns a list of organisms which have a protein which contains a match to IPR026381.
+
+[/api/taxonomy/uniprot/entry/interpro/IPR026381](https://www.ebi.ac.uk/interpro/beta/api/taxonomy/uniprot/entry/interpro/IPR026381)
 
 ## Key concepts
 
@@ -68,19 +98,15 @@ The first end point block in a request defines the data type which will be retur
 |Query|Main type|Main source|Main accession|Filter type(s)|Filter source(s)|Filter accession(s)|Response type|Description|
 |----|----|----|----|----|---|----|----|----|
 |[/api/entry/](https://www.ebi.ac.uk/interpro/beta/api/entry)|entry|-|-|-|-|-|List of counts|List of all entry sources and counts|
-|[/api/entry/protein/](https://www.ebi.ac.uk/interpro/beta/api/entry/protein)|entry|-|-|protein|-|-|List of counts|List of all entry sources and counts + all protein sources and counts|
-|[/api/entry/protein/set/](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set)|entry|-|-|*protein *set|-|-|List of counts|List of all entry sources and counts + all protein sources and counts + all set sources and counts|
-|[/api/entry/protein/set/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set/structure)|entry|-|-|*protein *set *structure|-|-|List of counts|List of all entry sources and counts + all protein sources and counts + all set sources and counts + all structure sources and counts|
+|[/api/entry/protein/](https://www.ebi.ac.uk/interpro/beta/api/entry/protein)|entry|-|-|protein|-|-|List of counts|Matches only entries which map to a protein. List of all entry sources and counts + all protein sources and counts|
+|[/api/entry/protein/set/](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set)|entry|-|-|*protein *set|-|-|List of counts|Matches only entries which are members of a set and map to a protein. List of all entry sources and counts + all protein sources and counts + all set sources and counts|
+|[/api/entry/protein/set/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set/structure)|entry|-|-|*protein *set *structure|-|-|List of counts|Matches only those entries which are members of a set and map to a protein which has at lease one structure. List of all entry sources and counts + all protein sources and counts + all set sources and counts + all structure sources and counts|
 |[/api/entry/interpro/](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro)|entry|interpro|-|-|-|-|List of entities|List of all entry InterPro entries|
-|[/api/entry/interpro/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure)|entry|interpro|-|structure|-|-|List of entities|List of all entry InterPro entries together with a structure count|
-|[/api/entry/interpro/structure/pdb](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure/pdb)|entry|interpro|-|structure|pdb|-|List of entities|List of all entry InterPro entries together with a structure count|
+|[/api/entry/interpro/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure)|entry|interpro|-|structure|-|-|List of entities|Matches InterPro entries which map to a protein with a structure. List of all entry InterPro entries together with a structure count|
+|[/api/entry/interpro/structure/pdb](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure/pdb)|entry|interpro|-|structure|pdb|-|Matches InterPro entries which map to a protein with a structure in PDB. List of entities|List of all entry InterPro entries with each item containing a list of all PDB structure that it's linked with|
 
-
-Some care needs to be taken when combining filters in order to ensure the desired data is requested. 
-
-
-
-### Examples
 
 ### On-going issues and future work
+Some care needs to be taken when combining filters in order to ensure the desired data is requested. Some queries return lists of results within lists. These 'inner' lists  are limited to a maximum of 20 hits and cannot be paginated. To avoid confusion, we aim to either remove these inner lists or mark them as subsets in future.
+
 

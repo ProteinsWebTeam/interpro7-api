@@ -1,8 +1,9 @@
 # InterPro API documentation
 
-This document aims to provide some guidance on how to use the InterPro API. In addition the information given here, 
-the [InterPro website](https://www.ebi.ac.uk/interpro/beta) is built upon the API and therefore provides many examples
-of how the API is used to fetch different types of data.
+This document aims to provide some guidance on how to use the InterPro API. Correctly formulating requests to filter data can be somewhat confusing but the rules described below should help ensure that the only the desired data is returned.
+
+In addition the to information given here, the [InterPro website](https://www.ebi.ac.uk/interpro/beta) is built upon the API and therefore provides many practical examples of how the API is used to fetch different types of data.  
+
 
 ## Key concepts
 
@@ -42,10 +43,10 @@ The main data types (entry, protein, structure, set, proteome, taxonomy) are the
 ### End point blocks
 Endpoint blocks are the most important aspect of the query. An endpoint block can be composed of up to 3 parts: an endpoint data type (e.g., entry), a source database (e.g., InterPro) and a unique identifier (e.g., IPR00009). The endpoint type is mandatory, while the other two parts are optional.
 
-The presence of the different parts of the main block define the filter and determine the type of response returned by the API. The following rules determine the type response:
-• A query that only contains the endpoint type will return a list of aggregated values giving the total counts of all the unique entities, grouped by each data source of that type. For example, a query ‘/protein’ will return a JSON object with the number of proteins in UniProtKB, including the reviewed and unreviewed sections.
-• When the query includes a data source, the response is a paginated list of the entities that belong to that source, including some basic information. For example, the entities returned by the query ‘/structure/pdb’ include the name, accession and experiment type for each PDB structure.
-• If an accession block is part of the request, the response contains more detailed information about the requested entity. For example, the API response to the query ‘protein/UniProt/P50876’ will be a JSON object containing all the available information for that protein that has been imported into InterPro, including its sequence, description, etc.
+The presence of the different parts of the main block define the filter and determine the type of response returned by the API. The following rules define the type of the response:
+• A query defining only an endpoint type returns a list of aggregated values giving the total counts of all the unique entities, grouped by each data source of that type. For example, a query ‘/protein’ will return a JSON object with the number of proteins in UniProtKB, including the reviewed and unreviewed sections.
+• When a query includes a data source, the response is a paginated list of the entities from the source, including some basic information. For example, the entities returned by the query ‘/structure/pdb’ include the name, accession and experiment type for each PDB structure.
+• If an accession is included in the request, the response contains more detailed information about the requested entity. For example, the API response to the query ‘protein/UniProt/P50876’ is a JSON object containing all the available information for that protein that has been imported into InterPro, including its sequence, description, etc.
 
 The following table shows some examples of end point blocks and how the components determine the response type.
 
@@ -63,6 +64,17 @@ The following table shows some examples of end point blocks and how the componen
 
 ### Filtering data
 The first end point block in a request defines the data type which will be returned. Additional end point blocks can be combined to filter the main dataset. This allows combinations of end points to be constructed to limit the data returned by the API.
+
+|Query|Main type|Main source|Main accession|Filter type(s)|Filter source(s)|Filter accession(s)|Response type|Description|
+|----|----|----|----|----|---|----|----|----|
+|[/api/entry/](https://www.ebi.ac.uk/interpro/beta/api/entry)|entry|-|-|-|-|-|List of counts|List of all entry sources and counts|
+|[/api/entry/protein/](https://www.ebi.ac.uk/interpro/beta/api/entry/protein)|entry|-|-|protein|-|-|List of counts|List of all entry sources and counts + all protein sources and counts|
+|[/api/entry/protein/set](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set)|entry|-|-|*protein *set|-|-|List of counts|List of all entry sources and counts + all protein sources and counts + all set sources and counts|
+|[/api/entry/protein/set/](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set)|entry|-|-|*protein *set|-|-|List of counts|List of all entry sources and counts + all protein sources and counts + all set sources and counts|
+|[/api/entry/protein/set/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set/structure)|entry|-|-|*protein *set *structure|-|-|List of counts|List of all entry sources and counts + all protein sources and counts + all set sources and counts + all structure sources and counts|
+
+
+Some care needs to be taken when combining filters in order to ensure the desired data is requested. 
 
 
 

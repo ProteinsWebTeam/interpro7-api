@@ -69,9 +69,11 @@ The first end point block in a request defines the data type which will be retur
 |----|----|----|----|----|---|----|----|----|
 |[/api/entry/](https://www.ebi.ac.uk/interpro/beta/api/entry)|entry|-|-|-|-|-|List of counts|List of all entry sources and counts|
 |[/api/entry/protein/](https://www.ebi.ac.uk/interpro/beta/api/entry/protein)|entry|-|-|protein|-|-|List of counts|List of all entry sources and counts + all protein sources and counts|
-|[/api/entry/protein/set](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set)|entry|-|-|*protein *set|-|-|List of counts|List of all entry sources and counts + all protein sources and counts + all set sources and counts|
 |[/api/entry/protein/set/](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set)|entry|-|-|*protein *set|-|-|List of counts|List of all entry sources and counts + all protein sources and counts + all set sources and counts|
 |[/api/entry/protein/set/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set/structure)|entry|-|-|*protein *set *structure|-|-|List of counts|List of all entry sources and counts + all protein sources and counts + all set sources and counts + all structure sources and counts|
+|[/api/entry/interpro/](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro)|entry|interpro|-|-|-|-|List of entities|List of all entry InterPro entries|
+|[/api/entry/interpro/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure)|entry|interpro|-|structure|-|-|List of entities|List of all entry InterPro entries together with a structure count|
+|[/api/entry/interpro/structure/pdb](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure/pdb)|entry|interpro|-|structure|pdb|-|List of entities|List of all entry InterPro entries together with a structure count|
 
 
 Some care needs to be taken when combining filters in order to ensure the desired data is requested. 

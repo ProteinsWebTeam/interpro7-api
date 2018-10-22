@@ -90,7 +90,7 @@ The following table shows some examples of end point blocks and how the componen
 |[/api/proteome/uniprot](https://www.ebi.ac.uk/interpro/beta/api/proteome/uniprot)|List of entities|List of proteomes (there is only 1 source of proteomes)|
 |[/api/entry/interpro/ipr023411](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/ipr023411)|Detailed object|Data about InterPro entry IPR023411|
 |[/api/entry/pfam/pf06235](https://www.ebi.ac.uk/interpro/beta/api/entry/pfam/pf06235)|Detailed object|Data about Pfam entry pf06235|
-|[/api/entry/taxonomy/uniprot/9606](https://www.ebi.ac.uk/interpro/beta/api/taxonomy/uniprot/9606)|Detailed object|Data about Taxonomy ID 9606|
+|[/api/taxonomy/uniprot/9606](https://www.ebi.ac.uk/interpro/beta/api/taxonomy/uniprot/9606)|Detailed object|Data about Taxonomy ID 9606|
 
 ### Filtering data
 The first end point block in a request defines the data type which will be returned. Additional end point blocks can be combined to filter the main dataset. This allows combinations of end points to be constructed to limit the data returned by the API.
@@ -103,8 +103,8 @@ The first end point block in a request defines the data type which will be retur
 |[/api/entry/protein/set/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/set/structure)|entry|-|-|*protein *set *structure|-|-|List of counts|Matches only those entries which are members of a set and map to a protein which has at lease one structure. List of all entry sources and counts + all protein sources and counts + all set sources and counts + all structure sources and counts|
 |[/api/entry/interpro/](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro)|entry|interpro|-|-|-|-|List of entities|List of all entry InterPro entries|
 |[/api/entry/interpro/structure](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure)|entry|interpro|-|structure|-|-|List of entities|Matches InterPro entries which map to a protein with a structure. List of all entry InterPro entries together with a structure count|
-|[/api/entry/interpro/structure/pdb](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure/pdb)|entry|interpro|-|structure|pdb|-|Matches InterPro entries which map to a protein with a structure in PDB. List of entities|List of all entry InterPro entries with each item containing a list of all PDB structure that it's linked with|
-
+|[/api/entry/interpro/structure/pdb](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/structure/pdb)|entry|interpro|-|structure|pdb|-|List of entities|Matches InterPro entries which map to a protein with a structure in PDB. List of all entry InterPro entries with each item containing a list of all PDB structure that it's linked with|
+|[/api/protein/reviewed/entry/interpro/ipr002117/taxonomy/uniprot/9606](https://www.ebi.ac.uk/interpro/beta/api/protein/reviewed/entry/interpro/ipr002117/taxonomy/uniprot/9606)|protein|reviewed|-|<ul><li>entry</li><li>taxonomy</li></ul>|<ul><li>interpro</li><li>uniprot</li></ul>|<ul><li>-</li><li>9606</li></ul>|List of entities|Matches InterPro proteins with Taxonomy ID 9606 which contain the InterPro IPR002117 entry. List of proteins|
 
 ### On-going issues and future work
 Some care needs to be taken when combining filters in order to ensure the desired data is requested. Some queries return lists of results within lists. These 'inner' lists  are limited to a maximum of 20 hits and cannot be paginated. To avoid confusion, we aim to either remove these inner lists or mark them as subsets in future.

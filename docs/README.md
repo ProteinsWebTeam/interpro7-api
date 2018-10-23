@@ -15,7 +15,7 @@ This query will return a paginatable list of summary information about CDD entri
 
 [/api/entry/cdd](https://www.ebi.ac.uk/interpro/beta/api/entry/cdd)
 
-### 3. How many entries match Human P53 protein in the different data sources (accession P04637)?
+### 3. How many entries matching Human P53 protein in the different data sources (accession P04637)?
 This query returns a list of counts of entries linked to P53 in all datasources in InterPro
 
 [/api/entry/protein/uniprot/P04637](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/uniprot/P04637)
@@ -23,7 +23,7 @@ This query returns a list of counts of entries linked to P53 in all datasources 
 ### 4. How do I retrieve a list of all InterPro entries found in Human P53 protein (accession P04637)?
 This query returns a list of InterPro entries which map to Human P53 protein.
 
-[/api/entry/protein/uniprot/P04637](https://www.ebi.ac.uk/interpro/beta/api/entry/protein/uniprot/P04637)
+[/api/entry/interpro/protein/uniprot/P04637](https://www.ebi.ac.uk/interpro/beta/api/entry/interpro/protein/uniprot/P04637)
 
 ### 5. How do I retrieve a list of UniProtKB reviewed proteins containing the entry IPR002117 domain?
 This query returns a list of proteins with IPR002117 domains together with the location of the domain in the protein sequence.

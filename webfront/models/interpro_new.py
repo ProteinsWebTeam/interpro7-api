@@ -60,6 +60,7 @@ class Protein(models.Model):
     # genomic_context = JSONField(null=True)
     source_database = models.CharField(max_length=20, default="unreviewed", db_index=True)
     residues = JSONField(null=True)
+    extra_features = JSONField(null=True)
     structure = JSONField(default={})
     is_fragment = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")

@@ -1,16 +1,17 @@
+from webfront.exceptions import EmptyQuerysetError
 from webfront.models import Protein
 
 from webfront.serializers.content_serializers import ModelContentSerializer
 import webfront.serializers.interpro
 import webfront.serializers.pdb
 from webfront.views.custom import SerializerDetail
-# from webfront.serializers.utils import recategorise_go_terms
 from webfront.views.queryset_manager import escape
 
 mamberDBNames = {
     "REVIEWED": "reviewed",
     "UNREVIEWED": "unreviewed",
 }
+
 
 def formatMemberDBName(name):
     return mamberDBNames[name] if name in mamberDBNames else name
@@ -156,7 +157,7 @@ class ProteinSerializer(ModelContentSerializer):
     def to_group_representation(instance):
         if "groups" in instance:
             if ProteinSerializer.grouper_is_empty(instance):
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Protein"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Protein"))
             return {
                 ProteinSerializer.get_key_from_bucket(bucket):
                     ProteinSerializer.serialize_counter_bucket(bucket, "proteins")
@@ -173,7 +174,7 @@ class ProteinSerializer(ModelContentSerializer):
             filters = []
         if "proteins" not in instance:
             if ProteinSerializer.grouper_is_empty(instance, "databases"):
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Protein"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Protein"))
 
             ins2 = {"proteins": {
                        ProteinSerializer.get_key_from_bucket(bucket):

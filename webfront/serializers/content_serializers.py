@@ -1,12 +1,9 @@
 from rest_framework import serializers
 
-from webfront.views.custom import SerializerDetail, CustomView
-from webfront.views.queryset_manager import escape
-import webfront.serializers  # .uniprot
+from webfront.exceptions import EmptyQuerysetError
+from webfront.views.custom import SerializerDetail
+import webfront.serializers
 
-
-# import webfront.serializers.pdb
-# import webfront.serializers.taxonomy
 
 class ModelContentSerializer(serializers.ModelSerializer):
     plurals = {
@@ -105,7 +102,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         ]
 
         if len(response) == 0:
-            raise ReferenceError('No organisms found matching this request')
+            raise EmptyQuerysetError('No organisms found matching this request')
         return response
 
     @staticmethod
@@ -116,7 +113,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
         ]
         if len(response) == 0:
-            raise ReferenceError('No sets found matching this request')
+            raise EmptyQuerysetError('No sets found matching this request')
         return response
 
     @staticmethod
@@ -133,7 +130,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in searcher.get_group_obj_of_field_by_query(None, field, fq=query, rows=10)["groups"]
         ]
         if len(response) == 0:
-            raise ReferenceError('No entries found matching this request')
+            raise EmptyQuerysetError('No entries found matching this request')
         return response
 
     @staticmethod
@@ -153,7 +150,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in search
         ]
         if len(response) == 0:
-            raise ReferenceError('No entries found matching this request')
+            raise EmptyQuerysetError('No entries found matching this request')
 
         for entry in response:
             if hasattr(instance, 'residues') and entry['accession'] in instance.residues:
@@ -175,7 +172,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in searcher.get_group_obj_of_field_by_query(None, field, fq=searcher_query, rows=10)["groups"]
         ]
         if len(response) == 0:
-            raise ReferenceError('No proteins found matching this request')
+            raise EmptyQuerysetError('No proteins found matching this request')
         return response
 
     @staticmethod
@@ -188,7 +185,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             for r in searcher.get_group_obj_of_field_by_query(None, fields, fq=query, rows=10)["groups"]
         ]
         if len(response) == 0:
-            raise ReferenceError('No proteomes found matching this request')
+            raise EmptyQuerysetError('No proteomes found matching this request')
         return response
 
     @staticmethod

@@ -1,3 +1,4 @@
+from webfront.exceptions import EmptyQuerysetError
 from webfront.views.custom import CustomView, SerializerDetail
 from webfront.serializers.content_serializers import ModelContentSerializer
 
@@ -25,7 +26,7 @@ class AccessionHandler(CustomView):
         docs = general_handler.searcher.get_document_by_any_accession(acc)
 
         if len(docs["hits"]["hits"]) == 0:
-            raise ReferenceError("No accessions matching {} can be found in our data"
+            raise EmptyQuerysetError("No accessions matching {} can be found in our data"
                                  .format(acc))
 
         hit = docs["hits"]["hits"][0]["_source"]

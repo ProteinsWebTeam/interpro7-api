@@ -1,3 +1,4 @@
+from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 from webfront.models import Structure
@@ -192,7 +193,7 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def to_chains_representation(chains):
         if len(chains) < 1:
-            raise ReferenceError('Trying to display an empty list of chains')
+            raise EmptyQuerysetError('Trying to display an empty list of chains')
         return {
             ch["structure_chain_acc"]: StructureSerializer.get_chain_from_search_object(ch)
             for ch in chains
@@ -232,7 +233,7 @@ class StructureSerializer(ModelContentSerializer):
     def to_group_representation(instance):
         if "groups" in instance:
             if StructureSerializer.grouper_is_empty(instance):
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Structure"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Structure"))
             return {
                 StructureSerializer.get_key_from_bucket(bucket): StructureSerializer.serialize_counter_bucket(bucket, "structures")
                 for bucket in instance["groups"]["buckets"]
@@ -250,7 +251,7 @@ class StructureSerializer(ModelContentSerializer):
         if "structures" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Structure"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Structure"))
             instance = {
                 "structures": {
                     "pdb": StructureSerializer.serialize_counter_bucket(instance["databases"], "structures")

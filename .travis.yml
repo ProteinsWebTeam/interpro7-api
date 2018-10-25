@@ -39,4 +39,4 @@ branches:
   only:
     - master
     - dev
-    - proteome_as_endpoint
+    - del_entries

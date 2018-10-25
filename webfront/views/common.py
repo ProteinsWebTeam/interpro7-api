@@ -3,6 +3,8 @@ import os
 import logging
 
 from rest_framework import status
+
+from webfront.exceptions import DeletedEntryError, EmptyQuerysetError
 from webfront.response import Response
 
 from django.conf import settings
@@ -161,7 +163,12 @@ class GeneralHandler(CustomView):
 
             else:
                 response = query((self, request, endpoint_levels, full_path, caching_allowed))
-        except ReferenceError as e:
+        except DeletedEntryError as e:
+            if settings.DEBUG:
+                raise
+            content = {'detail': e.args[1], 'accession': e.args[1]}
+            response = Response(content, status=status.HTTP_410_GONE)
+        except EmptyQuerysetError as e:
             if settings.DEBUG:
                 raise
             content = {'detail': e.args[0]}

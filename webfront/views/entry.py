@@ -1,5 +1,6 @@
 from django.db.models import Count
 
+from webfront.exceptions import DeletedEntryError
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
 from webfront.views.modifiers import group_by, sort_by, filter_by_field, get_interpro_status_counter, \
@@ -111,7 +112,17 @@ class AccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
-        general_handler.queryset_manager.add_filter("entry", accession=endpoint_levels[level - 1].lower())
+        acc = endpoint_levels[level - 1].lower()
+        general_handler.queryset_manager.add_filter("entry", accession=acc)
+
+        # Checking if the entry has been marked as deleted
+        general_handler.queryset_manager.add_filter("entry", is_alive=False)
+        qs = general_handler.queryset_manager.get_queryset()
+        if qs.count() > 0:
+            raise DeletedEntryError(acc, "The entry {} is not active. Removed:".format(acc, qs.first().deletion_date))
+        general_handler.queryset_manager.add_filter("entry", is_alive=True)
+
+
         general_handler.modifiers.register(
             "ida", get_domain_architectures,
             use_model_as_payload=True,
@@ -309,6 +320,7 @@ class EntryHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
+        general_handler.queryset_manager.add_filter("entry", is_alive=True)
         general_handler.modifiers.register(
             "group_by",
             group_by(Entry, {
@@ -346,4 +358,5 @@ class EntryHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
+        general_handler.queryset_manager.add_filter("entry", is_alive=True)
         return queryset

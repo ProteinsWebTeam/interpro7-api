@@ -1,3 +1,4 @@
+from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 from webfront.models import Taxonomy, Proteome
@@ -136,7 +137,7 @@ class ProteomeSerializer(ModelContentSerializer):
         if "proteomes" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome"))
             instance = {
                 "proteomes": {
                     "uniprot": ProteomeSerializer.serialize_counter_bucket(instance["databases"], "proteomes"),
@@ -160,7 +161,7 @@ class ProteomeSerializer(ModelContentSerializer):
     def to_group_representation(instance):
         if "groups" in instance:
             if ProteomeSerializer.grouper_is_empty(instance):
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome"))
             return {
                 ProteomeSerializer.get_key_from_bucket(bucket): ProteomeSerializer.serialize_counter_bucket(bucket, "proteomes")
                 for bucket in instance["groups"]["buckets"]

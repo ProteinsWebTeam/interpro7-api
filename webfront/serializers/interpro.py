@@ -1,4 +1,6 @@
 from django.conf import settings
+
+from webfront.exceptions import EmptyQuerysetError
 from webfront.models import Entry, EntryAnnotation
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
@@ -198,7 +200,7 @@ class EntrySerializer(ModelContentSerializer):
     def to_group_representation(instance):
         if "groups" in instance:
             if EntrySerializer.grouper_is_empty(instance):
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Entry"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Entry"))
             return {
                         EntrySerializer.get_key_from_bucket(bucket): EntrySerializer.serialize_counter_bucket(bucket, "entries")
                         for bucket in instance["groups"]["buckets"]
@@ -212,7 +214,7 @@ class EntrySerializer(ModelContentSerializer):
             filters = []
         if "entries" not in instance:
             if EntrySerializer.counter_is_empty(instance):
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Entry"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Entry"))
             result = {
                 "entries": {
                     "member_databases": {

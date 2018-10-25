@@ -10,6 +10,7 @@
       "source_database" : "interpro",
       "entry_date": "2001-04-21T00:00:00Z",
       "is_featured": true,
+      "is_alive": true,
       "member_databases" : {
         "smart": {"sm00950": "Piwi domain"},
         "profile": {"ps50822": "PIWI"},
@@ -123,6 +124,7 @@
       "member_databases" : {},
       "entry_date": "2002-04-21T00:00:00Z",
       "is_featured": false,
+      "is_alive": true,
       "integrated" : null,
       "hierarchy": {
           "children": [
@@ -189,6 +191,7 @@
       "type": "domain",
       "name": "Piwi domain",
       "is_featured": true,
+      "is_alive": true,
       "entry_date": "2003-04-21T00:00:00Z",
       "short_name": "Piwi",
       "go_terms": [
@@ -254,6 +257,7 @@
       "name": "Piwi domain",
       "entry_date": "2004-04-21T00:00:00Z",
       "is_featured": true,
+      "is_alive": true,
       "short_name": "Piwi",
       "go_terms": [
         {
@@ -283,6 +287,7 @@
       "entry_date": "2001-04-21T00:00:00Z",
       "name": "PIWI",
       "is_featured": true,
+      "is_alive": true,
       "short_name": "Piwi",
       "go_terms": [],
       "source_database": "profile",
@@ -301,6 +306,7 @@
       "entry_id": "id3",
       "type": "domain",
       "is_featured": true,
+      "is_alive": true,
       "entry_date": "2002-04-21T00:00:00Z",
       "go_terms": [],
       "source_database": "pfam",
@@ -322,6 +328,7 @@
       "type": "domain",
       "entry_date": "2002-04-21T00:00:00Z",
       "is_featured": true,
+      "is_alive": true,
       "go_terms": [],
       "source_database": "pfam",
       "member_databases": {},
@@ -344,6 +351,7 @@
       "name": "Myelin family",
       "entry_date": "2003-04-21T00:00:00Z",
       "is_featured": true,
+      "is_alive": true,
       "short_name": "Myelin",
       "go_terms": [
         {
@@ -375,6 +383,7 @@
       "go_terms": [],
       "entry_date": "2004-04-21T00:00:00Z",
       "is_featured": true,
+      "is_alive": true,
       "source_database": "profile",
       "member_databases": null,
       "integrated": null,
@@ -382,6 +391,19 @@
       "wikipedia": null,
       "literature": {},
       "cross_references": {}
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields":{
+      "entry_id": null,
+      "accession": "ipr123456",
+      "type": "D",
+      "name": "Deleted",
+      "entry_date": "1994-04-21T00:00:00Z",
+      "deletion_date": "1994-04-21T00:00:00Z",
+      "is_alive": false,
+      "source_database": "interpro"
     }
   }
 ]

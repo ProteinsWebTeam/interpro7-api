@@ -4,6 +4,7 @@ from rest_framework.generics import GenericAPIView
 from django.http import HttpResponse
 import logging
 
+from webfront.exceptions import EmptyQuerysetError
 from webfront.response import Response
 from webfront.constants import SerializerDetail
 from webfront.models import Entry
@@ -82,7 +83,7 @@ class CustomView(GenericAPIView):
                     #     raise Exception("The URL requested didn't have any data related.\nList of endpoints: {}"
                     #                     .format(endpoint_levels))
 
-                    raise ReferenceError("The URL requested didn't have any data related.\nList of endpoints: {}"
+                    raise EmptyQuerysetError("The URL requested didn't have any data related.\nList of endpoints: {}"
                                          .format(endpoint_levels))
                 if self.many:
                     self.queryset = self.paginator.paginate_queryset(

@@ -6,6 +6,7 @@ import webfront.serializers.taxonomy
 
 from webfront.views.custom import SerializerDetail
 from webfront.views.queryset_manager import escape
+from webfront.exceptions import EmptyQuerysetError
 
 
 class SetSerializer(ModelContentSerializer):
@@ -87,7 +88,7 @@ class SetSerializer(ModelContentSerializer):
             if ("count" in instance and instance["count"] == 0) or \
                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
                ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0) :
-                raise ReferenceError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Set"))
+                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Set"))
             ins2 = {
                 "sets": {
                         SetSerializer.get_key_from_bucket(bucket): SetSerializer.serialize_counter_bucket(bucket, "sets")

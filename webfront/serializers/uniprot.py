@@ -102,8 +102,15 @@ class ProteinSerializer(ModelContentSerializer):
 
     def to_full_representation(self, instance):
         sq = self.queryset_manager.get_searcher_query()
+        counters = None
+        if self.queryset_manager.is_single_endpoint():
+            counters = instance.counts
+            counters["dbEntries"] = {e:c for [e, c] in counters["entries"].items() if e != "total"}
+            counters["entries"] = counters["entries"]["total"]
+            counters["proteome"] = 0 if instance.proteome is None else 1
+            counters["taxonomy"] = 0 if instance.tax_id is None else 1
         return {
-            "metadata": self.to_metadata_representation(instance, self.searcher, sq),
+            "metadata": self.to_metadata_representation(instance, self.searcher, sq, counters),
         }
 
     @staticmethod
@@ -119,7 +126,7 @@ class ProteinSerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def to_metadata_representation(instance, searcher, sq):
+    def to_metadata_representation(instance, searcher, sq, counters=None):
         # recategorise_go_terms(instance.go_terms)
         
         protein = {
@@ -133,13 +140,13 @@ class ProteinSerializer(ModelContentSerializer):
             "description": instance.description,
             "length": instance.length,
             "sequence": instance.sequence,
-            "proteomes": instance.proteomes,
+            "proteomes": instance.proteome,
             "gene": instance.gene,
             "go_terms": instance.go_terms,
             "protein_evidence": 4,  # TODO
             "source_database": instance.source_database,
             'is_fragment': instance.is_fragment,
-            "counters": ProteinSerializer.get_counters(instance, searcher, sq)
+            "counters": ProteinSerializer.get_counters(instance, searcher, sq) if counters is None else counters
         }
         return protein
 

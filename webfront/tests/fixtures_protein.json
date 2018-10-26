@@ -15,14 +15,23 @@
       "sequence": "MRVLPATLLVGAATAAVPPFQQILGLPKKGADTLSKPLHDFQEQLKTLSDDARRLWDEVAKHFPDSMDHNPVFSLPKKHTRRPDSHWDHIVRGADVQSVWVTGANGEKEREVDGKLEAYDLRVKTTDPGALGIDPGVKQYTGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFLELGPSSIDSKIKPVYNDFAWNSNASVIFLDQPVNVGYSYSGSAVSDTVAAGKDVYALLTLFFKQFPEYAKQDFHIAGESYAGHYIPVFASEILSHKKRNINLKSVLIGNGLTDPLTQYDHYRPMACGDGGYPAVLDEASCQSMDNALPRCKSMIESCYNTESSWVCVPASIYCNNALIGPYQRTGQNVYDVRGKCEDESNLCYKGMGYVSEYLNKREVREAVGAEVDGYDSCNFDINRNFLFHGDWMKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEYASAELEDLVIEQNEHQGKKIGQIKSHGNFTFMRLYGGGHMVPMDQPEASLEFFNRWIGGEWF",
       "length" : "543",
       "size" : "medium",
-      "proteomes": ["up000006701"],
+      "proteome": "up000006701",
       "gene": "cpyA",
       "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 3,
       "source_database": "reviewed",
       "is_fragment": false,
       "residues": {},
-      "extra_features": { "feature": "EXTRA"}
+      "extra_features": { "feature": "EXTRA"},
+      "counts": {
+        "entries": {
+            "total": 5,
+            "pfam": 2,
+            "smart": 1
+        },
+        "structures": 1,
+        "sets": 2
+      }
     }
   },
   {
@@ -41,7 +50,7 @@
       "sequence": "MESGIIEILIRNGVSHMTEKPVFHINGYLGLILVLVILGLGVYLSVVGWGVLGVILVVLAVLAASSLTIIEPNQSKVLTFFGRYIGTIKESGLYLTVPLTTKTTVSLRVRNFNSAILKVNDLQGNPVEIAAVIVFKVVDTSKALFAVEDYEKFVEIQSESAIRHVASEYAYDNFGDHQALTLRSNPTEVSNHLTEELQARLEVAGVQIIETRLTHLAYATEIASAMLQRQQSQAILSARKIIVEGAVSITEGAIEQLAAETDLHLTDNQKLQLINNMMVSIINERGSQPVINTGKVE",
       "length" : 297,
       "size" : "small",
-      "proteomes": ["up000012042"],
+      "proteome": "up000012042",
       "gene": "LVISKB_0797",
       "go_terms": [
         {
@@ -93,7 +102,15 @@
       "evidence_code": 1,
       "source_database": "reviewed",
       "is_fragment": false,
-      "residues": {}
+      "residues": {},
+      "counts": {
+        "entries": {
+          "pfam": 1,
+          "total":1
+        },
+        "structures": 2,
+        "sets": 1
+      }
     }
   },
   {
@@ -112,13 +129,18 @@
       "sequence": "MRVLSTTLLVGAASAAAPSFQQVLGAHSEHAENVAQQGADAFKPLQHLQDQFKSLSSEARQLWEEVSNYFPESMGSAPMLSLPKKHTRRPDSHWDYHVSGAKVQDIWVSGAEGTKEREVDGKLEDYALRAKKVDPSALGIDPGVKQYSGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFMELGPSSIGANIKPIYNDFSWNNNASVIFLDQPINVGYSYSGSSVSDTVAAGKDVYALLTLFFKQFPEYATQDFHIAGESYAGHYIPVMASEILSHKKRNINLKSVLIGNGLTDGLTQYEYYRPMACGEGGYPAVLDESTCQSMDNALSRCQSMIQSCYNSESPWVCVPASIYCNNAMLGPYQRTGQNVYDVRGKCEDESNLCYKGLGYVSEYLGQESVREAVGAEVDGYDSCNFDINRNFLFNGDWFKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEFASAELEDLKIVQNEHVGKKIGQIKSHGNFTFMRIFGGGHMVPMDQPESGLEFFNRWIGGEWF",
       "length" : "550",
       "size" : "medium",
-      "proteomes": ["up000030104"],
+      "proteome": "up000030104",
       "gene": "PITC_084940",
       "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 1,
       "source_database": "unreviewed",
       "is_fragment": false,
-      "residues": {}
+      "residues": {},
+      "counts":{
+        "entries": {"total": 0},
+        "structures": 2,
+        "sets": 0
+      }
     }
   },
   {
@@ -137,13 +159,21 @@
       "sequence": "MRRRSLALRLLLALLLLPPPLPQTLLGAPCPEPCSCRPDGALRCPGPRAGLSRLSLTYLPIKVIPSQAFRGLNEVVKIEISQSDSLEKIEANAFDNLLNLSEILIQNTKNLVYIEPGAFTNLPRLKYLSICNTGIRKLPDVTKIFSSEFNFILEICDNLHITTVPANAFQGMNNESITLKLYGNGFEEIQSHAFNGTTLISLELKENAHLKKMHNDAFRGARGPSILDISSTKLQALPSYGLESIQTLIATSSYSLKKLPSREKFTNLLDATLTYPSHCCAFRNLPTKEQNFSFSIFKNFSKQCESTARRPNNETLYSAIFAESELSDWDYDYGFCSPKTLQCAPEPDAFNPCEDIMGYDFLRVLIWLINILAIMGNVTVLFVLLTSHYKLTVPRFLMCNLSFADFCMGLYLLLIASVDAQTKGQYYNHAIDWQTGNGCSVAGFFTVFASELSVYTLTVITLERWHTITYAIQLDQKLRLRHAIPIMLGGWLFSTLIAMLPLVGVSSYMKVSICLPMDVETTLSQVYILTILILNVVAFIIICACYIKIYFAVQNPELMATNKDTKIAKKMAVLIFTDFTCMAPISFFAISAALKVPLITVTNSKVLLVLFYPVNSCANPFLYAIFTKAFRRDFFLLLSKSGCCKHQAELYRRKDFSAYCKNGFTGSNKPSRSTLKLTTLQCQYSTVMDKTCYKDC",
       "length" : 696,
       "size" : "long",
-      "proteomes": ["up000030104"],
+      "proteome": "up000030104",
       "gene": "LHCGR",
       "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
       "evidence_code": 4,
       "source_database": "unreviewed",
       "is_fragment": false,
-      "residues": {}
+      "residues": {},
+      "counts": {
+        "entries": {
+          "profile": 1,
+          "total": 2
+        },
+        "structures": 1,
+        "sets": 0
+      }
     }
   }
 ]

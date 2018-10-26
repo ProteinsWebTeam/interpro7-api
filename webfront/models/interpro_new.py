@@ -49,17 +49,14 @@ class Protein(models.Model):
     identifier = models.CharField(max_length=16, unique=True, null=False)
     organism = JSONField(null=True)
     name = models.CharField(max_length=20)
-    # short_name = models.CharField(max_length=20, null=True)
     other_names = JSONField(null=True)
     description = JSONField(null=True)
     sequence = models.TextField(null=False)
     length = models.IntegerField(null=False)
-    proteomes = JSONField(null=True)
+    proteome = models.CharField(max_length=20, null=True)
     gene = models.CharField(max_length=70, null=True)
     go_terms = JSONField(null=True)
     evidence_code = models.IntegerField()
-    # feature = JSONField(null=True)
-    # genomic_context = JSONField(null=True)
     source_database = models.CharField(max_length=20, default="unreviewed", db_index=True)
     residues = JSONField(null=True)
     extra_features = JSONField(null=True)
@@ -67,8 +64,7 @@ class Protein(models.Model):
     is_fragment = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
     size = models.CharField(max_length=10, null=True)
-    # Domain arch string e.g. 275/UPI0004FEB881#29021:2-66~20422&29021&340&387:103-266#
-    # domain_architectures = models.TextField(null=True)
+    counts = JSONField(null=True)
 
 
 class Structure(models.Model):

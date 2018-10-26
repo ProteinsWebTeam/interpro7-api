@@ -205,3 +205,11 @@ class QuerysetManager:
             elif k == "accession" or k == "accession__iexact":
                 self.filters[endpoint]["integrated"] = f.lower()
                 del self.filters[endpoint][k]
+
+    def is_single_endpoint(self):
+        main_ep = self.main_endpoint
+        filters = [
+            f for f in self.filters
+            if f != main_ep and f != "search" and self.filters[f] != {}
+        ]
+        return len(filters) == 0

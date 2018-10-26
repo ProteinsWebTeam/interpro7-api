@@ -119,7 +119,8 @@ class AccessionHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry", is_alive=False)
         qs = general_handler.queryset_manager.get_queryset()
         if qs.count() > 0:
-            raise DeletedEntryError(acc, "The entry {} is not active. Removed:".format(acc, qs.first().deletion_date))
+            date = qs.first().deletion_date
+            raise DeletedEntryError(acc, date, "The entry {} is not active. Removed: {}".format(acc, date))
         general_handler.queryset_manager.add_filter("entry", is_alive=True)
 
 

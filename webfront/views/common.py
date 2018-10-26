@@ -166,7 +166,7 @@ class GeneralHandler(CustomView):
         except DeletedEntryError as e:
             if settings.DEBUG:
                 raise
-            content = {'detail': e.args[1], 'accession': e.args[1]}
+            content = {'detail': e.args[2], 'accession': e.args[0], 'date': e.args[1]}
             response = Response(content, status=status.HTTP_410_GONE)
         except EmptyQuerysetError as e:
             if settings.DEBUG:

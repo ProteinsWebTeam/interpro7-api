@@ -22,6 +22,7 @@ class TaxonomySerializer(ModelContentSerializer):
                     self.searcher,
                     self.queryset_manager.get_searcher_query()
                 )
+
             representation = self.add_other_fields(
                 representation,
                 instance,
@@ -58,31 +59,31 @@ class TaxonomySerializer(ModelContentSerializer):
         if detail != SerializerDetail.TAXONOMY_OVERVIEW:
             sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.ENTRY_DB in detail_filters or \
-                    SerializerDetail.ENTRY_DETAIL in detail_filters:
+                SerializerDetail.ENTRY_DETAIL in detail_filters:
                 representation["entries"] = self.to_entries_detail_representation(
                     instance, s, self.get_searcher_query(instance),
                     base_query=sq
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
-                    SerializerDetail.STRUCTURE_DETAIL in detail_filters:
+                SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
                     instance, s, self.get_searcher_query(instance),
                     include_chain=True,
                     base_query=sq
                 )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
-                    SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = self.to_proteins_detail_representation(
                     instance, self.searcher, self.get_searcher_query(instance),
                     base_query=sq
                 )
             if SerializerDetail.PROTEOME_DB in detail_filters or \
-                    SerializerDetail.PROTEOME_DETAIL in detail_filters:
+                SerializerDetail.PROTEOME_DETAIL in detail_filters:
                 representation["proteomes"] = self.to_proteomes_detail_representation(
                     self.searcher, self.get_searcher_query(instance)
                 )
             if SerializerDetail.SET_DB in detail_filters or \
-                    SerializerDetail.SET_DETAIL in detail_filters:
+                SerializerDetail.SET_DETAIL in detail_filters:
                 representation["sets"] = self.to_set_detail_representation(
                     instance,
                     self.searcher,
@@ -93,6 +94,11 @@ class TaxonomySerializer(ModelContentSerializer):
     def to_full_representation(self, instance):
         searcher = self.searcher
         sq = self.queryset_manager.get_searcher_query()
+        counters = instance.counts
+        if self.queryset_manager.is_single_endpoint():
+            self.reformatEntryCounters(counters)
+        else:
+            counters = TaxonomySerializer.get_counters(instance, searcher, sq)
         obj = {
             "metadata": {
                 "accession": str(instance.accession),
@@ -105,7 +111,7 @@ class TaxonomySerializer(ModelContentSerializer):
                     "name": instance.scientific_name,
                     "short": instance.full_name,
                 },
-                "counters": TaxonomySerializer.get_counters(instance, searcher, sq)
+                "counters": counters
             }
         }
         return obj
@@ -117,13 +123,14 @@ class TaxonomySerializer(ModelContentSerializer):
             q = "{} && tax_lineage:{}".format(query, child)
             response = self.searcher._elastic_json_query(q, {"size": 0})
             return response["hits"]["total"] > 0
+
         return filter_children
 
     def get_children(self, instance):
         filter_children = lambda x: True
         if len(self.detail_filters) > 0:
             filter_children = self.isChildInQuery()
-        return [str(c)for c in instance.children if filter_children(c)]
+        return [str(c) for c in instance.children if filter_children(c)]
 
     @staticmethod
     def to_headers_representation(instance):
@@ -152,7 +159,7 @@ class TaxonomySerializer(ModelContentSerializer):
     def to_counter_representation(instance, filter=None):
         if "taxa" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
-               ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
+                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
                 raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy"))
             instance = {
                 "taxa": {
@@ -216,7 +223,7 @@ class TaxonomySerializer(ModelContentSerializer):
 
     @staticmethod
     def get_names_map(instance):
-        qs = Taxonomy.objects.filter(accession__in=instance.lineage.strip().split()+instance.children)
+        qs = Taxonomy.objects.filter(accession__in=instance.lineage.strip().split() + instance.children)
         return {
             t.accession: {
                 "name": t.scientific_name,

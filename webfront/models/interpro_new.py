@@ -91,6 +91,7 @@ class Taxonomy(models.Model):
     children = JSONField(null=True)
     left_number = models.IntegerField()
     right_number = models.IntegerField()
+    counts = JSONField(null=True)
 
 
 class Proteome(models.Model):

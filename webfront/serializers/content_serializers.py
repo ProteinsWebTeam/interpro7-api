@@ -206,3 +206,11 @@ class ModelContentSerializer(serializers.ModelSerializer):
             if f in other_fields:
                 representation["extra_fields"][f] = functions[f]()
         return representation
+
+    @staticmethod
+    def reformatEntryCounters(counters):
+        counters["dbEntries"] = {e: c for [e, c] in counters["entries"].items() if e != "total"}
+        if "total" in counters["entries"]:
+            counters["entries"] = counters["entries"]["total"]
+        else:
+            counters["entries"] = sum(counters["entries"].values())

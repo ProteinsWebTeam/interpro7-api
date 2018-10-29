@@ -105,8 +105,7 @@ class ProteinSerializer(ModelContentSerializer):
         counters = None
         if self.queryset_manager.is_single_endpoint():
             counters = instance.counts
-            counters["dbEntries"] = {e:c for [e, c] in counters["entries"].items() if e != "total"}
-            counters["entries"] = counters["entries"]["total"]
+            self.reformatEntryCounters(counters)
             counters["proteome"] = 0 if instance.proteome is None else 1
             counters["taxonomy"] = 0 if instance.tax_id is None else 1
         return {

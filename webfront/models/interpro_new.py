@@ -110,3 +110,4 @@ class Set(models.Model):
     integrated = JSONField(null=True)
     relationships = JSONField(null=True)  # {nodes: [{accession:"", type: ""}], links:[source:"", target: ""]}
     is_set = models.BooleanField(default=True)
+    counts = JSONField(null=True)

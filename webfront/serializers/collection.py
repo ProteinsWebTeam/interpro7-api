@@ -22,6 +22,7 @@ class SetSerializer(ModelContentSerializer):
                     self.searcher,
                     self.queryset_manager.get_searcher_query()
                 )
+
             representation = self.add_other_fields(
                 representation,
                 instance,
@@ -56,27 +57,27 @@ class SetSerializer(ModelContentSerializer):
             q = "set_acc:" + escape(instance.accession.lower())
             sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.ENTRY_DB in detail_filters or \
-                    SerializerDetail.ENTRY_DETAIL in detail_filters:
+                SerializerDetail.ENTRY_DETAIL in detail_filters:
                 representation["entries"] = self.to_entries_detail_representation(instance, s, q, base_query=sq)
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
-                    SerializerDetail.STRUCTURE_DETAIL in detail_filters:
+                SerializerDetail.STRUCTURE_DETAIL in detail_filters:
                 representation["structures"] = self.to_structures_detail_representation(
                     instance, s, q,
                     include_chain=True,
                     base_query=sq
                 )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
-                    SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                SerializerDetail.PROTEIN_DETAIL in detail_filters:
                 representation["proteins"] = self.to_proteins_detail_representation(
                     instance, self.searcher, q, base_query=sq
                 )
             if SerializerDetail.TAXONOMY_DB in detail_filters or \
-                    SerializerDetail.TAXONOMY_DETAIL in detail_filters:
+                SerializerDetail.TAXONOMY_DETAIL in detail_filters:
                 representation["taxa"] = self.to_taxonomy_detail_representation(
                     instance, self.searcher, q
                 )
             if SerializerDetail.PROTEOME_DB in detail_filters or \
-                    SerializerDetail.PROTEOME_DETAIL in detail_filters:
+                SerializerDetail.PROTEOME_DETAIL in detail_filters:
                 representation["proteomes"] = self.to_proteomes_detail_representation(
                     self.searcher, q
                 )
@@ -86,13 +87,13 @@ class SetSerializer(ModelContentSerializer):
     def to_counter_representation(instance, filters=None):
         if "sets" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
-               ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
-               ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0) :
+                ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
+                ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0):
                 raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Set"))
             ins2 = {
                 "sets": {
-                        SetSerializer.get_key_from_bucket(bucket): SetSerializer.serialize_counter_bucket(bucket, "sets")
-                        for bucket in instance["databases"]["buckets"]
+                    SetSerializer.get_key_from_bucket(bucket): SetSerializer.serialize_counter_bucket(bucket, "sets")
+                    for bucket in instance["databases"]["buckets"]
                 }
             }
             ins2["sets"]["all"] = SetSerializer.serialize_counter_bucket(
@@ -105,6 +106,8 @@ class SetSerializer(ModelContentSerializer):
     def to_full_representation(self, instance):
         searcher = self.searcher
         sq = self.queryset_manager.get_searcher_query()
+        counters = instance.counts if self.queryset_manager.is_single_endpoint() else SetSerializer.get_counters(
+            instance, searcher, sq)
         obj = {
             "metadata": {
                 "accession": instance.accession,
@@ -115,7 +118,7 @@ class SetSerializer(ModelContentSerializer):
                 "description": instance.description,
                 "integrated": instance.integrated,
                 "relationships": instance.relationships,
-                "counters": SetSerializer.get_counters(instance, searcher, sq)
+                "counters": counters
             },
         }
         return obj

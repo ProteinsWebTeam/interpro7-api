@@ -34,6 +34,7 @@ class Entry(models.Model):
     overlaps_with = JSONField(default=[])
     is_alive = models.BooleanField(default=False)
     deletion_date = models.DateTimeField(null=True)
+    counts = JSONField(null=True)
 
 
 class EntryAnnotation(models.Model):

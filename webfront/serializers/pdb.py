@@ -47,8 +47,12 @@ class StructureSerializer(ModelContentSerializer):
 
     def to_full_representation(self, instance):
         base_query = self.queryset_manager.get_searcher_query()
+        counters = None
+        if self.queryset_manager.is_single_endpoint():
+            counters = instance.counts
+            self.reformatEntryCounters(counters)
         return {
-            "metadata": self.to_metadata_representation(instance, self.searcher, base_query),
+            "metadata": self.to_metadata_representation(instance, self.searcher, base_query, counters),
         }
 
     def filter_representation(self, representation, instance):
@@ -121,7 +125,7 @@ class StructureSerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def to_metadata_representation(instance, searcher, base_query):
+    def to_metadata_representation(instance, searcher, base_query, counters=None):
         return {
             "accession": instance.accession,
             "name": {
@@ -135,7 +139,7 @@ class StructureSerializer(ModelContentSerializer):
             "chains": instance.chains,
             "resolution": instance.resolution,
             "source_database": instance.source_database,
-            "counters": StructureSerializer.get_counters(instance, searcher, base_query),
+            "counters": StructureSerializer.get_counters(instance, searcher, base_query) if counters is None else counters
         }
 
     @staticmethod

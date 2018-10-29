@@ -78,7 +78,7 @@ class Structure(models.Model):
     chains = JSONField(null=True)
     source_database = models.CharField(max_length=10, default="pdb", db_index=True)
     resolution = models.FloatField(null=True)
-    #TODO add description
+    counts = JSONField(null=True)
 
 
 class Taxonomy(models.Model):

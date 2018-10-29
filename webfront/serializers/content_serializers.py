@@ -209,6 +209,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def reformatEntryCounters(counters):
+        if counters is None:
+            return None
         counters["dbEntries"] = {e: c for [e, c] in counters["entries"].items() if e != "total"}
         if "total" in counters["entries"]:
             counters["entries"] = counters["entries"]["total"]

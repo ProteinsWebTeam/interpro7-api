@@ -101,6 +101,7 @@ class Proteome(models.Model):
     strain = models.CharField(max_length=512)
     assembly = models.CharField(max_length=512)
     taxonomy = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)
+    counts = JSONField(null=True)
 
 
 class Set(models.Model):

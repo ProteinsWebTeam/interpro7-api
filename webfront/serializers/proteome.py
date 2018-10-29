@@ -93,6 +93,11 @@ class ProteomeSerializer(ModelContentSerializer):
     def to_full_representation(self, instance):
         searcher = self.searcher
         sq = self.queryset_manager.get_searcher_query()
+        counters = instance.counts
+        if self.queryset_manager.is_single_endpoint():
+            self.reformatEntryCounters(counters)
+        else:
+            counters = ProteomeSerializer.get_counters(instance, searcher, sq)
         return {
             "metadata": {
                 "accession": instance.accession,
@@ -105,7 +110,7 @@ class ProteomeSerializer(ModelContentSerializer):
                 "assembly": instance.assembly,
                 "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
                 "lineage": instance.taxonomy.lineage if instance.taxonomy is not None else None,
-                "counters": ProteomeSerializer.get_counters(instance, searcher, sq)
+                "counters": counters
             }
         }
 

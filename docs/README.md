@@ -2,7 +2,7 @@
 
 This document aims to provide some guidance on how to use the InterPro API. The query syntax is very flexible and enables fetching and filtering of many different kinds of data from the InterPro databases. The documentation here defines some key concepts that should help with getting started.
 
-In addition the to information given here, the [InterPro website](https://www.ebi.ac.uk/interpro/beta) is built upon the API and therefore provides many practical examples of how the API is used to fetch different types of data.  
+In addition the to information given here, the [InterPro website](https://www.ebi.ac.uk/interpro/beta) is built upon the API and therefore provides many practical examples of how the API is used to fetch different types of data. The [dynamic code snippet generator](https://www.ebi.ac.uk/interpro/beta/download/#) is a particularly useful resource for looking at examples of how to download InterPro data.
 
 ## Getting started with some Examples
 ### 1. How many entries are there in the InterPro API?

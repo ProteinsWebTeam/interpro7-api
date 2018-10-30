@@ -8,6 +8,8 @@ from webfront.exceptions import DeletedEntryError, EmptyQuerysetError
 from webfront.response import Response
 
 from django.conf import settings
+from django.http import HttpRequest
+from rest_framework.request import Request
 from webfront.views.custom import CustomView
 from webfront.views.modifier_manager import ModifierManager
 from webfront.views.queryset_manager import QuerysetManager
@@ -21,7 +23,6 @@ from webfront.views.set import SetHandler
 from webfront.views.utils import UtilsHandler
 from webfront.views.cache import InterProCache
 
-
 from webfront.models import Database
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from time import sleep
@@ -30,15 +31,16 @@ QUERY_TIMEOUT = settings.INTERPRO_CONFIG.get('query_timeout', 90)
 CACHE_TIMEOUT = settings.INTERPRO_CONFIG.get('cache_volatile_key_ttl', 1800)
 logger = logging.getLogger(__name__)
 
+
 def map_url_to_levels(url):
     parts = [x.strip("/") for x in re.compile("(entry|protein|structure|organism|set)").split(url)]
 
     new_url = parts[:3]
     for i in range(4, len(parts), 2):
         if parts[i] == "":
-            new_url = new_url[:3] + parts[i-1:i+1] + new_url[3:]
+            new_url = new_url[:3] + parts[i - 1:i + 1] + new_url[3:]
         else:
-            new_url += parts[i-1:i+1]
+            new_url += parts[i - 1:i + 1]
 
     return "/".join(filter(lambda a: len(a) != 0, new_url)).split("/")
 
@@ -47,7 +49,7 @@ def pagination_information(request):
     # Extracts the pagination parameters out of the URL and returns a dictionary.
     return {
         "index": int(request.GET.get("page", 1)),
-        "size":  int(request.GET.get(
+        "size": int(request.GET.get(
             "page_size",
             settings.INTERPRO_CONFIG.get('default_page_size', 20)
         )),
@@ -66,7 +68,7 @@ def getDataForRoot(handlers):
                 "releaseDate": db["release_date"],
                 "type": db["type"],
             } for db in Database.objects.order_by("type")
-                .values("name", "name_long", "description", "version", "release_date", "type")
+            .values("name", "name_long", "description", "version", "release_date", "type")
         },
     }
 
@@ -133,13 +135,14 @@ class GeneralHandler(CustomView):
         self.searcher = self.get_search_controller(self.queryset_manager)
         try:
             def query(args):
-                self, request, endpoint_levels, full_path, caching_allowed = args
+                self, request, endpoint_levels, full_path, drf_request, caching_allowed = args
                 response = super(GeneralHandler, self, ).get(
                     request, endpoint_levels,
                     available_endpoint_handlers=self.available_endpoint_handlers,
                     level=0,
                     parent_queryset=self.queryset,
-                    general_handler=self
+                    general_handler=self,
+                    drf_request=drf_request,
                 )
                 self._set_in_cache(caching_allowed, full_path, response)
                 return response
@@ -150,10 +153,12 @@ class GeneralHandler(CustomView):
                 response = Response(content, status=status.HTTP_408_REQUEST_TIMEOUT)
                 return response
 
+            drf_request = request
             if caching_allowed:
                 pool = ThreadPoolExecutor(2)
                 futures = [
-                    pool.submit(query, (self, request, endpoint_levels,full_path, caching_allowed)),
+                    pool.submit(query,
+                                (self, request._request, endpoint_levels, full_path, drf_request, caching_allowed)),
                     pool.submit(timer, caching_allowed),
                 ]
                 result = wait(futures, return_when=FIRST_COMPLETED)
@@ -162,7 +167,7 @@ class GeneralHandler(CustomView):
                     self._set_in_cache(caching_allowed, full_path, response, timeout=CACHE_TIMEOUT)
 
             else:
-                response = query((self, request, endpoint_levels, full_path, caching_allowed))
+                response = query((self, request._request, endpoint_levels, full_path, drf_request, caching_allowed))
         except DeletedEntryError as e:
             if settings.DEBUG:
                 raise

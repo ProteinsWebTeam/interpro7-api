@@ -18,8 +18,8 @@ class ChainPDBAccessionHandler(CustomView):
         general_handler.queryset_manager.add_filter("searcher",
                                                     structure_chain_acc=endpoint_levels[level - 1])
         return super(ChainPDBAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -42,8 +42,8 @@ class PDBAccessionHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("structure", accession=endpoint_levels[level - 1].lower())
         return super(PDBAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -72,8 +72,8 @@ class PDBHandler(CustomView):
             add_extra_fields(Structure, "counters"),
         )
         return super(PDBHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -123,8 +123,8 @@ class StructureHandler(CustomView):
         general_handler.modifiers.register("experiment_type", filter_by_field("structure", "experiment_type"))
 
         return super(StructureHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod

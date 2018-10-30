@@ -44,8 +44,8 @@ class AccessionHandler(CustomView):
                 }
 
         return super(AccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
 
@@ -67,8 +67,8 @@ class AccessionEndpointHandler(CustomView):
         }
 
         return super(AccessionEndpointHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
 
@@ -87,7 +87,7 @@ class UtilsHandler(CustomView):
         self.queryset = {"available": [ch[0] for ch in self.child_handlers]}
 
         return super(UtilsHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 

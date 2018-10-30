@@ -46,11 +46,11 @@ class CustomView(GenericAPIView):
     serializer_detail_filter = SerializerDetail.ALL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+            parent_queryset=None, handler=None, general_handler=None, drf_request=None, *args, **kwargs):
         # if this is the last level
         if len(endpoint_levels) == level:
             searcher = general_handler.searcher
-            has_payload = general_handler.modifiers.execute(request)
+            has_payload = general_handler.modifiers.execute(drf_request)
             logger.debug(request.get_full_path())
             if has_payload or general_handler.modifiers.serializer is not None:
                 self.serializer_detail = general_handler.modifiers.serializer
@@ -68,7 +68,7 @@ class CustomView(GenericAPIView):
                 if self.many:
                     self.queryset = self.paginator.paginate_queryset(
                         self.get_queryset(),
-                        request, view=self,
+                        drf_request, view=self,
                         search_size=self.search_size
                     )
 
@@ -89,7 +89,7 @@ class CustomView(GenericAPIView):
                 if self.many:
                     self.queryset = self.paginator.paginate_queryset(
                         self.get_queryset(),
-                        request, view=self,
+                        drf_request, view=self,
                         search_size=self.search_size
                     )
                 else:
@@ -105,7 +105,7 @@ class CustomView(GenericAPIView):
                 many=self.many,
                 # extracted out in the custom view
                 content=request.GET.getlist('content'),
-                context={"request": request},
+                context={"request": drf_request},
                 searcher=searcher,
                 serializer_detail=self.serializer_detail,
                 serializer_detail_filters=general_handler.filter_serializers,
@@ -153,14 +153,14 @@ class CustomView(GenericAPIView):
                     self.filter_entrypoint(handler_name, handler_class, endpoint_levels, endpoints, general_handler)
                     return super(handler, self).get(
                         request, endpoint_levels, endpoints, len(endpoint_levels),
-                        parent_queryset, handler, general_handler,
+                        parent_queryset, handler, general_handler, drf_request,
                         *args, **kwargs
                     )
 
             # delegate to the lower level handler
             return handler_class.as_view()(
                 request, endpoint_levels, endpoints, level + 1,
-                self.queryset, handler_class, general_handler,
+                self.queryset, handler_class, general_handler, drf_request,
                 *args, **kwargs
             )
 

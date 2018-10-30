@@ -19,8 +19,8 @@ class TaxonomyAccessionHandler(CustomView):
         )
 
         return super(TaxonomyAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -52,8 +52,8 @@ class UniprotHandler(CustomView):
             filter_by_key_species,
         )
         return super(UniprotHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -83,8 +83,8 @@ class TaxonomyHandler(CustomView):
         general_handler.queryset_manager.reset_filters("taxonomy", endpoint_levels)
 
         return super(TaxonomyHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod

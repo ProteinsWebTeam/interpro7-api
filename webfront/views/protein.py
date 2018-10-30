@@ -8,7 +8,6 @@ from webfront.views.modifiers import \
     filter_by_contains_field, filter_by_match_presence, add_extra_fields
 from webfront.models import Protein
 from django.conf import settings
-from django.core.cache import cache
 
 entry_db_members = '|'.join(settings.DB_MEMBERS)
 
@@ -41,8 +40,8 @@ class UniprotAccessionHandler(CustomView):
             use_model_as_payload=True
         )
         return super(UniprotAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -86,8 +85,8 @@ class UniprotHandler(CustomView):
             add_extra_fields(Protein, "counters"),
         )
         return super(UniprotHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -157,8 +156,8 @@ class ProteinHandler(CustomView):
         general_handler.modifiers.register("match_presence", filter_by_match_presence)
 
         return super(ProteinHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod

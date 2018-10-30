@@ -32,8 +32,8 @@ class MemberAccessionHandler(CustomView):
             serializer=SerializerDetail.ANNOTATION_BLOB
         )
         return super(MemberAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, self.queryset,
-            handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -87,8 +87,8 @@ class MemberHandler(CustomView):
         )
 
         return super(MemberHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler,
-            general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, parent_queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -130,8 +130,8 @@ class AccessionHandler(CustomView):
             serializer=SerializerDetail.IDA_LIST
         )
         return super(AccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset,
-            handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, parent_queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -161,8 +161,8 @@ class UnintegratedHandler(CustomView):
             add_extra_fields(Entry, "counters"),
         )
         return super(UnintegratedHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -196,8 +196,8 @@ class IntegratedHandler(CustomView):
             add_extra_fields(Entry, "counters"),
         )
         return super(IntegratedHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -243,8 +243,8 @@ class InterproHandler(CustomView):
         )
         general_handler.modifiers.register("signature_in", filter_by_contains_field("entry", "member_databases"))
         return super(InterproHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -272,8 +272,8 @@ class AllHandler(CustomView):
             add_extra_fields(Entry, "counters"),
         )
         return super(AllHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -351,8 +351,8 @@ class EntryHandler(CustomView):
             use_model_as_payload=False
         )
         response = super(EntryHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers,
-            level, self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
         return response
 

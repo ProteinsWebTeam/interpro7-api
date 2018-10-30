@@ -1,8 +1,6 @@
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
-import unittest
-
 
 class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
 
@@ -21,8 +19,8 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
             "/api/entry/unintegrated/protein/",
             "/api/entry/interpro/pfam/protein/",
             "/api/entry/unintegrated/pfam/protein/",
-            "/api/entry/interpro/"+acc+"/pfam/protein",
-            ]
+            "/api/entry/interpro/" + acc + "/pfam/protein",
+        ]
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -33,13 +31,13 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_un = "PF17176"
         urls = [
-            "/api/entry/interpro/"+acc+"/protein",
-            "/api/entry/pfam/"+pfam+"/protein/",
-            "/api/entry/pfam/"+pfam_un+"/protein/",
-            "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/",
-            "/api/entry/interpro/pfam/"+pfam+"/protein/",
-            "/api/entry/unintegrated/pfam/"+pfam_un+"/protein/",
-            ]
+            "/api/entry/interpro/" + acc + "/protein",
+            "/api/entry/pfam/" + pfam + "/protein/",
+            "/api/entry/pfam/" + pfam_un + "/protein/",
+            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/protein/",
+            "/api/entry/interpro/pfam/" + pfam + "/protein/",
+            "/api/entry/unintegrated/pfam/" + pfam_un + "/protein/",
+        ]
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -53,7 +51,8 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
     def test_can_get_protein_match_from_entry(self):
         response = self.client.get("/api/entry/protein/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("proteins", response.data["entries"]["unintegrated"], "'proteins' should be one of the keys in the response")
+        self.assertIn("proteins", response.data["entries"]["unintegrated"],
+                      "'proteins' should be one of the keys in the response")
         # TODO: Improve this test
         # uniprots = response.data["proteins"]
         # response = self.client.get("/api/entry/protein/reviewed")
@@ -100,11 +99,11 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_u = "PF17180"
         tests = {
-            "/api/entry/interpro/"+acc+"/protein/uniprot": ["A1CUJ5", "P16582"],
-            "/api/entry/interpro/"+acc+"/protein/reviewed": ["A1CUJ5"],
-            "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/uniprot": ["A1CUJ5"],
-            "/api/entry/pfam/"+pfam+"/protein/uniprot": ["A1CUJ5"],
-            "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot": ["M5ADK6"],
+            "/api/entry/interpro/" + acc + "/protein/uniprot": ["A1CUJ5", "P16582"],
+            "/api/entry/interpro/" + acc + "/protein/reviewed": ["A1CUJ5"],
+            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/protein/uniprot": ["A1CUJ5"],
+            "/api/entry/pfam/" + pfam + "/protein/uniprot": ["A1CUJ5"],
+            "/api/entry/unintegrated/pfam/" + pfam_u + "/protein/uniprot": ["M5ADK6"],
         }
         for url in tests:
             response = self.client.get(url)
@@ -120,8 +119,8 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_entry_overview_filtered_by_protein(self):
         prot_s = "M5ADK6"
         tests = [
-            "/api/entry/protein/uniprot/"+prot_s,
-            ]
+            "/api/entry/protein/uniprot/" + prot_s,
+        ]
         for url in tests:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -135,16 +134,16 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_u = "M5ADK6"
 
         tests = {
-            "/api/entry/interpro/"+acc+"/protein/uniprot/"+prot: ["A1CUJ5"],
-            "/api/entry/interpro/"+acc+"/protein/reviewed/"+prot: ["A1CUJ5"],
-            "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/uniprot/"+prot: ["A1CUJ5"],
-            "/api/entry/pfam/"+pfam+"/protein/uniprot/"+prot: ["A1CUJ5"],
-            "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot/"+prot_u: ["M5ADK6"],
+            "/api/entry/interpro/" + acc + "/protein/uniprot/" + prot: ["A1CUJ5"],
+            "/api/entry/interpro/" + acc + "/protein/reviewed/" + prot: ["A1CUJ5"],
+            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/protein/uniprot/" + prot: ["A1CUJ5"],
+            "/api/entry/pfam/" + pfam + "/protein/uniprot/" + prot: ["A1CUJ5"],
+            "/api/entry/unintegrated/pfam/" + pfam_u + "/protein/uniprot/" + prot_u: ["M5ADK6"],
         }
         for url in tests:
             response = self.client.get(url)
             self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-            self.assertEqual(len(response.data["proteins"]), len(tests[url]), "failed at "+url)
+            self.assertEqual(len(response.data["proteins"]), len(tests[url]), "failed at " + url)
             for match in response.data["proteins"]:
                 self._check_match(match)
                 # self._check_protein_details(match["protein"])
@@ -157,11 +156,11 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_u = "M5ADK6"
 
         tests = {
-            "/api/entry/interpro/protein/uniprot/"+prot: ["A1CUJ5"],
-            "/api/entry/interpro/protein/reviewed/"+prot: ["A1CUJ5"],
-            "/api/entry/interpro/"+acc+"/pfam//protein/uniprot/"+prot: ["A1CUJ5"],
-            "/api/entry/pfam/protein/uniprot/"+prot: ["A1CUJ5"],
-            "/api/entry/unintegrated/pfam/protein/uniprot/"+prot_u: ["M5ADK6"],
+            "/api/entry/interpro/protein/uniprot/" + prot: ["A1CUJ5"],
+            "/api/entry/interpro/protein/reviewed/" + prot: ["A1CUJ5"],
+            "/api/entry/interpro/" + acc + "/pfam//protein/uniprot/" + prot: ["A1CUJ5"],
+            "/api/entry/pfam/protein/uniprot/" + prot: ["A1CUJ5"],
+            "/api/entry/unintegrated/pfam/protein/uniprot/" + prot_u: ["M5ADK6"],
         }
         for url in tests:
             response = self.client.get(url)
@@ -181,23 +180,24 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_u = "M5ADK6"
         smart = "SM00002"
         tests = [
-            "/api/entry/interpro/protein/uniprot/"+prot_u,
-            "/api/entry/interpro/"+acc+"/protein/unreviewed/"+prot,
-            "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/protein/unreviewed/"+prot,
-            "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/uniprot/"+prot,
-            "/api/entry/unintegrated/pfam/"+pfam_u+"/protein/unreviewed/"+prot_u,
-            "/api/entry/unintegrated/smart/"+smart+"/protein/uniprot",
+            "/api/entry/interpro/protein/uniprot/" + prot_u,
+            "/api/entry/interpro/" + acc + "/protein/unreviewed/" + prot,
+            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/protein/unreviewed/" + prot,
+            "/api/entry/unintegrated/pfam/" + pfam_u + "/protein/uniprot/" + prot,
+            "/api/entry/unintegrated/pfam/" + pfam_u + "/protein/unreviewed/" + prot_u,
+            "/api/entry/unintegrated/smart/" + smart + "/protein/uniprot",
         ]
         for url in tests:
-            self._check_HTTP_response_code(url, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, msg="The URL [" + url + "] should've failed.")
 
     def test_urls_that_should_fail(self):
         acc = "IPR003165"
         pfam = "PF02171"
         prot = "A1CUJ5"
         tests = [
-            "/api/entry/interpro/"+acc+"/smart/"+pfam+"/protein/unreviewed/"+prot,
-            "/api/entry/unintegrated/pfam/"+pfam+"/protein/unreviewed/"+prot,
-            ]
+            "/api/entry/interpro/" + acc + "/smart/" + pfam + "/protein/unreviewed/" + prot,
+            "/api/entry/unintegrated/pfam/" + pfam + "/protein/unreviewed/" + prot,
+        ]
         for url in tests:
-            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT, msg="The URL ["+url+"] should've failed.")
+            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT,
+                                           msg="The URL [" + url + "] should've failed.")

@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 def map_url_to_levels(url):
-    parts = [x.strip("/") for x in re.compile("(entry|protein|structure|organism|set)").split(url)]
+    parts = [x.strip("/") for x in re.compile("(entry|protein|structure|taxonomy|proteome|set)").split(url)]
 
     new_url = parts[:3]
     for i in range(4, len(parts), 2):

@@ -24,7 +24,7 @@ install:
   - pip freeze
 before_script:
   - sleep 10
-  - curl -XPUT 'localhost:9200/test?pretty' -d @config/elastic_mapping.json
+  - "curl -XPUT 'localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json"
 script:
   - coverage run --source='.' manage.py test
 after_success:

@@ -60,6 +60,14 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertEqual(response.data["match_presence"]["true"], 3)
         self.assertEqual(response.data["match_presence"]["false"], 1)
 
+    def test_can_group_proteomes_by_is_reference(self):
+        response = self.client.get("/api/proteome/uniprot?group_by=proteome_is_reference")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("proteome_is_reference", response.data)
+        self.assertIn("true", response.data["proteome_is_reference"])
+        self.assertIn("false", response.data["proteome_is_reference"])
+        self.assertEqual(response.data["proteome_is_reference"]["true"], 2)
+        self.assertEqual(response.data["proteome_is_reference"]["false"], 1)
 
 class FilterByFieldModifierTest(InterproRESTTestCase):
 

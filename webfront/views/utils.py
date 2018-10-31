@@ -1,5 +1,7 @@
+from webfront.models.interpro_new import Release_Note
+
+from webfront.views.custom import CustomView
 from webfront.exceptions import EmptyQuerysetError
-from webfront.views.custom import CustomView, SerializerDetail
 from webfront.serializers.content_serializers import ModelContentSerializer
 
 endpoints = [
@@ -72,11 +74,65 @@ class AccessionEndpointHandler(CustomView):
         )
 
 
+class ReleaseVersionEndpointHandler(CustomView):
+    level_description = 'Release level'
+    from_model = False
+    many = False
+    serializer_class = ModelContentSerializer
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+
+        note_version = endpoint_levels[level - 1].lower()
+        notes = Release_Note.objects.all()
+        if note_version == "current":
+            notes = notes.order_by('-release_date')
+        else:
+            notes = notes.filter(version=note_version)
+        if notes.count() == 0:
+            raise ReferenceError("Nothing found for version {}".format(note_version))
+
+        note = notes.first()
+        self.queryset = {
+            "version": note.version,
+            "release_date": note.release_date,
+            "content": note.content,
+        }
+
+        return super(ReleaseVersionEndpointHandler, self).get(
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
+        )
+
+class ReleaseEndpointHandler(CustomView):
+    level_description = 'Release level'
+    from_model = False
+    child_handlers = [
+        (r'current|(\d\d\.\d)', ReleaseVersionEndpointHandler),
+    ]
+    many = False
+    serializer_class = ModelContentSerializer
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+
+        self.queryset = {
+            note.version: note.release_date
+            for note in Release_Note.objects.all()
+        }
+
+        return super(ReleaseEndpointHandler, self).get(
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
+        )
+
+
 class UtilsHandler(CustomView):
     level_description = 'Utils level'
     from_model = False
     child_handlers = [
         ("accession", AccessionEndpointHandler),
+        ("release", ReleaseEndpointHandler),
     ]
     many = False
     serializer_class = ModelContentSerializer

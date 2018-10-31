@@ -21,7 +21,8 @@
       "evidence_code": 3,
       "source_database": "reviewed",
       "is_fragment": false,
-      "residues": {}
+      "residues": {},
+      "extra_features": { "feature": "EXTRA"}
     }
   },
   {

@@ -324,3 +324,17 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+class ExtraFeaturesModifierTest(InterproRESTTestCase):
+
+    def test_extra_features_modifier_is_different_than_acc_protein(self):
+        response1 = self.client.get("/api/protein/uniprot/a1cuj5")
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        response2 = self.client.get("/api/protein/uniprot/a1cuj5?extra_features")
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertNotEquals(response1.data, response2.data)
+
+    def test_extra_features_modifier(self):
+        response2 = self.client.get("/api/protein/uniprot/a1cuj5?extra_features")
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertIn("feature", response2.data)
+        self.assertIn("EXTRA", response2.data["feature"])

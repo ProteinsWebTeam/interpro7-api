@@ -105,9 +105,12 @@ class SetSerializer(ModelContentSerializer):
 
     def to_full_representation(self, instance):
         searcher = self.searcher
-        sq = self.queryset_manager.get_searcher_query()
-        counters = instance.counts if self.queryset_manager.is_single_endpoint() else SetSerializer.get_counters(
-            instance, searcher, sq)
+        if self.queryset_manager.is_single_endpoint():
+            counters = instance.counts
+            self.reformatEntryCounters(counters)
+        else:
+            sq = self.queryset_manager.get_searcher_query()
+            counters = SetSerializer.get_counters(instance, searcher, sq)
         obj = {
             "metadata": {
                 "accession": instance.accession,

@@ -30,7 +30,10 @@
         ]
       },
       "counts": {
-        "entries": 2,
+        "entries": {
+          "pfam": 2,
+          "total": 2
+        },
         "structures": 2,
         "proteins": 2,
         "taxa": 2,
@@ -69,7 +72,10 @@
         ]
       },
       "counts": {
-        "entries": 2,
+        "entries": {
+          "pfam": 2,
+          "total": 2
+        },
         "structures": 1,
         "proteins": 1,
         "taxa": 1,
@@ -109,7 +115,11 @@
       }
     },
     "counts": {
-      "entries": 4,
+      "entries": {
+        "profile": 1,
+        "pfam": 1,
+        "total": 4
+      },
       "structures": 2,
       "proteins": 2,
       "taxa": 2,
@@ -143,7 +153,10 @@
         "links": []
       },
       "counts": {
-        "entries": 2,
+        "entries": {
+          "pfam": 1,
+          "total": 2
+        },
         "structures": 2,
         "proteins": 2,
         "taxa": 2,
@@ -178,7 +191,10 @@
         "links": []
       },
       "counts": {
-        "entries": 2,
+        "entries": {
+          "profile": 1,
+          "total": 2
+        },
         "structures": 2,
         "proteins": 2,
         "taxa": 2,

@@ -7,9 +7,25 @@
       "full_name": "ROOT",
       "lineage": " 1 ",
       "rank": "no rank",
-      "children": ["2579", "2"],
+      "children": [
+        "2579",
+        "2"
+      ],
       "left_number": 0,
-      "right_number": 6
+      "right_number": 6,
+      "counts": {
+        "entries": {
+          "total": 7,
+          "interpro": 2,
+          "pfam": 3,
+          "profile": 1,
+          "smart": 1
+        },
+        "structures": 4,
+        "proteins": 4,
+        "sets": 2,
+        "proteomes": 3
+      }
     }
   },
   {
@@ -26,7 +42,19 @@
         "1001583"
       ],
       "left_number": 1,
-      "right_number": 4
+      "right_number": 4,
+      "counts": {
+        "entries": {
+          "total": 6,
+          "interpro": 2,
+          "pfam": 3,
+          "smart": 1
+        },
+        "structures": 2,
+        "proteins": 2,
+        "sets": 2,
+        "proteomes": 2
+      }
     }
   },
   {
@@ -42,7 +70,18 @@
         "40296"
       ],
       "left_number": 5,
-      "right_number": 6
+      "right_number": 6,
+      "counts": {
+        "entries": {
+          "total": 2,
+          "interpro": 1,
+          "profile": 1
+        },
+        "structures": 3,
+        "proteins": 2,
+        "sets": 0,
+        "proteomes": 1
+      }
     }
   },
   {
@@ -56,7 +95,18 @@
       "rank": "SPECIES",
       "children": [],
       "left_number": 3,
-      "right_number": 4
+      "right_number": 4,
+      "counts": {
+        "entries": {
+          "total": 2,
+          "interpro": 1,
+          "profile": 1
+        },
+        "structures": 3,
+        "proteins": 2,
+        "sets": 0,
+        "proteomes": 1
+      }
     }
   },
   {
@@ -70,7 +120,17 @@
       "rank": "SPECIES",
       "children": [],
       "left_number": 5,
-      "right_number": 6
+      "right_number": 6,
+      "counts": {
+        "entries": {
+          "total": 1,
+          "pfam": 1
+        },
+        "structures": 2,
+        "proteins": 1,
+        "sets": 1,
+        "proteomes": 1
+      }
     }
   },
   {
@@ -84,7 +144,19 @@
       "rank": "SPECIES",
       "children": [],
       "left_number": 1,
-      "right_number": 2
+      "right_number": 2,
+      "counts": {
+        "entries": {
+          "total": 5,
+          "pfam": 2,
+          "interpro": 2,
+          "smart": 1
+        },
+        "structures": 1,
+        "proteins": 1,
+        "sets": 2,
+        "proteomes": 1
+      }
     }
   },
   {
@@ -95,7 +167,19 @@
       "is_reference": true,
       "strain": "ATCC 1007 / CBS 513.65 / DSM 816 / NCTC 3887 / NRRL 1",
       "assembly": "GCA_000002715.1 from ENA/EMBL",
-      "taxonomy": "344612"
+      "taxonomy": "344612",
+      "counts": {
+        "entries": {
+          "total": 5,
+          "pfam": 2,
+          "interpro": 2,
+          "smart": 1
+        },
+        "structures": 1,
+        "proteins": 1,
+        "taxa": 1,
+        "sets": 2
+      }
     }
   },
   {
@@ -106,7 +190,18 @@
       "is_reference": true,
       "strain": "PHI-1",
       "assembly": "GCA_000769765.1 from ENA/EMBL",
-      "taxonomy": "40296"
+      "taxonomy": "40296",
+      "counts": {
+        "entries": {
+          "total": 2,
+          "profile": 1,
+          "interpro": 1
+        },
+        "structures": 3,
+        "proteins": 2,
+        "taxa": 1,
+        "sets": 0
+      }
     }
   },
   {
@@ -117,7 +212,17 @@
       "is_reference": false,
       "strain": "KB290",
       "assembly": "GCA_000359625.1 from ENA/EMBL",
-      "taxonomy": "1001583"
+      "taxonomy": "1001583",
+      "counts": {
+        "entries": {
+          "total": 1,
+          "pfam": 1
+        },
+        "structures": 2,
+        "proteins": 1,
+        "taxa": 1,
+        "sets": 1
+      }
     }
   }
 ]

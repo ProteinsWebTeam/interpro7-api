@@ -25,8 +25,8 @@ class SetNodeAccessionHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("set", accession=endpoint_levels[level - 1].lower())
         return super(SetNodeAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -56,8 +56,8 @@ class SetNodeHandler(CustomView):
         general_handler.queryset_manager.remove_filter("set", "accession")
         general_handler.queryset_manager.remove_filter("set", "source_database")
         return super(SetNodeHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -83,8 +83,8 @@ class SetAccessionHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("set", accession=endpoint_levels[level - 1].lower())
         return super(SetAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -114,8 +114,8 @@ class SetTypeHandler(CustomView):
             add_extra_fields(Set, "counters"),
         )
         return super(SetTypeHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -152,8 +152,8 @@ class SetHandler(CustomView):
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
 
         return super(SetHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod

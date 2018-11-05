@@ -9,7 +9,7 @@ class RESTRequestsTest(FunctionalTest):
         content = self.browser.find_element_by_tag_name('body').text
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp["entries"]), 5, "the output has exactly 3 keys")
+        self.assertEqual(len(jsonp["entries"]), 5, "the output has exactly 5 keys")
         self.assertIn('"member_databases"', content)
         self.assertIn('"interpro"', content)
         self.assertIn('"unintegrated"', content)
@@ -45,7 +45,7 @@ class RESTRequestsTest(FunctionalTest):
 
         jsonp = json.loads(content)
 
-        self.assertEqual(len(jsonp["proteins"]), 3, "the output has exactly 1 keys")
+        self.assertEqual(len(jsonp["proteins"]), 3, "the output has exactly 3 keys")
 
         self.assertIn('"uniprot"', content)
 

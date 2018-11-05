@@ -10,10 +10,34 @@
       "is_set": true,
       "relationships": {
         "nodes": [
-          {"accession": "pf02171", "type": "entry", "score": 0.6},
-          {"accession": "pf17180", "type": "entry", "score": 0.9}
+          {
+            "accession": "pf02171",
+            "type": "entry",
+            "score": 0.6
+          },
+          {
+            "accession": "pf17180",
+            "type": "entry",
+            "score": 0.9
+          }
         ],
-        "links": [{"source": "pf17180", "target": "pf02171", "score": 0.4}]
+        "links": [
+          {
+            "source": "pf17180",
+            "target": "pf02171",
+            "score": 0.4
+          }
+        ]
+      },
+      "counts": {
+        "entries": {
+          "pfam": 2,
+          "total": 2
+        },
+        "structures": 2,
+        "proteins": 2,
+        "taxa": 2,
+        "proteomes": 2
       }
     }
   },
@@ -28,10 +52,34 @@
       "is_set": true,
       "relationships": {
         "nodes": [
-          {"accession": "pf02171", "type": "entry", "score": 0.2},
-          {"accession": "pf17176", "type": "entry", "score": 0.8}
+          {
+            "accession": "pf02171",
+            "type": "entry",
+            "score": 0.2
+          },
+          {
+            "accession": "pf17176",
+            "type": "entry",
+            "score": 0.8
+          }
         ],
-        "links": [{"source": "pf17176", "target": "pf02171", "score": 0.6}]
+        "links": [
+          {
+            "source": "pf17176",
+            "target": "pf02171",
+            "score": 0.6
+          }
+        ]
+      },
+      "counts": {
+        "entries": {
+          "pfam": 2,
+          "total": 2
+        },
+        "structures": 1,
+        "proteins": 1,
+        "taxa": 1,
+        "proteomes": 1
       }
     }
   },
@@ -46,11 +94,36 @@
       "is_set": false,
       "relationships": {
         "nodes": [
-          {"accession": "kegg01.1", "type": "node", "score": 0.5},
-          {"accession": "kegg01.2", "type": "node", "score": 0.5}
+          {
+            "accession": "kegg01.1",
+            "type": "node",
+            "score": 0.5
+          },
+          {
+            "accession": "kegg01.2",
+            "type": "node",
+            "score": 0.5
+          }
         ],
-        "links": [{"source": "kegg01.1", "target": "kegg01.2", "score": 0.5}]
+        "links": [
+          {
+            "source": "kegg01.1",
+            "target": "kegg01.2",
+            "score": 0.5
+          }
+        ]
       }
+    },
+    "counts": {
+      "entries": {
+        "profile": 1,
+        "pfam": 1,
+        "total": 4
+      },
+      "structures": 2,
+      "proteins": 2,
+      "taxa": 2,
+      "proteomes": 2
     }
   },
   {
@@ -60,14 +133,34 @@
       "name": "First Node",
       "description": "Example of a step in a pathway",
       "source_database": "node",
-      "integrated": ["kegg01"],
+      "integrated": [
+        "kegg01"
+      ],
       "is_set": false,
       "relationships": {
         "nodes": [
-          {"accession": "ipr003165", "type": "entry", "score": 0.5},
-          {"accession": "pf02171", "type": "entry", "score": 0.5}
+          {
+            "accession": "ipr003165",
+            "type": "entry",
+            "score": 0.5
+          },
+          {
+            "accession": "pf02171",
+            "type": "entry",
+            "score": 0.5
+          }
         ],
         "links": []
+      },
+      "counts": {
+        "entries": {
+          "pfam": 1,
+          "total": 2
+        },
+        "structures": 2,
+        "proteins": 2,
+        "taxa": 2,
+        "proteomes": 2
       }
     }
   },
@@ -79,13 +172,33 @@
       "description": "yet another Example of a step in a pathway",
       "source_database": "node",
       "is_set": false,
-      "integrated": ["kegg01"],
+      "integrated": [
+        "kegg01"
+      ],
       "relationships": {
         "nodes": [
-          {"accession": "ipr001165", "type": "entry", "score": 0.5},
-          {"accession": "ps50822", "type": "entry", "score": 0.5}
+          {
+            "accession": "ipr001165",
+            "type": "entry",
+            "score": 0.5
+          },
+          {
+            "accession": "ps50822",
+            "type": "entry",
+            "score": 0.5
+          }
         ],
         "links": []
+      },
+      "counts": {
+        "entries": {
+          "profile": 1,
+          "total": 2
+        },
+        "structures": 2,
+        "proteins": 2,
+        "taxa": 2,
+        "proteomes": 2
       }
     }
   }

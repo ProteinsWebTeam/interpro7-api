@@ -1,5 +1,6 @@
 from django.db.models import Count
 
+from webfront.exceptions import DeletedEntryError
 from webfront.models import Entry
 from webfront.serializers.interpro import EntrySerializer
 from webfront.views.modifiers import group_by, sort_by, filter_by_field, get_interpro_status_counter, \
@@ -31,8 +32,8 @@ class MemberAccessionHandler(CustomView):
             serializer=SerializerDetail.ANNOTATION_BLOB
         )
         return super(MemberAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, self.queryset,
-            handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -86,8 +87,8 @@ class MemberHandler(CustomView):
         )
 
         return super(MemberHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset, handler,
-            general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, parent_queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -111,15 +112,26 @@ class AccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
-        general_handler.queryset_manager.add_filter("entry", accession=endpoint_levels[level - 1].lower())
+        acc = endpoint_levels[level - 1].lower()
+        general_handler.queryset_manager.add_filter("entry", accession=acc)
+
+        # Checking if the entry has been marked as deleted
+        general_handler.queryset_manager.add_filter("entry", is_alive=False)
+        qs = general_handler.queryset_manager.get_queryset()
+        if qs.count() > 0:
+            date = qs.first().deletion_date
+            raise DeletedEntryError(acc, date, "The entry {} is not active. Removed: {}".format(acc, date))
+        general_handler.queryset_manager.add_filter("entry", is_alive=True)
+
+
         general_handler.modifiers.register(
             "ida", get_domain_architectures,
             use_model_as_payload=True,
             serializer=SerializerDetail.IDA_LIST
         )
         return super(AccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level, parent_queryset,
-            handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, parent_queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -149,8 +161,8 @@ class UnintegratedHandler(CustomView):
             add_extra_fields(Entry, "counters"),
         )
         return super(UnintegratedHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -184,8 +196,8 @@ class IntegratedHandler(CustomView):
             add_extra_fields(Entry, "counters"),
         )
         return super(IntegratedHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -231,8 +243,8 @@ class InterproHandler(CustomView):
         )
         general_handler.modifiers.register("signature_in", filter_by_contains_field("entry", "member_databases"))
         return super(InterproHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -260,8 +272,8 @@ class AllHandler(CustomView):
             add_extra_fields(Entry, "counters"),
         )
         return super(AllHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -309,6 +321,7 @@ class EntryHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
+        general_handler.queryset_manager.add_filter("entry", is_alive=True)
         general_handler.modifiers.register(
             "group_by",
             group_by(Entry, {
@@ -338,12 +351,13 @@ class EntryHandler(CustomView):
             use_model_as_payload=False
         )
         response = super(EntryHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers,
-            level, self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
         return response
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
+        general_handler.queryset_manager.add_filter("entry", is_alive=True)
         return queryset

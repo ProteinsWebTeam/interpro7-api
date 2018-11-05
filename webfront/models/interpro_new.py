@@ -32,6 +32,9 @@ class Entry(models.Model):
     entry_date = models.DateTimeField(null=True)
     is_featured = models.BooleanField(default=False)
     overlaps_with = JSONField(default=[])
+    is_alive = models.BooleanField(default=False)
+    deletion_date = models.DateTimeField(null=True)
+    counts = JSONField(null=True)
 
 
 class EntryAnnotation(models.Model):
@@ -47,17 +50,14 @@ class Protein(models.Model):
     identifier = models.CharField(max_length=16, unique=True, null=False)
     organism = JSONField(null=True)
     name = models.CharField(max_length=20)
-    # short_name = models.CharField(max_length=20, null=True)
     other_names = JSONField(null=True)
     description = JSONField(null=True)
     sequence = models.TextField(null=False)
     length = models.IntegerField(null=False)
-    proteomes = JSONField(null=True)
+    proteome = models.CharField(max_length=20, null=True)
     gene = models.CharField(max_length=70, null=True)
     go_terms = JSONField(null=True)
     evidence_code = models.IntegerField()
-    # feature = JSONField(null=True)
-    # genomic_context = JSONField(null=True)
     source_database = models.CharField(max_length=20, default="unreviewed", db_index=True)
     residues = JSONField(null=True)
     extra_features = JSONField(null=True)
@@ -65,8 +65,7 @@ class Protein(models.Model):
     is_fragment = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
     size = models.CharField(max_length=10, null=True)
-    # Domain arch string e.g. 275/UPI0004FEB881#29021:2-66~20422&29021&340&387:103-266#
-    # domain_architectures = models.TextField(null=True)
+    counts = JSONField(null=True)
 
 
 class Structure(models.Model):
@@ -80,7 +79,7 @@ class Structure(models.Model):
     chains = JSONField(null=True)
     source_database = models.CharField(max_length=10, default="pdb", db_index=True)
     resolution = models.FloatField(null=True)
-    #TODO add description
+    counts = JSONField(null=True)
 
 
 class Taxonomy(models.Model):
@@ -93,6 +92,7 @@ class Taxonomy(models.Model):
     children = JSONField(null=True)
     left_number = models.IntegerField()
     right_number = models.IntegerField()
+    counts = JSONField(null=True)
 
 
 class Proteome(models.Model):
@@ -102,6 +102,7 @@ class Proteome(models.Model):
     strain = models.CharField(max_length=512)
     assembly = models.CharField(max_length=512)
     taxonomy = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)
+    counts = JSONField(null=True)
 
 
 class Set(models.Model):
@@ -112,3 +113,10 @@ class Set(models.Model):
     integrated = JSONField(null=True)
     relationships = JSONField(null=True)  # {nodes: [{accession:"", type: ""}], links:[source:"", target: ""]}
     is_set = models.BooleanField(default=True)
+    counts = JSONField(null=True)
+
+
+class Release_Note(models.Model):
+    version = models.CharField(max_length=20, primary_key=True)
+    release_date = models.DateTimeField(null=True)
+    content = JSONField(null=True)

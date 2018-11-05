@@ -1,4 +1,7 @@
-from webfront.views.custom import CustomView, SerializerDetail
+from webfront.models.interpro_new import Release_Note
+
+from webfront.views.custom import CustomView
+from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
 
 endpoints = [
@@ -25,7 +28,7 @@ class AccessionHandler(CustomView):
         docs = general_handler.searcher.get_document_by_any_accession(acc)
 
         if len(docs["hits"]["hits"]) == 0:
-            raise ReferenceError("No accessions matching {} can be found in our data"
+            raise EmptyQuerysetError("No accessions matching {} can be found in our data"
                                  .format(acc))
 
         hit = docs["hits"]["hits"][0]["_source"]
@@ -43,8 +46,8 @@ class AccessionHandler(CustomView):
                 }
 
         return super(AccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
 
@@ -66,8 +69,61 @@ class AccessionEndpointHandler(CustomView):
         }
 
         return super(AccessionEndpointHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
+        )
+
+
+class ReleaseVersionEndpointHandler(CustomView):
+    level_description = 'Release level'
+    from_model = False
+    many = False
+    serializer_class = ModelContentSerializer
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+
+        note_version = endpoint_levels[level - 1].lower()
+        notes = Release_Note.objects.all()
+        if note_version == "current":
+            notes = notes.order_by('-release_date')
+        else:
+            notes = notes.filter(version=note_version)
+        if notes.count() == 0:
+            raise ReferenceError("Nothing found for version {}".format(note_version))
+
+        note = notes.first()
+        self.queryset = {
+            "version": note.version,
+            "release_date": note.release_date,
+            "content": note.content,
+        }
+
+        return super(ReleaseVersionEndpointHandler, self).get(
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
+        )
+
+class ReleaseEndpointHandler(CustomView):
+    level_description = 'Release level'
+    from_model = False
+    child_handlers = [
+        (r'current|(\d\d\.\d)', ReleaseVersionEndpointHandler),
+    ]
+    many = False
+    serializer_class = ModelContentSerializer
+
+    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+
+        self.queryset = {
+            note.version: note.release_date
+            for note in Release_Note.objects.all()
+        }
+
+        return super(ReleaseEndpointHandler, self).get(
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
 
@@ -76,6 +132,7 @@ class UtilsHandler(CustomView):
     from_model = False
     child_handlers = [
         ("accession", AccessionEndpointHandler),
+        ("release", ReleaseEndpointHandler),
     ]
     many = False
     serializer_class = ModelContentSerializer
@@ -86,7 +143,7 @@ class UtilsHandler(CustomView):
         self.queryset = {"available": [ch[0] for ch in self.child_handlers]}
 
         return super(UtilsHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 

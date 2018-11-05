@@ -64,5 +64,241 @@
       "prev_version": "13.0",
       "prev_release_date": "2018-01-21T00:00:00Z"
     }
+  },
+  {
+    "model": "webfront.Release_Note",
+    "fields": {
+      "version": "60.0",
+      "release_date": "2017-01-21T00:00:00Z",
+      "content": {
+        "test": "OLD"
+      }
+    }
+  },
+  {
+    "model": "webfront.Release_Note",
+    "fields": {
+      "version": "70.0",
+      "release_date": "2018-01-22T00:00:00Z",
+      "content": {
+        "new_entries": [],
+        "new_databases": [],
+        "database_updates": [],
+        "integration": [],
+        "interpro": {
+          "last_entry": "ipr040122",
+          "types": [
+            {
+              "type": "domain",
+              "count": 9390
+            },
+            {
+              "type": "family",
+              "count": 21971
+            },
+            {
+              "type": "repeat",
+              "count": 288
+            },
+            {
+              "type": "conserved_site",
+              "count": 692
+            },
+            {
+              "type": "ptm",
+              "count": 25
+            },
+            {
+              "type": "binding_site",
+              "count": 79
+            },
+            {
+              "type": "active_site",
+              "count": 133
+            },
+            {
+              "type": "homologous_superfamily",
+              "count": 2961
+            }
+          ],
+          "citations": 53708,
+          "go_terms": 6168
+        },
+        "member_databases": [
+          {
+            "name": "CDD",
+            "version": "3.16",
+            "count": 12805,
+            "integrated": 2943
+          },
+          {
+            "name": "CATH-Gene3D",
+            "version": "4.2.0",
+            "count": 6119,
+            "integrated": 2220
+          },
+          {
+            "name": "HAMAP",
+            "version": "2018_03",
+            "count": 2246,
+            "integrated": 2245
+          },
+          {
+            "name": "MobiDB Lite",
+            "version": "2.0",
+            "count": 1,
+            "integrated": 0
+          },
+          {
+            "name": "ProDom",
+            "version": "2006.1",
+            "count": 1894,
+            "integrated": 1312
+          },
+          {
+            "name": "Pfam",
+            "version": "31.0",
+            "count": 16712,
+            "integrated": 16348
+          },
+          {
+            "name": "PIRSF",
+            "version": "3.02",
+            "count": 3285,
+            "integrated": 3237
+          },
+          {
+            "name": "PRINTS",
+            "version": "42.0",
+            "count": 2106,
+            "integrated": 2019
+          },
+          {
+            "name": "PROSITE patterns",
+            "version": "2018_02",
+            "count": 1309,
+            "integrated": 1303
+          },
+          {
+            "name": "PROSITE profiles",
+            "version": "2018_02",
+            "count": 1210,
+            "integrated": 1178
+          },
+          {
+            "name": "PANTHER",
+            "version": "12.0",
+            "count": 90742,
+            "integrated": 9118
+          },
+          {
+            "name": "SFLD",
+            "version": "4",
+            "count": 303,
+            "integrated": 195
+          },
+          {
+            "name": "SMART",
+            "version": "7.1",
+            "count": 1312,
+            "integrated": 1269
+          },
+          {
+            "name": "SUPERFAMILY",
+            "version": "1.75",
+            "count": 2019,
+            "integrated": 1625
+          },
+          {
+            "name": "TIGRFAMs",
+            "version": "15.0",
+            "count": 4488,
+            "integrated": 4457
+          }
+        ],
+        "proteins": {
+          "uniprot": {
+            "reviewed": 558125,
+            "unreviewed": 124797108
+          },
+          "integrated": {
+            "reviewed": 539956,
+            "unreviewed": 101049491
+          },
+          "unintegrated": {
+            "reviewed": 18169,
+            "unreviewed": 23747617
+          },
+          "ssf": {
+            "reviewed": 450702,
+            "unreviewed": 80020266
+          },
+          "tigrfams": {
+            "reviewed": 273418,
+            "unreviewed": 25101094
+          },
+          "cathgene3d": {
+            "reviewed": 456515,
+            "unreviewed": 81519526
+          },
+          "panther": {
+            "reviewed": 500683,
+            "unreviewed": 85615649
+          },
+          "cdd": {
+            "reviewed": 280428,
+            "unreviewed": 41651109
+          },
+          "pfam": {
+            "reviewed": 528899,
+            "unreviewed": 95940566
+          },
+          "profile": {
+            "reviewed": 157455,
+            "unreviewed": 34316214
+          },
+          "mobidblt": {
+            "reviewed": 116760,
+            "unreviewed": 25108376
+          },
+          "smart": {
+            "reviewed": 145228,
+            "unreviewed": 23771245
+          },
+          "prosite": {
+            "reviewed": 208236,
+            "unreviewed": 20558499
+          },
+          "prints": {
+            "reviewed": 127227,
+            "unreviewed": 17209428
+          },
+          "pirsf": {
+            "reviewed": 111275,
+            "unreviewed": 11898839
+          },
+          "sfld": {
+            "reviewed": 8573,
+            "unreviewed": 1229980
+          },
+          "hamap": {
+            "reviewed": 326378,
+            "unreviewed": 14166552
+          },
+          "prodom": {
+            "reviewed": 37352,
+            "unreviewed": 2206933
+          }
+        },
+        "structures": {
+          "total": 133200,
+          "integrated": 41416
+        },
+        "proteomes": {
+          "total": 111849,
+          "integrated": 111336
+        }
+      }
+    }
   }
 ]

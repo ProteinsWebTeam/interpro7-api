@@ -21,7 +21,12 @@
           "raw_pages": "1434-7",
           "medline_journal": "Science",
           "ISO_journal": "Science",
-          "authors": ["Song JJ", "Smith SK", "Hannon GJ", "Joshua-Tor L."],
+          "authors": [
+            "Song JJ",
+            "Smith SK",
+            "Hannon GJ",
+            "Joshua-Tor L."
+          ],
           "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
         },
         "PUB00018283": {
@@ -36,12 +41,31 @@
           "raw_pages": "481-2",
           "medline_journal": "Trends Biochem Sci",
           "ISO_journal": "Trends Biochem. Sci.",
-          "authors": ["Cerutti L", "Mian N", "Bateman A."],
+          "authors": [
+            "Cerutti L",
+            "Mian N",
+            "Bateman A."
+          ],
           "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
         }
       },
-      "chains": ["A", "B"],
-      "source_database": "pdb"
+      "chains": [
+        "A",
+        "B"
+      ],
+      "source_database": "pdb",
+      "counts": {
+        "entries": {
+            "total": 6,
+            "pfam": 3,
+            "interpro": 2,
+            "smart": 1
+        },
+        "proteins": 2,
+        "taxa": 2,
+        "proteomes": 2,
+        "sets": 2
+      }
     }
   },
   {
@@ -54,8 +78,24 @@
       "experiment_type": "x-ray",
       "release_date": "2011-07-13T00:00:00Z",
       "literature": {},
-      "chains": ["A", "B", "C", "D", "E"],
-      "source_database": "pdb"
+      "chains": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "source_database": "pdb",
+      "counts": {
+        "entries": {
+          "total": 2,
+          "profile": 1
+        },
+        "proteins": 1,
+        "taxa": 1,
+        "proteomes": 1,
+        "sets": 0
+      }
     }
   },
   {
@@ -80,12 +120,29 @@
           "raw_pages": "481-2",
           "medline_journal": "Trends Biochem Sci",
           "ISO_journal": "Trends Biochem. Sci.",
-          "authors": ["Cerutti L", "Mian N", "Bateman A."],
+          "authors": [
+            "Cerutti L",
+            "Mian N",
+            "Bateman A."
+          ],
           "DOI_URL": "http://dx.doi.org/10.1016/S0968-0004(00)01641-8"
         }
       },
-      "chains": ["A", "B"],
-      "source_database": "pdb"
+      "chains": [
+        "A",
+        "B"
+      ],
+      "source_database": "pdb",
+      "counts": {
+        "entries": {
+          "pfam": 1,
+          "total": 1
+        },
+        "proteins": 2,
+        "taxa": 2,
+        "proteomes": 2,
+        "sets": 1
+      }
     }
   },
   {
@@ -110,12 +167,29 @@
           "raw_pages": "1434-7",
           "medline_journal": "Science",
           "ISO_journal": "Science",
-          "authors": ["Song JJ", "Smith SK", "Hannon GJ", "Joshua-Tor L."],
+          "authors": [
+            "Song JJ",
+            "Smith SK",
+            "Hannon GJ",
+            "Joshua-Tor L."
+          ],
           "DOI_URL": "http://dx.doi.org/10.1126/science.1102514"
         }
       },
-      "chains": ["A", "B"],
-      "source_database": "pdb"
+      "chains": [
+        "A",
+        "B"
+      ],
+      "source_database": "pdb",
+      "counts": {
+        "entries": {
+          "total": 0
+        },
+        "proteins": 1,
+        "taxa": 1,
+        "proteomes": 1,
+        "sets": 0
+      }
     }
   }
 ]

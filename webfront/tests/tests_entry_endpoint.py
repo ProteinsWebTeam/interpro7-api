@@ -62,6 +62,9 @@ class EntryRESTTest(InterproRESTTestCase):
     def test_fail_entry_interpro_unknown_id(self):
         self._check_HTTP_response_code("/api/entry/interpro/IPR999999", code=status.HTTP_204_NO_CONTENT)
 
+    def test_gets_410_for_deleted_entry(self):
+        self._check_HTTP_response_code("/api/entry/interpro/ipr123456", code=status.HTTP_410_GONE)
+
     def test_bad_entry_point(self):
         self._check_HTTP_response_code("/api/bad_entry_point", code=status.HTTP_404_NOT_FOUND)
 

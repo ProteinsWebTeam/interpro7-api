@@ -16,8 +16,8 @@ class ProteomeAccessionHandler(CustomView):
         general_handler.queryset_manager.add_filter("proteome", accession=endpoint_levels[level - 1].lower())
         # self.serializer_detail = SerializerDetail.PROTEIN_DETAIL
         return super(ProteomeAccessionHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -46,8 +46,8 @@ class UniprotHandler(CustomView):
         )
 
         return super(UniprotHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod
@@ -85,8 +85,8 @@ class ProteomeHandler(CustomView):
         general_handler.queryset_manager.reset_filters("proteome", endpoint_levels)
 
         return super(ProteomeHandler, self).get(
-            request, endpoint_levels, available_endpoint_handlers, level,
-            self.queryset, handler, general_handler, *args, **kwargs
+            request._request, endpoint_levels, available_endpoint_handlers,
+            level, self.queryset, handler, general_handler, request, *args, **kwargs
         )
 
     @staticmethod

@@ -145,10 +145,14 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance, searcher, sq, counters=None):
-        # recategorise_go_terms(instance.go_terms)
         results = EntryAnnotation.objects.filter(accession=instance.accession).only("type")
-        # annotation_types = map(lambda x: x.type, results)
         annotation_types = [x.type for x in results]
+        if counters is None:
+            counters = EntrySerializer.get_counters(instance, searcher, sq)
+
+        if "domains" in counters:
+            counters["domain_architectures"] = counters["domains"]
+            del counters["domains"]
         obj = {
             "accession": instance.accession,
             "entry_id": instance.entry_id,
@@ -167,7 +171,7 @@ class EntrySerializer(ModelContentSerializer):
             "wikipedia": instance.wikipedia,
             "literature": instance.literature,
             "overlaps_with": instance.overlaps_with,
-            "counters": EntrySerializer.get_counters(instance, searcher, sq) if counters is None else counters,
+            "counters": counters,
             "entry_annotations": annotation_types,
             "cross_references": EntrySerializer.reformat_cross_references(instance.cross_references)
         }

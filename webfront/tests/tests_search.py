@@ -114,12 +114,10 @@ class TwoEndpointsRESTSearchTest(InterproRESTTestCase):
             ("/api/protein/reviewed/proteome", "degradation"),
             ("/api/entry/interpro/protein", "cleave"),
             ("/api/entry/interpro/structure", "cleave"),
-            ("/api/entry/interpro/set", "cleave"),
             ("/api/entry/interpro/taxonomy", "cleave"),
             ("/api/entry/interpro/proteome", "cleave"),
             ("/api/structure/pdb/entry", "t2v"),
             ("/api/structure/pdb/protein", "t2v"),
-            ("/api/structure/pdb/set", "t2v"),
             ("/api/set/pfam/taxonomy", "002"),
             ("/api/set/pfam/proteome", "002"),
             ("/api/set/pfam/protein", "002"),
@@ -133,7 +131,7 @@ class TwoEndpointsRESTSearchTest(InterproRESTTestCase):
             ("/api/proteome/uniprot/entry", "penicillium"),
             ("/api/proteome/uniprot/protein", "penicillium"),
             ("/api/proteome/uniprot/structure", "penicillium"),
-            ("/api/proteome/uniprot/set", "penicillium"),
+            ("/api/proteome/uniprot/set", "aspergillus"),
         ]
         for url in urls:
             filtered = self.client.get(

@@ -74,6 +74,7 @@ class CustomView(GenericAPIView):
 
             elif self.from_model:
 
+
                 if is_single_endpoint(general_handler) or not self.expected_response_is_list():
                     self.queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True)
                 else:

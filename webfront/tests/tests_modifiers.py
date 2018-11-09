@@ -315,11 +315,13 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
                 for field in self.fields[endpoint]:
                     url = "/api{}/{}?extra_fields={}".format(self.list_url[endpoint], ep, field)
                     response = self.client.get(url)
-                    self.assertEqual(response.status_code, status.HTTP_200_OK, url)
-                    self.assertIn("results", response.data)
-                    for result in response.data["results"]:
-                        self.assertIn("extra_fields", result)
-                        self.assertIn(field, result["extra_fields"])
+                    if response.status_code == status.HTTP_200_OK:
+                        self.assertIn("results", response.data)
+                        for result in response.data["results"]:
+                            self.assertIn("extra_fields", result)
+                            self.assertIn(field, result["extra_fields"])
+                    else:
+                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
                 url = "/api{}/{}?extra_fields=name,ERROR".format(self.list_url[endpoint], ep)
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

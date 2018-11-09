@@ -33,8 +33,7 @@ notifications:
   slack:
     on_success: change
     on_failure: always
-    rooms:
-      - protein-families-team:z1Fwm5IHFOou6YBDj0fRcTTY#interpro7
+    secure: VK+fSEw/3kwgxXiBLnuKdLb7pHl5oB5PqvZYZATW5uCHOuBr6z++10wVatuK0LYMRT3582v+0PJ+Vu59Wgj/iYn+l8VR24QzyKQsHfHBrt+gWlOWHhKkVlfBwKnoPaLGyw90epWRYRWKRkBJFbMROWcWxxxk5KeflPgc1gT5Qd69BiZWgrffAKfNHRr7aqA52B0lrg2H8hRY1fUrUfWh3Ns3PePrFTLxim4efB84ITuXpEn+H8M+J6EHk+NBRanPuNa0fln49PHJMsTxwkIOEZXGkha/PpKOVxnifvq05Qyb17+x54PuoLktqkok392PG9+O1nW9E4tcWQVtYKtkr29NR2K+dHZX3rZoS21GuMqxl8ZuP2wwaJqP48zu2QGCFk03LjWg/NgdBV+TBUG43imdKS8cvVPWSRh6IRFPbDwCGcUVMe0qwo+nYaGkj9BL28/YKkcMFBSU9SfuUt2/+6kvsXHPRKHJ9BO5ZuK+UEbVqID8ijmplrMzHo6lyWgciBsC0j81e5Rg0kuE6LpR9fzP35bQQIHZFJWDJHKkuDqJhivI2LXQy3wEe7HRr1WKfmNvf5MXDKFrftl2axydxYRVrCm5OIcdA6XJGKmOqGTtrDuGPpm4Nh7myKo3ftFdp/YjMnPXBezjJUnze6GNi17fRC69DOM2U4gSlJAAczU=
 branches:
   only:
     - master

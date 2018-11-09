@@ -432,8 +432,8 @@ class SetTaxonomyTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count_on_a_list(self):
         urls = [
             "/api/set/pfam/taxonomy",
-            "/api/set/kegg/taxonomy",
-            "/api/set/kegg/KEGG01/node/taxonomy",
+#            "/api/set/kegg/taxonomy",
+#            "/api/set/kegg/KEGG01/node/taxonomy",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -446,8 +446,8 @@ class SetTaxonomyTest(InterproRESTTestCase):
     def test_can_get_the_taxonomy_count_on_a_set(self):
         urls = [
             "/api/set/pfam/CL0001/taxonomy",
-            "/api/set/kegg/KEGG01/taxonomy",
-            "/api/set/kegg/KEGG01/node/KEGG01-1/taxonomy",
+#            "/api/set/kegg/KEGG01/taxonomy",
+#            "/api/set/kegg/KEGG01/node/KEGG01-1/taxonomy",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -461,11 +461,11 @@ class SetTaxonomyTest(InterproRESTTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
         self.assertIsInstance(response.data, dict)
-        if "kegg" in response.data["sets"]:
-            self.assertIn("taxa", response.data["sets"]["kegg"],
-                          "'taxa' should be one of the keys in the response")
-            self.assertIn("sets", response.data["sets"]["kegg"],
-                          "'sets' should be one of the keys in the response")
+        # if "kegg" in response.data["sets"]:
+        #     self.assertIn("taxa", response.data["sets"]["kegg"],
+        #                   "'taxa' should be one of the keys in the response")
+        #     self.assertIn("sets", response.data["sets"]["kegg"],
+        #                   "'sets' should be one of the keys in the response")
         if "pfam" in response.data["sets"]:
             self.assertIn("taxa", response.data["sets"]["pfam"],
                           "'taxa' should be one of the keys in the response")
@@ -474,8 +474,8 @@ class SetTaxonomyTest(InterproRESTTestCase):
 
     def test_can_get_the_set_list_on_a_list(self):
         urls = [
-            "/api/set/kegg/taxonomy/uniprot",
-            "/api/set/kegg/kegg01/node/taxonomy/uniprot",
+#            "/api/set/kegg/taxonomy/uniprot",
+#            "/api/set/kegg/kegg01/node/taxonomy/uniprot",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -489,7 +489,7 @@ class SetTaxonomyTest(InterproRESTTestCase):
     def test_can_get_a_list_from_the_set_object(self):
         urls = [
             "/api/set/pfam/Cl0001/taxonomy/uniprot",
-            "/api/set/kegg/kegg01/node/KEGG01-1/taxonomy/uniprot/",
+#            "/api/set/kegg/kegg01/node/KEGG01-1/taxonomy/uniprot/",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -501,34 +501,36 @@ class SetTaxonomyTest(InterproRESTTestCase):
 
     def test_can_filter_set_counter_with_acc(self):
         urls = [
-            "/api/set/taxonomy/uniprot/2",
-            "/api/set/taxonomy/uniprot/40296",
+            "/api/set/taxonomy/uniprot/1",
+            "/api/set/taxonomy/uniprot/2579",
+            "/api/set/taxonomy/uniprot/344612",
+            "/api/set/taxonomy/uniprot/1001583",
             ]
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
             self._check_set_count_overview(response.data)
 
-    def test_can_get_object_on_a_set_list(self):
-        urls = [
-            "/api/set/kegg/taxonomy/uniprot/2579",
-            "/api/set/kegg/taxonomy/uniprot/344612",
-            ]
-        for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "taxa")
-            for result in response.data["results"]:
-                self._check_set_details(result["metadata"], False)
-                for st in result["taxa"]:
-                    self._check_taxonomy_from_searcher(st)
+#     def test_can_get_object_on_a_set_list(self):
+#         urls = [
+# #            "/api/set/kegg/taxonomy/uniprot/2579",
+# #            "/api/set/kegg/taxonomy/uniprot/344612",
+#             ]
+#         for url in urls:
+#             response = self.client.get(url)
+#             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+#             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+#             self._check_is_list_of_objects_with_key(response.data["results"], "taxa")
+#             for result in response.data["results"]:
+#                 self._check_set_details(result["metadata"], False)
+#                 for st in result["taxa"]:
+#                     self._check_taxonomy_from_searcher(st)
 
     def test_can_get_an_object_from_the_set_object(self):
         urls = [
-            "/api/set/kegg/kegg01/taxonomy/uniprot/2",
-            "/api/set/kegg/kegg01/taxonomy/uniprot/40296",
-            "/api/set/kegg/kegg01/node/kegg01-1/taxonomy/uniprot/40296",
+#            "/api/set/kegg/kegg01/taxonomy/uniprot/2",
+#            "/api/set/kegg/kegg01/taxonomy/uniprot/40296",
+#            "/api/set/kegg/kegg01/node/kegg01-1/taxonomy/uniprot/40296",
             "/api/set/pfam/Cl0001/taxonomy/uniprot/344612",
             ]
         for url in urls:
@@ -941,8 +943,8 @@ class TaxonomySetTest(InterproRESTTestCase):
 
     def test_urls_that_return_taxonomy_with_set_count(self):
         urls = [
-            "/api/taxonomy/uniprot/40296/set",
-            "/api/taxonomy/uniprot/2/set",
+            "/api/taxonomy/uniprot/1001583/set",
+            "/api/taxonomy/uniprot/1/set",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -954,8 +956,8 @@ class TaxonomySetTest(InterproRESTTestCase):
     def test_can_filter_taxonomy_counter_with_taxonomy_db(self):
         urls = [
             "/api/taxonomy/set/pfam",
-            "/api/taxonomy/set/kegg",
-            "/api/taxonomy/set/kegg/kegg01/node",
+#            "/api/taxonomy/set/kegg",
+#            "/api/taxonomy/set/kegg/kegg01/node",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -970,7 +972,7 @@ class TaxonomySetTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         urls = [
             "/api/taxonomy/uniprot/set/pfam",
-            "/api/taxonomy/uniprot/set/kegg",
+#            "/api/taxonomy/uniprot/set/kegg",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -984,8 +986,8 @@ class TaxonomySetTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a__tax_object(self):
         urls = [
             "/api/taxonomy/uniprot/2579/set/pfam",
-            "/api/taxonomy/uniprot/2579/set/kegg",
-            "/api/taxonomy/uniprot/2579/set/kegg/kegg01/node",
+#            "/api/taxonomy/uniprot/2579/set/kegg",
+#            "/api/taxonomy/uniprot/2579/set/kegg/kegg01/node",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -998,9 +1000,9 @@ class TaxonomySetTest(InterproRESTTestCase):
     def test_can_filter_counter_with_set_acc(self):
         urls = [
             "/api/taxonomy/set/pfam/Cl0001",
-            "/api/taxonomy/set/kegg/kegg01",
-            "/api/taxonomy/set/kegg/kegg01/node/KEGG01-1",
-            "/api/taxonomy/set/kegg/kegg01/node/KEGG01-2",
+#            "/api/taxonomy/set/kegg/kegg01",
+#            "/api/taxonomy/set/kegg/kegg01/node/KEGG01-1",
+#            "/api/taxonomy/set/kegg/kegg01/node/KEGG01-2",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -1009,8 +1011,8 @@ class TaxonomySetTest(InterproRESTTestCase):
 
     def test_can_get_the_set_object_on_a_list(self):
         urls = [
-            "/api/taxonomy/uniprot/set/kegg/kegg01",
-            "/api/taxonomy/uniprot/set/kegg/kegg01/node/kegg01-1",
+#            "/api/taxonomy/uniprot/set/kegg/kegg01",
+#            "/api/taxonomy/uniprot/set/kegg/kegg01/node/kegg01-1",
             "/api/taxonomy/uniprot/set/pfam/Cl0001",
             ]
         for url in urls:
@@ -1024,9 +1026,9 @@ class TaxonomySetTest(InterproRESTTestCase):
 
     def test_can_get_the_object_on_an_object(self):
         urls = [
-            "/api/taxonomy/uniprot/2/set/kegg/kegg01",
-            "/api/taxonomy/uniprot/40296/set/kegg/kegg01",
-            "/api/taxonomy/uniprot/40296/set/kegg/kegg01/node/kegg01-1",
+#            "/api/taxonomy/uniprot/2/set/kegg/kegg01",
+#            "/api/taxonomy/uniprot/40296/set/kegg/kegg01",
+#            "/api/taxonomy/uniprot/40296/set/kegg/kegg01/node/kegg01-1",
             "/api/taxonomy/uniprot/344612/set/pfam/Cl0001",
             ]
         for url in urls:

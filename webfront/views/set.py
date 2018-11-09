@@ -49,7 +49,6 @@ class SetNodeHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
-        # general_handler.queryset_manager.add_filter("set", integrated__isnull=False)
         general_handler.queryset_manager.remove_filter("set", "integrated")
         general_handler.queryset_manager.add_filter("set", integrated__contains=endpoint_levels[level - 2].lower())
         # general_handler.queryset_manager.add_filter("set", source_database='node')
@@ -74,9 +73,9 @@ class SetAccessionHandler(CustomView):
     serializer_class = SetSerializer
     queryset = Set.objects.all()
     many = False
-    child_handlers = [
-        ("node", SetNodeHandler),
-    ]
+    # child_handlers = [
+    #     ("node", SetNodeHandler),
+    # ]
     serializer_detail_filter = SerializerDetail.SET_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
@@ -148,7 +147,6 @@ class SetHandler(CustomView):
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
 
         general_handler.queryset_manager.reset_filters("set", endpoint_levels)
-        general_handler.queryset_manager.add_filter("set", integrated=[])
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
 
         return super(SetHandler, self).get(
@@ -159,5 +157,4 @@ class SetHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
-        general_handler.queryset_manager.add_filter("set", integrated=[])
         return queryset

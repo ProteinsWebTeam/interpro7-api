@@ -255,8 +255,8 @@ sets:
     accession: 'CL\d{4}'
   'cdd':
     accession: 'cl\d{5}'
-  'kegg':
-    accession: 'KEGG\d+'
+  'pirsf':
+    accession: '[Pp][Ii][Rr][Ss][Ff][0-9]{6}'
 
 key_organisms:
   '39947': 'Oryza sativa subsp. japonica'

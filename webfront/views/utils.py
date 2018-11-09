@@ -35,7 +35,7 @@ class AccessionHandler(CustomView):
 
         self.queryset = {}
         for ep in endpoints:
-            if hit[ep["accession"]] == acc:
+            if ep["accession"] in hit and hit[ep["accession"]] == acc:
                 db = ep["db"]
                 if ep["name"] in ["entry", "protein", "set"]:
                     db = hit[ep["db"]]

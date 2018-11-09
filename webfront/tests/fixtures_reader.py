@@ -57,8 +57,8 @@ class FixtureReader:
                     integrated = self.sets[s]["integrated"]
                     if integrated is not None:
                         integrated = [x.lower() for x in integrated]
-                    if db == "node":
-                        db = "kegg"
+                    # if db == "node":
+                    #     db = "kegg"
                     if n["accession"] not in e2s:
                         e2s[n["accession"]] = []
                     e2s[n["accession"]].append({"accession": s,

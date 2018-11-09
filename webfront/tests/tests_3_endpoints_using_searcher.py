@@ -70,9 +70,6 @@ api_test_map = {
         ]
     },
     "set": {
-        "kegg": [
-            "KEGG01"
-        ],
         "pfam": [
             "CL0001",
             "CL0002"

@@ -8,7 +8,7 @@ class SetsFixturesTest(InterproRESTTestCase):
 
     def test_the_fixtures_are_loaded(self):
         sets = Set.objects.all()
-        self.assertEqual(sets.count(), 5)
+        self.assertEqual(sets.count(), 2)
         names = [t.name for t in sets]
         self.assertIn("The Clan", names)
         self.assertNotIn("unicorn", names)
@@ -18,7 +18,7 @@ class SetsFixturesTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("sets", response.data)
         self.assertIn("pfam", response.data["sets"])
-        self.assertIn("kegg", response.data["sets"])
+        # self.assertIn("kegg", response.data["sets"])
         self.assertNotIn("unicorn", response.data["sets"])
         self.assertNotIn("node", response.data["sets"])
 
@@ -28,26 +28,26 @@ class SetsFixturesTest(InterproRESTTestCase):
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
         self.assertEqual(len(response.data["results"]), 2)
 
-        response = self.client.get("/api/set/kegg")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self.assertEqual(len(response.data["results"]), 1)
+        # response = self.client.get("/api/set/kegg")
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        # self.assertEqual(len(response.data["results"]), 1)
 
     def test_can_read_set_id(self):
         response = self.client.get("/api/set/pfam/CL0001")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_set_details(response.data["metadata"])
 
-    def test_can_read_set_nodes(self):
-        response = self.client.get("/api/set/kegg/KEGG01/node")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self.assertEqual(len(response.data["results"]), 2)
+    # def test_can_read_set_nodes(self):
+    #     response = self.client.get("/api/set/kegg/KEGG01/node")
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+    #     self.assertEqual(len(response.data["results"]), 2)
 
-    def test_can_read_set_node_id(self):
-        response = self.client.get("/api/set/kegg/KEGG01/node/KEGG01-1")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self._check_set_details(response.data["metadata"])
+    # def test_can_read_set_node_id(self):
+    #     response = self.client.get("/api/set/kegg/KEGG01/node/KEGG01-1")
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self._check_set_details(response.data["metadata"])
 
 
 class EntrySetTest(InterproRESTTestCase):
@@ -60,7 +60,6 @@ class EntrySetTest(InterproRESTTestCase):
     def test_can_get_the_set_count_on_a_list(self):
         acc = "IPR003165"
         urls = [
-            "/api/entry/interpro/set",
             "/api/entry/pfam/set",
             "/api/entry/unintegrated/set",
             "/api/entry/interpro/pfam/set",
@@ -80,7 +79,6 @@ class EntrySetTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_un = "PF17176"
         urls = [
-            "/api/entry/interpro/"+acc+"/set",
             "/api/entry/pfam/"+pfam+"/set",
             "/api/entry/pfam/"+pfam_un+"/set",
             "/api/entry/interpro/"+acc+"/pfam/"+pfam+"/set",
@@ -97,8 +95,8 @@ class EntrySetTest(InterproRESTTestCase):
     def test_can_filter_entry_counter_with_set_db(self):
         urls = [
             "/api/entry/set/pfam",
-            "/api/entry/set/kegg",
-            "/api/entry/set/kegg/kegg01/node",
+#            "/api/entry/set/kegg",
+#            "/api/entry/set/kegg/kegg01/node",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -112,10 +110,10 @@ class EntrySetTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         acc = "IPR003165"
         urls = [
-            "/api/entry/interpro/set/kegg",
+#            "/api/entry/interpro/set/kegg",
             "/api/entry/pfam/set/pfam",
             "/api/entry/unintegrated/set/pfam",
-            "/api/entry/interpro/pfam/set/kegg/kegg01/node",
+#            "/api/entry/interpro/pfam/set/kegg/kegg01/node",
             "/api/entry/interpro/"+acc+"/pfam/set/pfam",
             ]
         for url in urls:
@@ -129,12 +127,12 @@ class EntrySetTest(InterproRESTTestCase):
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
         urls = [
-            "/api/entry/interpro/IPR003165/set/kegg",
+#            "/api/entry/interpro/IPR003165/set/kegg",
             "/api/entry/pfam/PF02171/set/pfam",
-            "/api/entry/interpro/IPR003165/set/kegg/kegg01/node",
+#            "/api/entry/interpro/IPR003165/set/kegg/kegg01/node",
             "/api/entry/unintegrated/pfam/PF17176/set/pfam",
-            "/api/entry/interpro/pfam/PF02171/set/kegg/",
-            "/api/entry/interpro/IPR003165/pfam/PF02171/set/kegg/kegg01/node",
+#            "/api/entry/interpro/pfam/PF02171/set/kegg/",
+#            "/api/entry/interpro/IPR003165/pfam/PF02171/set/kegg/kegg01/node",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -147,9 +145,9 @@ class EntrySetTest(InterproRESTTestCase):
     def test_can_filter_entry_counter_with_set_acc(self):
         urls = [
             "/api/entry/set/pfam/Cl0001",
-            "/api/entry/set/kegg/kegg01",
-            "/api/entry/set/kegg/kegg01/node/KEGG01-1",
-            "/api/entry/set/kegg/kegg01/node/KEGG01-2",
+#            "/api/entry/set/kegg/kegg01",
+#            "/api/entry/set/kegg/kegg01/node/KEGG01-1",
+#            "/api/entry/set/kegg/kegg01/node/KEGG01-2",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -159,13 +157,13 @@ class EntrySetTest(InterproRESTTestCase):
     def test_can_get_the_set_object_on_a_list(self):
         acc = "IPR003165"
         urls = [
-            "/api/entry/interpro/set/kegg/kegg01",
-            "/api/entry/pfam/set/kegg/kegg01",
+#            "/api/entry/interpro/set/kegg/kegg01",
+#            "/api/entry/pfam/set/kegg/kegg01",
             "/api/entry/pfam/set/pfam/Cl0001",
             "/api/entry/unintegrated/set/pfam/Cl0001",
-            "/api/entry/interpro/pfam/set/kegg/kegg01",
+#            "/api/entry/interpro/pfam/set/kegg/kegg01",
             "/api/entry/unintegrated/pfam/set/pfam/Cl0001",
-            "/api/entry/interpro/"+acc+"/pfam/set/kegg/kegg01",
+#            "/api/entry/interpro/"+acc+"/pfam/set/kegg/kegg01",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -178,14 +176,14 @@ class EntrySetTest(InterproRESTTestCase):
 
     def test_can_get_the_object_on_an_object(self):
         urls = [
-            "/api/entry/interpro/IPR003165/set/kegg/kegg01",
-            "/api/entry/pfam/PF02171/set/kegg/kegg01",
+#            "/api/entry/interpro/IPR003165/set/kegg/kegg01",
+#            "/api/entry/pfam/PF02171/set/kegg/kegg01",
             "/api/entry/pfam/PF02171/set/pfam/CL0001",
-            "/api/entry/interpro/IPR003165/set/kegg/kegg01",
+#            "/api/entry/interpro/IPR003165/set/kegg/kegg01",
             "/api/entry/unintegrated/pfam/PF17176/set/pfam/CL0002",
-            "/api/entry/interpro/pfam/PF02171/set/kegg/kegg01",
-            "/api/entry/interpro/IPR003165/pfam/PF02171/set/kegg/kegg01",
-            "/api/entry/interpro/IPR003165/pfam/PF02171/set/kegg/kegg01/node/kegg01-1",
+#            "/api/entry/interpro/pfam/PF02171/set/kegg/kegg01",
+#            "/api/entry/interpro/IPR003165/pfam/PF02171/set/kegg/kegg01",
+#            "/api/entry/interpro/IPR003165/pfam/PF02171/set/kegg/kegg01/node/kegg01-1",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -206,7 +204,6 @@ class ProteinSetTest(InterproRESTTestCase):
     def test_can_get_the_set_count_on_a_list(self):
         urls = [
             "/api/protein/reviewed/set/",
-            "/api/protein/unreviewed/set/",
             "/api/protein/uniprot/set/",
             ]
         for url in urls:
@@ -222,9 +219,7 @@ class ProteinSetTest(InterproRESTTestCase):
         unreviewed = "P16582"
         urls = [
             "/api/protein/uniprot/"+reviewed+"/set",
-            "/api/protein/uniprot/"+unreviewed+"/set",
             "/api/protein/reviewed/"+reviewed+"/set",
-            "/api/protein/unreviewed/"+unreviewed+"/set",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -236,8 +231,8 @@ class ProteinSetTest(InterproRESTTestCase):
     def test_can_filter_protein_counter_with_set_db(self):
         urls = [
             "/api/protein/set/pfam",
-            "/api/protein/set/kegg",
-            "/api/protein/set/kegg/kegg01/node",
+#            "/api/protein/set/kegg",
+#            "/api/protein/set/kegg/kegg01/node",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -260,8 +255,8 @@ class ProteinSetTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         urls = [
             "/api/protein/reviewed/set/pfam",
-            "/api/protein/unreviewed/set/kegg",
-            "/api/protein/uniprot/set/kegg/kegg01/node",
+#            "/api/protein/unreviewed/set/kegg",
+#            "/api/protein/uniprot/set/kegg/kegg01/node",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -274,11 +269,11 @@ class ProteinSetTest(InterproRESTTestCase):
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
         urls = [
-            "/api/protein/unreviewed/P16582/set/kegg/kegg01/node",
+#            "/api/protein/unreviewed/P16582/set/kegg/kegg01/node",
             "/api/protein/uniprot/M5ADK6/set/pfam",
             "/api/protein/reviewed/A1CUJ5/set/pfam",
-            "/api/protein/reviewed/A1CUJ5/set/kegg",
-            "/api/protein/reviewed/A1CUJ5/set/kegg/kegg01/node",
+#            "/api/protein/reviewed/A1CUJ5/set/kegg",
+#            "/api/protein/reviewed/A1CUJ5/set/kegg/kegg01/node",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -291,9 +286,9 @@ class ProteinSetTest(InterproRESTTestCase):
     def test_can_filter_counter_with_set_acc(self):
         urls = [
             "/api/protein/set/pfam/Cl0001",
-            "/api/protein/set/kegg/kegg01",
-            "/api/protein/set/kegg/kegg01/node/KEGG01-1",
-            "/api/protein/set/kegg/kegg01/node/KEGG01-2",
+#            "/api/protein/set/kegg/kegg01",
+#            "/api/protein/set/kegg/kegg01/node/KEGG01-1",
+#            "/api/protein/set/kegg/kegg01/node/KEGG01-2",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -302,12 +297,12 @@ class ProteinSetTest(InterproRESTTestCase):
 
     def test_can_get_the_set_object_on_a_list(self):
         urls = [
-            "/api/protein/uniprot/set/kegg/kegg01",
-            "/api/protein/reviewed/set/kegg/kegg01",
-            "/api/protein/unreviewed/set/kegg/kegg01",
-            "/api/protein/uniprot/set/kegg/kegg01/node/kegg01-1",
-            "/api/protein/reviewed/set/kegg/kegg01/node/kegg01-1",
-            "/api/protein/unreviewed/set/kegg/kegg01/node/kegg01-1",
+#            "/api/protein/uniprot/set/kegg/kegg01",
+#            "/api/protein/reviewed/set/kegg/kegg01",
+#            "/api/protein/unreviewed/set/kegg/kegg01",
+#            "/api/protein/uniprot/set/kegg/kegg01/node/kegg01-1",
+#            "/api/protein/reviewed/set/kegg/kegg01/node/kegg01-1",
+#            "/api/protein/unreviewed/set/kegg/kegg01/node/kegg01-1",
             "/api/protein/uniprot/set/pfam/Cl0001",
             "/api/protein/reviewed/set/pfam/Cl0001",
             ]
@@ -322,12 +317,12 @@ class ProteinSetTest(InterproRESTTestCase):
 
     def test_can_get_the_object_on_an_object(self):
         urls = [
-            "/api/protein/uniprot/A1CUJ5/set/kegg/kegg01",
-            "/api/protein/reviewed/A1CUJ5/set/kegg/kegg01",
-            "/api/protein/unreviewed/P16582/set/kegg/kegg01",
-            "/api/protein/uniprot/A1CUJ5/set/kegg/kegg01/node/kegg01-1",
-            "/api/protein/reviewed/A1CUJ5/set/kegg/kegg01/node/kegg01-1",
-            "/api/protein/unreviewed/P16582/set/kegg/kegg01/node/kegg01-1",
+#            "/api/protein/uniprot/A1CUJ5/set/kegg/kegg01",
+#            "/api/protein/reviewed/A1CUJ5/set/kegg/kegg01",
+#            "/api/protein/unreviewed/P16582/set/kegg/kegg01",
+#            "/api/protein/uniprot/A1CUJ5/set/kegg/kegg01/node/kegg01-1",
+#            "/api/protein/reviewed/A1CUJ5/set/kegg/kegg01/node/kegg01-1",
+#            "/api/protein/unreviewed/P16582/set/kegg/kegg01/node/kegg01-1",
             "/api/protein/uniprot/A1CUJ5/set/pfam/Cl0001",
             "/api/protein/reviewed/A1CUJ5/set/pfam/Cl0001",
             ]
@@ -360,7 +355,7 @@ class StructureSetTest(InterproRESTTestCase):
                 self._check_set_count_overview(result)
 
     def test_urls_that_return_structure_with_set_count(self):
-        urls = ["/api/structure/pdb/"+pdb+"/set/" for pdb in ["1JM7", "2BKM", "1T2V"]]
+        urls = ["/api/structure/pdb/"+pdb+"/set/" for pdb in ["1JM7", "2BKM"]]
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
@@ -371,8 +366,8 @@ class StructureSetTest(InterproRESTTestCase):
     def test_can_filter_structure_counter_with_organism_db(self):
         urls = [
             "/api/structure/set/pfam",
-            "/api/structure/set/kegg",
-            "/api/structure/set/kegg/kegg01/node",
+#            "/api/structure/set/kegg",
+#            "/api/structure/set/kegg/kegg01/node",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -385,8 +380,8 @@ class StructureSetTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         urls = [
             "/api/structure/pdb/set/pfam",
-            "/api/structure/pdb/set/kegg",
-            "/api/structure/pdb/set/kegg/kegg01/node",
+#            "/api/structure/pdb/set/kegg",
+#            "/api/structure/pdb/set/kegg/kegg01/node",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -399,10 +394,10 @@ class StructureSetTest(InterproRESTTestCase):
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
         urls = [
-            "/api/structure/pdb/1T2V/set/kegg",
-            "/api/structure/pdb/1T2V/set/kegg/kegg01/node",
+#            "/api/structure/pdb/1T2V/set/kegg",
+#            "/api/structure/pdb/1T2V/set/kegg/kegg01/node",
             "/api/structure/pdb/1JM7/set/pfam",
-            "/api/structure/pdb/1JM7/set/kegg",
+#            "/api/structure/pdb/1JM7/set/kegg",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -415,9 +410,9 @@ class StructureSetTest(InterproRESTTestCase):
     def test_can_filter_counter_with_set_acc(self):
         urls = [
             "/api/structure/set/pfam/Cl0001",
-            "/api/structure/set/kegg/kegg01",
-            "/api/structure/set/kegg/kegg01/node/KEGG01-1",
-            "/api/structure/set/kegg/kegg01/node/KEGG01-2",
+#            "/api/structure/set/kegg/kegg01",
+#            "/api/structure/set/kegg/kegg01/node/KEGG01-1",
+#            "/api/structure/set/kegg/kegg01/node/KEGG01-2",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -426,8 +421,8 @@ class StructureSetTest(InterproRESTTestCase):
 
     def test_can_get_the_set_object_on_a_list(self):
         urls = [
-            "/api/structure/pdb/set/kegg/kegg01",
-            "/api/structure/pdb/set/kegg/kegg01/node/kegg01-1",
+#            "/api/structure/pdb/set/kegg/kegg01",
+#            "/api/structure/pdb/set/kegg/kegg01/node/kegg01-1",
             "/api/structure/pdb/set/pfam/Cl0001",
             ]
         for url in urls:
@@ -441,8 +436,8 @@ class StructureSetTest(InterproRESTTestCase):
 
     def test_can_get_the_object_on_an_object(self):
         urls = [
-            "/api/structure/pdb/1JM7/set/kegg/kegg01",
-            "/api/structure/pdb/1JM7/set/kegg/kegg01/node/kegg01-1",
+#            "/api/structure/pdb/1JM7/set/kegg/kegg01",
+#            "/api/structure/pdb/1JM7/set/kegg/kegg01/node/kegg01-1",
             "/api/structure/pdb/1JM7/set/pfam/Cl0001",
             ]
         for url in urls:
@@ -464,8 +459,8 @@ class SetEntryTest(InterproRESTTestCase):
     def test_can_get_the_entry_count_on_a_list(self):
         urls = [
             "/api/set/pfam/entry",
-            "/api/set/kegg/entry",
-            "/api/set/kegg/KEGG01/node/entry",
+#            "/api/set/kegg/entry",
+#            "/api/set/kegg/KEGG01/node/entry",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -478,8 +473,8 @@ class SetEntryTest(InterproRESTTestCase):
     def test_can_get_the_entry_count_on_a_set(self):
         urls = [
             "/api/set/pfam/CL0001/entry",
-            "/api/set/kegg/KEGG01/entry",
-            "/api/set/kegg/KEGG01/node/KEGG01-1/entry",
+#            "/api/set/kegg/KEGG01/entry",
+#            "/api/set/kegg/KEGG01/node/KEGG01-1/entry",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -501,11 +496,11 @@ class SetEntryTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
             self.assertIsInstance(response.data, dict)
-            if "kegg" in response.data["sets"]:
-                self.assertIn("entries", response.data["sets"]["kegg"],
-                              "'entries' should be one of the keys in the response")
-                self.assertIn("sets", response.data["sets"]["kegg"],
-                              "'sets' should be one of the keys in the response")
+            # if "kegg" in response.data["sets"]:
+            #     self.assertIn("entries", response.data["sets"]["kegg"],
+            #                   "'entries' should be one of the keys in the response")
+            #     self.assertIn("sets", response.data["sets"]["kegg"],
+            #                   "'sets' should be one of the keys in the response")
             if "pfam" in response.data["sets"]:
                 self.assertIn("entries", response.data["sets"]["pfam"],
                               "'entries' should be one of the keys in the response")
@@ -515,10 +510,10 @@ class SetEntryTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         acc = "IPR003165"
         urls = [
-            "/api/set/kegg/entry/interpro",
+#            "/api/set/kegg/entry/interpro",
             "/api/set/pfam/entry/pfam",
             "/api/set/pfam/entry/unintegrated",
-            "/api/set/kegg/kegg01/node/entry/interpro/pfam",
+#            "/api/set/kegg/kegg01/node/entry/interpro/pfam",
             "/api/set/pfam/entry/interpro/"+acc+"/pfam",
             ]
         for url in urls:
@@ -532,13 +527,13 @@ class SetEntryTest(InterproRESTTestCase):
 
     def test_can_get_a_list_from_the_set_object(self):
         urls = [
-            "/api/set/kegg/kegg01/entry/interpro",
+#            "/api/set/kegg/kegg01/entry/interpro",
             "/api/set/pfam/Cl0001/entry/pfam",
             "/api/set/pfam/CL0001/entry/unintegrated",
-            "/api/set/kegg/kegg01/node/kegg01-1/entry/interpro/pfam",
+#            "/api/set/kegg/kegg01/node/kegg01-1/entry/interpro/pfam",
             "/api/set/pfam/CL0001/entry/unintegrated/pfam",
-            "/api/set/kegg/kegg01/entry/interpro/IPR003165/pfam",
-            "/api/set/kegg/kegg01/node/KEGG01-1/entry/interpro/IPR003165/pfam",
+#            "/api/set/kegg/kegg01/entry/interpro/IPR003165/pfam",
+#            "/api/set/kegg/kegg01/node/KEGG01-1/entry/interpro/IPR003165/pfam",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -553,7 +548,6 @@ class SetEntryTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_un = "PF17176"
         urls = [
-            "/api/set/entry/interpro/"+acc,
             "/api/set/entry/pfam/"+pfam,
             "/api/set/entry/pfam/"+pfam_un,
             "/api/set/entry/interpro/"+acc+"/pfam/"+pfam,
@@ -570,11 +564,11 @@ class SetEntryTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_un = "PF17176"
         urls = [
-            "/api/set/kegg/entry/interpro/"+acc,
-            "/api/set/kegg/kegg01/node/entry/pfam/"+pfam,
-            "/api/set/kegg/entry/integrated/pfam/"+pfam,
-            "/api/set/kegg/entry/interpro/pfam/"+pfam,
-            "/api/set/kegg/entry/interpro/IPR003165/pfam/"+pfam,
+#            "/api/set/kegg/entry/interpro/"+acc,
+#            "/api/set/kegg/kegg01/node/entry/pfam/"+pfam,
+#            "/api/set/kegg/entry/integrated/pfam/"+pfam,
+#            "/api/set/kegg/entry/interpro/pfam/"+pfam,
+#            "/api/set/kegg/entry/interpro/IPR003165/pfam/"+pfam,
             "/api/set/pfam/entry/unintegrated/pfam/"+pfam_un,
             "/api/set/pfam/entry/integrated/pfam/"+pfam,
             ]
@@ -590,14 +584,14 @@ class SetEntryTest(InterproRESTTestCase):
 
     def test_can_get_an_object_from_the_set_object(self):
         urls = [
-            "/api/set/kegg/kegg01/entry/interpro/IPR003165",
-            "/api/set/kegg/kegg01/entry/pfam/PF02171",
+#            "/api/set/kegg/kegg01/entry/interpro/IPR003165",
+#            "/api/set/kegg/kegg01/entry/pfam/PF02171",
             "/api/set/pfam/CL0001/entry/pfam/PF02171",
-            "/api/set/kegg/kegg01/entry/interpro/IPR003165",
+#            "/api/set/kegg/kegg01/entry/interpro/IPR003165",
             "/api/set/pfam/CL0002/entry/unintegrated/pfam/PF17176",
-            "/api/set/kegg/kegg01/entry/interpro/pfam/PF02171",
-            "/api/set/kegg/kegg01/entry/interpro/IPR003165/pfam/PF02171",
-            "/api/set/kegg/kegg01/node/kegg01-1/entry/interpro/IPR003165/pfam/PF02171",
+#            "/api/set/kegg/kegg01/entry/interpro/pfam/PF02171",
+#            "/api/set/kegg/kegg01/entry/interpro/IPR003165/pfam/PF02171",
+#            "/api/set/kegg/kegg01/node/kegg01-1/entry/interpro/IPR003165/pfam/PF02171",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -618,8 +612,8 @@ class SetProteinTest(InterproRESTTestCase):
     def test_can_get_the_protein_count_on_a_list(self):
         urls = [
             "/api/set/pfam/protein",
-            "/api/set/kegg/protein",
-            "/api/set/kegg/KEGG01/node/protein",
+#            "/api/set/kegg/protein",
+#            "/api/set/kegg/KEGG01/node/protein",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -632,8 +626,8 @@ class SetProteinTest(InterproRESTTestCase):
     def test_can_get_the_protein_count_on_a_set(self):
         urls = [
             "/api/set/pfam/CL0001/protein",
-            "/api/set/kegg/KEGG01/protein",
-            "/api/set/kegg/KEGG01/node/KEGG01-1/protein",
+#            "/api/set/kegg/KEGG01/protein",
+#            "/api/set/kegg/KEGG01/node/KEGG01-1/protein",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -646,17 +640,16 @@ class SetProteinTest(InterproRESTTestCase):
         urls = [
             "/api/set/protein/uniprot",
             "/api/set/protein/reviewed",
-            "/api/set/protein/unreviewed",
         ]
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
             self.assertIsInstance(response.data, dict)
-            if "kegg" in response.data["sets"]:
-                self.assertIn("proteins", response.data["sets"]["kegg"],
-                              "'proteins' should be one of the keys in the response")
-                self.assertIn("sets", response.data["sets"]["kegg"],
-                              "'sets' should be one of the keys in the response")
+            # if "kegg" in response.data["sets"]:
+            #     self.assertIn("proteins", response.data["sets"]["kegg"],
+            #                   "'proteins' should be one of the keys in the response")
+            #     self.assertIn("sets", response.data["sets"]["kegg"],
+            #                   "'sets' should be one of the keys in the response")
             if "pfam" in response.data["sets"]:
                 self.assertIn("proteins", response.data["sets"]["pfam"],
                               "'proteins' should be one of the keys in the response")
@@ -665,10 +658,10 @@ class SetProteinTest(InterproRESTTestCase):
 
     def test_can_get_the_set_list_on_a_list(self):
         urls = [
-            "/api/set/kegg/protein/uniprot",
-            "/api/set/kegg/protein/unreviewed",
+#            "/api/set/kegg/protein/uniprot",
+#            "/api/set/kegg/protein/unreviewed",
             "/api/set/pfam/protein/reviewed",
-            "/api/set/kegg/kegg01/node/protein/unreviewed",
+#            "/api/set/kegg/kegg01/node/protein/unreviewed",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -683,10 +676,10 @@ class SetProteinTest(InterproRESTTestCase):
         urls = [
             "/api/set/pfam/Cl0001/protein/reviewed",
             "/api/set/pfam/CL0001/protein/uniprot",
-            "/api/set/kegg/kegg01/protein/unreviewed",
-            "/api/set/kegg/kegg01/protein/reviewed",
-            "/api/set/kegg/kegg01/node/kegg01-1/protein/reviewed",
-            "/api/set/kegg/kegg01/node/KEGG01-1/protein/unreviewed",
+#            "/api/set/kegg/kegg01/protein/unreviewed",
+#            "/api/set/kegg/kegg01/protein/reviewed",
+#            "/api/set/kegg/kegg01/node/kegg01-1/protein/reviewed",
+#            "/api/set/kegg/kegg01/node/KEGG01-1/protein/unreviewed",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -699,7 +692,6 @@ class SetProteinTest(InterproRESTTestCase):
     def test_can_filter_set_counter_with_acc(self):
         urls = [
             "/api/set/protein/uniprot/M5ADK6",
-            "/api/set/protein/unreviewed/p16582",
             "/api/set/protein/reviewed/M5ADK6",
             ]
         for url in urls:
@@ -709,11 +701,11 @@ class SetProteinTest(InterproRESTTestCase):
 
     def test_can_get_object_on_a_set_list(self):
         urls = [
-            "/api/set/kegg/protein/uniprot/P16582",
+#            "/api/set/kegg/protein/uniprot/P16582",
             "/api/set/pfam/protein/uniprot/a1cuj5",
-            "/api/set/kegg/protein/unreviewed/p16582",
-            "/api/set/kegg/kegg01/node/protein/unreviewed/p16582",
-            "/api/set/kegg/kegg01/node/protein/reviewed/a1cuj5",
+#            "/api/set/kegg/protein/unreviewed/p16582",
+#            "/api/set/kegg/kegg01/node/protein/unreviewed/p16582",
+#            "/api/set/kegg/kegg01/node/protein/reviewed/a1cuj5",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -727,12 +719,12 @@ class SetProteinTest(InterproRESTTestCase):
 
     def test_can_get_an_object_from_the_set_object(self):
         urls = [
-            "/api/set/kegg/kegg01/protein/uniprot/A1CUJ5",
-            "/api/set/kegg/kegg01/protein/reviewed/A1CUJ5",
-            "/api/set/kegg/kegg01/protein/unreviewed/P16582",
-            "/api/set/kegg/kegg01/node/kegg01-1/protein/uniprot/A1CUJ5",
-            "/api/set/kegg/kegg01/node/kegg01-1/protein/reviewed/A1CUJ5",
-            "/api/set/kegg/kegg01/node/kegg01-1/protein/unreviewed/P16582",
+#            "/api/set/kegg/kegg01/protein/uniprot/A1CUJ5",
+#            "/api/set/kegg/kegg01/protein/reviewed/A1CUJ5",
+#            "/api/set/kegg/kegg01/protein/unreviewed/P16582",
+#            "/api/set/kegg/kegg01/node/kegg01-1/protein/uniprot/A1CUJ5",
+#            "/api/set/kegg/kegg01/node/kegg01-1/protein/reviewed/A1CUJ5",
+#            "/api/set/kegg/kegg01/node/kegg01-1/protein/unreviewed/P16582",
             "/api/set/pfam/Cl0001/protein/uniprot/A1CUJ5",
             "/api/set/pfam/Cl0001/protein/reviewed/A1CUJ5",
             ]
@@ -755,8 +747,8 @@ class SetStructureTest(InterproRESTTestCase):
     def test_can_get_the_structure_count_on_a_list(self):
         urls = [
             "/api/set/pfam/structure",
-            "/api/set/kegg/structure",
-            "/api/set/kegg/KEGG01/node/structure",
+#            "/api/set/kegg/structure",
+#            "/api/set/kegg/KEGG01/node/structure",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -769,8 +761,8 @@ class SetStructureTest(InterproRESTTestCase):
     def test_can_get_the_structure_count_on_a_set(self):
         urls = [
             "/api/set/pfam/CL0001/structure",
-            "/api/set/kegg/KEGG01/structure",
-            "/api/set/kegg/KEGG01/node/KEGG01-1/structure",
+#            "/api/set/kegg/KEGG01/structure",
+#            "/api/set/kegg/KEGG01/node/KEGG01-1/structure",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -800,10 +792,10 @@ class SetStructureTest(InterproRESTTestCase):
 
     def test_can_get_the_set_list_on_a_list(self):
         urls = [
-            "/api/set/kegg/structure/pdb",
-            "/api/set/kegg/structure/pdb",
+#            "/api/set/kegg/structure/pdb",
+#            "/api/set/kegg/structure/pdb",
             "/api/set/pfam/structure/pdb",
-            "/api/set/kegg/kegg01/node/structure/pdb",
+#            "/api/set/kegg/kegg01/node/structure/pdb",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -817,8 +809,8 @@ class SetStructureTest(InterproRESTTestCase):
     def test_can_get_a_list_from_the_set_object(self):
         urls = [
             "/api/set/pfam/Cl0001/structure/pdb",
-            "/api/set/kegg/kegg01/structure/pdb",
-            "/api/set/kegg/kegg01/node/KEGG01-1/structure/pdb",
+#            "/api/set/kegg/kegg01/structure/pdb",
+#            "/api/set/kegg/kegg01/node/KEGG01-1/structure/pdb",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -840,9 +832,9 @@ class SetStructureTest(InterproRESTTestCase):
 
     def test_can_get_object_on_a_set_list(self):
         urls = [
-            "/api/set/kegg/structure/pdb/1t2v",
+#            "/api/set/kegg/structure/pdb/1t2v",
             "/api/set/pfam/structure/pdb/1JM7",
-            "/api/set/kegg/kegg01/node/structure/pdb/1t2v",
+#            "/api/set/kegg/kegg01/node/structure/pdb/1t2v",
             ]
         for url in urls:
             response = self.client.get(url)
@@ -856,8 +848,8 @@ class SetStructureTest(InterproRESTTestCase):
 
     def test_can_get_an_object_from_the_set_object(self):
         urls = [
-            "/api/set/kegg/kegg01/structure/pdb/1JM7",
-            "/api/set/kegg/kegg01/node/kegg01-1/structure/pdb/1JM7",
+#            "/api/set/kegg/kegg01/structure/pdb/1JM7",
+#            "/api/set/kegg/kegg01/node/kegg01-1/structure/pdb/1JM7",
             "/api/set/pfam/Cl0001/structure/pdb/1JM7",
             ]
         for url in urls:

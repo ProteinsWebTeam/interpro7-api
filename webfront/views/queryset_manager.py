@@ -53,84 +53,83 @@ class QuerysetManager:
     def order_by(self,field):
         self.order_field = field
 
-
     def get_searcher_query(self, include_search=False):
-        q = ""
+        blocks = []
         for ep in self.filters:
             for k, v in self.filters[ep].items():
                 if ep == "searcher":
-                    q += " && {}:{}".format(k, escape(v))
+                    blocks.append("{}:{}".format(k, escape(v)))
                 elif ep == "proteome" and k == "is_reference":
-                    q += " && proteome_is_reference:{}".format(escape(v).strip())
+                    blocks.append("proteome_is_reference:{}".format(escape(v).strip()))
                 elif include_search and ep == "search":
                     main_ep = self.main_endpoint
                     for token in v.split():
-                        q += " && text_{}:*{}*".format(main_ep, escape(token))
+                        blocks.append("text_{}:{}".format(main_ep, escape(token)))
                 elif k == "source_database__isnull":
-                    q += " && {}_exists_:{}_db".format("!" if v else "", ep)
+                    blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
                 elif k == "accession" or k == "accession__iexact":
                     if ep == 'taxonomy':
-                        q += " && tax_lineage:{}".format(escape(v))
+                        blocks.append("tax_lineage:{}".format(escape(v)))
                     else:
-                        q += " && {}_acc:{}".format(ep, escape(v))
+                        blocks.append("{}_acc:{}".format(ep, escape(v)))
                 elif k == "accession__isnull":
                     if ep == 'structure':
-                        q += " && {}_exists_:{}_acc".format("!" if v else "", ep)
+                        blocks.append("{}_exists_:{}_acc".format("!" if v else "", ep))
                     elif ep == 'taxonomy':
-                        q += " && {}_exists_:tax_id".format("!" if v else "")
+                        blocks.append("{}_exists_:tax_id".format("!" if v else ""))
                     elif ep == 'proteome':
-                        q += " && {}_exists_:proteome_acc".format("!" if v else "")
+                        blocks.append("{}_exists_:proteome_acc".format("!" if v else ""))
                     else:
-                        q += " && {}_exists_:{}_db".format("!" if v else "", ep)
+                        blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
 
                 elif k == 'accession__in' and ep == 'taxonomy' and isinstance(v, list) and len(v) > 0:
-                    q += " && ({})".format(
+                    blocks.append("({})".format(
                         " || ".join(["tax_id:{}".format(value) for value in v])
-                    )
+                    ))
                 elif k == "integrated" or k == "integrated__iexact" or k == "integrated__contains":
                     if ep == 'set':
                         if not v:
-                            q += " && !_exists_:set_integrated"
+                            blocks.append("!_exists_:set_integrated")
                         else:
-                            q += " && set_integrated:{}".format(escape(v))
+                            blocks.append("set_integrated:{}".format(escape(v)))
                     else:
-                        q += " && entry_integrated:{}".format(escape(v))
+                        blocks.append("entry_integrated:{}".format(escape(v)))
                 elif k == "integrated__isnull":
                     if ep == 'set':
-                        q += " && {}_exists_:set_integrated".format("!" if v else "")
+                        blocks.append("{}_exists_:set_integrated".format("!" if v else ""))
                     else:
-                        q += " && {}_exists_:entry_integrated".format("!entry_db:interpro && !" if v else "")
+                        blocks.append("{}_exists_:entry_integrated".format("!entry_db:interpro && !" if v else ""))
                 elif k == "type" or k == "type__iexact":
-                    q += " && {}_type:{}".format(ep, escape(v))
+                    blocks.append("{}_type:{}".format(ep, escape(v)))
                 elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":
-                    q += " && tax_id:{}".format(escape(v))
+                    blocks.append("tax_id:{}".format(escape(v)))
                 elif "tax_lineage__contains" in k:
-                    q += " && tax_lineage:{}".format(escape(v).strip())
+                    blocks.append("tax_lineage:{}".format(escape(v).strip()))
                 elif "experiment_type__" in k:
-                    q += " && structure_evidence:{}".format(escape(v).strip())
+                    blocks.append("structure_evidence:{}".format(escape(v).strip()))
                 elif ep == "protein" and "size__" in k:
-                    q += " && protein_size:{}".format(escape(v).strip())
+                    blocks.append("protein_size:{}".format(escape(v).strip()))
                 elif "__gt" in k:
                     filter_k = "protein_"+k if k.startswith("length_") else k
-                    q += " && {}:{}{} TO *]".format(
+                    blocks.append("{}:{}{} TO *]".format(
                         re.sub(r"__gte?", "", filter_k),
                         "[" if "__gte" in filter_k else "{",
                         escape(v)
-                    )
+                    ))
                 elif "__lt" in k:
                     filter_k = "protein_"+k if k.startswith("length_") else k
-                    q += " && {}:[* TO {}{}".format(
+                    blocks.append("{}:[* TO {}{}".format(
                         re.sub(r"__lte?", "", filter_k),
                         escape(v),
                         "]" if "__lte" in filter_k else "}"
-                    )
+                    ))
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
-                        q += " && {}_db:{}".format(ep, escape(v))
+                        blocks.append("{}_db:{}".format(ep, escape(v)))
 
-
-
-        q = q[4:].lower()
+        blocks = list(set(blocks))
+        blocks.sort()
+        q = " && ".join(blocks).lower()
         if self.order_field is not None:
             q += "&sort="+self.order_field
         return q

@@ -1,4 +1,27 @@
 {
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "autocomplete": {
+          "tokenizer": "autocomplete",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      },
+      "tokenizer": {
+        "autocomplete": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 20,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        }
+      }
+    }
+  },
   "mappings": {
     "relationship": {
       "properties": {
@@ -35,12 +58,25 @@
         "protein_structure_locations": { "type": "object", "enabled" : false},
         "entry_protein_locations": { "type": "object", "enabled" : false},
 
-        "text_entry": {"type":  "text"},
-        "text_protein": {"type":  "text"},
-        "text_structure": {"type":  "text"},
-        "text_set": {"type":  "text"},
-        "text_taxonomy": {"type":  "text"},
-        "text_proteome": {"type":  "text"},
+        "text_entry": {
+          "type":  "text",
+          "analyzer": "autocomplete"
+        },
+        "text_protein": {"type":  "text",
+          "analyzer": "autocomplete"
+        },
+        "text_structure": {"type":  "text",
+          "analyzer": "autocomplete"
+        },
+        "text_set": {"type":  "text",
+          "analyzer": "autocomplete"
+        },
+        "text_taxonomy": {"type":  "text",
+          "analyzer": "autocomplete"
+        },
+        "text_proteome": {"type":  "text",
+          "analyzer": "autocomplete"
+        },
 
         "set_acc": {"type":  "keyword"},
         "set_db": {"type":  "keyword"},

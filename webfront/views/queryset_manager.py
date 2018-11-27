@@ -64,7 +64,7 @@ class QuerysetManager:
                 elif include_search and ep == "search":
                     main_ep = self.main_endpoint
                     for token in v.split():
-                        blocks.append("text_{}:{}".format(main_ep, escape(token)))
+                        blocks.append("text_{}:{}".format(main_ep, token))
                 elif k == "source_database__isnull":
                     blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
                 elif k == "accession" or k == "accession__iexact":

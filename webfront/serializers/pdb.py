@@ -206,7 +206,7 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def get_chain_from_search_object(obj):
         output = {
-            "protein_structure_locations": obj["protein_structure_locations"],
+            "structure_protein_locations": obj["structure_protein_locations"],
             "organism": {
                 "taxid": obj["tax_id"]
             },

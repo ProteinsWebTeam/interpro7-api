@@ -393,7 +393,8 @@ class EntrySerializer(ModelContentSerializer):
         if for_structure:
             header["chain"] = obj["structure_chain_acc"]
             header["protein"] = obj["protein_acc"]
-            header["protein_structure_locations"] = obj["protein_structure_locations"]
+            header["structure_protein_locations"] = obj["structure_protein_locations"]
+            header["protein_structure_mapping"] = obj["protein_structure"]
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(
                 Entry.objects.get(accession=obj["entry_acc"].upper()), searcher, sq

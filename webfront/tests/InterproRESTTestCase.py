@@ -121,7 +121,7 @@ class InterproRESTTestCase(APITransactionTestCase):
             try:
                 self.assertIn("entry_protein_locations", obj, msg)
             except Exception:
-                self.assertIn("protein_structure_locations", obj, msg)
+                self.assertIn("structure_protein_locations", obj, msg)
 
         # self.assertIsInstance(obj["coordinates"], list, msg)
         # TODO: Find a way to check JSON from elasticsearch
@@ -159,11 +159,11 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("counters", obj)
 
     def _check_structure_chain_details(self, obj):
-        self.assertIn("protein_structure_locations", obj)
+        self.assertIn("structure_protein_locations", obj)
         self.assertIn("organism", obj)
 
     def _check_entry_structure_details(self, obj):
-        self.assertIn("protein_structure_locations", obj)
+        self.assertIn("structure_protein_locations", obj)
         self.assertIn("entry_protein_locations", obj)
         self.assertIn("chain", obj)
 

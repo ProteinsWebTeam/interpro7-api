@@ -55,7 +55,7 @@
         "tax_lineage": {"type":  "keyword"},
         "tax_rank": {"type":  "keyword"},
 
-        "protein_structure_locations": { "type": "object", "enabled" : false},
+        "structure_protein_locations": { "type": "object", "enabled" : false},
         "entry_protein_locations": { "type": "object", "enabled" : false},
 
         "text_entry": {

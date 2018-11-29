@@ -4,10 +4,18 @@
     "fields": {
       "entry": "ipr003165",
       "protein": "a1cuj5",
-      "coordinates":
-      [{"fragments" : [{"start" : 27, "end" : 80}]}],
-      "ida" : "274/upi00014fb1c3#12340&22666:124-270~14726:197-273#",
-      "ida_id" : 50134
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 27,
+              "end": 80
+            }
+          ]
+        }
+      ],
+      "ida": "274/upi00014fb1c3#12340&22666:124-270~14726:197-273#",
+      "ida_id": 50134
     }
   },
   {
@@ -15,7 +23,20 @@
     "fields": {
       "entry": "pf02171",
       "protein": "a1cuj5",
-      "coordinates": [{"fragments" : [{"start" : 17, "end" : 70}, {"start" : 92, "end" : 110}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 17,
+              "end": 70
+            },
+            {
+              "start": 92,
+              "end": 110
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -23,7 +44,16 @@
     "fields": {
       "entry": "sm00950",
       "protein": "a1cuj5",
-      "coordinates": [{"fragments" : [{"start" : 37, "end" : 90}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 37,
+              "end": 90
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -31,9 +61,18 @@
     "fields": {
       "entry": "ipr003165",
       "protein": "p16582",
-      "coordinates": [{"fragments" : [{"start" : 48, "end" : 101}]}],
-      "ida" : "274/upi00014fb1c3#12340&22666:2-125~14722:119-195~22669&8991:124-270~14726:197-273#",
-      "ida_id" : 590134
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 48,
+              "end": 101
+            }
+          ]
+        }
+      ],
+      "ida": "274/upi00014fb1c3#12340&22666:2-125~14722:119-195~22669&8991:124-270~14726:197-273#",
+      "ida_id": 590134
     }
   },
   {
@@ -42,8 +81,34 @@
       "entry": "ps50822",
       "protein": "p16582",
       "coordinates": [
-        {"fragments" : [{"start" : 48, "end" : 91, "bounds": "e"}, {"start" : 95, "end" : 99, "bounds": "se"}]},
-        {"fragments" : [{"start" : 148, "end" : 191, "bounds": "e"}, {"start" : 195, "end" : 199, "bounds": "s"}]}
+        {
+          "fragments": [
+            {
+              "start": 48,
+              "end": 91,
+              "bounds": "e"
+            },
+            {
+              "start": 95,
+              "end": 99,
+              "bounds": "se"
+            }
+          ]
+        },
+        {
+          "fragments": [
+            {
+              "start": 148,
+              "end": 191,
+              "bounds": "e"
+            },
+            {
+              "start": 195,
+              "end": 199,
+              "bounds": "s"
+            }
+          ]
+        }
       ]
     }
   },
@@ -52,7 +117,16 @@
     "fields": {
       "entry": "pf17180",
       "protein": "m5adk6",
-      "coordinates": [{"fragments" : [{"start" : 48, "end" : 10}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 48,
+              "end": 10
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -60,9 +134,18 @@
     "fields": {
       "entry": "ipr001165",
       "protein": "a1cuj5",
-      "coordinates": [{"fragments" : [{"start" : 148, "end" : 201}]}],
-      "ida" : "274/upi00014fb1c3#12340&1165:2-125#",
-      "ida_id" : 59013
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 148,
+              "end": 201
+            }
+          ]
+        }
+      ],
+      "ida": "274/upi00014fb1c3#12340&1165:2-125#",
+      "ida_id": 59013
     }
   },
   {
@@ -70,7 +153,16 @@
     "fields": {
       "entry": "pf17176",
       "protein": "a1cuj5",
-      "coordinates": [{"fragments" : [{"start" : 48, "end" : 101}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 48,
+              "end": 101
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -84,7 +176,34 @@
         "name": "Homo sapiens (Human)",
         "taxId": 9606
       },
-      "coordinates": [{"fragments" : [{"start" : 1, "end" : 53}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 1,
+              "end": 53
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 1,
+            "protein_end": 53,
+            "structure_start": 5,
+            "structure_end": 58
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 1,
+            "protein_end": 114,
+            "structure_start": 1,
+            "structure_end": 114
+          }
+        ]
+      }
     }
   },
   {
@@ -98,7 +217,34 @@
         "name": "Homo sapiens (Human)",
         "taxId": 9606
       },
-      "coordinates": [{"fragments" : [{"start" : 1, "end" : 114}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 1,
+              "end": 114
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 1,
+            "protein_end": 53,
+            "structure_start": 5,
+            "structure_end": 58
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 1,
+            "protein_end": 114,
+            "structure_start": 1,
+            "structure_end": 114
+          }
+        ]
+      }
     }
   },
   {
@@ -112,7 +258,40 @@
         "name": "Homo sapiens (Human)",
         "taxId": 9606
       },
-      "coordinates": [{"fragments" : [{"start" : 1, "end" : 74}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 1,
+              "end": 74
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 10,
+            "protein_end": 137,
+            "structure_start": 1,
+            "structure_end": 127
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 1,
+            "protein_end": 30,
+            "structure_start": 1,
+            "structure_end": 30
+          },
+          {
+            "protein_start": 40,
+            "protein_end": 74,
+            "structure_start": 31,
+            "structure_end": 65
+          }
+        ]
+      }
     }
   },
   {
@@ -126,7 +305,40 @@
         "name": "Geobacillus kaustophilus (strain HTA426)",
         "taxId": 235909
       },
-      "coordinates": [{"fragments" : [{"start" : 10, "end" : 137}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 10,
+              "end": 137
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 10,
+            "protein_end": 137,
+            "structure_start": 1,
+            "structure_end": 127
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 1,
+            "protein_end": 30,
+            "structure_start": 1,
+            "structure_end": 30
+          },
+          {
+            "protein_start": 40,
+            "protein_end": 74,
+            "structure_start": 31,
+            "structure_end": 65
+          }
+        ]
+      }
     }
   },
   {
@@ -140,7 +352,58 @@
         "name": "Sus scrofa (Pig)",
         "taxId": 9823
       },
-      "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 146,
+              "end": 359
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "C": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "D": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "E": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ]
+      }
     }
   },
   {
@@ -154,7 +417,58 @@
         "name": "Sus scrofa (Pig)",
         "taxId": 9823
       },
-      "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 146,
+              "end": 359
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "C": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "D": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "E": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ]
+      }
     }
   },
   {
@@ -168,7 +482,58 @@
         "name": "Sus scrofa (Pig)",
         "taxId": 9823
       },
-      "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 146,
+              "end": 359
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "C": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "D": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "E": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ]
+      }
     }
   },
   {
@@ -182,7 +547,58 @@
         "name": "Sus scrofa (Pig)",
         "taxId": 9823
       },
-      "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 146,
+              "end": 359
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "C": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "D": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "E": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ]
+      }
     }
   },
   {
@@ -196,7 +612,58 @@
         "name": "Sus scrofa (Pig)",
         "taxId": 9823
       },
-      "coordinates": [{"fragments" : [{"start" : 146, "end" : 359}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 146,
+              "end": 359
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "C": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "D": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ],
+        "E": [
+          {
+            "protein_start": 146,
+            "protein_end": 359,
+            "structure_start": 1,
+            "structure_end": 213
+          }
+        ]
+      }
     }
   },
   {
@@ -205,12 +672,39 @@
       "protein": "a0a0a2l2g2",
       "structure": "1jz8",
       "chain": "A",
-      "length": 228,
+      "length": 550,
       "organism": {
         "name": "Geobacillus kaustophilus (strain HTA426)",
         "taxId": 235909
       },
-      "coordinates": [{"fragments" : [{"start" : 137, "end" : 600}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 137,
+              "end": 500
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 137,
+            "protein_end": 500,
+            "structure_start": 1,
+            "structure_end": 365
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 137,
+            "protein_end": 500,
+            "structure_start": 1,
+            "structure_end": 365
+          }
+        ]
+      }
     }
   },
   {
@@ -224,18 +718,54 @@
         "name": "Geobacillus kaustophilus (strain HTA426)",
         "taxId": 235909
       },
-      "coordinates": [{"fragments" : [{"start" : 137, "end" : 600}]}]
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 137,
+              "end": 500
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "A": [
+          {
+            "protein_start": 137,
+            "protein_end": 500,
+            "structure_start": 1,
+            "structure_end": 365
+          }
+        ],
+        "B": [
+          {
+            "protein_start": 137,
+            "protein_end": 500,
+            "structure_start": 1,
+            "structure_end": 365
+          }
+        ]
+      }
     }
   },
-
-
   {
     "model": "webfront.EntryStructureFeature",
     "fields": {
       "entry": "ipr001165",
       "structure": "1jm7",
       "chain": "A",
-      "coordinates": [{"entry":[30,60], "structure":[1,53]}]
+      "coordinates": [
+        {
+          "entry": [
+            30,
+            60
+          ],
+          "structure": [
+            1,
+            53
+          ]
+        }
+      ]
     }
   },
   {
@@ -244,7 +774,18 @@
       "entry": "ipr003165",
       "structure": "1t2v",
       "chain": "A",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -253,7 +794,18 @@
       "entry": "ipr003165",
       "structure": "1t2v",
       "chain": "B",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -262,7 +814,18 @@
       "entry": "ipr003165",
       "structure": "1t2v",
       "chain": "C",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -271,7 +834,18 @@
       "entry": "ipr003165",
       "structure": "1t2v",
       "chain": "D",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -280,7 +854,18 @@
       "entry": "ipr003165",
       "structure": "1t2v",
       "chain": "E",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -289,7 +874,18 @@
       "entry": "ipr003165",
       "structure": "1jm7",
       "chain": "A",
-      "coordinates": [{"entry":[20,50], "structure":[1,53]}]
+      "coordinates": [
+        {
+          "entry": [
+            20,
+            50
+          ],
+          "structure": [
+            1,
+            53
+          ]
+        }
+      ]
     }
   },
   {
@@ -298,7 +894,18 @@
       "entry": "ps50822",
       "structure": "1t2v",
       "chain": "A",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -307,7 +914,18 @@
       "entry": "ps50822",
       "structure": "1t2v",
       "chain": "B",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -316,7 +934,18 @@
       "entry": "ps50822",
       "structure": "1t2v",
       "chain": "C",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -325,7 +954,18 @@
       "entry": "ps50822",
       "structure": "1t2v",
       "chain": "D",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -334,7 +974,18 @@
       "entry": "ps50822",
       "structure": "1t2v",
       "chain": "E",
-      "coordinates": [{"entry":[1,213], "structure":[146,359]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            213
+          ],
+          "structure": [
+            146,
+            359
+          ]
+        }
+      ]
     }
   },
   {
@@ -343,7 +994,18 @@
       "entry": "pf02171",
       "structure": "1jm7",
       "chain": "A",
-      "coordinates": [{"entry":[30,50], "structure":[20,40]}]
+      "coordinates": [
+        {
+          "entry": [
+            30,
+            50
+          ],
+          "structure": [
+            20,
+            40
+          ]
+        }
+      ]
     }
   },
   {
@@ -352,7 +1014,18 @@
       "entry": "sm00950",
       "structure": "1jm7",
       "chain": "A",
-      "coordinates": [{"entry":[20,50], "structure":[20,50]}]
+      "coordinates": [
+        {
+          "entry": [
+            20,
+            50
+          ],
+          "structure": [
+            20,
+            50
+          ]
+        }
+      ]
     }
   },
   {
@@ -361,7 +1034,18 @@
       "entry": "pf17180",
       "structure": "2bkm",
       "chain": "B",
-      "coordinates": [{"entry":[6,30], "structure":[46,70]}]
+      "coordinates": [
+        {
+          "entry": [
+            6,
+            30
+          ],
+          "structure": [
+            46,
+            70
+          ]
+        }
+      ]
     }
   },
   {
@@ -370,7 +1054,18 @@
       "entry": "pf17180",
       "structure": "1jm7",
       "chain": "B",
-      "coordinates": [{"entry":[1,40], "structure":[21,60]}]
+      "coordinates": [
+        {
+          "entry": [
+            1,
+            40
+          ],
+          "structure": [
+            21,
+            60
+          ]
+        }
+      ]
     }
   },
   {
@@ -379,8 +1074,18 @@
       "entry": "pf17176",
       "structure": "1jm7",
       "chain": "A",
-      "coordinates": [{"entry":[2,32], "structure":[22,52]}]
+      "coordinates": [
+        {
+          "entry": [
+            2,
+            32
+          ],
+          "structure": [
+            22,
+            52
+          ]
+        }
+      ]
     }
   }
-
 ]

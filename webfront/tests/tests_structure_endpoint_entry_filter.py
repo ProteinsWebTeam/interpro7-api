@@ -89,10 +89,10 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "entries",
-                                                    "It should have the key 'entries' for the URL ["+url+"]")
+            self._check_is_list_of_objects_with_key(response.data["results"], "entry_subset",
+                                                    "It should have the key 'entry_subset' for the URL ["+url+"]")
             for structure in response.data["results"]:
-                for match in structure["entries"]:
+                for match in structure["entry_subset"]:
                     self._check_entry_structure_details(match)
 
     def test_urls_that_return_a_structure_details_with_matches(self):
@@ -114,10 +114,10 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_structure_details(response.data["metadata"])
-            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-            self.assertEqual(len(response.data["entries"]), len(urls[url]),
+            self.assertIn("entry_subset", response.data, "'entry_subset' should be one of the keys in the response")
+            self.assertEqual(len(response.data["entry_subset"]), len(urls[url]),
                              "The number of entries should be the same URL: [{}]".format(url))
-            for entry in response.data["entries"]:
+            for entry in response.data["entry_subset"]:
                 self.assertIn(entry["accession"].upper(), urls[url])
 
     def test_urls_that_return_a_structure_details_with_matches_from_chain(self):
@@ -140,10 +140,10 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_structure_details(response.data["metadata"])
-            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-            self.assertEqual(len(response.data["entries"]), len(urls[url]),
-                             "The number of entries should be the same. URL: [{}]".format(url))
-            for entry in response.data["entries"]:
+            self.assertIn("entry_subset", response.data, "'entry_subset' should be one of the keys in the response")
+            self.assertEqual(len(response.data["entry_subset"]), len(urls[url]),
+                             "The number of entry_subset should be the same. URL: [{}]".format(url))
+            for entry in response.data["entry_subset"]:
                 self.assertIn(entry["accession"].upper(), urls[url])
 
     def test_urls_that_should_return_empty_entries(self):

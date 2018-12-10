@@ -57,28 +57,33 @@ class SetSerializer(ModelContentSerializer):
             q = "set_acc:" + escape(instance.accession.lower())
             sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.ENTRY_DB in detail_filters or \
-                SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = self.to_entries_detail_representation(instance, s, q, base_query=sq)
+                    SerializerDetail.ENTRY_DETAIL in detail_filters:
+                key = "entries" if SerializerDetail.ENTRY_DETAIL in detail_filters else "entry_subset"
+                representation[key] = self.to_entries_detail_representation(instance, s, q, base_query=sq)
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
-                SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = self.to_structures_detail_representation(
+                    SerializerDetail.STRUCTURE_DETAIL in detail_filters:
+                key = "structures" if SerializerDetail.STRUCTURE_DETAIL in detail_filters else "structure_subset"
+                representation[key] = self.to_structures_detail_representation(
                     instance, s, q,
                     include_chain=True,
                     base_query=sq
                 )
             if SerializerDetail.PROTEIN_DB in detail_filters or \
-                SerializerDetail.PROTEIN_DETAIL in detail_filters:
-                representation["proteins"] = self.to_proteins_detail_representation(
+                    SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                key = "proteins" if SerializerDetail.PROTEIN_DETAIL in detail_filters else "protein_subset"
+                representation[key] = self.to_proteins_detail_representation(
                     instance, self.searcher, q, base_query=sq
                 )
             if SerializerDetail.TAXONOMY_DB in detail_filters or \
-                SerializerDetail.TAXONOMY_DETAIL in detail_filters:
-                representation["taxa"] = self.to_taxonomy_detail_representation(
+                    SerializerDetail.TAXONOMY_DETAIL in detail_filters:
+                key = "taxa" if SerializerDetail.TAXONOMY_DETAIL in detail_filters else "taxonomy_subset"
+                representation[key] = self.to_taxonomy_detail_representation(
                     instance, self.searcher, q
                 )
             if SerializerDetail.PROTEOME_DB in detail_filters or \
-                SerializerDetail.PROTEOME_DETAIL in detail_filters:
-                representation["proteomes"] = self.to_proteomes_detail_representation(
+                    SerializerDetail.PROTEOME_DETAIL in detail_filters:
+                key = "proteomes" if SerializerDetail.PROTEOME_DETAIL in detail_filters else "proteome_subset"
+                representation[key] = self.to_proteomes_detail_representation(
                     self.searcher, q
                 )
         return representation
@@ -88,7 +93,7 @@ class SetSerializer(ModelContentSerializer):
         if "sets" not in instance:
             if ("count" in instance and instance["count"] == 0) or \
                 ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0) or \
-                ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0):
+                    ("buckets" in instance["databases"] and len(instance["databases"]["buckets"]) == 0):
                 raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Set"))
             ins2 = {
                 "sets": {

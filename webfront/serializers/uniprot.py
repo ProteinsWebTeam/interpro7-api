@@ -67,33 +67,38 @@ class ProteinSerializer(ModelContentSerializer):
             sq = self.queryset_manager.get_searcher_query()
             if SerializerDetail.ENTRY_DB in detail_filters or \
                     SerializerDetail.ENTRY_DETAIL in detail_filters:
-                representation["entries"] = self.to_entries_detail_representation(
+                key = "entries" if SerializerDetail.ENTRY_DETAIL in detail_filters else "entry_subset"
+                representation[key] = self.to_entries_detail_representation(
                     instance, s, "protein_acc:" + escape(instance.accession.lower()),
                     base_query=sq
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                     SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = self.to_structures_detail_representation(
+                key = "structures" if SerializerDetail.STRUCTURE_DETAIL in detail_filters else "structure_subset"
+                representation[key] = self.to_structures_detail_representation(
                     instance, s, "protein_acc:" + escape(instance.accession.lower()),
                     include_chain=True,
                     base_query=sq
                 )
             if SerializerDetail.TAXONOMY_DB in detail_filters or \
                     SerializerDetail.TAXONOMY_DETAIL in detail_filters:
-                representation["taxa"] = self.to_taxonomy_detail_representation(
+                key = "taxa" if SerializerDetail.TAXONOMY_DETAIL in detail_filters else "taxonomy_subset"
+                representation[key] = self.to_taxonomy_detail_representation(
                     instance,
                     self.searcher,
                     "protein_acc:" + escape(instance.accession.lower())
                 )
             if SerializerDetail.PROTEOME_DB in detail_filters or \
                     SerializerDetail.PROTEOME_DETAIL in detail_filters:
-                representation["proteomes"] = self.to_proteomes_detail_representation(
+                key = "proteomes" if SerializerDetail.PROTEOME_DETAIL in detail_filters else "proteome_subset"
+                representation[key] = self.to_proteomes_detail_representation(
                     self.searcher,
                     "protein_acc:" + escape(instance.accession.lower())
                 )
             if SerializerDetail.SET_DB in detail_filters or \
                     SerializerDetail.SET_DETAIL in detail_filters:
-                representation["sets"] = self.to_set_detail_representation(
+                key = "sets" if SerializerDetail.SET_DETAIL in detail_filters else "set_subset"
+                representation[key] = self.to_set_detail_representation(
                     instance,
                     self.searcher,
                     "protein_acc:" + escape(instance.accession.lower())

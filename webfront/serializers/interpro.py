@@ -37,8 +37,9 @@ class EntrySerializer(ModelContentSerializer):
     def endpoint_representation(self, representation, instance, detail):
         if detail == SerializerDetail.ALL or detail == SerializerDetail.ENTRY_DETAIL:
             sq = self.queryset_manager.get_searcher_query()
-            representation["metadata"] = self.to_metadata_representation(instance, self.searcher, sq,
-                                                                         instance.counts if self.queryset_manager.is_single_endpoint() else None)
+            representation["metadata"] = self.to_metadata_representation(
+                instance, self.searcher, sq,
+                instance.counts if self.queryset_manager.is_single_endpoint() else None)
         elif detail == SerializerDetail.ENTRY_OVERVIEW:
             representation = self.to_counter_representation(instance, self.detail_filters)
         elif detail == SerializerDetail.ENTRY_HEADERS:
@@ -65,36 +66,40 @@ class EntrySerializer(ModelContentSerializer):
 
         if detail != SerializerDetail.ENTRY_OVERVIEW:
             sq = self.queryset_manager.get_searcher_query()
-            if SerializerDetail.PROTEIN_DB in detail_filters or \
-                SerializerDetail.PROTEIN_DETAIL in detail_filters:
-                representation["proteins"] = EntrySerializer.to_proteins_detail_representation(
+            if SerializerDetail.PROTEIN_DB in detail_filters or SerializerDetail.PROTEIN_DETAIL in detail_filters:
+                key = "proteins" if SerializerDetail.PROTEIN_DETAIL in detail_filters else "protein_subset"
+                representation[key] = EntrySerializer.to_proteins_detail_representation(
                     instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()),
                     for_entry=True,
                     base_query=sq
                 )
             if SerializerDetail.STRUCTURE_DB in detail_filters or \
                 SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                representation["structures"] = self.to_structures_detail_representation(
+                key = "structures" if SerializerDetail.STRUCTURE_DETAIL in detail_filters else "structure_subset"
+                representation[key] = self.to_structures_detail_representation(
                     instance, self.searcher, "entry_acc:" + escape(instance.accession.lower()),
                     include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters,
                     base_query=sq
                 )
             if SerializerDetail.TAXONOMY_DB in detail_filters or \
                 SerializerDetail.TAXONOMY_DETAIL in detail_filters:
-                representation["taxa"] = self.to_taxonomy_detail_representation(
+                key = "taxa" if SerializerDetail.TAXONOMY_DETAIL in detail_filters else "taxonomy_subset"
+                representation[key] = self.to_taxonomy_detail_representation(
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower())
                 )
             if SerializerDetail.PROTEOME_DB in detail_filters or \
                 SerializerDetail.PROTEOME_DETAIL in detail_filters:
-                representation["proteomes"] = self.to_proteomes_detail_representation(
+                key = "proteomes" if SerializerDetail.PROTEOME_DETAIL in detail_filters else "proteome_subset"
+                representation[key] = self.to_proteomes_detail_representation(
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower())
                 )
             if SerializerDetail.SET_DB in detail_filters or \
                 SerializerDetail.SET_DETAIL in detail_filters:
-                representation["sets"] = self.to_set_detail_representation(
+                key = "sets" if SerializerDetail.SET_DETAIL in detail_filters else "set_subset"
+                representation[key] = self.to_set_detail_representation(
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower())
@@ -287,27 +292,6 @@ class EntrySerializer(ModelContentSerializer):
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"]["interpro"]
                 del result["entries"]["member_databases"]["interpro"]
-            # vals = list(result["entries"]["member_databases"].values())
-            # if len(vals) > 0:
-            #     unintegrated = result["entries"]["unintegrated"]
-            #     if type(unintegrated) != int and "entries" in unintegrated:
-            #         unintegrated = unintegrated["entries"]
-            #
-            #     if type(vals[0]) == int:
-            #         result["entries"]["integrated"] = sum(vals) - unintegrated
-            #     else:
-            #         result["entries"]["integrated"] = {
-            #             "entries": sum([v["entries"] for v in vals]) - unintegrated
-            #         }
-            #         if "proteins" in result["entries"]["interpro"]:
-            #             result["entries"]["integrated"]["proteins"] = result["entries"]["interpro"]["proteins"]
-            #         if "structures" in result["entries"]["interpro"]:
-            #             result["entries"]["integrated"]["structures"] = result["entries"]["interpro"]["structures"]
-            #         if "organisms" in result["entries"]["interpro"]:
-            #             result["entries"]["integrated"]["organisms"] = result["entries"]["interpro"]["organisms"]
-            #         if "sets" in result["entries"]["interpro"]:
-            #             result["entries"]["integrated"]["sets"] = result["entries"]["interpro"]["sets"]
-
             return result
         return instance
 

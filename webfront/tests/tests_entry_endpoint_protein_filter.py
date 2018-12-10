@@ -69,11 +69,11 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         has_one = False
         has_two = False
         for result in response.data["results"]:
-            if len(result["proteins"]) == 1:
+            if len(result["protein_subset"]) == 1:
                 has_one = True
-            elif len(result["proteins"]) == 2:
+            elif len(result["protein_subset"]) == 2:
                 has_two = True
-            for match in result["proteins"]:
+            for match in result["protein_subset"]:
                 self._check_match(match)
 
         self.assertTrue(has_one and has_two,
@@ -85,11 +85,11 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         has_one = False
         has_two = False
         for result in response.data["results"]:
-            if len(result["proteins"]) == 1:
+            if len(result["protein_subset"]) == 1:
                 has_one = True
-            elif len(result["proteins"]) == 2:
+            elif len(result["protein_subset"]) == 2:
                 has_two = True
-            for match in result["proteins"]:
+            for match in result["protein_subset"]:
                 self._check_match(match)
         self.assertTrue(has_one and not has_two,
                         "One of the entries should have one protein and the other one should have two")
@@ -107,11 +107,11 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         }
         for url in tests:
             response = self.client.get(url)
-            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-            self.assertEqual(len(response.data["proteins"]), len(tests[url]))
-            for match in response.data["proteins"]:
+            self.assertIn("protein_subset", response.data, "'proteins' should be one of the keys in the response")
+            self.assertEqual(len(response.data["protein_subset"]), len(tests[url]))
+            for match in response.data["protein_subset"]:
                 self._check_match(match)
-            ids = [x["accession"].upper() for x in response.data["proteins"]]
+            ids = [x["accession"].upper() for x in response.data["protein_subset"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
 

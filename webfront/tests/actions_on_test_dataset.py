@@ -2,7 +2,8 @@ from webfront.serializers.content_serializers import ModelContentSerializer
 
 plurals = ModelContentSerializer.plurals
 singular = {v: k for k, v in plurals.items()}
-
+for s in plurals.keys():
+    singular[s+"_subset"] = s
 
 
 # value: * all that have the field, None all that don't have the field
@@ -419,7 +420,10 @@ def extend_obj_with_other_endpoints(data, endpoints, dbs, accs, instance, ep):
                         dbs[j]
                     )
         else:
-            instance[plurals[current_ep]] = get_payload_list(
+            key = plurals[current_ep]
+            if current_acc is None:
+                key = current_ep+"_subset"
+            instance[key] = get_payload_list(
                 data, current_ep, current_db, False,
                 ep == "structure" or current_ep == "structure" # and current_acc is None
             )[:10]  # the API only returns up to 10 items in a sublist
@@ -430,10 +434,7 @@ def get_db_payload(data, endpoints, dbs, accs=None):
     db = dbs[0]
     payload = get_payload_list(data, ep, db)
     for instance in payload:
-        if db == "proteome":
-            filtered = filter_by_contain_value(data, "proteome_acc", instance["metadata"]["accession"])
-        else:
-            filtered = filter_by_value(data, endpoint_attributes[ep][0], instance["metadata"]["accession"])
+        filtered = filter_by_value(data, endpoint_attributes[ep][0], instance["metadata"]["accession"])
         extend_obj_with_other_endpoints(filtered, endpoints, dbs, accs, instance, ep)
     return payload
 

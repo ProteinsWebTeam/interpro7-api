@@ -61,10 +61,10 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/protein/uniprot/structure/pdb")
         self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
         for result in response.data["results"]:
-            self.assertEqual(len(result["structures"]),
+            self.assertEqual(len(result["structure_subset"]),
                              len(data_in_fixtures[result["metadata"]["accession"]]),
                              "failing for "+result["metadata"]["accession"])
-            for match in result["structures"]:
+            for match in result["structure_subset"]:
                 self.assertIn(match["accession"].lower(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
@@ -72,11 +72,11 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/protein/reviewed/structure/pdb")
         self.assertEqual(len(response.data["results"]), len(data_reviewed))
         for result in response.data["results"]:
-            self.assertEqual(len(result["structures"]),
+            self.assertEqual(len(result["structure_subset"]),
                              len(data_in_fixtures[result["metadata"]["accession"]]),
                              "failing for "+result["metadata"]["accession"])
             self.assertIn(result["metadata"]["accession"], data_reviewed)
-            for match in result["structures"]:
+            for match in result["structure_subset"]:
                 self.assertIn(match["accession"].lower(), data_in_fixtures[result["metadata"]["accession"]])
                 self._check_structure_chain_details(match)
 
@@ -84,11 +84,11 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         tests = {"/api/protein/uniprot/"+prot+"/structure/pdb": data_in_fixtures[prot] for prot in data_in_fixtures}
         for url in tests:
             response = self.client.get(url)
-            self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
-            self.assertEqual(len(response.data["structures"]), len(tests[url]))
-            for match in response.data["structures"]:
+            self.assertIn("structure_subset", response.data, "'structure_subset' should be one of the keys in the response")
+            self.assertEqual(len(response.data["structure_subset"]), len(tests[url]))
+            for match in response.data["structure_subset"]:
                 self._check_structure_chain_details(match)
-            ids = [x["accession"] for x in response.data["structures"]]
+            ids = [x["accession"] for x in response.data["structure_subset"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_urls_that_should_fails(self):

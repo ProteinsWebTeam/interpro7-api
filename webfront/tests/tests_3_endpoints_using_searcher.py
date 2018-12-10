@@ -571,9 +571,9 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
             self.assert_obj_response_is_as_expected(obj_expected, obj_response, endpoint1, url)
 
     def test_db_db_endpoint(self):
-        for endpoint1 in ["proteome"]: #api_test_map:
+        for endpoint1 in api_test_map:
             for db1 in api_test_map[endpoint1]:
-                for endpoint2 in ["structure"]: #api_test_map:
+                for endpoint2 in api_test_map:
                     if endpoint1 == endpoint2:
                         continue
                     for db2 in api_test_map[endpoint2]:
@@ -583,6 +583,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                             if not settings.DEBUG:
                                 time.sleep(0.1)
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, db2, endpoint3)
+                            print(url)
                             response = self._get_in_debug_mode(url)
                             data = filter_by_endpoint(self.all_docs, endpoint1, db1)
                             data = filter_by_endpoint(data, endpoint2, db2)

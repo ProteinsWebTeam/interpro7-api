@@ -107,10 +107,10 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "entries",
-                                                    "It should have the key 'entries' for the URL ["+url+"]")
+            self._check_is_list_of_objects_with_key(response.data["results"], "entry_subset",
+                                                    "It should have the key 'entry_subset' for the URL ["+url+"]")
             for protein in response.data["results"]:
-                for match in protein["entries"]:
+                for match in protein["entry_subset"]:
                     self._check_match(match)
 
     def test_urls_that_return_a_protein_details_with_matches(self):
@@ -118,22 +118,22 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         sp_2 = "A1CUJ5"
         acc = "IPR003165"
         urls = {
-            # "/api/protein/uniprot/"+sp_2+"/entry/interpro": ["IPR003165", "IPR001165"],
-            # "/api/protein/uniprot/"+sp_1+"/entry/unintegrated": ["PF17180"],
-            # "/api/protein/uniprot/"+sp_2+"/entry/pfam": ["PF17176", "PF02171"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro": ["IPR003165", "IPR001165"],
+            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated": ["PF17180"],
+            "/api/protein/uniprot/"+sp_2+"/entry/pfam": ["PF17176", "PF02171"],
             "/api/protein/uniprot/"+sp_2+"/entry/interpro/pfam": ["PF02171"],
-            # "/api/protein/uniprot/"+sp_2+"/entry/interpro/smart": ["SM00950"],
-            # "/api/protein/uniprot/"+sp_1+"/entry/unintegrated/pfam": ["PF17180"],
-            # "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/smart": ["SM00950"],
-            # "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/pfam": ["PF02171"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro/smart": ["SM00950"],
+            "/api/protein/uniprot/"+sp_1+"/entry/unintegrated/pfam": ["PF17180"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/smart": ["SM00950"],
+            "/api/protein/uniprot/"+sp_2+"/entry/interpro/"+acc+"/pfam": ["PF02171"],
         }
         for url in urls:
             response = self.client.get(url)
             self._check_protein_details(response.data["metadata"])
-            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
-            self.assertEqual(len(response.data["entries"]), len(urls[url]),
+            self.assertIn("entry_subset", response.data, "'entry_subset' should be one of the keys in the response")
+            self.assertEqual(len(response.data["entry_subset"]), len(urls[url]),
                              "The number of entries should be the same URL: [{}]".format(url))
-            self.assertIn(response.data["entries"][0]["accession"].upper(), urls[url])
+            self.assertIn(response.data["entry_subset"][0]["accession"].upper(), urls[url])
 
     def test_urls_that_should_fails(self):
         tr_1 = "P16582"

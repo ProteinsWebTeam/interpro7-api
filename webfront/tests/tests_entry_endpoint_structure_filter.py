@@ -61,7 +61,7 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/interpro/structure/pdb")
         self.assertEqual(len(response.data["results"]), 2)
         for result in response.data["results"]:
-            for match in result["structures"]:
+            for match in result["structure_subset"]:
                 # self.assertIn(match["structure"], data_in_fixtures[result["accession"]])
                 self._check_entry_structure_details(match)
 
@@ -77,11 +77,11 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
         }
         for url in tests:
             response = self.client.get(url)
-            self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
-            self.assertEqual(len(response.data["structures"]), len(tests[url]), "on url: "+url)
-            for match in response.data["structures"]:
+            self.assertIn("structure_subset", response.data, "'structures' should be one of the keys in the response")
+            self.assertEqual(len(response.data["structure_subset"]), len(tests[url]), "on url: "+url)
+            for match in response.data["structure_subset"]:
                 self._check_entry_structure_details(match)
-            ids = [x["accession"] for x in response.data["structures"]]
+            ids = [x["accession"] for x in response.data["structure_subset"]]
             self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_urls_that_should_fails_with_no_content(self):

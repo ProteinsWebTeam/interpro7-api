@@ -262,7 +262,7 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             'source_database', 'resolution'
         ],
         'taxonomy': [
-            'accession', 'scientific_name', 'full_name', 'lineage', 'rank', 'children', 'left_number', 'right_number'
+            'accession', 'scientific_name', 'full_name', 'lineage', 'rank', 'children'
         ],
         'proteome': [
             'accession', 'strain', 'is_reference', 'assembly'

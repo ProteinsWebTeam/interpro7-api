@@ -90,8 +90,6 @@ class Taxonomy(models.Model):
     parent = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)
     rank = models.CharField(max_length=20)
     children = JSONField(null=True)
-    left_number = models.IntegerField()
-    right_number = models.IntegerField()
     counts = JSONField(null=True)
 
 

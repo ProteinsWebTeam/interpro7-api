@@ -15,6 +15,10 @@ def merge_two_dicts(x, y):
     return z
 
 
+def uses_wildcards(query):
+    return re.match(r'[-+!(){}[\]^"~*?:\\\/]', query) is not None
+
+
 class QuerysetManager:
     main_endpoint = None
     filters = {}
@@ -63,8 +67,11 @@ class QuerysetManager:
                     blocks.append("proteome_is_reference:{}".format(escape(v).strip()))
                 elif include_search and ep == "search":
                     main_ep = self.main_endpoint
-                    for token in v.split():
-                        blocks.append("text_{}:{}".format(main_ep, token))
+                    if uses_wildcards(v):
+                        blocks.append("text_{}:{}".format(main_ep, v.replace(' ', '%20')))
+                    else:
+                        for token in v.split():
+                            blocks.append("text_{}:{}~0".format(main_ep, token))
                 elif k == "source_database__isnull":
                     blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
                 elif k == "accession" or k == "accession__iexact":
@@ -99,7 +106,7 @@ class QuerysetManager:
                         blocks.append("{}_exists_:set_integrated".format("!" if v else ""))
                     else:
                         blocks.append("{}_exists_:entry_integrated".format("!entry_db:interpro && !" if v else ""))
-                elif k == "type" or k == "type__iexact":
+                elif k == "type" or k == "type__iexact" or k == "type__exact":
                     blocks.append("{}_type:{}".format(ep, escape(v)))
                 elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":
                     blocks.append("tax_id:{}".format(escape(v)))

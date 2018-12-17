@@ -111,7 +111,6 @@ class AccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-
         acc = endpoint_levels[level - 1].lower()
         general_handler.queryset_manager.add_filter("entry", accession=acc)
 
@@ -122,7 +121,6 @@ class AccessionHandler(CustomView):
             date = qs.first().deletion_date
             raise DeletedEntryError(acc, date, "The entry {} is not active. Removed: {}".format(acc, date))
         general_handler.queryset_manager.add_filter("entry", is_alive=True)
-
 
         general_handler.modifiers.register(
             "ida", get_domain_architectures,
@@ -241,7 +239,11 @@ class InterproHandler(CustomView):
             "extra_fields",
             add_extra_fields(Entry, "counters"),
         )
-        general_handler.modifiers.register("signature_in", filter_by_contains_field("entry", "member_databases"))
+        general_handler.modifiers.register(
+            "signature_in",
+            filter_by_contains_field("entry", "member_databases", '"{}"'),
+            works_in_multiple_endpoint=False
+        )
         return super(InterproHandler, self).get(
             request._request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, request, *args, **kwargs
@@ -344,7 +346,8 @@ class EntryHandler(CustomView):
         general_handler.modifiers.register(
             "go_category",
             filter_by_contains_field("entry", "go_terms", '"code": "{}"'))
-        general_handler.modifiers.register("go_term", filter_by_contains_field("entry", "go_terms", '"identifier": "{}"'))
+        general_handler.modifiers.register("go_term",
+                                           filter_by_contains_field("entry", "go_terms", '"identifier": "{}"'))
         general_handler.modifiers.register(
             "annotation",
             filter_by_contains_field("entry", "entryannotation__type"),

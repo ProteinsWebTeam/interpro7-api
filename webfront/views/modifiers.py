@@ -16,7 +16,7 @@ def group_by_member_databases(general_handler):
         dbs = Entry.objects.get_queryset().values('source_database').distinct()
         qs = {db['source_database']:
                   general_handler.queryset_manager.get_queryset()
-                      .filter(member_databases__contains=db['source_database'])
+                      .filter(member_databases__contains='"{}"'.format(db['source_database']))
                       .count()
               for db in dbs
               }

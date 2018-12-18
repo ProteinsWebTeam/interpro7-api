@@ -29,7 +29,7 @@ class ProteinRESTTest(InterproRESTTestCase):
         url_id = "/api/protein/uniprot/CBPYA_ASPCL"
         response = self.client.get(url_id)
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        self.assertIn("a1cuj5", response.url)
+        self.assertIn("a1cuj5", response.url.lower())
 
     def test_can_read_protein_reviewed(self):
         response = self.client.get("/api/protein/reviewed")

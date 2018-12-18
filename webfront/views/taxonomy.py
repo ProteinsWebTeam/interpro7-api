@@ -13,7 +13,7 @@ class TaxonomyAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("taxonomy", accession=endpoint_levels[level - 1].lower())
+        general_handler.queryset_manager.add_filter("taxonomy", accession__iexact=endpoint_levels[level - 1])
         general_handler.modifiers.register(
             "with_names", passing, serializer=SerializerDetail.TAXONOMY_DETAIL_NAMES
         )
@@ -25,7 +25,7 @@ class TaxonomyAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("taxonomy", accession=level_name.lower())
+        general_handler.queryset_manager.add_filter("taxonomy", accession__iexact=level_name)
         return queryset
 
 

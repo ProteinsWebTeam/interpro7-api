@@ -23,7 +23,7 @@ class SetNodeAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("set", accession=endpoint_levels[level - 1].lower())
+        general_handler.queryset_manager.add_filter("set", accession__iexact=endpoint_levels[level - 1])
         return super(SetNodeAccessionHandler, self).get(
             request._request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, request, *args, **kwargs
@@ -31,7 +31,7 @@ class SetNodeAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("set", accession=level_name.lower())
+        general_handler.queryset_manager.add_filter("set", accession__iexact=level_name)
         return queryset
 
 
@@ -80,7 +80,7 @@ class SetAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("set", accession=endpoint_levels[level - 1].lower())
+        general_handler.queryset_manager.add_filter("set", accession__iexact=endpoint_levels[level - 1].lower())
         return super(SetAccessionHandler, self).get(
             request._request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, request, *args, **kwargs
@@ -88,7 +88,7 @@ class SetAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("set", accession=level_name.lower())
+        general_handler.queryset_manager.add_filter("set", accession__iexact=level_name.lower())
         return queryset
 
 

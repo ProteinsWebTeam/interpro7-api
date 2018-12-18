@@ -583,7 +583,6 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                             if not settings.DEBUG:
                                 time.sleep(0.1)
                             url = "/api/{}/{}/{}/{}/{}".format(endpoint1, db1, endpoint2, db2, endpoint3)
-                            print(url)
                             response = self._get_in_debug_mode(url)
                             data = filter_by_endpoint(self.all_docs, endpoint1, db1)
                             data = filter_by_endpoint(data, endpoint2, db2)

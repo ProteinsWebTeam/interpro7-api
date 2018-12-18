@@ -23,7 +23,7 @@ class MemberAccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter(
-            "entry", accession=endpoint_levels[level - 1].lower())
+            "entry", accession__iexact=endpoint_levels[level - 1].lower())
 
         general_handler.modifiers.register(
             "annotation",
@@ -61,8 +61,8 @@ class MemberHandler(CustomView):
         if endpoint_levels[level - 2] == "interpro":
             general_handler.queryset_manager.add_filter("entry", integrated__isnull=False)
         if level - 3 >= 0 and endpoint_levels[level - 3] == "interpro":
-            general_handler.queryset_manager.add_filter("entry", integrated=endpoint_levels[level - 2].lower())
-            general_handler.queryset_manager.remove_filter("entry", "accession")
+            general_handler.queryset_manager.add_filter("entry", integrated__accession__iexact=endpoint_levels[level - 2].lower())
+            general_handler.queryset_manager.remove_filter("entry", "accession__iexact")
         general_handler.modifiers.register(
             "group_by",
             group_by(Entry, {
@@ -112,7 +112,7 @@ class AccessionHandler(CustomView):
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         acc = endpoint_levels[level - 1].lower()
-        general_handler.queryset_manager.add_filter("entry", accession=acc)
+        general_handler.queryset_manager.add_filter("entry", accession__iexact=acc)
 
         # Checking if the entry has been marked as deleted
         general_handler.queryset_manager.add_filter("entry", is_alive=False)

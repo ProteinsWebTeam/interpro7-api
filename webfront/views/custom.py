@@ -4,6 +4,10 @@ from rest_framework.generics import GenericAPIView
 from django.http import HttpResponse
 import logging
 
+from django.db.models import Q
+from functools import reduce
+from operator import or_
+
 from webfront.exceptions import EmptyQuerysetError
 from webfront.response import Response
 from webfront.constants import SerializerDetail
@@ -235,7 +239,20 @@ class CustomView(GenericAPIView):
         qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
         res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st, query=qs)
         self.queryset = general_handler.queryset_manager\
-            .get_base_queryset(ep)\
-            .filter(accession__in=res)
+            .get_base_queryset(ep)
+
+        self.queryset = filter_queryset_accession_in(self.queryset, res)
+
         self.search_size = length
+
+
+def filter_queryset_accession_in(queryset, list):
+    if len(list)> 0:
+        or_filter = reduce(
+            or_,
+            (Q(**{"accession__iexact": acc}) for acc in list),
+        )
+        return queryset.filter(or_filter)
+    else:
+        return queryset.filter(accession__in=[])
 

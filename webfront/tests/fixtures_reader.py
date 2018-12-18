@@ -30,23 +30,23 @@ class FixtureReader:
     def load_from_json(self, data):
         for fixture in data:
             if fixture['model'] == "webfront.Entry":
-                self.entries[fixture['fields']["accession"]] = fixture['fields']
+                self.entries[fixture['fields']["accession"].lower()] = fixture['fields']
             elif fixture['model'] == "webfront.Protein":
-                self.proteins[fixture['fields']["accession"]] = fixture['fields']
-                self.protein_structure_list[fixture['fields']["accession"]] = []
+                self.proteins[fixture['fields']["accession"].lower()] = fixture['fields']
+                self.protein_structure_list[fixture['fields']["accession"].lower()] = []
             elif fixture['model'] == "webfront.Structure":
-                self.structures[fixture['fields']["accession"]] = fixture['fields']
+                self.structures[fixture['fields']["accession"].lower()] = fixture['fields']
             elif fixture['model'] == "webfront.ProteinEntryFeature":
                 self.entry_protein_list.append(fixture['fields'])
             elif fixture['model'] == "webfront.ProteinStructureFeature":
-                self.protein_structure_list[fixture['fields']["protein"]].append(fixture['fields'])
+                self.protein_structure_list[fixture['fields']["protein"].lower()].append(fixture['fields'])
             elif fixture['model'] == "webfront.Taxonomy":
-                self.tax2lineage[fixture['fields']["accession"]] = fixture['fields']['lineage'].split()
-                self.tax2rank[fixture['fields']["accession"]] = fixture['fields']['rank']
+                self.tax2lineage[fixture['fields']["accession"].lower()] = fixture['fields']['lineage'].split()
+                self.tax2rank[fixture['fields']["accession"].lower()] = fixture['fields']['rank']
             elif fixture['model'] == "webfront.Proteome":
-                self.proteomes[fixture['fields']["accession"]] = fixture['fields']
+                self.proteomes[fixture['fields']["accession"].lower()] = fixture['fields']
             elif fixture['model'] == "webfront.Set":
-                self.sets[fixture['fields']["accession"]] = fixture['fields']
+                self.sets[fixture['fields']["accession"].lower()] = fixture['fields']
 
     def get_entry2set(self):
         e2s = {}
@@ -59,11 +59,13 @@ class FixtureReader:
                         integrated = [x.lower() for x in integrated]
                     # if db == "node":
                     #     db = "kegg"
-                    if n["accession"] not in e2s:
-                        e2s[n["accession"]] = []
-                    e2s[n["accession"]].append({"accession": s,
-                                                "source_database": db,
-                                                "integrated": integrated})
+                    if n["accession"].lower() not in e2s:
+                        e2s[n["accession"].lower()] = []
+                    e2s[n["accession"].lower()].append({
+                        "accession": s,
+                        "source_database": db,
+                        "integrated": integrated
+                    })
                     if self.sets[s]["integrated"] is not None:
                         for i in self.sets[s]["integrated"]:
                             e2s[n["accession"]].append({

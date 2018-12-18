@@ -252,7 +252,7 @@ class ProteinSerializer(ModelContentSerializer):
                 header["protein_structure_mapping"] = obj["protein_structure"]
         if include_protein:
             header["protein"] = ProteinSerializer.to_metadata_representation(
-                Protein.objects.get(accession=obj["protein_acc"].lower()), searcher, sq
+                Protein.objects.get(accession__iexact=obj["protein_acc"].lower()), searcher, sq
             )
         return header
 

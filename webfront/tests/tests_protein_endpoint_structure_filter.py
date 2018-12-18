@@ -2,12 +2,12 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 data_in_fixtures = {
-    "a0a0a2l2g2": ["2bkm", "1jz8", "1jz8"],
-    "m5adk6": ["2bkm", "1jm7"],
-    "p16582": ["1t2v", "1t2v", "1t2v", "1t2v", "1t2v"],
-    "a1cuj5": ["1jm7"],
+    "A0A0A2L2G2": ["2bkm", "1jz8", "1jz8"],
+    "M5ADK6": ["2bkm", "1jm7"],
+    "P16582": ["1t2v", "1t2v", "1t2v", "1t2v", "1t2v"],
+    "A1CUJ5": ["1jm7"],
 }
-data_reviewed = ["a1cuj5", "m5adk6"]
+data_reviewed = ["A1CUJ5", "M5ADK6"]
 
 
 import unittest

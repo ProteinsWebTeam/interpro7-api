@@ -3,9 +3,9 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 data_in_fixtures = {
     "2bkm": ["a0a0a2l2g2", "m5adk6"],
-    "1t2v": ["p16582", "p16582", "p16582", "p16582", "p16582"],
+    "1t2V": ["p16582", "p16582", "p16582", "p16582", "p16582"],
     "1jm7": ["a1cuj5", "m5adk6"],
-    "1jz8": ["a0a0a2l2g2", "a0a0a2l2g2"]
+    "1jZ8": ["a0a0a2l2g2", "a0a0a2l2g2"]
 }
 
 

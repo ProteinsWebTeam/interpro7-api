@@ -71,7 +71,7 @@
   {
     "model": "webfront.Structure",
     "fields": {
-      "accession": "1t2v",
+      "accession": "1t2V",
       "resolution": 2.9,
       "name": "Structural basis of phospho-peptide recognition by the brct domain of brca1, structure with phosphopeptide",
       "other_names": [],
@@ -148,7 +148,7 @@
   {
     "model": "webfront.Structure",
     "fields": {
-      "accession": "1jz8",
+      "accession": "1jZ8",
       "resolution": 59.2,
       "name": "E. COLI (lacZ) BETA-GALACTOSIDASE (E537Q) IN COMPLEX WITH ALLOLACTOSE",
       "other_names": [],

@@ -150,11 +150,11 @@ class StructureSerializer(ModelContentSerializer):
     @staticmethod
     def get_counters(instance, searcher, base_query):
         return {
+            "sets": searcher.get_number_of_field_by_endpoint("structure", "set_acc", instance.accession, base_query),
             "entries": searcher.get_number_of_field_by_endpoint("structure", "entry_acc", instance.accession, base_query),
             "proteins": searcher.get_number_of_field_by_endpoint("structure", "protein_acc", instance.accession, base_query),
             "taxa": searcher.get_number_of_field_by_endpoint("structure", "tax_id", instance.accession, base_query),
             "proteomes": searcher.get_number_of_field_by_endpoint("structure", "proteome_acc", instance.accession, base_query),
-            "sets": searcher.get_number_of_field_by_endpoint("structure", "set_acc", instance.accession, base_query),
         }
 
     @staticmethod
@@ -235,7 +235,7 @@ class StructureSerializer(ModelContentSerializer):
         output["source_database"] = "pdb"
         if include_structure:
             output["structure"] = StructureSerializer.to_metadata_representation(
-                Structure.objects.get(accession=obj["structure_acc"].lower()), search, base_query
+                Structure.objects.get(accession__iexact=obj["structure_acc"]), search, base_query
             )
         return output
 

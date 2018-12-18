@@ -93,7 +93,7 @@ class QuerysetManager:
                     blocks.append("({})".format(
                         " || ".join(["tax_id:{}".format(value) for value in v])
                     ))
-                elif k == "integrated" or k == "integrated__iexact" or k == "integrated__contains":
+                elif k == "integrated" or k == "integrated__accession__iexact"  or k == "integrated__iexact" or k == "integrated__contains":
                     if ep == 'set':
                         if not v:
                             blocks.append("!_exists_:set_integrated")
@@ -209,7 +209,7 @@ class QuerysetManager:
                     self.filters[endpoint]["integrated__isnull"] = False
                     del self.filters[endpoint][k]
             elif k == "accession" or k == "accession__iexact":
-                self.filters[endpoint]["integrated"] = f.lower()
+                self.filters[endpoint]["integrated__accession__iexact"] = f.lower()
                 del self.filters[endpoint][k]
 
     def is_single_endpoint(self):

@@ -11,10 +11,10 @@ class ModelTest(InterproRESTTestCase):
         self.assertIn(Entry.objects.filter(source_database="interpro").first().accession.upper(), ["IPR003165", "IPR001165"])
 
     def test_content_of_a_json_attribute(self):
-        entry = Entry.objects.get(accession="ipr003165")
+        entry = Entry.objects.get(accession__iexact="ipr003165")
         self.assertTrue("pfam" in entry.member_databases)
-        self.assertTrue("pf02171" in entry.member_databases["pfam"])
-        self.assertTrue("Piwi domain" in entry.member_databases["pfam"]["pf02171"])
+        self.assertTrue("PF02171" in entry.member_databases["pfam"])
+        self.assertTrue("Piwi domain" in entry.member_databases["pfam"]["PF02171"])
 
     def test_url_mapper(self):
         urls = {

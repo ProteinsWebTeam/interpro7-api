@@ -23,7 +23,7 @@ class UniprotAccessionHandler(CustomView):
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("protein", accession=endpoint_levels[level - 1].lower())
+        general_handler.queryset_manager.add_filter("protein", accession__iexact=endpoint_levels[level - 1])
         general_handler.modifiers.register(
             "residues",
             get_single_value("residues"),
@@ -46,7 +46,7 @@ class UniprotAccessionHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("protein", accession=level_name.lower())
+        general_handler.queryset_manager.add_filter("protein", accession__iexact=level_name.lower())
         return queryset
 
 

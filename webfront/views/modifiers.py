@@ -3,6 +3,7 @@ from webfront.views.custom import is_single_endpoint
 
 from django.db.models import Count
 from webfront.models import Entry, EntryAnnotation
+from webfront.views.custom import filter_queryset_accession_in
 
 from django.conf import settings
 
@@ -158,7 +159,7 @@ def filter_by_field(endpoint, field):
     def x(value, general_handler):
         general_handler.queryset_manager.add_filter(
             endpoint,
-            **{"{}__exact".format(field): value.lower()}
+            **{"{}__iexact".format(field): value.lower()}
         )
     return x
 
@@ -257,9 +258,11 @@ def get_domain_architectures(field, general_handler):
     else:
         query = general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
         res, length = searcher.get_list_of_endpoint("protein", query, rows, index*rows-rows)
-        return general_handler.queryset_manager\
-            .get_base_queryset("protein")\
-            .filter(accession__in=res)
+        return filter_queryset_accession_in(
+            general_handler.queryset_manager.get_base_queryset("protein"),
+            res,
+        )
+
 
 
 def get_entry_annotation(field, general_handler):

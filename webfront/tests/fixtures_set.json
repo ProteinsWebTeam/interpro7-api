@@ -2,7 +2,7 @@
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "cl0001",
+      "accession": "CL0001",
       "name": "The Clan",
       "description": "An example of a pfam clan",
       "source_database": "pfam",
@@ -11,20 +11,20 @@
       "relationships": {
         "nodes": [
           {
-            "accession": "pf02171",
+            "accession": "PF02171",
             "type": "entry",
             "score": 0.6
           },
           {
-            "accession": "pf17180",
+            "accession": "PF17180",
             "type": "entry",
             "score": 0.9
           }
         ],
         "links": [
           {
-            "source": "pf17180",
-            "target": "pf02171",
+            "source": "PF17180",
+            "target": "PF02171",
             "score": 0.4
           }
         ]
@@ -44,7 +44,7 @@
   {
     "model": "webfront.Set",
     "fields": {
-      "accession": "cl0002",
+      "accession": "CL0002",
       "name": "A Clan",
       "description": "Another example of a pfam clan",
       "source_database": "pfam",
@@ -53,20 +53,20 @@
       "relationships": {
         "nodes": [
           {
-            "accession": "pf02171",
+            "accession": "PF02171",
             "type": "entry",
             "score": 0.2
           },
           {
-            "accession": "pf17176",
+            "accession": "PF17176",
             "type": "entry",
             "score": 0.8
           }
         ],
         "links": [
           {
-            "source": "pf17176",
-            "target": "pf02171",
+            "source": "PF17176",
+            "target": "PF02171",
             "score": 0.6
           }
         ]

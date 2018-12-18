@@ -81,7 +81,7 @@ class FixtureReader:
         for ep in self.entry_protein_list:
             e = ep["entry"]
             p = ep["protein"]
-            proteome = self.proteins[p]["proteome"]
+            proteome = self.proteins[p]["proteome"].lower()
             obj = {
                 "entry_acc": e,
                 "entry_type": self.entries[e]["type"],
@@ -96,7 +96,7 @@ class FixtureReader:
                 "tax_name": self.proteins[p]["organism"]["name"],
                 "tax_lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
                 "tax_rank": self.tax2rank[self.proteins[p]["organism"]["taxId"]],
-                "proteome_acc": proteome,
+                "proteome_acc": self.proteomes[proteome]["accession"],
                 "proteome_name": self.proteomes[proteome]["name"],
                 "proteome_is_reference": self.proteomes[proteome]["is_reference"],
                 "text_proteome": proteome + " " + self.proteomes[proteome]["name"],
@@ -153,7 +153,7 @@ class FixtureReader:
         for p, chains in self.protein_structure_list.items():
             if p not in proteins:
                 for sp in chains:
-                    proteome = self.proteins[p]["proteome"]
+                    proteome = self.proteins[p]["proteome"].lower()
                     to_add.append({
                         "text": p + " " + sp["structure"],
                         "protein_acc": p,
@@ -163,7 +163,7 @@ class FixtureReader:
                         "tax_name": self.proteins[p]["organism"]["name"],
                         "tax_rank": self.tax2rank[self.proteins[p]["organism"]["taxId"]],
                         "tax_lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
-                        "proteome_acc": proteome,
+                        "proteome_acc": self.proteomes[proteome]["accession"],
                         "proteome_name": self.proteomes[proteome]["name"],
                         "proteome_is_reference": self.proteomes[proteome]["is_reference"],
                         "protein_length": self.proteins[p]["length"],

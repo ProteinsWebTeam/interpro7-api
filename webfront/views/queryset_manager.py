@@ -1,4 +1,4 @@
-from webfront.models import Entry, Protein, Structure, Taxonomy, Proteome, Set
+from webfront.models import Entry, Protein, Structure, Taxonomy, Proteome, Set, Alignment
 from django.db.models import Q
 from functools import reduce
 from operator import or_
@@ -10,8 +10,8 @@ def escape(text):
 
 
 def merge_two_dicts(x, y):
-    z = x.copy()   # start with x's keys and values
-    z.update(y)    # modifies z with y's keys and values & returns None
+    z = x.copy()  # start with x's keys and values
+    z.update(y)  # modifies z with y's keys and values & returns None
     return z
 
 
@@ -39,14 +39,18 @@ class QuerysetManager:
             "taxonomy": {},
             "proteome": {},
             "set": {},
+            "set_alignment": {},
         }
         self.exclusions = self.filters.copy()
         self.order_field = None
 
-    def add_filter(self, endpoint,  **kwargs):
+    def set_main_endpoint(self, endpoint):
+        self.main_endpoint = endpoint
+
+    def add_filter(self, endpoint, **kwargs):
         self.filters[endpoint] = merge_two_dicts(self.filters[endpoint], kwargs)
 
-    def add_exclusion(self, endpoint,  **kwargs):
+    def add_exclusion(self, endpoint, **kwargs):
         self.exclusions[endpoint] = merge_two_dicts(self.exclusions[endpoint], kwargs)
 
     def remove_filter(self, endpoint, f):
@@ -54,7 +58,7 @@ class QuerysetManager:
         del self.filters[endpoint][f]
         return tmp
 
-    def order_by(self,field):
+    def order_by(self, field):
         self.order_field = field
 
     def get_searcher_query(self, include_search=False):
@@ -93,7 +97,7 @@ class QuerysetManager:
                     blocks.append("({})".format(
                         " || ".join(["tax_id:{}".format(value) for value in v])
                     ))
-                elif k == "integrated" or k == "integrated__accession__iexact"  or k == "integrated__iexact" or k == "integrated__contains":
+                elif k == "integrated" or k == "integrated__accession__iexact" or k == "integrated__iexact" or k == "integrated__contains":
                     if ep == 'set':
                         if not v:
                             blocks.append("!_exists_:set_integrated")
@@ -117,14 +121,14 @@ class QuerysetManager:
                 elif ep == "protein" and "size__" in k:
                     blocks.append("protein_size:{}".format(escape(v).strip()))
                 elif "__gt" in k:
-                    filter_k = "protein_"+k if k.startswith("length_") else k
+                    filter_k = "protein_" + k if k.startswith("length_") else k
                     blocks.append("{}:{}{} TO *]".format(
                         re.sub(r"__gte?", "", filter_k),
                         "[" if "__gte" in filter_k else "{",
                         escape(v)
                     ))
                 elif "__lt" in k:
-                    filter_k = "protein_"+k if k.startswith("length_") else k
+                    filter_k = "protein_" + k if k.startswith("length_") else k
                     blocks.append("{}:[* TO {}{}".format(
                         re.sub(r"__lte?", "", filter_k),
                         escape(v),
@@ -138,7 +142,7 @@ class QuerysetManager:
         blocks.sort()
         q = " && ".join(blocks).lower()
         if self.order_field is not None:
-            q += "&sort="+self.order_field
+            q += "&sort=" + self.order_field
         return q
 
     def get_base_queryset(self, endpoint):
@@ -155,6 +159,8 @@ class QuerysetManager:
             queryset = Taxonomy.objects.all()
         elif endpoint == "set":
             queryset = Set.objects.all()
+        elif endpoint == "set_alignment":
+            queryset = Alignment.objects.all()
         return queryset
 
     @staticmethod
@@ -171,7 +177,7 @@ class QuerysetManager:
             elif not only_main_endpoint:
                 current_filters = merge_two_dicts(
                     current_filters,
-                    {ep+"__"+k: v for k, v in filters[ep].items()}
+                    {ep + "__" + k: v for k, v in filters[ep].items()}
                 )
         return current_filters
 
@@ -193,7 +199,7 @@ class QuerysetManager:
             )
             queryset = queryset.filter(or_filter, **current_filters)
         queryset = queryset.filter(**current_filters)
-        if len(current_exclusions)>0:
+        if len(current_exclusions) > 0:
             queryset = queryset.exclude(**current_exclusions)
         if self.order_field is not None:
             queryset = queryset.order_by(self.order_field)

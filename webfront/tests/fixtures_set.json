@@ -82,5 +82,129 @@
         "proteomes": 1
       }
     }
+  },
+  {
+    "model": "webfront.Alignment",
+    "fields": {
+      "set_acc": "CL0001",
+      "entry_acc": "PF02171",
+      "alignments": {
+        "PF17176": {
+          "set_acc": "CL0001",
+          "score": 0.0016,
+          "length": 142,
+          "domains": [
+            {
+              "start": 16,
+              "end": 43
+            }
+          ]
+        },
+        "PF17180": {
+          "set_acc": "CL0001",
+          "score": 0.01088,
+          "length": 142,
+          "domains": [
+            {
+              "start": 110,
+              "end": 139
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "webfront.Alignment",
+    "fields": {
+      "set_acc": "CL0001",
+      "entry_acc": "PF17180",
+      "alignments": {
+        "PF17176": {
+          "set_acc": "CL0001",
+          "score": 0.0011,
+          "length": 142,
+          "domains": [
+            {
+              "start": 26,
+              "end": 53
+            }
+          ]
+        },
+        "PF02171": {
+          "set_acc": "CL0001",
+          "score": 0.00988,
+          "length": 142,
+          "domains": [
+            {
+              "start": 100,
+              "end": 129
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "webfront.Alignment",
+    "fields": {
+      "set_acc": "CL0002",
+      "entry_acc": "PF17176",
+      "alignments": {
+        "PF02171": {
+          "set_acc": "CL0002",
+          "score": 0.0056,
+          "length": 42,
+          "domains": [
+            {
+              "start": 6,
+              "end": 33
+            }
+          ]
+        },
+        "PF17180": {
+          "set_acc": "CL0002",
+          "score": 0.00088,
+          "length": 42,
+          "domains": [
+            {
+              "start": 10,
+              "end": 39
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "webfront.Alignment",
+    "fields": {
+      "set_acc": "CL0002",
+      "entry_acc": "PF02171",
+      "alignments": {
+        "PF17176": {
+          "set_acc": "CL0002",
+          "score": 0.0056,
+          "length": 42,
+          "domains": [
+            {
+              "start": 9,
+              "end": 36
+            }
+          ]
+        },
+        "PF17180": {
+          "set_acc": "CL0002",
+          "score": 0.00088,
+          "length": 42,
+          "domains": [
+            {
+              "start": 6,
+              "end": 35
+            }
+          ]
+        }
+      }
+    }
   }
 ]

@@ -69,6 +69,7 @@ class CustomView(GenericAPIView):
                         return HttpResponse(value, content_type=mime_type)
                 general_handler.filter_serializers = []
                 self.many = general_handler.modifiers.many
+                self.search_size = general_handler.modifiers.search_size
                 if self.many:
                     self.queryset = self.paginator.paginate_queryset(
                         self.get_queryset(),

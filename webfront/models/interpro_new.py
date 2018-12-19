@@ -118,3 +118,9 @@ class Release_Note(models.Model):
     version = models.CharField(max_length=20, primary_key=True)
     release_date = models.DateTimeField(null=True)
     content = JSONField(null=True)
+
+
+class Alignment(models.Model):
+    set_acc = models.ForeignKey(Set, on_delete=models.SET_NULL, null=True)
+    entry_acc = models.ForeignKey(Entry, on_delete=models.SET_NULL, null=True)
+    alignments = JSONField(null=True)

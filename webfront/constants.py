@@ -45,6 +45,7 @@ class SerializerDetail(Enum):
     SET_OVERVIEW = 501
     SET_DETAIL = 502
     SET_DB = 503
+    SET_ALIGNMENT = 504
 
     IDA_LIST = 600
 

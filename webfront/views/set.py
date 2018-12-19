@@ -5,68 +5,26 @@ from webfront.serializers.collection import SetSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from django.conf import settings
 
-from webfront.views.modifiers import add_extra_fields
+from webfront.views.modifiers import add_extra_fields, get_set_alignment
 
 entry_sets = '|'.join(settings.ENTRY_SETS) + '|all'
 entry_sets_accessions = (
     r'^({})$'.format('|'.join((set['accession'] for (_, set) in settings.ENTRY_SETS.items())))
 )
-
-
-class SetNodeAccessionHandler(CustomView):
-    level_description = 'Set nodeaccession level'
-    serializer_class = SetSerializer
-    queryset = Set.objects.all()
-    many = False
-    child_handlers = []
-    serializer_detail_filter = SerializerDetail.SET_DETAIL
-
-    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("set", accession__iexact=endpoint_levels[level - 1])
-        return super(SetNodeAccessionHandler, self).get(
-            request._request, endpoint_levels, available_endpoint_handlers,
-            level, self.queryset, handler, general_handler, request, *args, **kwargs
-        )
-
-    @staticmethod
-    def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("set", accession__iexact=level_name)
-        return queryset
-
-
-class SetNodeHandler(CustomView):
-    serializer_class = SetSerializer
-    serializer_detail = SerializerDetail.SET_HEADERS
-    serializer_detail_filter = SerializerDetail.SET_DB
-    level_description = 'set type level'
-    child_handlers = [
-        (r'.+', SetNodeAccessionHandler),
-        # ("proteome", ProteomeHandler),
-    ]
-    queryset = Set.objects.all()
-
-    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-
-        general_handler.queryset_manager.remove_filter("set", "integrated")
-        general_handler.queryset_manager.add_filter("set", integrated__contains=endpoint_levels[level - 2].lower())
-        # general_handler.queryset_manager.add_filter("set", source_database='node')
-        general_handler.queryset_manager.remove_filter("set", "accession")
-        general_handler.queryset_manager.remove_filter("set", "source_database")
-        return super(SetNodeHandler, self).get(
-            request._request, endpoint_levels, available_endpoint_handlers,
-            level, self.queryset, handler, general_handler, request, *args, **kwargs
-        )
-
-    @staticmethod
-    def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.update_integrated_filter("set")
-        # general_handler.queryset_manager.add_filter("set", integrated__isnull=False)
-        # general_handler.queryset_manager.remove_filter("set", "source_database")
-        # general_handler.queryset_manager.add_filter("set", source_database__iexact=level_name)
-        return queryset
-
+#
+# class SetAlignmentHandler(CustomView):
+#     level_description = 'Set alignment level'
+#     many = False
+#     serializer_class = SetSerializer
+#     serializer_detail = SerializerDetail.SET_ALIGNMENTS
+#     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
+#             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+#         general_handler.queryset_manager.set_main_endpoint("set_alignment")
+#         # general_handler.queryset_manager.add_filter("set", accession__iexact=endpoint_levels[level - 1].lower())
+#         return super(SetAlignmentHandler, self).get(
+#             request._request, endpoint_levels, available_endpoint_handlers,
+#             level, self.queryset, handler, general_handler, request, *args, **kwargs
+#         )
 
 class SetAccessionHandler(CustomView):
     level_description = 'Set accession level'
@@ -74,13 +32,21 @@ class SetAccessionHandler(CustomView):
     queryset = Set.objects.all()
     many = False
     # child_handlers = [
-    #     ("node", SetNodeHandler),
+    #     ("alignment", SetAlignmentHandler),
     # ]
     serializer_detail_filter = SerializerDetail.SET_DETAIL
 
     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
         general_handler.queryset_manager.add_filter("set", accession__iexact=endpoint_levels[level - 1].lower())
+        general_handler.modifiers.register(
+            "alignments",
+            get_set_alignment,
+            use_model_as_payload=True,
+            many=True,
+            serializer=SerializerDetail.SET_ALIGNMENT
+        )
+
         return super(SetAccessionHandler, self).get(
             request._request, endpoint_levels, available_endpoint_handlers,
             level, self.queryset, handler, general_handler, request, *args, **kwargs

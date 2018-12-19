@@ -2,7 +2,7 @@ from urllib.error import URLError
 from webfront.views.custom import is_single_endpoint
 
 from django.db.models import Count
-from webfront.models import Entry, EntryAnnotation
+from webfront.models import Entry, EntryAnnotation, Alignment
 from webfront.views.custom import filter_queryset_accession_in
 
 from django.conf import settings
@@ -15,12 +15,13 @@ def group_by_member_databases(general_handler):
     if is_single_endpoint(general_handler):
         holder = general_handler.queryset_manager.remove_filter('entry', 'source_database')
         dbs = Entry.objects.get_queryset().values('source_database').distinct()
-        qs = {db['source_database']:
-                  general_handler.queryset_manager.get_queryset()
-                      .filter(member_databases__contains='"{}"'.format(db['source_database']))
-                      .count()
-              for db in dbs
-              }
+        qs = {
+            db['source_database']:
+                general_handler.queryset_manager.get_queryset()
+                    .filter(member_databases__contains='"{}"'.format(db['source_database']))
+                    .count()
+            for db in dbs
+        }
 
         general_handler.queryset_manager.add_filter('entry', source_database=holder)
         return qs
@@ -31,10 +32,10 @@ def group_by_go_categories(general_handler):
     groups = {"P": "Biological Process", "C": "Cellular Component", "F": "Molecular Function"}
     if is_single_endpoint(general_handler):
         qs = {groups[cat]:
-                general_handler.queryset_manager.get_queryset()
+                  general_handler.queryset_manager.get_queryset()
                       .filter(go_terms__contains=template.format(cat))
                       .count()
-                for cat in groups
+              for cat in groups
               }
         return qs
 
@@ -63,7 +64,7 @@ def group_by_organism(general_handler, endpoint_queryset):
     searcher = general_handler.searcher
     qs = general_handler.queryset_manager.get_searcher_query()
     tmp = [
-        (org,  {
+        (org, {
             'value': searcher.count_unique(
                 qs + " && tax_lineage:{}".format(org),
                 "{}_acc".format(general_handler.queryset_manager.main_endpoint)
@@ -74,16 +75,18 @@ def group_by_organism(general_handler, endpoint_queryset):
     ]
     return [t for t in tmp if t[1]['value'] > 0]
 
+
 def group_by_match_presence(general_handler, endpoint_queryset):
     searcher = general_handler.searcher
     qs = general_handler.queryset_manager.get_searcher_query()
-    response =  {
+    response = {
         "match_presence": {
             "true": searcher.count_unique(qs + " && _exists_:entry_acc", "protein_acc"),
             "false": searcher.count_unique(qs + " && !_exists_:entry_acc", "protein_acc"),
         }
     }
     return response
+
 
 def group_by_is_reference(general_handler, endpoint_queryset):
     searcher = general_handler.searcher
@@ -96,10 +99,11 @@ def group_by_is_reference(general_handler, endpoint_queryset):
     }
     return response
 
+
 def group_by_annotations(general_handler):
     if is_single_endpoint(general_handler):
-        #queryset = Entry.objects.values('source_database', 'entryannotation__type').annotate(total=Count('entryannotation__type'))
-        queryset = EntryAnnotation.objects.values_list('accession_id__source_database', 'type').annotate(total=Count('type'))
+        queryset = EntryAnnotation.objects.values_list('accession_id__source_database', 'type').annotate(
+            total=Count('type'))
         formatted_results = {}
         for source, type, total in list(queryset):
             if source not in formatted_results:
@@ -138,6 +142,7 @@ def group_by(endpoint_queryset, fields):
                 general_handler.queryset_manager.main_endpoint, fields[field]
             )
             return result
+
     return inner
 
 
@@ -152,6 +157,7 @@ def sort_by(fields):
                 field, ", ".join(fields.keys())
             ))
         general_handler.queryset_manager.order_by(field)
+
     return x
 
 
@@ -161,13 +167,16 @@ def filter_by_field(endpoint, field):
             endpoint,
             **{"{}__iexact".format(field): value.lower()}
         )
+
     return x
+
 
 def filter_by_key_species(value, general_handler):
     general_handler.queryset_manager.add_filter(
         'taxonomy',
         **{"accession__in": list(organisms.keys())}
     )
+
 
 def filter_by_boolean_field(endpoint, field):
     def x(value, general_handler):
@@ -179,7 +188,9 @@ def filter_by_boolean_field(endpoint, field):
             endpoint,
             **{"{}".format(field): boolean_value}
         )
+
     return x
+
 
 def filter_by_contains_field(endpoint, field, value_template='{}'):
     def x(value, general_handler):
@@ -187,7 +198,9 @@ def filter_by_contains_field(endpoint, field, value_template='{}'):
             endpoint,
             **{"{}__contains".format(field): value_template.format(value)}
         )
+
     return x
+
 
 def filter_by_field_range(endpoint, field, value_template='{}'):
     def x(value, general_handler):
@@ -208,7 +221,9 @@ def filter_by_field_range(endpoint, field, value_template='{}'):
                     "{}_{}__lte".format(endpoint, field): value_template.format(pos[1]),
                 }
             )
+
     return x
+
 
 def filter_by_field_or_field_range(endpoint, field):
     def x(value, general_handler):
@@ -219,13 +234,16 @@ def filter_by_field_or_field_range(endpoint, field):
             filter_by_field(endpoint, field)(value, general_handler)
         else:
             raise URLError("{} is not a valid value for filter {}".format(value, field))
+
     return x
+
 
 def get_single_value(field):
     def x(value, general_handler):
         queryset = general_handler.queryset_manager.get_queryset()
         first = queryset.first()
         return first.__getattribute__(field)
+
     return x
 
 
@@ -246,23 +264,21 @@ def filter_by_match_presence(value, general_handler):
     )
 
 
-
 def get_domain_architectures(field, general_handler):
     searcher = general_handler.searcher
     rows = general_handler.pagination["size"] if "size" in general_handler.pagination else 10
     index = general_handler.pagination["index"] if "index" in general_handler.pagination else 1
     if field is None or field.strip() == "":
         return searcher.get_group_obj_of_field_by_query(
-            None, "ida_id", rows=rows, start=index*rows-rows,
+            None, "ida_id", rows=rows, start=index * rows - rows,
             inner_field_to_count="protein_acc")
     else:
         query = general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
-        res, length = searcher.get_list_of_endpoint("protein", query, rows, index*rows-rows)
+        res, length = searcher.get_list_of_endpoint("protein", query, rows, index * rows - rows)
         return filter_queryset_accession_in(
             general_handler.queryset_manager.get_base_queryset("protein"),
             res,
         )
-
 
 
 def get_entry_annotation(field, general_handler):
@@ -271,7 +287,17 @@ def get_entry_annotation(field, general_handler):
     for entry in queryset:
         data = entry.entryannotation_set.filter(type=field)
         annotation.append(data[0])
-    return(annotation)
+    return (annotation)
+
+
+def get_set_alignment(field, general_handler):
+    qs = Alignment.objects.filter(
+        set_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    if field is not None and field != "":
+        qs = qs.filter(entry_acc__accession__iexact=field)
+    general_handler.modifiers.search_size = qs.count()
+    return qs.order_by('entry_acc')
 
 
 def add_extra_fields(endpoint, *argv):
@@ -285,6 +311,7 @@ def add_extra_fields(endpoint, *argv):
                     field, ", ".join(supported_fields)
                 ))
         general_handler.queryset_manager.other_fields = fs
+
     return x
 
 

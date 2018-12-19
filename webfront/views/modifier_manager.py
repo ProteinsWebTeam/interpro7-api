@@ -7,6 +7,7 @@ class ModifierManager:
         self.payload = None
         self.serializer = None
         self.many = False
+        self.search_size = None
 
     def register(self, parameter, action,
                  use_model_as_payload=False,

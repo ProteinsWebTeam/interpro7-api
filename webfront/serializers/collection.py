@@ -157,7 +157,10 @@ class SetSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_alignment_representation(instance):
-        return {instance.entry_acc.accession: instance.alignments}
+        return {
+            "accession": instance.entry_acc.accession,
+            "alignedTo": instance.alignments,
+        }
 
     def to_entries_count_representation(self, instance):
         query = "set_acc:" + escape(instance.accession) if hasattr(instance, 'accession') else None

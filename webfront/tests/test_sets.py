@@ -728,12 +728,11 @@ class SetAlignmentTests(InterproRESTTestCase):
         self.assertEqual(len(response.data["results"]), 2)
         for aln in response.data["results"]:
             self.assertIsInstance(aln, dict)
-            for base in aln:
-                self.assertIsInstance(aln[base], dict)
-                for aligned in aln[base]:
-                    self.assertIsInstance(aln[base][aligned], dict)
-                    alignment = aln[base][aligned]
-                    self.assertEqual(clan, alignment["set_acc"].lower())
+            self.assertIsInstance(aln["alignedTo"], dict)
+            for aligned in aln["alignedTo"]:
+                self.assertIsInstance(aln["alignedTo"][aligned], dict)
+                alignment = aln["alignedTo"][aligned]
+                self.assertEqual(clan, alignment["set_acc"].lower())
 
     def test_can_get_the_set_alignment(self):
         clan = "cl0001"
@@ -743,10 +742,10 @@ class SetAlignmentTests(InterproRESTTestCase):
         self.assertEqual(len(response.data["results"]), 1)
         for aln in response.data["results"]:
             self.assertIsInstance(aln, dict)
-            for base in aln:
-                self.assertIsInstance(aln[base], dict)
-                self.assertEqual(pfam, base.lower())
-                for aligned in aln[base]:
-                    self.assertIsInstance(aln[base][aligned], dict)
-                    alignment = aln[base][aligned]
-                    self.assertEqual(clan, alignment["set_acc"].lower())
+            self.assertIsInstance(aln["alignedTo"], dict)
+            self.assertEqual(pfam, aln["accession"].lower())
+            for aligned in aln["alignedTo"]:
+                self.assertIsInstance(aln["alignedTo"][aligned], dict)
+                alignment = aln["alignedTo"][aligned]
+                self.assertEqual(clan, alignment["set_acc"].lower())
+

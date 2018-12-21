@@ -121,6 +121,6 @@ class Release_Note(models.Model):
 
 
 class Alignment(models.Model):
-    set_acc = models.ForeignKey(Set, on_delete=models.SET_NULL, null=True)
-    entry_acc = models.ForeignKey(Entry, on_delete=models.SET_NULL, null=True)
+    set_acc = models.ForeignKey(Set, db_column="set_acc", on_delete=models.SET_NULL, null=True)
+    entry_acc = models.ForeignKey(Entry, db_column="entry_acc", on_delete=models.SET_NULL, null=True)
     alignments = JSONField(null=True)

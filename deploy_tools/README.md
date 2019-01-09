@@ -109,6 +109,11 @@ Assume we have a user account at /home/username
     ../virtualenv/bin/python manage.py runserver 0.0.0.0:8000
     ```
 
+11.  _[Optional]_ Install the pre-commit hook, to enable the preformatiing of files with before each commit.
+    ```
+    ../virtualenv/bin/pre-commit install
+    ```  
+
 
 ## Testing
 

@@ -109,10 +109,14 @@ Assume we have a user account at /home/username
     ../virtualenv/bin/python manage.py runserver 0.0.0.0:8000
     ```
 
-11.  _[Optional]_ Install the pre-commit hook, to enable the preformatiing of files with before each commit.
+11.  _[Optional]_ Install precommit, black and the pre-commit hook, to enable the preformatiing of files with before each commit.
     ```
+    ../virtualenv/bin/pip install pre-commit black
     ../virtualenv/bin/pre-commit install
     ```  
+    *Note 1*: We are not including black and precommit in the dev_requirements because we run the tests on python 3.5 and black requires 3.6.
+    *Note 2*:It is importan to run the test in Python 3.5 because the VMs where the API runs uses that version.
+      
 
 
 ## Testing

@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/ProteinsWebTeam/interpro7-api.svg?branch=master)](https://travis-ci.org/ProteinsWebTeam/interpro7-api)
 [![Coverage Status](https://coveralls.io/repos/github/ProteinsWebTeam/interpro7-api/badge.svg?branch=master)](https://coveralls.io/github/ProteinsWebTeam/interpro7-api?branch=master)
 [![GitHub license](https://img.shields.io/badge/license-apache-blue.svg)](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/LICENSE)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 ![Logo InterPro7](https://raw.githubusercontent.com/ProteinsWebTeam/interpro7-api/master/webfront/static/logo_178x178.png  "Logo InterPro7")
 

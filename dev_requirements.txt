@@ -4,5 +4,5 @@ ipdb==0.11
 coveralls==1.5.1
 tqdm==4.29.0
 django-cors-headers==2.4.0
-black==18.9b0
+black
 pre-commit==1.14.0

@@ -5,7 +5,6 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
 class SetsFixturesTest(InterproRESTTestCase):
-
     def test_the_fixtures_are_loaded(self):
         sets = Set.objects.all()
         self.assertEqual(sets.count(), 2)
@@ -51,8 +50,12 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             self._check_is_list_of_objects_with_key(response.data["results"], "sets")
             for result in response.data["results"]:
                 self._check_set_count_overview(result)
@@ -70,23 +73,35 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_entry_details(response.data["metadata"])
-            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self.assertIn(
+                "sets",
+                response.data,
+                "'sets' should be one of the keys in the response",
+            )
             self._check_set_count_overview(response.data)
 
     def test_can_filter_entry_counter_with_set_db(self):
-        urls = [
-            "/api/entry/set/pfam",
-        ]
+        urls = ["/api/entry/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self.assertIn("sets", response.data["entries"]["integrated"],
-                          "'sets' should be one of the keys in the response")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self.assertIn(
+                "sets",
+                response.data["entries"]["integrated"],
+                "'sets' should be one of the keys in the response",
+            )
             if response.data["entries"]["unintegrated"] != 0:
-                self.assertIn("sets", response.data["entries"]["unintegrated"],
-                              "'sets' should be one of the keys in the response")
+                self.assertIn(
+                    "sets",
+                    response.data["entries"]["unintegrated"],
+                    "'sets' should be one of the keys in the response",
+                )
 
     def test_can_get_the_set_list_on_a_list(self):
         acc = "IPR003165"
@@ -97,9 +112,15 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "set_subset")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "set_subset"
+            )
             for result in response.data["results"]:
                 for s in result["set_subset"]:
                     self._check_set_from_searcher(s)
@@ -111,20 +132,21 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_entry_details(response.data["metadata"])
             self.assertIn("set_subset", response.data)
             for org in response.data["set_subset"]:
                 self._check_set_from_searcher(org)
 
     def test_can_filter_entry_counter_with_set_acc(self):
-        urls = [
-            "/api/entry/set/pfam/Cl0001",
-            "/api/entry/set/pfam/Cl0002",
-        ]
+        urls = ["/api/entry/set/pfam/Cl0001", "/api/entry/set/pfam/Cl0002"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_entry_count_overview(response.data)
 
     def test_can_get_the_set_object_on_a_list(self):
@@ -135,8 +157,12 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             self._check_is_list_of_objects_with_key(response.data["results"], "sets")
             for result in response.data["results"]:
                 for org in result["sets"]:
@@ -149,7 +175,9 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_entry_details(response.data["metadata"])
             self.assertIn("sets", response.data)
             for s in response.data["sets"]:
@@ -164,14 +192,15 @@ class ProteinSetTest(InterproRESTTestCase):
         self._check_protein_count_overview(response.data)
 
     def test_can_get_the_set_count_on_a_list(self):
-        urls = [
-            "/api/protein/reviewed/set/",
-            "/api/protein/uniprot/set/",
-        ]
+        urls = ["/api/protein/reviewed/set/", "/api/protein/uniprot/set/"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             self._check_is_list_of_objects_with_key(response.data["results"], "sets")
             for result in response.data["results"]:
                 self._check_set_count_overview(result)
@@ -184,42 +213,70 @@ class ProteinSetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_protein_details(response.data["metadata"])
-            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self.assertIn(
+                "sets",
+                response.data,
+                "'sets' should be one of the keys in the response",
+            )
             self._check_set_count_overview(response.data)
 
     def test_can_filter_protein_counter_with_set_db(self):
-        urls = [
-            "/api/protein/set/pfam",
-        ]
+        urls = ["/api/protein/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self.assertIn("proteins", response.data["proteins"]["uniprot"],
-                          "'proteins' should be one of the keys in the response")
-            self.assertIn("sets", response.data["proteins"]["uniprot"],
-                          "'sets' should be one of the keys in the response")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self.assertIn(
+                "proteins",
+                response.data["proteins"]["uniprot"],
+                "'proteins' should be one of the keys in the response",
+            )
+            self.assertIn(
+                "sets",
+                response.data["proteins"]["uniprot"],
+                "'sets' should be one of the keys in the response",
+            )
             if "reviewed" in response.data["proteins"]:
-                self.assertIn("proteins", response.data["proteins"]["reviewed"],
-                              "'proteins' should be one of the keys in the response")
-                self.assertIn("sets", response.data["proteins"]["reviewed"],
-                              "'sets' should be one of the keys in the response")
+                self.assertIn(
+                    "proteins",
+                    response.data["proteins"]["reviewed"],
+                    "'proteins' should be one of the keys in the response",
+                )
+                self.assertIn(
+                    "sets",
+                    response.data["proteins"]["reviewed"],
+                    "'sets' should be one of the keys in the response",
+                )
             if "unreviewed" in response.data["proteins"]:
-                self.assertIn("proteins", response.data["proteins"]["unreviewed"],
-                              "'proteins' should be one of the keys in the response")
-                self.assertIn("sets", response.data["proteins"]["unreviewed"],
-                              "'sets' should be one of the keys in the response")
+                self.assertIn(
+                    "proteins",
+                    response.data["proteins"]["unreviewed"],
+                    "'proteins' should be one of the keys in the response",
+                )
+                self.assertIn(
+                    "sets",
+                    response.data["proteins"]["unreviewed"],
+                    "'sets' should be one of the keys in the response",
+                )
 
     def test_can_get_the_set_list_on_a_list(self):
-        urls = [
-            "/api/protein/reviewed/set/pfam",
-        ]
+        urls = ["/api/protein/reviewed/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "set_subset")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "set_subset"
+            )
             for result in response.data["results"]:
                 for s in result["set_subset"]:
                     self._check_set_from_searcher(s)
@@ -231,19 +288,21 @@ class ProteinSetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_protein_details(response.data["metadata"])
             self.assertIn("set_subset", response.data)
             for s in response.data["set_subset"]:
                 self._check_set_from_searcher(s)
 
     def test_can_filter_counter_with_set_acc(self):
-        urls = [
-            "/api/protein/set/pfam/Cl0001",
-        ]
+        urls = ["/api/protein/set/pfam/Cl0001"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_protein_count_overview(response.data)
 
     def test_can_get_the_set_object_on_a_list(self):
@@ -253,8 +312,12 @@ class ProteinSetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             self._check_is_list_of_objects_with_key(response.data["results"], "sets")
             for result in response.data["results"]:
                 for org in result["sets"]:
@@ -267,7 +330,9 @@ class ProteinSetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_protein_details(response.data["metadata"])
             self.assertIn("sets", response.data)
             for s in response.data["sets"]:
@@ -282,13 +347,15 @@ class StructureSetTest(InterproRESTTestCase):
         self._check_structure_count_overview(response.data)
 
     def test_can_get_the_set_count_on_a_list(self):
-        urls = [
-            "/api/structure/pdb/set/",
-        ]
+        urls = ["/api/structure/pdb/set/"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             self._check_is_list_of_objects_with_key(response.data["results"], "sets")
             for result in response.data["results"]:
                 self._check_set_count_overview(result)
@@ -297,77 +364,95 @@ class StructureSetTest(InterproRESTTestCase):
         urls = ["/api/structure/pdb/" + pdb + "/set/" for pdb in ["1JM7", "2BKM"]]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_structure_details(response.data["metadata"])
-            self.assertIn("sets", response.data, "'sets' should be one of the keys in the response")
+            self.assertIn(
+                "sets",
+                response.data,
+                "'sets' should be one of the keys in the response",
+            )
             self._check_set_count_overview(response.data)
 
     def test_can_filter_structure_counter_with_organism_db(self):
-        urls = [
-            "/api/structure/set/pfam",
-        ]
+        urls = ["/api/structure/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self.assertIn("structures", response.data["structures"]["pdb"],
-                          "'structures' should be one of the keys in the response")
-            self.assertIn("sets", response.data["structures"]["pdb"],
-                          "'sets' should be one of the keys in the response")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self.assertIn(
+                "structures",
+                response.data["structures"]["pdb"],
+                "'structures' should be one of the keys in the response",
+            )
+            self.assertIn(
+                "sets",
+                response.data["structures"]["pdb"],
+                "'sets' should be one of the keys in the response",
+            )
 
     def test_can_get_the_set_list_on_a_list(self):
-        urls = [
-            "/api/structure/pdb/set/pfam",
-        ]
+        urls = ["/api/structure/pdb/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "set_subset")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "set_subset"
+            )
             for result in response.data["results"]:
                 for s in result["set_subset"]:
                     self._check_set_from_searcher(s)
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
-        urls = [
-            "/api/structure/pdb/1JM7/set/pfam",
-        ]
+        urls = ["/api/structure/pdb/1JM7/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_structure_details(response.data["metadata"])
             self.assertIn("set_subset", response.data)
             for s in response.data["set_subset"]:
                 self._check_set_from_searcher(s)
 
     def test_can_filter_counter_with_set_acc(self):
-        urls = [
-            "/api/structure/set/pfam/Cl0001",
-        ]
+        urls = ["/api/structure/set/pfam/Cl0001"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_structure_count_overview(response.data)
 
     def test_can_get_the_set_object_on_a_list(self):
-        urls = [
-            "/api/structure/pdb/set/pfam/Cl0001",
-        ]
+        urls = ["/api/structure/pdb/set/pfam/Cl0001"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             self._check_is_list_of_objects_with_key(response.data["results"], "sets")
             for result in response.data["results"]:
                 for org in result["sets"]:
                     self._check_set_from_searcher(org)
 
     def test_can_get_the_object_on_an_object(self):
-        urls = [
-            "/api/structure/pdb/1JM7/set/pfam/Cl0001",
-        ]
+        urls = ["/api/structure/pdb/1JM7/set/pfam/Cl0001"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_structure_details(response.data["metadata"])
             self.assertIn("sets", response.data)
             for s in response.data["sets"]:
@@ -382,26 +467,32 @@ class SetEntryTest(InterproRESTTestCase):
         self._check_entry_count_overview(response.data)
 
     def test_can_get_the_entry_count_on_a_list(self):
-        urls = [
-            "/api/set/pfam/entry",
-        ]
+        urls = ["/api/set/pfam/entry"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
             for result in response.data["results"]:
                 self._check_entry_count_overview(result)
 
     def test_can_get_the_entry_count_on_a_set(self):
-        urls = [
-            "/api/set/pfam/CL0001/entry",
-        ]
+        urls = ["/api/set/pfam/CL0001/entry"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"])
-            self.assertIn("entries", response.data, "'entries' should be one of the keys in the response")
+            self.assertIn(
+                "entries",
+                response.data,
+                "'entries' should be one of the keys in the response",
+            )
             self._check_entry_count_overview(response.data)
 
     def test_can_filter_set_counter_with_entry_db(self):
@@ -415,13 +506,21 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self.assertIsInstance(response.data, dict)
             if "pfam" in response.data["sets"]:
-                self.assertIn("entries", response.data["sets"]["pfam"],
-                              "'entries' should be one of the keys in the response")
-                self.assertIn("sets", response.data["sets"]["pfam"],
-                              "'sets' should be one of the keys in the response")
+                self.assertIn(
+                    "entries",
+                    response.data["sets"]["pfam"],
+                    "'entries' should be one of the keys in the response",
+                )
+                self.assertIn(
+                    "sets",
+                    response.data["sets"]["pfam"],
+                    "'sets' should be one of the keys in the response",
+                )
 
     def test_can_get_the_set_list_on_a_list(self):
         acc = "IPR003165"
@@ -432,9 +531,15 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "entry_subset")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "entry_subset"
+            )
             for result in response.data["results"]:
                 for s in result["entry_subset"]:
                     self._check_entry_from_searcher(s)
@@ -447,7 +552,9 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"], True)
             self.assertIn("entry_subset", response.data)
             for st in response.data["entry_subset"]:
@@ -466,7 +573,9 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_count_overview(response.data)
 
     def test_can_get_object_on_a_set_list(self):
@@ -478,8 +587,12 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             self._check_is_list_of_objects_with_key(response.data["results"], "entries")
             for result in response.data["results"]:
                 self._check_set_details(result["metadata"], False)
@@ -493,7 +606,9 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"])
             self.assertIn("entries", response.data)
             for s in response.data["entries"]:
@@ -508,52 +623,69 @@ class SetProteinTest(InterproRESTTestCase):
         self._check_protein_count_overview(response.data)
 
     def test_can_get_the_protein_count_on_a_list(self):
-        urls = [
-            "/api/set/pfam/protein",
-        ]
+        urls = ["/api/set/pfam/protein"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "proteins"
+            )
             for result in response.data["results"]:
                 self._check_protein_count_overview(result)
 
     def test_can_get_the_protein_count_on_a_set(self):
-        urls = [
-            "/api/set/pfam/CL0001/protein",
-        ]
+        urls = ["/api/set/pfam/CL0001/protein"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"])
-            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+            self.assertIn(
+                "proteins",
+                response.data,
+                "'proteins' should be one of the keys in the response",
+            )
             self._check_protein_count_overview(response.data)
 
     def test_can_filter_set_counter_with_protein_db(self):
-        urls = [
-            "/api/set/protein/uniprot",
-            "/api/set/protein/reviewed",
-        ]
+        urls = ["/api/set/protein/uniprot", "/api/set/protein/reviewed"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self.assertIsInstance(response.data, dict)
             if "pfam" in response.data["sets"]:
-                self.assertIn("proteins", response.data["sets"]["pfam"],
-                              "'proteins' should be one of the keys in the response")
-                self.assertIn("sets", response.data["sets"]["pfam"],
-                              "'sets' should be one of the keys in the response")
+                self.assertIn(
+                    "proteins",
+                    response.data["sets"]["pfam"],
+                    "'proteins' should be one of the keys in the response",
+                )
+                self.assertIn(
+                    "sets",
+                    response.data["sets"]["pfam"],
+                    "'sets' should be one of the keys in the response",
+                )
 
     def test_can_get_the_set_list_on_a_list(self):
-        urls = [
-            "/api/set/pfam/protein/reviewed",
-        ]
+        urls = ["/api/set/pfam/protein/reviewed"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "protein_subset")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "protein_subset"
+            )
             for result in response.data["results"]:
                 for s in result["protein_subset"]:
                     self._check_match(s, include_coordinates=False)
@@ -565,31 +697,36 @@ class SetProteinTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"], True)
             self.assertIn("protein_subset", response.data)
             for st in response.data["protein_subset"]:
                 self._check_match(st, include_coordinates=False)
 
     def test_can_filter_set_counter_with_acc(self):
-        urls = [
-            "/api/set/protein/uniprot/M5ADK6",
-            "/api/set/protein/reviewed/M5ADK6",
-        ]
+        urls = ["/api/set/protein/uniprot/M5ADK6", "/api/set/protein/reviewed/M5ADK6"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_count_overview(response.data)
 
     def test_can_get_object_on_a_set_list(self):
-        urls = [
-            "/api/set/pfam/protein/uniprot/a1cuj5",
-        ]
+        urls = ["/api/set/pfam/protein/uniprot/a1cuj5"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "proteins")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "proteins"
+            )
             for result in response.data["results"]:
                 self._check_set_details(result["metadata"], False)
                 for st in result["proteins"]:
@@ -602,7 +739,9 @@ class SetProteinTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"])
             self.assertIn("proteins", response.data)
             for s in response.data["proteins"]:
@@ -617,103 +756,130 @@ class SetStructureTest(InterproRESTTestCase):
         self._check_structure_count_overview(response.data)
 
     def test_can_get_the_structure_count_on_a_list(self):
-        urls = [
-            "/api/set/pfam/structure",
-        ]
+        urls = ["/api/set/pfam/structure"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "structures"
+            )
             for result in response.data["results"]:
                 self._check_structure_count_overview(result)
 
     def test_can_get_the_structure_count_on_a_set(self):
-        urls = [
-            "/api/set/pfam/CL0001/structure",
-        ]
+        urls = ["/api/set/pfam/CL0001/structure"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"])
-            self.assertIn("structures", response.data, "'structures' should be one of the keys in the response")
+            self.assertIn(
+                "structures",
+                response.data,
+                "'structures' should be one of the keys in the response",
+            )
             self._check_structure_count_overview(response.data)
 
     def test_can_filter_set_counter_with_structure_db(self):
-        urls = [
-            "/api/set/structure/pdb",
-        ]
+        urls = ["/api/set/structure/pdb"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self.assertIsInstance(response.data, dict)
             if "kegg" in response.data["sets"]:
-                self.assertIn("structures", response.data["sets"]["kegg"],
-                              "'structures' should be one of the keys in the response")
-                self.assertIn("sets", response.data["sets"]["kegg"],
-                              "'sets' should be one of the keys in the response")
+                self.assertIn(
+                    "structures",
+                    response.data["sets"]["kegg"],
+                    "'structures' should be one of the keys in the response",
+                )
+                self.assertIn(
+                    "sets",
+                    response.data["sets"]["kegg"],
+                    "'sets' should be one of the keys in the response",
+                )
             if "pfam" in response.data["sets"]:
-                self.assertIn("structures", response.data["sets"]["pfam"],
-                              "'structures' should be one of the keys in the response")
-                self.assertIn("sets", response.data["sets"]["pfam"],
-                              "'sets' should be one of the keys in the response")
+                self.assertIn(
+                    "structures",
+                    response.data["sets"]["pfam"],
+                    "'structures' should be one of the keys in the response",
+                )
+                self.assertIn(
+                    "sets",
+                    response.data["sets"]["pfam"],
+                    "'sets' should be one of the keys in the response",
+                )
 
     def test_can_get_the_set_list_on_a_list(self):
-        urls = [
-            "/api/set/pfam/structure/pdb",
-        ]
+        urls = ["/api/set/pfam/structure/pdb"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "structure_subset")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "structure_subset"
+            )
             for result in response.data["results"]:
                 for s in result["structure_subset"]:
                     self._check_structure_chain_details(s)
 
     def test_can_get_a_list_from_the_set_object(self):
-        urls = [
-            "/api/set/pfam/Cl0001/structure/pdb",
-        ]
+        urls = ["/api/set/pfam/Cl0001/structure/pdb"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"], True)
             self.assertIn("structure_subset", response.data)
             for st in response.data["structure_subset"]:
                 self._check_structure_chain_details(st)
 
     def test_can_filter_set_counter_with_acc(self):
-        urls = [
-            "/api/set/structure/pdb/1JM7",
-            "/api/set/structure/pdb/2bkm",
-        ]
+        urls = ["/api/set/structure/pdb/1JM7", "/api/set/structure/pdb/2bkm"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_count_overview(response.data)
 
     def test_can_get_object_on_a_set_list(self):
-        urls = [
-            "/api/set/pfam/structure/pdb/1JM7",
-        ]
+        urls = ["/api/set/pfam/structure/pdb/1JM7"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-            self._check_is_list_of_objects_with_key(response.data["results"], "structures")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "structures"
+            )
             for result in response.data["results"]:
                 self._check_set_details(result["metadata"], False)
                 for st in result["structures"]:
                     self._check_structure_chain_details(st)
 
     def test_can_get_an_object_from_the_set_object(self):
-        urls = [
-            "/api/set/pfam/Cl0001/structure/pdb/1JM7",
-        ]
+        urls = ["/api/set/pfam/Cl0001/structure/pdb/1JM7"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url))
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
             self._check_set_details(response.data["metadata"])
             self.assertIn("structures", response.data)
             for s in response.data["structures"]:
@@ -737,7 +903,7 @@ class SetAlignmentTests(InterproRESTTestCase):
     def test_can_get_the_set_alignment(self):
         clan = "cl0001"
         pfam = "pf02171"
-        response = self.client.get("/api/set/pfam/" + clan + "?alignments="+pfam)
+        response = self.client.get("/api/set/pfam/" + clan + "?alignments=" + pfam)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
         for aln in response.data["results"]:
@@ -748,4 +914,3 @@ class SetAlignmentTests(InterproRESTTestCase):
                 self.assertIsInstance(aln["alignedTo"][aligned], dict)
                 alignment = aln["alignedTo"][aligned]
                 self.assertEqual(clan, alignment["set_acc"].lower())
-

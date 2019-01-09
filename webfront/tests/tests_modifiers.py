@@ -3,7 +3,6 @@ from rest_framework import status
 
 
 class GroupByModifierTest(InterproRESTTestCase):
-
     def test_can_get_the_entry_type_groups(self):
         response = self.client.get("/api/entry?group_by=type")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -49,7 +48,9 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertEqual(response.data["long"], 1)
 
     def test_wrong_field_for_group_by_should_fail(self):
-        self._check_HTTP_response_code("/api/entry?group_by=entry_type", code=status.HTTP_404_NOT_FOUND)
+        self._check_HTTP_response_code(
+            "/api/entry?group_by=entry_type", code=status.HTTP_404_NOT_FOUND
+        )
 
     def test_can_get_the_match_presence_groups(self):
         response = self.client.get("/api/protein?group_by=match_presence")
@@ -61,7 +62,9 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertEqual(response.data["match_presence"]["false"], 1)
 
     def test_can_group_proteomes_by_is_reference(self):
-        response = self.client.get("/api/proteome/uniprot?group_by=proteome_is_reference")
+        response = self.client.get(
+            "/api/proteome/uniprot?group_by=proteome_is_reference"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("proteome_is_reference", response.data)
         self.assertIn("true", response.data["proteome_is_reference"])
@@ -69,11 +72,11 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertEqual(response.data["proteome_is_reference"]["true"], 2)
         self.assertEqual(response.data["proteome_is_reference"]["false"], 1)
 
-class FilterByFieldModifierTest(InterproRESTTestCase):
 
+class FilterByFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_pfam_by_integrated(self):
         acc = "IPR003165"
-        response = self.client.get("/api/entry/pfam?integrated="+acc)
+        response = self.client.get("/api/entry/pfam?integrated=" + acc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("count", response.data)
         self.assertEqual(response.data["count"], 1)
@@ -89,7 +92,7 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_smart_by_type(self):
         entry_types = ["family", "domain"]
         for entry_type in entry_types:
-            response = self.client.get("/api/entry/smart?type="+entry_type)
+            response = self.client.get("/api/entry/smart?type=" + entry_type)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIn("count", response.data)
             self.assertEqual(response.data["count"], 1)
@@ -108,7 +111,7 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_protein_by_size(self):
         sizes = ["small", "medium", "long"]
         for size in sizes:
-            response = self.client.get("/api/protein/uniprot?size="+size)
+            response = self.client.get("/api/protein/uniprot?size=" + size)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIn("results", response.data)
             for result in response.data["results"]:
@@ -118,7 +121,7 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_reviewed_protein_by_size(self):
         sizes = ["small", "medium", "long"]
         for size in sizes:
-            response = self.client.get("/api/protein/reviewed?size="+size)
+            response = self.client.get("/api/protein/reviewed?size=" + size)
             if response.status_code == status.HTTP_204_NO_CONTENT:
                 self.assertEqual("long", size)
             else:
@@ -131,7 +134,7 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_unreviewed_protein_by_size(self):
         sizes = ["small", "medium", "long"]
         for size in sizes:
-            response = self.client.get("/api/protein/unreviewed?size="+size)
+            response = self.client.get("/api/protein/unreviewed?size=" + size)
             if response.status_code == status.HTTP_204_NO_CONTENT:
                 self.assertEqual("small", size)
             else:
@@ -144,7 +147,7 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_by_size_protein_with_entry_filter(self):
         sizes = ["small", "medium", "long"]
         for size in sizes:
-            response = self.client.get("/api/protein/uniprot/entry?size="+size)
+            response = self.client.get("/api/protein/uniprot/entry?size=" + size)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIn("results", response.data)
             for result in response.data["results"]:
@@ -154,7 +157,9 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_proteins_by_match_presence(self):
         options = ["true", "false"]
         for option in options:
-            response = self.client.get("/api/protein/uniprot?extra_fields=counters&match_presence="+option)
+            response = self.client.get(
+                "/api/protein/uniprot?extra_fields=counters&match_presence=" + option
+            )
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIn("results", response.data)
             for result in response.data["results"]:
@@ -164,11 +169,11 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
                 else:
                     self.assertEqual(entries, 0)
 
-class FilterByContainsFieldModifierTest(InterproRESTTestCase):
 
+class FilterByContainsFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_pfam_by_signature_in(self):
         db = "pfam"
-        response = self.client.get("/api/entry/interpro?signature_in="+db)
+        response = self.client.get("/api/entry/interpro?signature_in=" + db)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("count", response.data)
         self.assertEqual(response.data["count"], 1)
@@ -178,7 +183,6 @@ class FilterByContainsFieldModifierTest(InterproRESTTestCase):
 
 
 class SortByModifierTest(InterproRESTTestCase):
-
     def test_can_sort_pfam_by_accession(self):
         response = self.client.get("/api/entry/pfam?sort_by=accession")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -194,32 +198,36 @@ class SortByModifierTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/pfam?sort_by=-integrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.data)
-        payload_accs_rev = [r["metadata"]["integrated"] for r in response.data["results"]]
+        payload_accs_rev = [
+            r["metadata"]["integrated"] for r in response.data["results"]
+        ]
         self.assertEqual(payload_accs_rev, list(reversed(payload_accs)))
 
 
 class InterProStatusModifierTest(InterproRESTTestCase):
-
     def test_can_apply_interpro_status(self):
         mdbs = ["profile", "smart", "pfam"]
         for db in mdbs:
-            response = self.client.get("/api/entry/"+db)
+            response = self.client.get("/api/entry/" + db)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIn("results", response.data)
-            unintegrated = len([
-                r["metadata"]["integrated"]
-                for r in response.data["results"]
-                if r["metadata"]["integrated"] is None
-            ])
-            response2 = self.client.get("/api/entry/"+db+"?interpro_status")
+            unintegrated = len(
+                [
+                    r["metadata"]["integrated"]
+                    for r in response.data["results"]
+                    if r["metadata"]["integrated"] is None
+                ]
+            )
+            response2 = self.client.get("/api/entry/" + db + "?interpro_status")
             self.assertEqual(response2.status_code, status.HTTP_200_OK)
             self.assertEqual(response2.data["unintegrated"], unintegrated)
-            self.assertEqual(response2.data["integrated"],
-                             len(response.data["results"]) - unintegrated)
+            self.assertEqual(
+                response2.data["integrated"],
+                len(response.data["results"]) - unintegrated,
+            )
 
 
 class IDAModifiersTest(InterproRESTTestCase):
-
     def test_ida_modifier(self):
         response = self.client.get("/api/entry/interpro/IPR001165?ida")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -234,7 +242,9 @@ class IDAModifiersTest(InterproRESTTestCase):
         self.assertIn("count", response.data)
         self.assertGreater(response.data["count"], len(response.data["results"]))
         first_ida_fk = response.data["results"][0]["ida_id"]
-        response = self.client.get("/api/entry/interpro/IPR003165?ida&page_size=1&page=2")
+        response = self.client.get(
+            "/api/entry/interpro/IPR003165?ida&page_size=1&page=2"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(first_ida_fk, response.data["results"][0]["ida_id"])
 
@@ -244,31 +254,77 @@ class IDAModifiersTest(InterproRESTTestCase):
         self.assertIn("results", response.data)
         self.assertIn("count", response.data)
         self.assertEqual(response.data["count"], 1)
-        self.assertEqual("a1cuj5", response.data["results"][0]["metadata"]["accession"].lower())
+        self.assertEqual(
+            "a1cuj5", response.data["results"][0]["metadata"]["accession"].lower()
+        )
 
 
 class ExtraFieldsModifierTest(InterproRESTTestCase):
     fields = {
         "entry": [
-          'entry_id', 'accession', 'type', 'name', 'short_name', 'source_database', 'member_databases', 'go_terms',
-          'description', 'wikipedia', 'literature', 'hierarchy', 'cross_references', 'entry_date', 'is_featured'
+            "entry_id",
+            "accession",
+            "type",
+            "name",
+            "short_name",
+            "source_database",
+            "member_databases",
+            "go_terms",
+            "description",
+            "wikipedia",
+            "literature",
+            "hierarchy",
+            "cross_references",
+            "entry_date",
+            "is_featured",
         ],
         "protein": [
-          'accession', 'identifier', 'organism', 'name', 'other_names', 'description', 'sequence', 'length', 'proteome', 'gene', 'go_terms',
-          'evidence_code', 'source_database', 'residues', 'structure', 'is_fragment', 'tax_id'
+            "accession",
+            "identifier",
+            "organism",
+            "name",
+            "other_names",
+            "description",
+            "sequence",
+            "length",
+            "proteome",
+            "gene",
+            "go_terms",
+            "evidence_code",
+            "source_database",
+            "residues",
+            "structure",
+            "is_fragment",
+            "tax_id",
         ],
-        'structure': [
-            'accession', 'name', 'short_name', 'other_names', 'experiment_type', 'release_date', 'literature', 'chains',
-            'source_database', 'resolution'
+        "structure": [
+            "accession",
+            "name",
+            "short_name",
+            "other_names",
+            "experiment_type",
+            "release_date",
+            "literature",
+            "chains",
+            "source_database",
+            "resolution",
         ],
-        'taxonomy': [
-            'accession', 'scientific_name', 'full_name', 'lineage', 'rank', 'children'
+        "taxonomy": [
+            "accession",
+            "scientific_name",
+            "full_name",
+            "lineage",
+            "rank",
+            "children",
         ],
-        'proteome': [
-            'accession', 'strain', 'is_reference', 'assembly'
-        ],
-        'set': [
-            'accession', 'name', 'description', 'source_database', 'integrated', 'relationships'
+        "proteome": ["accession", "strain", "is_reference", "assembly"],
+        "set": [
+            "accession",
+            "name",
+            "description",
+            "source_database",
+            "integrated",
+            "relationships",
         ],
     }
     list_url = {
@@ -296,7 +352,9 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
 
     def test_extra_fields_together(self):
         for endpoint in self.fields:
-            url = "/api{}?extra_fields={}".format(self.list_url[endpoint], ",".join(self.fields[endpoint]))
+            url = "/api{}?extra_fields={}".format(
+                self.list_url[endpoint], ",".join(self.fields[endpoint])
+            )
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK, url)
             self.assertIn("results", response.data)
@@ -313,7 +371,9 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             other_ep = [ep for ep in self.fields if ep != endpoint]
             for ep in other_ep:
                 for field in self.fields[endpoint]:
-                    url = "/api{}/{}?extra_fields={}".format(self.list_url[endpoint], ep, field)
+                    url = "/api{}/{}?extra_fields={}".format(
+                        self.list_url[endpoint], ep, field
+                    )
                     response = self.client.get(url)
                     if response.status_code == status.HTTP_200_OK:
                         self.assertIn("results", response.data)
@@ -321,13 +381,17 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
                             self.assertIn("extra_fields", result)
                             self.assertIn(field, result["extra_fields"])
                     else:
-                        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-                url = "/api{}/{}?extra_fields=name,ERROR".format(self.list_url[endpoint], ep)
+                        self.assertEqual(
+                            response.status_code, status.HTTP_204_NO_CONTENT
+                        )
+                url = "/api{}/{}?extra_fields=name,ERROR".format(
+                    self.list_url[endpoint], ep
+                )
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-class ExtraFeaturesModifierTest(InterproRESTTestCase):
 
+class ExtraFeaturesModifierTest(InterproRESTTestCase):
     def test_extra_features_modifier_is_different_than_acc_protein(self):
         response1 = self.client.get("/api/protein/uniprot/a1cuj5")
         self.assertEqual(response1.status_code, status.HTTP_200_OK)

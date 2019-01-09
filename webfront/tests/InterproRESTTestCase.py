@@ -17,19 +17,19 @@ chains = {
 @override_settings(SEARCHER_URL=settings.SEARCHER_TEST_URL)
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [
-        'webfront/tests/fixtures_entry.json',
-        'webfront/tests/fixtures_protein.json',
-        'webfront/tests/fixtures_structure.json',
-        'webfront/tests/fixtures_organisms.json',
-        'webfront/tests/fixtures_set.json',
-        'webfront/tests/fixtures_database.json',
+        "webfront/tests/fixtures_entry.json",
+        "webfront/tests/fixtures_protein.json",
+        "webfront/tests/fixtures_structure.json",
+        "webfront/tests/fixtures_organisms.json",
+        "webfront/tests/fixtures_set.json",
+        "webfront/tests/fixtures_database.json",
     ]
-    links_fixtures = 'webfront/tests/relationship_features.json'
+    links_fixtures = "webfront/tests/relationship_features.json"
 
     @classmethod
     def setUpClass(cls):
         super(InterproRESTTestCase, cls).setUpClass()
-        cls.fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
+        cls.fr = FixtureReader(cls.fixtures + [cls.links_fixtures])
         docs = cls.fr.get_fixtures()
         cls.fr.add_to_search_engine(docs)
 
@@ -42,8 +42,11 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_single_entry_response(self, response, msg=""):
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg)
         self.assertIn("entries", response.data, msg)
-        self.assertEqual(len(response.data["entries"]), 1,
-                         "only one entry should be included when the ID is specified" + msg)
+        self.assertEqual(
+            len(response.data["entries"]),
+            1,
+            "only one entry should be included when the ID is specified" + msg,
+        )
         # self.assertIn("entry", response.data["entries"][0], msg)
         # self._check_entry_details(response.data["entries"][0]["entry"], msg)
 
@@ -74,7 +77,10 @@ class InterproRESTTestCase(APITransactionTestCase):
         for obj in _list:
             self.assertIn("metadata", obj, msg)
             self.assertTrue(isinstance(obj, dict))
-            if "children" not in obj["metadata"] and "is_reference" not in obj["metadata"]:
+            if (
+                "children" not in obj["metadata"]
+                and "is_reference" not in obj["metadata"]
+            ):
                 self.assertIn("source_database", obj["metadata"], msg)
             self.assertIn("accession", obj["metadata"], msg)
             self.assertIn("name", obj["metadata"], msg)
@@ -101,10 +107,11 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_protein_count_overview(self, main_obj, msg=""):
         obj = main_obj["proteins"]
         self.assertIn("uniprot", obj, msg)
-        if (isinstance(obj["uniprot"], int) and obj["uniprot"] > 0) or \
-            (isinstance(obj["uniprot"], dict) and
-             isinstance(obj["uniprot"]["proteins"], int) and
-             obj["uniprot"]["proteins"] > 0):
+        if (isinstance(obj["uniprot"], int) and obj["uniprot"] > 0) or (
+            isinstance(obj["uniprot"], dict)
+            and isinstance(obj["uniprot"]["proteins"], int)
+            and obj["uniprot"]["proteins"] > 0
+        ):
             self.assertTrue("unreviewed" in obj or "reviewed" in obj, msg)
 
     def _check_protein_details(self, obj):
@@ -188,65 +195,116 @@ class InterproRESTTestCase(APITransactionTestCase):
 
     def _check_count_overview_per_endpoints(self, obj, endpoints1, endpoints2, msg=""):
         for inner_obj in obj[endpoints2]:
-            if inner_obj in ["interpro", "unintegrated", "uniprot", "reviewed", "unreviewed", "pdb"] and not (
-                        inner_obj in ["unintegrated", "interpro"] and obj[endpoints2][inner_obj] == 0):
-                    self.assertIn(endpoints1,
-                                  obj[endpoints2][inner_obj],
-                                  msg)
-                    self.assertIn(endpoints2,
-                                  obj[endpoints2][inner_obj],
-                                  msg)
+            if inner_obj in [
+                "interpro",
+                "unintegrated",
+                "uniprot",
+                "reviewed",
+                "unreviewed",
+                "pdb",
+            ] and not (
+                inner_obj in ["unintegrated", "interpro"]
+                and obj[endpoints2][inner_obj] == 0
+            ):
+                self.assertIn(endpoints1, obj[endpoints2][inner_obj], msg)
+                self.assertIn(endpoints2, obj[endpoints2][inner_obj], msg)
 
-    def _check_structure_and_chains(self, response, endpoint, db, acc, postfix="", key=None, msg=""):
+    def _check_structure_and_chains(
+        self, response, endpoint, db, acc, postfix="", key=None, msg=""
+    ):
         urls = []
         if "structure" == endpoint:
             # _chains = [list(ch.keys())[0] for ch in chains[acc]]
             self.assertEqual(chains[acc], response.data["metadata"]["chains"], msg)
             for chain in chains[acc]:
-                current = "/api/"+endpoint+"/"+db+"/"+acc+"/"+chain+postfix
+                current = (
+                    "/api/" + endpoint + "/" + db + "/" + acc + "/" + chain + postfix
+                )
                 urls.append(current)
                 response_acc = self._get_in_debug_mode(current)
                 if response_acc.status_code == status.HTTP_200_OK:
                     self.assertEqual(response_acc.status_code, status.HTTP_200_OK, msg)
                     self._check_object_by_accesssion(response_acc.data, msg)
-                    self.assertEqual(len(response_acc.data["metadata"]["chains"]), 1, msg)
+                    self.assertEqual(
+                        len(response_acc.data["metadata"]["chains"]), 1, msg
+                    )
                     if key is not None:
                         for ch2 in response_acc.data[key]:
                             if "lineage" not in ch2 and "taxonomy" not in ch2:
                                 self.assertEqual(ch2["chain"].upper(), chain, msg)
-                    self.assertIn(chain.lower(), response_acc.data["metadata"]["chains"], msg)
-                    self._check_match(response_acc.data["metadata"]["chains"][chain.lower()], msg)
+                    self.assertIn(
+                        chain.lower(), response_acc.data["metadata"]["chains"], msg
+                    )
+                    self._check_match(
+                        response_acc.data["metadata"]["chains"][chain.lower()], msg
+                    )
                 elif response_acc.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)
         return urls
 
-    def _check_structure_chains_as_counter_filter(self, endpoint, db, acc, prefix="", postfix="", key1=None, key2=None):
+    def _check_structure_chains_as_counter_filter(
+        self, endpoint, db, acc, prefix="", postfix="", key1=None, key2=None
+    ):
         urls = []
         if "structure" == endpoint:
             for chain in chains[acc]:
-                current = "/api/"+prefix+"/"+endpoint+"/"+db+"/"+acc+"/"+chain+postfix
+                current = (
+                    "/api/"
+                    + prefix
+                    + "/"
+                    + endpoint
+                    + "/"
+                    + db
+                    + "/"
+                    + acc
+                    + "/"
+                    + chain
+                    + postfix
+                )
                 urls.append(current)
                 response = self._get_in_debug_mode(current)
                 if response.status_code == status.HTTP_200_OK:
-                    self._check_counter_by_endpoint(prefix, response.data, "URL : [{}]".format(current))
+                    self._check_counter_by_endpoint(
+                        prefix, response.data, "URL : [{}]".format(current)
+                    )
                     # self._check_count_overview_per_endpoints(response.data, key1, key2,
                     #                                          "URL : [{}]".format(current))
                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)
         return urls
 
-    def _check_structure_chains_as_filter(self, endpoint, db, acc, prefix="", postfix="", key1=None):
+    def _check_structure_chains_as_filter(
+        self, endpoint, db, acc, prefix="", postfix="", key1=None
+    ):
         urls = []
         if "structure" == endpoint:
             for chain in chains[acc]:
-                current = "/api/"+prefix+"/"+endpoint+"/"+db+"/"+acc+"/"+chain+postfix
+                current = (
+                    "/api/"
+                    + prefix
+                    + "/"
+                    + endpoint
+                    + "/"
+                    + db
+                    + "/"
+                    + acc
+                    + "/"
+                    + chain
+                    + postfix
+                )
                 urls.append(current)
                 response = self._get_in_debug_mode(current)
                 if response.status_code == status.HTTP_200_OK:
-                    obj = [response.data] if "structures" in response.data else response.data["results"]
+                    obj = (
+                        [response.data]
+                        if "structures" in response.data
+                        else response.data["results"]
+                    )
                     self._check_is_list_of_metadata_objects(obj)
                     for result in [x[key1] for x in obj if key1 in x]:
-                        self._check_list_of_matches(result, "URL : [{}]".format(current))
+                        self._check_list_of_matches(
+                            result, "URL : [{}]".format(current)
+                        )
                         self.assertGreaterEqual(len(result), 1)
                         for r in result:
                             self.assertEqual(r["chain"].upper(), chain)
@@ -259,13 +317,11 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertLessEqual(
             len(subset),
             len(superset),
-            "Can't be subset if more elements in subset than in set"
+            "Can't be subset if more elements in subset than in set",
         )
         for element in subset:
             self.assertIn(
-                element,
-                superset,
-                "Element {} in subset but not in set".format(element)
+                element, superset, "Element {} in subset but not in set".format(element)
             )
 
     def _check_taxonomy_details(self, obj, is_complete=True, msg=""):
@@ -322,5 +378,3 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("accession", obj, msg)
         self.assertIn("source_database", obj, msg)
         self.assertIn("integrated", obj, msg)
-
-

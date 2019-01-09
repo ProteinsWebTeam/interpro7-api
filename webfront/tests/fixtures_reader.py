@@ -29,24 +29,36 @@ class FixtureReader:
 
     def load_from_json(self, data):
         for fixture in data:
-            if fixture['model'] == "webfront.Entry":
-                self.entries[fixture['fields']["accession"].lower()] = fixture['fields']
-            elif fixture['model'] == "webfront.Protein":
-                self.proteins[fixture['fields']["accession"].lower()] = fixture['fields']
-                self.protein_structure_list[fixture['fields']["accession"].lower()] = []
-            elif fixture['model'] == "webfront.Structure":
-                self.structures[fixture['fields']["accession"].lower()] = fixture['fields']
-            elif fixture['model'] == "webfront.ProteinEntryFeature":
-                self.entry_protein_list.append(fixture['fields'])
-            elif fixture['model'] == "webfront.ProteinStructureFeature":
-                self.protein_structure_list[fixture['fields']["protein"].lower()].append(fixture['fields'])
-            elif fixture['model'] == "webfront.Taxonomy":
-                self.tax2lineage[fixture['fields']["accession"].lower()] = fixture['fields']['lineage'].split()
-                self.tax2rank[fixture['fields']["accession"].lower()] = fixture['fields']['rank']
-            elif fixture['model'] == "webfront.Proteome":
-                self.proteomes[fixture['fields']["accession"].lower()] = fixture['fields']
-            elif fixture['model'] == "webfront.Set":
-                self.sets[fixture['fields']["accession"].lower()] = fixture['fields']
+            if fixture["model"] == "webfront.Entry":
+                self.entries[fixture["fields"]["accession"].lower()] = fixture["fields"]
+            elif fixture["model"] == "webfront.Protein":
+                self.proteins[fixture["fields"]["accession"].lower()] = fixture[
+                    "fields"
+                ]
+                self.protein_structure_list[fixture["fields"]["accession"].lower()] = []
+            elif fixture["model"] == "webfront.Structure":
+                self.structures[fixture["fields"]["accession"].lower()] = fixture[
+                    "fields"
+                ]
+            elif fixture["model"] == "webfront.ProteinEntryFeature":
+                self.entry_protein_list.append(fixture["fields"])
+            elif fixture["model"] == "webfront.ProteinStructureFeature":
+                self.protein_structure_list[
+                    fixture["fields"]["protein"].lower()
+                ].append(fixture["fields"])
+            elif fixture["model"] == "webfront.Taxonomy":
+                self.tax2lineage[fixture["fields"]["accession"].lower()] = fixture[
+                    "fields"
+                ]["lineage"].split()
+                self.tax2rank[fixture["fields"]["accession"].lower()] = fixture[
+                    "fields"
+                ]["rank"]
+            elif fixture["model"] == "webfront.Proteome":
+                self.proteomes[fixture["fields"]["accession"].lower()] = fixture[
+                    "fields"
+                ]
+            elif fixture["model"] == "webfront.Set":
+                self.sets[fixture["fields"]["accession"].lower()] = fixture["fields"]
 
     def get_entry2set(self):
         e2s = {}
@@ -61,18 +73,22 @@ class FixtureReader:
                     #     db = "kegg"
                     if n["accession"].lower() not in e2s:
                         e2s[n["accession"].lower()] = []
-                    e2s[n["accession"].lower()].append({
-                        "accession": s,
-                        "source_database": db,
-                        "integrated": integrated
-                    })
+                    e2s[n["accession"].lower()].append(
+                        {
+                            "accession": s,
+                            "source_database": db,
+                            "integrated": integrated,
+                        }
+                    )
                     if self.sets[s]["integrated"] is not None:
                         for i in self.sets[s]["integrated"]:
-                            e2s[n["accession"]].append({
-                                "accession": i,
-                                "source_database": db,
-                                "integrated": []
-                            })
+                            e2s[n["accession"]].append(
+                                {
+                                    "accession": i,
+                                    "source_database": db,
+                                    "integrated": [],
+                                }
+                            )
         return e2s
 
     def get_fixtures(self):
@@ -88,10 +104,18 @@ class FixtureReader:
                 "entry_db": self.entries[e]["source_database"],
                 "entry_integrated": self.entries[e]["integrated"],
                 "entry_date": self.entries[e]["entry_date"],
-                "text_entry": e + " " + self.entries[e]["type"] + " " + (" ".join(self.entries[e]["description"])),
+                "text_entry": e
+                + " "
+                + self.entries[e]["type"]
+                + " "
+                + (" ".join(self.entries[e]["description"])),
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
-                "text_protein": p+" "+self.proteins[p]["source_database"]+" "+(" ".join(self.proteins[p]["description"])),
+                "text_protein": p
+                + " "
+                + self.proteins[p]["source_database"]
+                + " "
+                + (" ".join(self.proteins[p]["description"])),
                 "tax_id": self.proteins[p]["organism"]["taxId"],
                 "tax_name": self.proteins[p]["organism"]["name"],
                 "tax_lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
@@ -103,7 +127,7 @@ class FixtureReader:
                 "entry_protein_locations": ep["coordinates"],
                 "protein_length": self.proteins[p]["length"],
                 "protein_size": self.proteins[p]["size"],
-                "id": get_id(e, p)
+                "id": get_id(e, p),
             }
             obj["text_taxonomy"] = obj["tax_id"] + " " + (" ".join(obj["tax_lineage"]))
 
@@ -115,9 +139,15 @@ class FixtureReader:
                 for sp in self.protein_structure_list[p]:
                     c = copy.copy(obj)
                     c["structure_acc"] = sp["structure"]
-                    c["structure_evidence"] = self.structures[sp["structure"]]["experiment_type"]
-                    c["structure_resolution"] = self.structures[sp["structure"]]["resolution"]
-                    c["structure_date"] = self.structures[sp["structure"]]["release_date"]
+                    c["structure_evidence"] = self.structures[sp["structure"]][
+                        "experiment_type"
+                    ]
+                    c["structure_resolution"] = self.structures[sp["structure"]][
+                        "resolution"
+                    ]
+                    c["structure_date"] = self.structures[sp["structure"]][
+                        "release_date"
+                    ]
                     c["structure_chain"] = sp["structure"] + " - " + sp["chain"]
                     c["structure_chain_acc"] = sp["chain"]
                     c["text_structure"] = c["structure_acc"] + " " + sp["chain"]
@@ -131,7 +161,9 @@ class FixtureReader:
                             c2["set_db"] = e2s["source_database"]
                             c2["set_integrated"] = e2s["integrated"]
                             c2["text_set"] = c2["set_acc"] + " " + c2["set_db"]
-                            c2["id"] = get_id(e, p, sp["structure"], sp["chain"], e2s["accession"])
+                            c2["id"] = get_id(
+                                e, p, sp["structure"], sp["chain"], e2s["accession"]
+                            )
                             to_add.append(c2)
                     else:
                         c["id"] = get_id(e, p, sp["structure"], sp["chain"])
@@ -154,34 +186,54 @@ class FixtureReader:
             if p not in proteins:
                 for sp in chains:
                     proteome = self.proteins[p]["proteome"].lower()
-                    to_add.append({
-                        "text": p + " " + sp["structure"],
-                        "protein_acc": p,
-                        "protein_db": self.proteins[p]["source_database"],
-                        "text_protein": p + " " + self.proteins[p]["source_database"] + " " + (" ".join(self.proteins[p]["description"])),
-                        "tax_id": self.proteins[p]["organism"]["taxId"],
-                        "tax_name": self.proteins[p]["organism"]["name"],
-                        "tax_rank": self.tax2rank[self.proteins[p]["organism"]["taxId"]],
-                        "tax_lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
-                        "proteome_acc": self.proteomes[proteome]["accession"],
-                        "proteome_name": self.proteomes[proteome]["name"],
-                        "proteome_is_reference": self.proteomes[proteome]["is_reference"],
-                        "protein_length": self.proteins[p]["length"],
-                        "protein_size": self.proteins[p]["size"],
-                        "id": get_id(None, p, sp["structure"], sp["chain"]),
-                        "structure_acc": sp["structure"],
-                        "structure_evidence": self.structures[sp["structure"]]["experiment_type"],
-                        "structure_resolution": self.structures[sp["structure"]]["resolution"],
-                        "structure_date": self.structures[sp["structure"]]["release_date"],
-                        "structure_chain": sp["structure"] + " - " + sp["chain"],
-                        "structure_chain_acc": sp["chain"],
-                        "text_structure": sp["structure"] + " " + sp["chain"],
-                        "structure_protein_locations": sp["coordinates"],
-                        "protein_structure": sp["mapping"],
-                    })
+                    to_add.append(
+                        {
+                            "text": p + " " + sp["structure"],
+                            "protein_acc": p,
+                            "protein_db": self.proteins[p]["source_database"],
+                            "text_protein": p
+                            + " "
+                            + self.proteins[p]["source_database"]
+                            + " "
+                            + (" ".join(self.proteins[p]["description"])),
+                            "tax_id": self.proteins[p]["organism"]["taxId"],
+                            "tax_name": self.proteins[p]["organism"]["name"],
+                            "tax_rank": self.tax2rank[
+                                self.proteins[p]["organism"]["taxId"]
+                            ],
+                            "tax_lineage": self.tax2lineage[
+                                self.proteins[p]["organism"]["taxId"]
+                            ],
+                            "proteome_acc": self.proteomes[proteome]["accession"],
+                            "proteome_name": self.proteomes[proteome]["name"],
+                            "proteome_is_reference": self.proteomes[proteome][
+                                "is_reference"
+                            ],
+                            "protein_length": self.proteins[p]["length"],
+                            "protein_size": self.proteins[p]["size"],
+                            "id": get_id(None, p, sp["structure"], sp["chain"]),
+                            "structure_acc": sp["structure"],
+                            "structure_evidence": self.structures[sp["structure"]][
+                                "experiment_type"
+                            ],
+                            "structure_resolution": self.structures[sp["structure"]][
+                                "resolution"
+                            ],
+                            "structure_date": self.structures[sp["structure"]][
+                                "release_date"
+                            ],
+                            "structure_chain": sp["structure"] + " - " + sp["chain"],
+                            "structure_chain_acc": sp["chain"],
+                            "text_structure": sp["structure"] + " " + sp["chain"],
+                            "structure_protein_locations": sp["coordinates"],
+                            "protein_structure": sp["mapping"],
+                        }
+                    )
         lower = []
         for doc in to_add:
-            lower.append({k: v.lower() if type(v) == str else v for k, v in doc.items()})
+            lower.append(
+                {k: v.lower() if type(v) == str else v for k, v in doc.items()}
+            )
         return lower
 
     def add_to_search_engine(self, docs):

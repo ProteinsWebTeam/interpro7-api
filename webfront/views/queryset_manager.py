@@ -1,4 +1,12 @@
-from webfront.models import Entry, Protein, Structure, Taxonomy, Proteome, Set, Alignment
+from webfront.models import (
+    Entry,
+    Protein,
+    Structure,
+    Taxonomy,
+    Proteome,
+    Set,
+    Alignment,
+)
 from django.db.models import Q
 from functools import reduce
 from operator import or_
@@ -72,33 +80,49 @@ class QuerysetManager:
                 elif include_search and ep == "search":
                     main_ep = self.main_endpoint
                     if uses_wildcards(v):
-                        blocks.append("text_{}:{}".format(main_ep, v.replace(' ', '%20')))
+                        blocks.append(
+                            "text_{}:{}".format(main_ep, v.replace(" ", "%20"))
+                        )
                     else:
                         for token in v.split():
                             blocks.append("text_{}:{}~0".format(main_ep, token))
                 elif k == "source_database__isnull":
                     blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
                 elif k == "accession" or k == "accession__iexact":
-                    if ep == 'taxonomy':
+                    if ep == "taxonomy":
                         blocks.append("tax_lineage:{}".format(escape(v)))
                     else:
                         blocks.append("{}_acc:{}".format(ep, escape(v)))
                 elif k == "accession__isnull":
-                    if ep == 'structure':
+                    if ep == "structure":
                         blocks.append("{}_exists_:{}_acc".format("!" if v else "", ep))
-                    elif ep == 'taxonomy':
+                    elif ep == "taxonomy":
                         blocks.append("{}_exists_:tax_id".format("!" if v else ""))
-                    elif ep == 'proteome':
-                        blocks.append("{}_exists_:proteome_acc".format("!" if v else ""))
+                    elif ep == "proteome":
+                        blocks.append(
+                            "{}_exists_:proteome_acc".format("!" if v else "")
+                        )
                     else:
                         blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
 
-                elif k == 'accession__in' and ep == 'taxonomy' and isinstance(v, list) and len(v) > 0:
-                    blocks.append("({})".format(
-                        " || ".join(["tax_id:{}".format(value) for value in v])
-                    ))
-                elif k == "integrated" or k == "integrated__accession__iexact" or k == "integrated__iexact" or k == "integrated__contains":
-                    if ep == 'set':
+                elif (
+                    k == "accession__in"
+                    and ep == "taxonomy"
+                    and isinstance(v, list)
+                    and len(v) > 0
+                ):
+                    blocks.append(
+                        "({})".format(
+                            " || ".join(["tax_id:{}".format(value) for value in v])
+                        )
+                    )
+                elif (
+                    k == "integrated"
+                    or k == "integrated__accession__iexact"
+                    or k == "integrated__iexact"
+                    or k == "integrated__contains"
+                ):
+                    if ep == "set":
                         if not v:
                             blocks.append("!_exists_:set_integrated")
                         else:
@@ -106,10 +130,16 @@ class QuerysetManager:
                     else:
                         blocks.append("entry_integrated:{}".format(escape(v)))
                 elif k == "integrated__isnull":
-                    if ep == 'set':
-                        blocks.append("{}_exists_:set_integrated".format("!" if v else ""))
+                    if ep == "set":
+                        blocks.append(
+                            "{}_exists_:set_integrated".format("!" if v else "")
+                        )
                     else:
-                        blocks.append("{}_exists_:entry_integrated".format("!entry_db:interpro && !" if v else ""))
+                        blocks.append(
+                            "{}_exists_:entry_integrated".format(
+                                "!entry_db:interpro && !" if v else ""
+                            )
+                        )
                 elif k == "type" or k == "type__iexact" or k == "type__exact":
                     blocks.append("{}_type:{}".format(ep, escape(v)))
                 elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":
@@ -122,18 +152,22 @@ class QuerysetManager:
                     blocks.append("protein_size:{}".format(escape(v).strip()))
                 elif "__gt" in k:
                     filter_k = "protein_" + k if k.startswith("length_") else k
-                    blocks.append("{}:{}{} TO *]".format(
-                        re.sub(r"__gte?", "", filter_k),
-                        "[" if "__gte" in filter_k else "{",
-                        escape(v)
-                    ))
+                    blocks.append(
+                        "{}:{}{} TO *]".format(
+                            re.sub(r"__gte?", "", filter_k),
+                            "[" if "__gte" in filter_k else "{",
+                            escape(v),
+                        )
+                    )
                 elif "__lt" in k:
                     filter_k = "protein_" + k if k.startswith("length_") else k
-                    blocks.append("{}:[* TO {}{}".format(
-                        re.sub(r"__lte?", "", filter_k),
-                        escape(v),
-                        "]" if "__lte" in filter_k else "}"
-                    ))
+                    blocks.append(
+                        "{}:[* TO {}{}".format(
+                            re.sub(r"__lte?", "", filter_k),
+                            escape(v),
+                            "]" if "__lte" in filter_k else "}",
+                        )
+                    )
                 elif ep != "structure":
                     if k == "source_database" or k == "source_database__iexact":
                         blocks.append("{}_db:{}".format(ep, escape(v)))
@@ -171,13 +205,11 @@ class QuerysetManager:
                 continue
             if ep == endpoint:
                 current_filters = merge_two_dicts(
-                    current_filters,
-                    {k: v for k, v in filters[ep].items()}
+                    current_filters, {k: v for k, v in filters[ep].items()}
                 )
             elif not only_main_endpoint:
                 current_filters = merge_two_dicts(
-                    current_filters,
-                    {ep + "__" + k: v for k, v in filters[ep].items()}
+                    current_filters, {ep + "__" + k: v for k, v in filters[ep].items()}
                 )
         return current_filters
 
@@ -185,18 +217,19 @@ class QuerysetManager:
         if endpoint is None:
             endpoint = self.main_endpoint
         queryset = self.get_base_queryset(endpoint)
-        current_filters = self.get_current_filters(self.filters, endpoint, only_main_endpoint)
+        current_filters = self.get_current_filters(
+            self.filters, endpoint, only_main_endpoint
+        )
         if "accession__isnull" in current_filters:
             del current_filters["accession__isnull"]
-        current_exclusions = self.get_current_filters(self.exclusions, endpoint, only_main_endpoint)
+        current_exclusions = self.get_current_filters(
+            self.exclusions, endpoint, only_main_endpoint
+        )
 
         # creates an `OR` filter for the search fields
         search_filters = self.filters.get("search")
         if search_filters:
-            or_filter = reduce(
-                or_,
-                (Q(**{f[0]: f[1]}) for f in search_filters.items()),
-            )
+            or_filter = reduce(or_, (Q(**{f[0]: f[1]}) for f in search_filters.items()))
             queryset = queryset.filter(or_filter, **current_filters)
         queryset = queryset.filter(**current_filters)
         if len(current_exclusions) > 0:
@@ -221,7 +254,8 @@ class QuerysetManager:
     def is_single_endpoint(self):
         main_ep = self.main_endpoint
         filters = [
-            f for f in self.filters
+            f
+            for f in self.filters
             if f != main_ep and f != "search" and self.filters[f] != {}
         ]
         return len(filters) == 0

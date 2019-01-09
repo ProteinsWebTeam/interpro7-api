@@ -21,39 +21,36 @@ class CanonicalTestCase(TestCase):
     def test_basic_incorrect_slash_urls(self):
         self.assertEqual(
             "/api/entry/InterPro/IPR000001/",
-            canonical("/api/entry//InterPro/IPR000001/")
+            canonical("/api/entry//InterPro/IPR000001/"),
         )
         self.assertEqual(
             "/api/entry/InterPro/IPR000001/",
-            canonical("/api///entry//////InterPro//IPR000001/")
+            canonical("/api///entry//////InterPro//IPR000001/"),
         )
         self.assertEqual(
             "/api/entry/InterPro/IPR000001/",
-            canonical("/api///entry//////InterPro//IPR000001")
+            canonical("/api///entry//////InterPro//IPR000001"),
         )
         self.assertEqual(
-            "/api/entry/InterPro/IPR000001/",
-            canonical("/api/entry/InterPro/IPR000001")
+            "/api/entry/InterPro/IPR000001/", canonical("/api/entry/InterPro/IPR000001")
         )
-
 
     def test_with_query_reorder_urls(self):
         self.assertEqual(
             "/api/entry/InterPro/?integrated=pfam&page=2",
-            canonical("/api/entry/InterPro/?page=2&integrated=pfam")
+            canonical("/api/entry/InterPro/?page=2&integrated=pfam"),
         )
-
 
     def with_query_remove_unneeded_urls(self):
         self.assertEqual(
             "/api/entry/InterPro/?integrated=pfam",
-            canonical("/api/entry/InterPro/?page=1&integrated=pfam")
+            canonical("/api/entry/InterPro/?page=1&integrated=pfam"),
         )
         self.assertEqual(
             "/api/entry/InterPro/",
-            canonical("/api/entry/InterPro/?page=1&page_size=20")
+            canonical("/api/entry/InterPro/?page=1&page_size=20"),
         )
         self.assertEqual(
             "/api/entry/InterPro/?integrated=pfam",
-            canonical("/api/entry/InterPro/?integrated=pfam&page_size=20")
+            canonical("/api/entry/InterPro/?integrated=pfam&page_size=20"),
         )

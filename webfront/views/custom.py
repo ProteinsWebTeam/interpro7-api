@@ -31,7 +31,7 @@ class CustomView(GenericAPIView):
     # Parent class of all the view handlers on the API, including the GeneralHandler.
 
     # description of the level of the endpoint, for debug purposes
-    level_description = 'level'
+    level_description = "level"
     # List of tuples for the handlers for lower levels of the endpoint
     # the firt item of each tuple will be regex or string to which the endpoint will be matched
     # and the second item is the view handler that should proccess it.
@@ -49,8 +49,19 @@ class CustomView(GenericAPIView):
     serializer_detail = SerializerDetail.ALL
     serializer_detail_filter = SerializerDetail.ALL
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, general_handler=None, drf_request=None, *args, **kwargs):
+    def get(
+        self,
+        request,
+        endpoint_levels,
+        available_endpoint_handlers=None,
+        level=0,
+        parent_queryset=None,
+        handler=None,
+        general_handler=None,
+        drf_request=None,
+        *args,
+        **kwargs
+    ):
         # if this is the last level
         if len(endpoint_levels) == level:
             searcher = general_handler.searcher
@@ -73,15 +84,20 @@ class CustomView(GenericAPIView):
                 if self.many:
                     self.queryset = self.paginator.paginate_queryset(
                         self.get_queryset(),
-                        drf_request, view=self,
-                        search_size=self.search_size
+                        drf_request,
+                        view=self,
+                        search_size=self.search_size,
                     )
 
             elif self.from_model:
 
-
-                if is_single_endpoint(general_handler) or not self.expected_response_is_list():
-                    self.queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True)
+                if (
+                    is_single_endpoint(general_handler)
+                    or not self.expected_response_is_list()
+                ):
+                    self.queryset = general_handler.queryset_manager.get_queryset(
+                        only_main_endpoint=True
+                    )
                 else:
                     self.update_queryset_from_search(searcher, general_handler)
 
@@ -90,13 +106,17 @@ class CustomView(GenericAPIView):
                     #     raise Exception("The URL requested didn't have any data related.\nList of endpoints: {}"
                     #                     .format(endpoint_levels))
 
-                    raise EmptyQuerysetError("The URL requested didn't have any data related.\nList of endpoints: {}"
-                                         .format(endpoint_levels))
+                    raise EmptyQuerysetError(
+                        "The URL requested didn't have any data related.\nList of endpoints: {}".format(
+                            endpoint_levels
+                        )
+                    )
                 if self.many:
                     self.queryset = self.paginator.paginate_queryset(
                         self.get_queryset(),
-                        drf_request, view=self,
-                        search_size=self.search_size
+                        drf_request,
+                        view=self,
+                        search_size=self.search_size,
                     )
                 else:
                     self.queryset = self.get_queryset().first()
@@ -110,7 +130,7 @@ class CustomView(GenericAPIView):
                 self.queryset,
                 many=self.many,
                 # extracted out in the custom view
-                content=request.GET.getlist('content'),
+                content=request.GET.getlist("content"),
                 context={"request": drf_request},
                 searcher=searcher,
                 serializer_detail=self.serializer_detail,
@@ -133,14 +153,19 @@ class CustomView(GenericAPIView):
             try:
                 # get the corresponding handler name
                 handler_name, handler_class = next(
-                    h for h in handlers
-                    if re.match(r'(?i)^{}$'.format(h[0]), level_name, flags=re.IGNORECASE)
+                    h
+                    for h in handlers
+                    if re.match(
+                        r"(?i)^{}$".format(h[0]), level_name, flags=re.IGNORECASE
+                    )
                 )
             except StopIteration:
                 # no handler has been found
-                raise ValueError('the level \'{}\' is not a valid {}'.format(
-                    level_name, self.level_description
-                ))
+                raise ValueError(
+                    "the level '{}' is not a valid {}".format(
+                        level_name, self.level_description
+                    )
+                )
 
             # if the handler name is one of the endpoints this one should be removed of the available ones
             index = -1
@@ -156,24 +181,50 @@ class CustomView(GenericAPIView):
                 level = 0
                 if handler is not None:
                     # Which implies that another endpoint is to be procces and therefore is filtering time.
-                    self.filter_entrypoint(handler_name, handler_class, endpoint_levels, endpoints, general_handler)
+                    self.filter_entrypoint(
+                        handler_name,
+                        handler_class,
+                        endpoint_levels,
+                        endpoints,
+                        general_handler,
+                    )
                     return super(handler, self).get(
-                        request, endpoint_levels, endpoints, len(endpoint_levels),
-                        parent_queryset, handler, general_handler, drf_request,
-                        *args, **kwargs
+                        request,
+                        endpoint_levels,
+                        endpoints,
+                        len(endpoint_levels),
+                        parent_queryset,
+                        handler,
+                        general_handler,
+                        drf_request,
+                        *args,
+                        **kwargs
                     )
 
             # delegate to the lower level handler
             return handler_class.as_view()(
-                request, endpoint_levels, endpoints, level + 1,
-                self.queryset, handler_class, general_handler, drf_request,
-                *args, **kwargs
+                request,
+                endpoint_levels,
+                endpoints,
+                level + 1,
+                self.queryset,
+                handler_class,
+                general_handler,
+                drf_request,
+                *args,
+                **kwargs
             )
 
-    def filter_entrypoint(self, handler_name, handler_class, endpoint_levels, endpoints, general_handler):
+    def filter_entrypoint(
+        self, handler_name, handler_class, endpoint_levels, endpoints, general_handler
+    ):
         for level in range(len(endpoint_levels)):
-            self.queryset = handler_class.filter(self.queryset, endpoint_levels[level], general_handler)
-            general_handler.register_filter_serializer(handler_class.serializer_detail_filter, endpoint_levels[level])
+            self.queryset = handler_class.filter(
+                self.queryset, endpoint_levels[level], general_handler
+            )
+            general_handler.register_filter_serializer(
+                handler_class.serializer_detail_filter, endpoint_levels[level]
+            )
             # general_handler.register_post_serializer(handler_class.post_serializer, endpoint_levels[level])
             handlers = endpoints + handler_class.child_handlers
 
@@ -185,14 +236,19 @@ class CustomView(GenericAPIView):
             try:
                 # get the corresponding handler name
                 handler_name, handler_class = next(
-                    h for h in handlers
-                    if re.match(r'(?i)^{}$'.format(h[0]), level_name, flags=re.IGNORECASE)
+                    h
+                    for h in handlers
+                    if re.match(
+                        r"(?i)^{}$".format(h[0]), level_name, flags=re.IGNORECASE
+                    )
                 )
             except StopIteration:
                 # no handler has been found
-                raise ValueError('the level \'{}\' is not a valid {}'.format(
-                    level_name, self.level_description
-                ))
+                raise ValueError(
+                    "the level '{}' is not a valid {}".format(
+                        level_name, self.level_description
+                    )
+                )
             try:
                 index = [e[0] for e in endpoints].index(handler_name)
                 endpoints.pop(index)
@@ -208,16 +264,22 @@ class CustomView(GenericAPIView):
         #     obj = self.get_database_contributions(self.queryset)
         #     return obj
         # else:
-            extra = [k
-                     for k, v in general_handler.filter_serializers.items()
-                     if v["filter_serializer"] in [SerializerDetail.PROTEIN_DB,
-                                                   SerializerDetail.ENTRY_DB,
-                                                   SerializerDetail.TAXONOMY_DB,
-                                                   SerializerDetail.PROTEOME_DB,
-                                                   SerializerDetail.SET_DB,
-                                                   SerializerDetail.STRUCTURE_DB]
-                     ]
-            return searcher.get_counter_object(general_handler.queryset_manager.main_endpoint, extra_counters=extra)
+        extra = [
+            k
+            for k, v in general_handler.filter_serializers.items()
+            if v["filter_serializer"]
+            in [
+                SerializerDetail.PROTEIN_DB,
+                SerializerDetail.ENTRY_DB,
+                SerializerDetail.TAXONOMY_DB,
+                SerializerDetail.PROTEOME_DB,
+                SerializerDetail.SET_DB,
+                SerializerDetail.STRUCTURE_DB,
+            ]
+        ]
+        return searcher.get_counter_object(
+            general_handler.queryset_manager.main_endpoint, extra_counters=extra
+        )
 
     def get_database_contributions(self, queryset):
         return
@@ -236,11 +298,10 @@ class CustomView(GenericAPIView):
         s = general_handler.pagination["size"]
         i = general_handler.pagination["index"]
         r = 100 if s <= 100 else s
-        st = r*((s*i)//r)
+        st = r * ((s * i) // r)
         qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
         res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st, query=qs)
-        self.queryset = general_handler.queryset_manager\
-            .get_base_queryset(ep)
+        self.queryset = general_handler.queryset_manager.get_base_queryset(ep)
 
         self.queryset = filter_queryset_accession_in(self.queryset, res)
 
@@ -248,12 +309,8 @@ class CustomView(GenericAPIView):
 
 
 def filter_queryset_accession_in(queryset, list):
-    if len(list)> 0:
-        or_filter = reduce(
-            or_,
-            (Q(**{"accession__iexact": acc}) for acc in list),
-        )
+    if len(list) > 0:
+        or_filter = reduce(or_, (Q(**{"accession__iexact": acc}) for acc in list))
         return queryset.filter(or_filter)
     else:
         return queryset.filter(accession__in=[])
-

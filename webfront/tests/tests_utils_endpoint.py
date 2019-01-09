@@ -4,7 +4,6 @@ from webfront.models.interpro_new import Release_Note
 
 
 class UtilsAccessionTest(InterproRESTTestCase):
-
     def test_can_read_structure_overview(self):
         response = self.client.get("/api/utils")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -58,7 +57,6 @@ class UtilsAccessionTest(InterproRESTTestCase):
 
 
 class UtilsReleaseTest(InterproRESTTestCase):
-
     def test_can_read_structure_overview(self):
         response = self.client.get("/api/utils")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -102,7 +100,6 @@ class UtilsReleaseTest(InterproRESTTestCase):
     def test_release_70_is_same_as_fixture(self):
         note_version = "70.0"
         note = Release_Note.objects.all().filter(version=note_version).first()
-        response = self.client.get("/api/utils/release/"+note_version)
+        response = self.client.get("/api/utils/release/" + note_version)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["content"], note.content)
-

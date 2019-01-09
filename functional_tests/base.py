@@ -14,24 +14,24 @@ from interpro.settings import SEARCHER_TEST_URL
 @override_settings(SEARCHER_URL=SEARCHER_TEST_URL)
 class FunctionalTest(StaticLiveServerTestCase):
     fixtures = [
-        'webfront/tests/fixtures_entry.json',
-        'webfront/tests/fixtures_protein.json',
-        'webfront/tests/fixtures_structure.json',
-        'webfront/tests/fixtures_organisms.json',
-        'webfront/tests/fixtures_set.json',
-        'webfront/tests/fixtures_database.json',
+        "webfront/tests/fixtures_entry.json",
+        "webfront/tests/fixtures_protein.json",
+        "webfront/tests/fixtures_structure.json",
+        "webfront/tests/fixtures_organisms.json",
+        "webfront/tests/fixtures_set.json",
+        "webfront/tests/fixtures_database.json",
     ]
-    links_fixtures = 'webfront/tests/relationship_features.json'
+    links_fixtures = "webfront/tests/relationship_features.json"
 
     @classmethod
     def setUpClass(cls):
         for arg in sys.argv:
-            if 'liveserver' in arg:
-                cls.server_url = 'http://' + arg.split('=')[1]
+            if "liveserver" in arg:
+                cls.server_url = "http://" + arg.split("=")[1]
                 return
         super().setUpClass()
         cls.server_url = cls.live_server_url
-        cls.fr = FixtureReader(cls.fixtures+[cls.links_fixtures])
+        cls.fr = FixtureReader(cls.fixtures + [cls.links_fixtures])
         docs = cls.fr.get_fixtures()
         cls.fr.add_to_search_engine(docs)
 
@@ -43,7 +43,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
         try:
-            if os.environ['BROWSER_TEST'] == "chrome":
+            if os.environ["BROWSER_TEST"] == "chrome":
                 chrome_options = Options()
                 chrome_options.add_argument("--headless")
                 self.browser = webdriver.Chrome(chrome_options=chrome_options)
@@ -62,7 +62,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         def link_has_gone_stale():
             try:
                 # poll the link with an arbitrary call
-                link.find_elements_by_id('doesnt-matter')
+                link.find_elements_by_id("doesnt-matter")
                 return False
             except StaleElementReferenceException:
                 return True
@@ -76,6 +76,4 @@ class FunctionalTest(StaticLiveServerTestCase):
                 return True
             else:
                 time.sleep(0.1)
-        raise Exception(
-            'Timeout waiting for {}'.format(condition_function.__name__)
-        )
+        raise Exception("Timeout waiting for {}".format(condition_function.__name__))

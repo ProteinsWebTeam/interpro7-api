@@ -3,7 +3,6 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
 class StructureRESTTest(InterproRESTTestCase):
-
     def test_can_read_structure_overview(self):
         response = self.client.get("/api/structure")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -34,10 +33,11 @@ class StructureRESTTest(InterproRESTTestCase):
             self._check_structure_chain_details(chain)
             self.assertEqual(chain["chain"].upper(), "B")
 
-
     # TODO:
     def test_cant_read_structure_bad_db(self):
-        self._check_HTTP_response_code("/api/structure/bad_db", code=status.HTTP_404_NOT_FOUND)
+        self._check_HTTP_response_code(
+            "/api/structure/bad_db", code=status.HTTP_404_NOT_FOUND
+        )
 
     def test_cant_read_structure_pdb_bad_chain(self):
         self._check_HTTP_response_code("/api/structure/pdb/2bkm/C")

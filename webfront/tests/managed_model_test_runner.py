@@ -19,11 +19,16 @@ class UnManagedModelTestRunner(DiscoverRunner):
 
     def setup_test_environment(self, *args, **kwargs):
         from django.apps import apps
-        myapp = apps.get_app_config('webfront')
-        self.unmanaged_models = [m for m in myapp.models.values() if not m._meta.managed]
+
+        myapp = apps.get_app_config("webfront")
+        self.unmanaged_models = [
+            m for m in myapp.models.values() if not m._meta.managed
+        ]
         for m in self.unmanaged_models:
             m._meta.managed = True
-            m._meta.db_table = re.sub(r'^"([^"]+)"\."([^"]+)"$', r'\1_\2', m._meta.db_table)
+            m._meta.db_table = re.sub(
+                r'^"([^"]+)"\."([^"]+)"$', r"\1_\2", m._meta.db_table
+            )
 
         super(UnManagedModelTestRunner, self).setup_test_environment(*args, **kwargs)
 
@@ -33,7 +38,12 @@ class UnManagedModelTestRunner(DiscoverRunner):
         for m in self.unmanaged_models:
             m._meta.managed = False
 
-if 'interpro_ro' in settings.DATABASES and ('test' in sys.argv or 'test_coverage' in sys.argv):  # Covers regular testing and django-coverage
-    settings.DATABASES['interpro_ro']['ENGINE'] = 'django.db.backends.sqlite3'
-    settings.DATABASES['interpro_ro']['NAME'] = os.path.join(settings.BASE_DIR, '../database/db3.sqlite3')
-    settings.DATABASES['interpro_ro']['TEST'] = {'MIRROR': 'default'}
+
+if "interpro_ro" in settings.DATABASES and (
+    "test" in sys.argv or "test_coverage" in sys.argv
+):  # Covers regular testing and django-coverage
+    settings.DATABASES["interpro_ro"]["ENGINE"] = "django.db.backends.sqlite3"
+    settings.DATABASES["interpro_ro"]["NAME"] = os.path.join(
+        settings.BASE_DIR, "../database/db3.sqlite3"
+    )
+    settings.DATABASES["interpro_ro"]["TEST"] = {"MIRROR": "default"}

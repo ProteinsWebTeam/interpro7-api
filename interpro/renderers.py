@@ -13,14 +13,14 @@ def flatDict(original, output=None, prefix=None):
         if isinstance(value, dict):
             flatDict(value, output, prefix=p_key)
         else:
-            output[p_key] = value;
+            output[p_key] = value
 
     return output
 
 
 class TSVRenderer(renderers.BaseRenderer):
-    media_type = 'text/tab-separated-values'
-    format = 'tsv'
+    media_type = "text/tab-separated-values"
+    format = "tsv"
 
     def render(self, data, media_type=None, renderer_context=None):
         objs = None
@@ -38,9 +38,9 @@ class TSVRenderer(renderers.BaseRenderer):
             writer = csv.DictWriter(
                 output,
                 fieldnames=[k for k in sorted(objs[0]) if k not in fields_to_exclude],
-                extrasaction='ignore',
-                delimiter='\t',
-                quoting=csv.QUOTE_NONNUMERIC
+                extrasaction="ignore",
+                delimiter="\t",
+                quoting=csv.QUOTE_NONNUMERIC,
             )
             writer.writeheader()
             writer.writerows(objs)

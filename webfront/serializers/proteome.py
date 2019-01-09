@@ -5,24 +5,25 @@ from webfront.views.queryset_manager import escape
 
 
 class ProteomeSerializer(ModelContentSerializer):
-
     def to_representation(self, instance):
         representation = {}
         representation = self.endpoint_representation(representation, instance)
-        representation = self.filter_representation(representation, instance, self.detail_filters, self.detail)
+        representation = self.filter_representation(
+            representation, instance, self.detail_filters, self.detail
+        )
         if self.queryset_manager.other_fields is not None:
+
             def counter_function():
                 get_c = ProteomeSerializer.get_counters
                 return get_c(
-                    instance,
-                    self.searcher,
-                    self.queryset_manager.get_searcher_query()
+                    instance, self.searcher, self.queryset_manager.get_searcher_query()
                 )
+
             representation = self.add_other_fields(
                 representation,
                 instance,
                 self.queryset_manager.other_fields,
-                {"counters": counter_function}
+                {"counters": counter_function},
             )
         return representation
 
@@ -46,49 +47,82 @@ class ProteomeSerializer(ModelContentSerializer):
             SerializerDetail.TAXONOMY_OVERVIEW: "taxonomy",
             SerializerDetail.SET_OVERVIEW: "set",
         }
-        query_searcher = "proteome_acc:" + escape(instance.accession).lower() \
-            if hasattr(instance, 'accession') else None
+        query_searcher = (
+            "proteome_acc:" + escape(instance.accession).lower()
+            if hasattr(instance, "accession")
+            else None
+        )
         for df in detail_filters:
             if df in serializer2endpoint:
                 endpoint = serializer2endpoint[df]
-                representation[self.plurals[endpoint]] = self.to_count_representation(endpoint, query_searcher)
+                representation[self.plurals[endpoint]] = self.to_count_representation(
+                    endpoint, query_searcher
+                )
         if detail != SerializerDetail.PROTEOME_OVERVIEW:
             sq = self.queryset_manager.get_searcher_query()
-            if SerializerDetail.ENTRY_DB in detail_filters or \
-                    SerializerDetail.ENTRY_DETAIL in detail_filters:
-                key = "entries" if SerializerDetail.ENTRY_DETAIL in detail_filters else "entry_subset"
+            if (
+                SerializerDetail.ENTRY_DB in detail_filters
+                or SerializerDetail.ENTRY_DETAIL in detail_filters
+            ):
+                key = (
+                    "entries"
+                    if SerializerDetail.ENTRY_DETAIL in detail_filters
+                    else "entry_subset"
+                )
                 representation[key] = self.to_entries_detail_representation(
-                    instance, self.searcher, query_searcher,
-                    base_query=sq
+                    instance, self.searcher, query_searcher, base_query=sq
                 )
-            if SerializerDetail.STRUCTURE_DB in detail_filters or \
-                    SerializerDetail.STRUCTURE_DETAIL in detail_filters:
-                key = "structures" if SerializerDetail.STRUCTURE_DETAIL in detail_filters else "structure_subset"
+            if (
+                SerializerDetail.STRUCTURE_DB in detail_filters
+                or SerializerDetail.STRUCTURE_DETAIL in detail_filters
+            ):
+                key = (
+                    "structures"
+                    if SerializerDetail.STRUCTURE_DETAIL in detail_filters
+                    else "structure_subset"
+                )
                 representation[key] = self.to_structures_detail_representation(
-                    instance, self.searcher, query_searcher,
+                    instance,
+                    self.searcher,
+                    query_searcher,
                     include_chain=True,
-                    base_query=sq
+                    base_query=sq,
                 )
-            if SerializerDetail.PROTEIN_DB in detail_filters or \
-                    SerializerDetail.PROTEIN_DETAIL in detail_filters:
-                key = "proteins" if SerializerDetail.PROTEIN_DETAIL in detail_filters else "protein_subset"
+            if (
+                SerializerDetail.PROTEIN_DB in detail_filters
+                or SerializerDetail.PROTEIN_DETAIL in detail_filters
+            ):
+                key = (
+                    "proteins"
+                    if SerializerDetail.PROTEIN_DETAIL in detail_filters
+                    else "protein_subset"
+                )
                 representation[key] = self.to_proteins_detail_representation(
-                    instance, self.searcher, query_searcher,
-                    base_query=sq
+                    instance, self.searcher, query_searcher, base_query=sq
                 )
-            if SerializerDetail.TAXONOMY_DB in detail_filters or \
-                    SerializerDetail.TAXONOMY_DETAIL in detail_filters:
-                key = "taxa" if SerializerDetail.TAXONOMY_DETAIL in detail_filters else "taxonomy_subset"
+            if (
+                SerializerDetail.TAXONOMY_DB in detail_filters
+                or SerializerDetail.TAXONOMY_DETAIL in detail_filters
+            ):
+                key = (
+                    "taxa"
+                    if SerializerDetail.TAXONOMY_DETAIL in detail_filters
+                    else "taxonomy_subset"
+                )
                 representation[key] = self.to_taxonomy_detail_representation(
                     None, self.searcher, query_searcher
                 )
-            if SerializerDetail.SET_DB in detail_filters or \
-                    SerializerDetail.SET_DETAIL in detail_filters:
-                key = "sets" if SerializerDetail.SET_DETAIL in detail_filters else "set_subset"
+            if (
+                SerializerDetail.SET_DB in detail_filters
+                or SerializerDetail.SET_DETAIL in detail_filters
+            ):
+                key = (
+                    "sets"
+                    if SerializerDetail.SET_DETAIL in detail_filters
+                    else "set_subset"
+                )
                 representation[key] = self.to_set_detail_representation(
-                    instance,
-                    self.searcher,
-                    query_searcher
+                    instance, self.searcher, query_searcher
                 )
         return representation
 
@@ -103,16 +137,18 @@ class ProteomeSerializer(ModelContentSerializer):
         return {
             "metadata": {
                 "accession": instance.accession,
-                "name": {
-                    "name": instance.name
-                },
+                "name": {"name": instance.name},
                 "source_database": "uniprot",
                 "is_reference": instance.is_reference,
                 "strain": instance.strain,
                 "assembly": instance.assembly,
-                "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
-                "lineage": instance.taxonomy.lineage if instance.taxonomy is not None else None,
-                "counters": counters
+                "taxonomy": instance.taxonomy.accession
+                if instance.taxonomy is not None
+                else None,
+                "lineage": instance.taxonomy.lineage
+                if instance.taxonomy is not None
+                else None,
+                "counters": counters,
             }
         }
 
@@ -123,8 +159,12 @@ class ProteomeSerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.name,
                 "is_reference": instance.is_reference,
-                "taxonomy": instance.taxonomy.accession if instance.taxonomy is not None else None,
-                "lineage": instance.taxonomy.lineage if instance.taxonomy is not None else None,
+                "taxonomy": instance.taxonomy.accession
+                if instance.taxonomy is not None
+                else None,
+                "lineage": instance.taxonomy.lineage
+                if instance.taxonomy is not None
+                else None,
                 "source_database": "uniprot",
             }
         }
@@ -132,22 +172,38 @@ class ProteomeSerializer(ModelContentSerializer):
     @staticmethod
     def get_counters(instance, searcher, sq):
         return {
-            "entries": searcher.get_number_of_field_by_endpoint("proteome", "entry_acc", instance.accession, sq),
-            "structures": searcher.get_number_of_field_by_endpoint("proteome", "structure_acc", instance.accession, sq),
-            "proteins": searcher.get_number_of_field_by_endpoint("proteome", "protein_acc", instance.accession, sq),
-            "taxa": searcher.get_number_of_field_by_endpoint("proteome", "tax_id", instance.accession, sq),
-            "sets": searcher.get_number_of_field_by_endpoint("proteome", "set_acc", instance.accession, sq),
+            "entries": searcher.get_number_of_field_by_endpoint(
+                "proteome", "entry_acc", instance.accession, sq
+            ),
+            "structures": searcher.get_number_of_field_by_endpoint(
+                "proteome", "structure_acc", instance.accession, sq
+            ),
+            "proteins": searcher.get_number_of_field_by_endpoint(
+                "proteome", "protein_acc", instance.accession, sq
+            ),
+            "taxa": searcher.get_number_of_field_by_endpoint(
+                "proteome", "tax_id", instance.accession, sq
+            ),
+            "sets": searcher.get_number_of_field_by_endpoint(
+                "proteome", "set_acc", instance.accession, sq
+            ),
         }
 
     @staticmethod
     def to_counter_representation(instance):
         if "proteomes" not in instance:
-            if ("count" in instance and instance["count"] == 0) or \
-               ("doc_count" in instance["databases"] and instance["databases"]["doc_count"] == 0):
-                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome"))
+            if ("count" in instance and instance["count"] == 0) or (
+                "doc_count" in instance["databases"]
+                and instance["databases"]["doc_count"] == 0
+            ):
+                raise EmptyQuerysetError(
+                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome")
+                )
             instance = {
                 "proteomes": {
-                    "uniprot": ProteomeSerializer.serialize_counter_bucket(instance["databases"], "proteomes"),
+                    "uniprot": ProteomeSerializer.serialize_counter_bucket(
+                        instance["databases"], "proteomes"
+                    )
                 }
             }
         return instance
@@ -158,7 +214,7 @@ class ProteomeSerializer(ModelContentSerializer):
             "taxonomy": obj["tax_id"],
             "accession": obj["proteome_acc"],
             "lineage": obj["tax_lineage"],
-            "source_database": "uniprot"
+            "source_database": "uniprot",
         }
         if include_chain:
             header["chain"] = obj["structure_chain_acc"]
@@ -168,9 +224,13 @@ class ProteomeSerializer(ModelContentSerializer):
     def to_group_representation(instance):
         if "groups" in instance:
             if ProteomeSerializer.grouper_is_empty(instance):
-                raise EmptyQuerysetError(ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome"))
+                raise EmptyQuerysetError(
+                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome")
+                )
             return {
-                ProteomeSerializer.get_key_from_bucket(bucket): ProteomeSerializer.serialize_counter_bucket(bucket, "proteomes")
+                ProteomeSerializer.get_key_from_bucket(
+                    bucket
+                ): ProteomeSerializer.serialize_counter_bucket(bucket, "proteomes")
                 for bucket in instance["groups"]["buckets"]
             }
         elif "proteome_is_reference" in instance:
@@ -178,10 +238,10 @@ class ProteomeSerializer(ModelContentSerializer):
         else:
             return {field_value: total for field_value, total in instance}
 
-
     def to_count_representation(self, endpoint, query):
         return self.serializers[endpoint].to_counter_representation(
-            self.searcher.get_counter_object(endpoint, query, self.get_extra_endpoints_to_count()),
-            self.detail_filters
+            self.searcher.get_counter_object(
+                endpoint, query, self.get_extra_endpoints_to_count()
+            ),
+            self.detail_filters,
         )[self.plurals[endpoint]]
-

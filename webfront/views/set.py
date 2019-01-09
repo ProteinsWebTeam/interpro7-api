@@ -7,9 +7,9 @@ from django.conf import settings
 
 from webfront.views.modifiers import add_extra_fields, get_set_alignment
 
-entry_sets = '|'.join(settings.ENTRY_SETS) + '|all'
-entry_sets_accessions = (
-    r'^({})$'.format('|'.join((set['accession'] for (_, set) in settings.ENTRY_SETS.items())))
+entry_sets = "|".join(settings.ENTRY_SETS) + "|all"
+entry_sets_accessions = r"^({})$".format(
+    "|".join((set["accession"] for (_, set) in settings.ENTRY_SETS.items()))
 )
 #
 # class SetAlignmentHandler(CustomView):
@@ -26,8 +26,9 @@ entry_sets_accessions = (
 #             level, self.queryset, handler, general_handler, request, *args, **kwargs
 #         )
 
+
 class SetAccessionHandler(CustomView):
-    level_description = 'Set accession level'
+    level_description = "Set accession level"
     serializer_class = SetSerializer
     queryset = Set.objects.all()
     many = False
@@ -36,30 +37,52 @@ class SetAccessionHandler(CustomView):
     # ]
     serializer_detail_filter = SerializerDetail.SET_DETAIL
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-        general_handler.queryset_manager.add_filter("set", accession__iexact=endpoint_levels[level - 1].lower())
+    def get(
+        self,
+        request,
+        endpoint_levels,
+        available_endpoint_handlers=None,
+        level=0,
+        parent_queryset=None,
+        handler=None,
+        general_handler=None,
+        *args,
+        **kwargs
+    ):
+        general_handler.queryset_manager.add_filter(
+            "set", accession__iexact=endpoint_levels[level - 1].lower()
+        )
         general_handler.modifiers.register(
             "alignments",
             get_set_alignment,
             use_model_as_payload=True,
             many=True,
-            serializer=SerializerDetail.SET_ALIGNMENT
+            serializer=SerializerDetail.SET_ALIGNMENT,
         )
 
         return super(SetAccessionHandler, self).get(
-            request._request, endpoint_levels, available_endpoint_handlers,
-            level, self.queryset, handler, general_handler, request, *args, **kwargs
+            request._request,
+            endpoint_levels,
+            available_endpoint_handlers,
+            level,
+            self.queryset,
+            handler,
+            general_handler,
+            request,
+            *args,
+            **kwargs
         )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
-        general_handler.queryset_manager.add_filter("set", accession__iexact=level_name.lower())
+        general_handler.queryset_manager.add_filter(
+            "set", accession__iexact=level_name.lower()
+        )
         return queryset
 
 
 class SetTypeHandler(CustomView):
-    level_description = 'set type level'
+    level_description = "set type level"
     child_handlers = [
         (entry_sets_accessions, SetAccessionHandler),
         # ("proteome", ProteomeHandler),
@@ -69,29 +92,48 @@ class SetTypeHandler(CustomView):
     serializer_detail = SerializerDetail.SET_HEADERS
     serializer_detail_filter = SerializerDetail.SET_DB
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+    def get(
+        self,
+        request,
+        endpoint_levels,
+        available_endpoint_handlers=None,
+        level=0,
+        parent_queryset=None,
+        handler=None,
+        general_handler=None,
+        *args,
+        **kwargs
+    ):
         db = endpoint_levels[level - 1]
         if db.lower() != "all":
             general_handler.queryset_manager.add_filter("set", source_database=db)
         general_handler.modifiers.register(
-            "extra_fields",
-            add_extra_fields(Set, "counters"),
+            "extra_fields", add_extra_fields(Set, "counters")
         )
         return super(SetTypeHandler, self).get(
-            request._request, endpoint_levels, available_endpoint_handlers,
-            level, self.queryset, handler, general_handler, request, *args, **kwargs
+            request._request,
+            endpoint_levels,
+            available_endpoint_handlers,
+            level,
+            self.queryset,
+            handler,
+            general_handler,
+            request,
+            *args,
+            **kwargs
         )
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         if level_name.lower() != "all":
-            general_handler.queryset_manager.add_filter("set", source_database=level_name)
+            general_handler.queryset_manager.add_filter(
+                "set", source_database=level_name
+            )
         return queryset
 
 
 class SetHandler(CustomView):
-    level_description = 'Set level'
+    level_description = "Set level"
     from_model = False
     child_handlers = [
         (entry_sets, SetTypeHandler),
@@ -104,20 +146,40 @@ class SetHandler(CustomView):
 
     def get_database_contributions(self, queryset):
         qs = Set.objects.filter(accession__in=queryset)
-        set_counter = qs.values_list('source_database').annotate(total=Count('source_database'))
+        set_counter = qs.values_list("source_database").annotate(
+            total=Count("source_database")
+        )
         output = {c[0]: c[1] for c in set_counter if c[0] != "node"}
         output["all"] = sum(output.values())
         return {"sets": output}
 
-    def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-            parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
+    def get(
+        self,
+        request,
+        endpoint_levels,
+        available_endpoint_handlers=None,
+        level=0,
+        parent_queryset=None,
+        handler=None,
+        general_handler=None,
+        *args,
+        **kwargs
+    ):
 
         general_handler.queryset_manager.reset_filters("set", endpoint_levels)
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
 
         return super(SetHandler, self).get(
-            request._request, endpoint_levels, available_endpoint_handlers,
-            level, self.queryset, handler, general_handler, request, *args, **kwargs
+            request._request,
+            endpoint_levels,
+            available_endpoint_handlers,
+            level,
+            self.queryset,
+            handler,
+            general_handler,
+            request,
+            *args,
+            **kwargs
         )
 
     @staticmethod

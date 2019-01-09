@@ -17,9 +17,11 @@ def get_unique_lines(logfiles):
     lut = OrderedDict()
     for file in files:
         with open(file, "r") as handle:
-            for line in tqdm(handle, desc="reading {}".format(file), unit="lines", leave=False):
+            for line in tqdm(
+                handle, desc="reading {}".format(file), unit="lines", leave=False
+            ):
                 line = line.strip()
-                if line and not line.startswith('#'):
+                if line and not line.startswith("#"):
                     line = canonical(line, remove_all_page_size=True)
                     lut[line] = lut.get(line, 0) + 1
     return sorted(lut, key=lut.get, reverse=True)
@@ -67,9 +69,7 @@ def send_queries(root, page_sizes, queries):
                 for size in page_sizes:
                     extra_url = canonical(
                         "{}{}page_size={}".format(
-                            url,
-                            "?" if url.endswith("/") else "&",
-                            size
+                            url, "?" if url.endswith("/") else "&", size
                         )
                     )
                     wrapped.update()
@@ -100,7 +100,10 @@ def analyze_stats(stats, n, output):
             log_time = "{}ms".format(int(time * 1000))
         else:
             log_time = "{:.3f}s".format(round(time, 3))
-        print("{}: {}{}".format(log_time, url, " (was cached)" if was_cached else ""), file=sys.stderr)
+        print(
+            "{}: {}{}".format(log_time, url, " (was cached)" if was_cached else ""),
+            file=sys.stderr,
+        )
     print("time", "status", "url", "was cached", "got cached", sep="\t", file=output)
     failed = 0
     for (time, status, url, was_cached, is_cached) in stats:
@@ -109,13 +112,15 @@ def analyze_stats(stats, n, output):
         print(time, status, url, was_cached, is_cached, sep="\t", file=output)
     if failed:
         print(
-            "❌ {} URL{} failed to be processed".format(failed, 's' if failed > 1 else ''),
-            file=sys.stderr
+            "❌ {} URL{} failed to be processed".format(
+                failed, "s" if failed > 1 else ""
+            ),
+            file=sys.stderr,
         )
     else:
         print("✅ all URLs were processed successfully", file=sys.stderr)
     return failed
-        
+
 
 def main(logfiles, root, page_sizes, top, output, *args, **kwargs):
     queries = get_unique_lines(logfiles)
@@ -129,25 +134,37 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "logfiles", type=str, nargs="+",
-            help="log files with requests to execute"
+            "logfiles", type=str, nargs="+", help="log files with requests to execute"
         )
         parser.add_argument(
-            "--root", "-r", type=str,
-            help="URL root", default="http://wp-np3-ac.ebi.ac.uk/interpro7"
+            "--root",
+            "-r",
+            type=str,
+            help="URL root",
+            default="http://wp-np3-ac.ebi.ac.uk/interpro7",
         )
         parser.add_argument(
-            "--page_sizes", "-p", type=int, nargs="+",
-            help="extra page size to query", default=[100, 50]
+            "--page_sizes",
+            "-p",
+            type=int,
+            nargs="+",
+            help="extra page size to query",
+            default=[100, 50],
         )
         parser.add_argument(
-            "--top", "-t", type=int,
-            help="display the top n longest queries", default=10
+            "--top",
+            "-t",
+            type=int,
+            help="display the top n longest queries",
+            default=10,
         )
         parser.add_argument(
-            "--output", "-o", type=FileType("w"),
-            help="output file for logs (defaults to stdout)", default=sys.stdout
-         )
+            "--output",
+            "-o",
+            type=FileType("w"),
+            help="output file for logs (defaults to stdout)",
+            default=sys.stdout,
+        )
 
     def handle(self, *args, **options):
         failed = main(**options)

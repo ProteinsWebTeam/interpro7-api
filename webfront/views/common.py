@@ -27,20 +27,25 @@ from webfront.models import Database
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from time import sleep
 
-QUERY_TIMEOUT = settings.INTERPRO_CONFIG.get('query_timeout', 90)
-CACHE_TIMEOUT = settings.INTERPRO_CONFIG.get('cache_volatile_key_ttl', 1800)
+QUERY_TIMEOUT = settings.INTERPRO_CONFIG.get("query_timeout", 90)
+CACHE_TIMEOUT = settings.INTERPRO_CONFIG.get("cache_volatile_key_ttl", 1800)
 logger = logging.getLogger(__name__)
 
 
 def map_url_to_levels(url):
-    parts = [x.strip("/") for x in re.compile("(entry|protein|structure|taxonomy|proteome|set)").split(url)]
+    parts = [
+        x.strip("/")
+        for x in re.compile("(entry|protein|structure|taxonomy|proteome|set)").split(
+            url
+        )
+    ]
 
     new_url = parts[:3]
     for i in range(4, len(parts), 2):
         if parts[i] == "":
-            new_url = new_url[:3] + parts[i - 1:i + 1] + new_url[3:]
+            new_url = new_url[:3] + parts[i - 1 : i + 1] + new_url[3:]
         else:
-            new_url += parts[i - 1:i + 1]
+            new_url += parts[i - 1 : i + 1]
 
     return "/".join(filter(lambda a: len(a) != 0, new_url)).split("/")
 
@@ -49,10 +54,11 @@ def pagination_information(request):
     # Extracts the pagination parameters out of the URL and returns a dictionary.
     return {
         "index": int(request.GET.get("page", 1)),
-        "size": int(request.GET.get(
-            "page_size",
-            settings.INTERPRO_CONFIG.get('default_page_size', 20)
-        )),
+        "size": int(
+            request.GET.get(
+                "page_size", settings.INTERPRO_CONFIG.get("default_page_size", 20)
+            )
+        ),
     }
 
 
@@ -67,8 +73,10 @@ def getDataForRoot(handlers):
                 "version": db["version"],
                 "releaseDate": db["release_date"],
                 "type": db["type"],
-            } for db in Database.objects.order_by("type")
-            .values("name", "name_long", "description", "version", "release_date", "type")
+            }
+            for db in Database.objects.order_by("type").values(
+                "name", "name_long", "description", "version", "release_date", "type"
+            )
         },
     }
 
@@ -84,19 +92,19 @@ class GeneralHandler(CustomView):
     # so it is accessible arounf the request procesing. (e.g. queryset management,
 
     # Human readable description for logging purposes
-    level_description = 'home level'
+    level_description = "home level"
 
     # A valid URL on the API can only use an endpoint of this list *once*.
     # This list contains the endpoint that haven't been used yet in this request.
     # Been this view the root handler, all the endpoints are available.
     available_endpoint_handlers = [
-        ('entry', EntryHandler),
-        ('protein', ProteinHandler),
-        ('structure', StructureHandler),
-        ('taxonomy', TaxonomyHandler),
-        ('proteome', ProteomeHandler),
-        ('set', SetHandler),
-        ('utils', UtilsHandler),
+        ("entry", EntryHandler),
+        ("protein", ProteinHandler),
+        ("structure", StructureHandler),
+        ("taxonomy", TaxonomyHandler),
+        ("proteome", ProteomeHandler),
+        ("set", SetHandler),
+        ("utils", UtilsHandler),
     ]
     # The queryset manager for the current request.
     queryset_manager = QuerysetManager()
@@ -110,19 +118,21 @@ class GeneralHandler(CustomView):
 
     cache = InterProCache()
 
-    def get(self, request, url='', *args, **kwargs):
+    def get(self, request, url="", *args, **kwargs):
         clean_url = url.strip()
-        if clean_url == '' or clean_url == '/':
+        if clean_url == "" or clean_url == "/":
             return Response(getDataForRoot(self.available_endpoint_handlers))
         full_path = request.get_full_path()
         response = None
-        caching_allowed = settings.INTERPRO_CONFIG.get('enable_caching', False)
+        caching_allowed = settings.INTERPRO_CONFIG.get("enable_caching", False)
         if caching_allowed:
             try:
                 response = self.cache.get(full_path)
             except Exception as e:
                 if "TRAVIS" not in os.environ:
-                    logger.error('Failed getting {} from cache: {}'.format(full_path, e))
+                    logger.error(
+                        "Failed getting {} from cache: {}".format(full_path, e)
+                    )
         if response:
             return response
 
@@ -134,10 +144,14 @@ class GeneralHandler(CustomView):
         self.queryset_manager = QuerysetManager()
         self.searcher = self.get_search_controller(self.queryset_manager)
         try:
+
             def query(args):
-                self, request, endpoint_levels, full_path, drf_request, caching_allowed = args
-                response = super(GeneralHandler, self, ).get(
-                    request, endpoint_levels,
+                self, request, endpoint_levels, full_path, drf_request, caching_allowed = (
+                    args
+                )
+                response = super(GeneralHandler, self).get(
+                    request,
+                    endpoint_levels,
                     available_endpoint_handlers=self.available_endpoint_handlers,
                     level=0,
                     parent_queryset=self.queryset,
@@ -149,7 +163,7 @@ class GeneralHandler(CustomView):
 
             def timer(caching_allowed):
                 sleep(QUERY_TIMEOUT)
-                content = {'detail': 'Query timed out'}
+                content = {"detail": "Query timed out"}
                 response = Response(content, status=status.HTTP_408_REQUEST_TIMEOUT)
                 return response
 
@@ -157,31 +171,51 @@ class GeneralHandler(CustomView):
             if caching_allowed:
                 pool = ThreadPoolExecutor(2)
                 futures = [
-                    pool.submit(query,
-                                (self, request._request, endpoint_levels, full_path, drf_request, caching_allowed)),
+                    pool.submit(
+                        query,
+                        (
+                            self,
+                            request._request,
+                            endpoint_levels,
+                            full_path,
+                            drf_request,
+                            caching_allowed,
+                        ),
+                    ),
                     pool.submit(timer, caching_allowed),
                 ]
                 result = wait(futures, return_when=FIRST_COMPLETED)
                 response = result.done.pop().result()
                 if response.status_code == status.HTTP_408_REQUEST_TIMEOUT:
-                    self._set_in_cache(caching_allowed, full_path, response, timeout=CACHE_TIMEOUT)
+                    self._set_in_cache(
+                        caching_allowed, full_path, response, timeout=CACHE_TIMEOUT
+                    )
 
             else:
-                response = query((self, request._request, endpoint_levels, full_path, drf_request, caching_allowed))
+                response = query(
+                    (
+                        self,
+                        request._request,
+                        endpoint_levels,
+                        full_path,
+                        drf_request,
+                        caching_allowed,
+                    )
+                )
         except DeletedEntryError as e:
             if settings.DEBUG:
                 raise
-            content = {'detail': e.args[2], 'accession': e.args[0], 'date': e.args[1]}
+            content = {"detail": e.args[2], "accession": e.args[0], "date": e.args[1]}
             response = Response(content, status=status.HTTP_410_GONE)
         except EmptyQuerysetError as e:
             if settings.DEBUG:
                 raise
-            content = {'detail': e.args[0]}
+            content = {"detail": e.args[0]}
             response = Response(content, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             if settings.DEBUG:
                 raise
-            content = {'Error': e.args[0]}
+            content = {"Error": e.args[0]}
             response = Response(content, status=status.HTTP_404_NOT_FOUND)
         return response
 
@@ -191,7 +225,9 @@ class GeneralHandler(CustomView):
                 self.cache.set(full_path, response, timeout)
             except Exception as e:
                 if "TRAVIS" not in os.environ:
-                    logger.error('Failed setting {} into cache: {}'.format(full_path, e))
+                    logger.error(
+                        "Failed setting {} into cache: {}".format(full_path, e)
+                    )
 
     def register_filter_serializer(self, filter_serializer, value):
         if value in [e[0] for e in self.available_endpoint_handlers]:
@@ -199,7 +235,7 @@ class GeneralHandler(CustomView):
         if self.current_filter_endpoint is not None:
             self.filter_serializers[self.current_filter_endpoint] = {
                 "filter_serializer": filter_serializer,
-                "value": value
+                "value": value,
             }
 
     def search_modifier(self, search, general_handler):
@@ -207,15 +243,11 @@ class GeneralHandler(CustomView):
             return
         if general_handler.queryset_manager.main_endpoint == "taxonomy":
             self.queryset_manager.add_filter(
-                "search",
-                accession__icontains=search,
-                full_name__icontains=search
+                "search", accession__icontains=search, full_name__icontains=search
             )
         else:
             self.queryset_manager.add_filter(
-                "search",
-                accession__icontains=search,
-                name__icontains=search
+                "search", accession__icontains=search, name__icontains=search
             )
 
     @staticmethod

@@ -22,7 +22,9 @@ class Entry(models.Model):
     # other_names = JSONField(null=True)
     source_database = models.CharField(max_length=100, db_index=True)
     member_databases = JSONField(null=True)
-    integrated = models.ForeignKey("Entry", on_delete=models.SET_NULL, null=True, blank=True)
+    integrated = models.ForeignKey(
+        "Entry", on_delete=models.SET_NULL, null=True, blank=True
+    )
     go_terms = JSONField(null=True)
     description = JSONField(null=True)
     wikipedia = models.TextField(null=True)
@@ -58,7 +60,9 @@ class Protein(models.Model):
     gene = models.CharField(max_length=70, null=True)
     go_terms = JSONField(null=True)
     evidence_code = models.IntegerField()
-    source_database = models.CharField(max_length=20, default="unreviewed", db_index=True)
+    source_database = models.CharField(
+        max_length=20, default="unreviewed", db_index=True
+    )
     residues = JSONField(null=True)
     extra_features = JSONField(null=True)
     structure = JSONField(default={})
@@ -87,7 +91,9 @@ class Taxonomy(models.Model):
     scientific_name = models.CharField(max_length=255)
     full_name = models.CharField(max_length=512)
     lineage = models.CharField(max_length=512)
-    parent = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)
+    parent = models.ForeignKey(
+        "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True
+    )
     rank = models.CharField(max_length=20)
     children = JSONField(null=True)
     counts = JSONField(null=True)
@@ -99,7 +105,9 @@ class Proteome(models.Model):
     is_reference = models.BooleanField(default=False)
     strain = models.CharField(max_length=512)
     assembly = models.CharField(max_length=512)
-    taxonomy = models.ForeignKey("Taxonomy", on_delete=models.SET_NULL, null=True, blank=True)
+    taxonomy = models.ForeignKey(
+        "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True
+    )
     counts = JSONField(null=True)
 
 
@@ -109,7 +117,9 @@ class Set(models.Model):
     description = models.TextField()
     source_database = models.CharField(max_length=20, db_index=True)
     integrated = JSONField(null=True)
-    relationships = JSONField(null=True)  # {nodes: [{accession:"", type: ""}], links:[source:"", target: ""]}
+    relationships = JSONField(
+        null=True
+    )  # {nodes: [{accession:"", type: ""}], links:[source:"", target: ""]}
     is_set = models.BooleanField(default=True)
     counts = JSONField(null=True)
 
@@ -121,6 +131,10 @@ class Release_Note(models.Model):
 
 
 class Alignment(models.Model):
-    set_acc = models.ForeignKey(Set, db_column="set_acc", on_delete=models.SET_NULL, null=True)
-    entry_acc = models.ForeignKey(Entry, db_column="entry_acc", on_delete=models.SET_NULL, null=True)
+    set_acc = models.ForeignKey(
+        Set, db_column="set_acc", on_delete=models.SET_NULL, null=True
+    )
+    entry_acc = models.ForeignKey(
+        Entry, db_column="entry_acc", on_delete=models.SET_NULL, null=True
+    )
     alignments = JSONField(null=True)

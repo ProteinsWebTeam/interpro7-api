@@ -1,5 +1,6 @@
 from webfront.views.custom import is_single_endpoint
 
+
 class ModifierManager:
     def __init__(self, general_handler=None):
         self.general_handler = general_handler
@@ -9,13 +10,16 @@ class ModifierManager:
         self.many = False
         self.search_size = None
 
-    def register(self, parameter, action,
-                 use_model_as_payload=False,
-                 serializer=None,
-                 many=False,
-                 works_in_single_endpoint=True,
-                 works_in_multiple_endpoint=True,
-                 ):
+    def register(
+        self,
+        parameter,
+        action,
+        use_model_as_payload=False,
+        serializer=None,
+        many=False,
+        works_in_single_endpoint=True,
+        works_in_multiple_endpoint=True,
+    ):
         self.modifiers[parameter] = {
             "action": action,
             "use_model_as_payload": use_model_as_payload,
@@ -32,9 +36,17 @@ class ModifierManager:
     def _check_modifier(self, modifier):
         single = is_single_endpoint(self.general_handler)
         if single and not self.modifiers[modifier]["works_in_single_endpoint"]:
-            raise Exception("The modifier '{}' doen't work on URLs of a single endpoint".format(modifier))
+            raise Exception(
+                "The modifier '{}' doen't work on URLs of a single endpoint".format(
+                    modifier
+                )
+            )
         if not single and not self.modifiers[modifier]["works_in_multiple_endpoint"]:
-            raise Exception("The modifier '{}' doen't work on URLs of multiple endpoints".format(modifier))
+            raise Exception(
+                "The modifier '{}' doen't work on URLs of multiple endpoints".format(
+                    modifier
+                )
+            )
 
     def execute(self, request):
         payload_modifiers = {}
@@ -49,7 +61,9 @@ class ModifierManager:
             param = request.query_params.get(modifier)
             if param is not None:
                 self._check_modifier(modifier)
-                self.payload = self.modifiers[modifier]["action"](param, self.general_handler)
+                self.payload = self.modifiers[modifier]["action"](
+                    param, self.general_handler
+                )
                 self.serializer = self.modifiers[modifier]["serializer"]
                 self.many = self.many or self.modifiers[modifier]["many"]
         use_model_as_payload = False
@@ -57,11 +71,16 @@ class ModifierManager:
             param = request.query_params.get(modifier)
             if param is not None:
                 self._check_modifier(modifier)
-                self.payload = self.modifiers[modifier]["action"](param, self.general_handler)
+                self.payload = self.modifiers[modifier]["action"](
+                    param, self.general_handler
+                )
                 self.many = self.many or self.modifiers[modifier]["many"]
                 if self.serializer is None:
                     self.serializer = self.modifiers[modifier]["serializer"]
                 else:
-                    raise(Exception, "only one modifier can change the shape of the payload")
+                    raise (
+                        Exception,
+                        "only one modifier can change the shape of the payload",
+                    )
                 use_model_as_payload = True
         return use_model_as_payload

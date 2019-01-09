@@ -54,6 +54,7 @@ class SerializerDetail(Enum):
 
     ANNOTATION_BLOB = 1000
 
+
 class QuerysetType(Enum):
     ENTRY = 100
     PROTEIN = 200

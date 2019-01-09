@@ -3,12 +3,15 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 
 
 class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
-
     def test_can_get_protein_overview_from_entry(self):
         response = self.client.get("/api/entry/protein/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_entry_count_overview(response.data)
-        self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+        self.assertIn(
+            "proteins",
+            response.data,
+            "'proteins' should be one of the keys in the response",
+        )
         self._check_protein_count_overview(response.data)
 
     def test_urls_that_return_list_of_accessions_and_proteins(self):
@@ -24,7 +27,9 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
         for url in urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
 
     def test_urls_that_return_entry_with_protein_count(self):
         acc = "IPR003165"
@@ -42,17 +47,23 @@ class EntryWithFilterProteinRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_entry_details(response.data["metadata"])
-            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
+            self.assertIn(
+                "proteins",
+                response.data,
+                "'proteins' should be one of the keys in the response",
+            )
             self._check_protein_count_overview(response.data)
 
 
 class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
-
     def test_can_get_protein_match_from_entry(self):
         response = self.client.get("/api/entry/protein/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("proteins", response.data["entries"]["unintegrated"],
-                      "'proteins' should be one of the keys in the response")
+        self.assertIn(
+            "proteins",
+            response.data["entries"]["unintegrated"],
+            "'proteins' should be one of the keys in the response",
+        )
         # TODO: Improve this test
         # uniprots = response.data["proteins"]
         # response = self.client.get("/api/entry/protein/reviewed")
@@ -76,8 +87,10 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             for match in result["protein_subset"]:
                 self._check_match(match)
 
-        self.assertTrue(has_one and has_two,
-                        "One of the entries should have one protein and the other one should have two")
+        self.assertTrue(
+            has_one and has_two,
+            "One of the entries should have one protein and the other one should have two",
+        )
 
     def test_can_get_reviewed_from_interpro_protein(self):
         response = self.client.get("/api/entry/interpro/protein/reviewed")
@@ -91,8 +104,10 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
                 has_two = True
             for match in result["protein_subset"]:
                 self._check_match(match)
-        self.assertTrue(has_one and not has_two,
-                        "One of the entries should have one protein and the other one should have two")
+        self.assertTrue(
+            has_one and not has_two,
+            "One of the entries should have one protein and the other one should have two",
+        )
 
     def test_can_get_matches_from_entries(self):
         acc = "IPR003165"
@@ -101,13 +116,21 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         tests = {
             "/api/entry/interpro/" + acc + "/protein/uniprot": ["A1CUJ5", "P16582"],
             "/api/entry/interpro/" + acc + "/protein/reviewed": ["A1CUJ5"],
-            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/protein/uniprot": ["A1CUJ5"],
+            "/api/entry/interpro/"
+            + acc
+            + "/pfam/"
+            + pfam
+            + "/protein/uniprot": ["A1CUJ5"],
             "/api/entry/pfam/" + pfam + "/protein/uniprot": ["A1CUJ5"],
             "/api/entry/unintegrated/pfam/" + pfam_u + "/protein/uniprot": ["M5ADK6"],
         }
         for url in tests:
             response = self.client.get(url)
-            self.assertIn("protein_subset", response.data, "'proteins' should be one of the keys in the response")
+            self.assertIn(
+                "protein_subset",
+                response.data,
+                "'proteins' should be one of the keys in the response",
+            )
             self.assertEqual(len(response.data["protein_subset"]), len(tests[url]))
             for match in response.data["protein_subset"]:
                 self._check_match(match)
@@ -118,9 +141,7 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
 class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_entry_overview_filtered_by_protein(self):
         prot_s = "M5ADK6"
-        tests = [
-            "/api/entry/protein/uniprot/" + prot_s,
-        ]
+        tests = ["/api/entry/protein/uniprot/" + prot_s]
         for url in tests:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -136,14 +157,28 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         tests = {
             "/api/entry/interpro/" + acc + "/protein/uniprot/" + prot: ["A1CUJ5"],
             "/api/entry/interpro/" + acc + "/protein/reviewed/" + prot: ["A1CUJ5"],
-            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/protein/uniprot/" + prot: ["A1CUJ5"],
+            "/api/entry/interpro/"
+            + acc
+            + "/pfam/"
+            + pfam
+            + "/protein/uniprot/"
+            + prot: ["A1CUJ5"],
             "/api/entry/pfam/" + pfam + "/protein/uniprot/" + prot: ["A1CUJ5"],
-            "/api/entry/unintegrated/pfam/" + pfam_u + "/protein/uniprot/" + prot_u: ["M5ADK6"],
+            "/api/entry/unintegrated/pfam/"
+            + pfam_u
+            + "/protein/uniprot/"
+            + prot_u: ["M5ADK6"],
         }
         for url in tests:
             response = self.client.get(url)
-            self.assertIn("proteins", response.data, "'proteins' should be one of the keys in the response")
-            self.assertEqual(len(response.data["proteins"]), len(tests[url]), "failed at " + url)
+            self.assertIn(
+                "proteins",
+                response.data,
+                "'proteins' should be one of the keys in the response",
+            )
+            self.assertEqual(
+                len(response.data["proteins"]), len(tests[url]), "failed at " + url
+            )
             for match in response.data["proteins"]:
                 self._check_match(match)
                 # self._check_protein_details(match["protein"])
@@ -165,9 +200,15 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         for url in tests:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
             for entry in response.data["results"]:
-                self.assertIn("proteins", entry, "'proteins' should be one of the keys in the response")
+                self.assertIn(
+                    "proteins",
+                    entry,
+                    "'proteins' should be one of the keys in the response",
+                )
                 for match in entry["proteins"]:
                     self._check_match(match)
                     # self._check_protein_details(match["protein"])
@@ -182,22 +223,37 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         tests = [
             "/api/entry/interpro/protein/uniprot/" + prot_u,
             "/api/entry/interpro/" + acc + "/protein/unreviewed/" + prot,
-            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/protein/unreviewed/" + prot,
+            "/api/entry/interpro/"
+            + acc
+            + "/pfam/"
+            + pfam
+            + "/protein/unreviewed/"
+            + prot,
             "/api/entry/unintegrated/pfam/" + pfam_u + "/protein/uniprot/" + prot,
             "/api/entry/unintegrated/pfam/" + pfam_u + "/protein/unreviewed/" + prot_u,
             "/api/entry/unintegrated/smart/" + smart + "/protein/uniprot",
         ]
         for url in tests:
-            self._check_HTTP_response_code(url, msg="The URL [" + url + "] should've failed.")
+            self._check_HTTP_response_code(
+                url, msg="The URL [" + url + "] should've failed."
+            )
 
     def test_urls_that_should_fail(self):
         acc = "IPR003165"
         pfam = "PF02171"
         prot = "A1CUJ5"
         tests = [
-            "/api/entry/interpro/" + acc + "/smart/" + pfam + "/protein/unreviewed/" + prot,
+            "/api/entry/interpro/"
+            + acc
+            + "/smart/"
+            + pfam
+            + "/protein/unreviewed/"
+            + prot,
             "/api/entry/unintegrated/pfam/" + pfam + "/protein/unreviewed/" + prot,
         ]
         for url in tests:
-            self._check_HTTP_response_code(url, code=status.HTTP_204_NO_CONTENT,
-                                           msg="The URL [" + url + "] should've failed.")
+            self._check_HTTP_response_code(
+                url,
+                code=status.HTTP_204_NO_CONTENT,
+                msg="The URL [" + url + "] should've failed.",
+            )

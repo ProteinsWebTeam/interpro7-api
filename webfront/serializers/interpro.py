@@ -237,6 +237,8 @@ class EntrySerializer(ModelContentSerializer):
             "entry_annotations": annotation_types,
             "cross_references": EntrySerializer.reformat_cross_references(
                 instance.cross_references
+                if instance.cross_references is not None
+                else {}
             ),
         }
         return obj

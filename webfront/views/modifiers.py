@@ -280,18 +280,26 @@ def filter_by_match_presence(value, general_handler):
     )
 
 
-def get_domain_architectures(field, general_handler):
-    searcher = general_handler.searcher
-    rows = (
+def _get_rows(general_handler):
+    return (
         general_handler.pagination["size"]
         if "size" in general_handler.pagination
-        else 10
+        else settings.INTERPRO_CONFIG.get("default_page_size", 20)
     )
-    index = (
+
+
+def _get_index(general_handler):
+    return (
         general_handler.pagination["index"]
         if "index" in general_handler.pagination
         else 1
     )
+
+
+def get_domain_architectures(field, general_handler):
+    searcher = general_handler.searcher
+    rows = _get_rows(general_handler)
+    index = _get_index(general_handler)
     if field is None or field.strip() == "":
         return searcher.get_group_obj_of_field_by_query(
             None,
@@ -350,6 +358,32 @@ def add_extra_fields(endpoint, *argv):
         general_handler.queryset_manager.other_fields = fs
 
     return x
+
+
+def ida_search(value, general_handler):
+    searcher = general_handler.searcher
+    rows = _get_rows(general_handler)
+    index = _get_index(general_handler)
+
+    conserve_order = "ordered" in general_handler.request.query_params
+    entries = value.lower().split(",")
+    if conserve_order:
+        query = "*{}*".format("*".join(entries))
+    else:
+        query = " && ".join(["ida:*{}*".format(e) for e in entries])
+    if "ida_ignore" in general_handler.request.query_params:
+        ignore_list = general_handler.request.query_params["ida_ignore"].split(",")
+        if len(ignore_list) > 0:
+            query = "({}) && ({})".format(
+                query, " && ".join(["!ida:*{}*".format(e) for e in ignore_list])
+            )
+    return searcher.get_group_obj_of_field_by_query(
+        query,
+        "ida_id",
+        rows=rows,
+        start=index * rows - rows,
+        inner_field_to_count="protein_acc",
+    )
 
 
 def passing(x, y):

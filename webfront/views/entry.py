@@ -12,6 +12,7 @@ from webfront.views.modifiers import (
     get_domain_architectures,
     get_entry_annotation,
     add_extra_fields,
+    ida_search,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -519,6 +520,12 @@ class EntryHandler(CustomView):
             "annotation",
             filter_by_contains_field("entry", "entryannotation__type"),
             use_model_as_payload=False,
+        )
+        general_handler.modifiers.register(
+            "ida_search",
+            ida_search,
+            use_model_as_payload=True,
+            serializer=SerializerDetail.IDA_LIST,
         )
         response = super(EntryHandler, self).get(
             request._request,

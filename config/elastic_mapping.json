@@ -32,7 +32,7 @@
         "entry_integrated": {"type":  "keyword"},
         "entry_go_terms" : {"type" : "keyword"},
         "ida_id": {"type":  "keyword"},
-        "ida": {"type":  "text"},
+        "ida": {"type":  "keyword"},
 
         "protein_acc": {"type":  "keyword"},
         "protein_length": {"type":  "long"},

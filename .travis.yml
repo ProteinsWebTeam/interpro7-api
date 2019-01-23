@@ -14,7 +14,7 @@ before_install:
   - unzip chromedriver_linux64.zip
   - sudo cp chromedriver /usr/local/bin/.
   - sleep 3
-#  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb && sudo service elasticsearch restart
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.3.0.deb && sudo dpkg -i --force-confnew elasticsearch-6.3.0.deb && sudo service elasticsearch restart
 services:
   - elasticsearch
 install:

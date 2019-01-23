@@ -38,4 +38,4 @@ branches:
   only:
     - master
     - dev
-    - precalculated_counters
+    - ida_search

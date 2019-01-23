@@ -6,7 +6,7 @@ python:
 addons:
   chrome: stable
 before_install:
-  - jdk_switcher use oraclejdk8
+#  - jdk_switcher use oraclejdk8
   - "sh -e /etc/init.d/xvfb start"
   - "export DISPLAY=:99.0"
   - "export BROWSER_TEST=chrome"
@@ -14,7 +14,7 @@ before_install:
   - unzip chromedriver_linux64.zip
   - sudo cp chromedriver /usr/local/bin/.
   - sleep 3
-  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb && sudo service elasticsearch restart
+#  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb && sudo service elasticsearch restart
 services:
   - elasticsearch
 install:
@@ -24,6 +24,7 @@ install:
   - pip freeze
 before_script:
   - sleep 10
+  - "curl 'localhost:9200'"
   - "curl -XPUT 'localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json"
 script:
   - coverage run --source='.' manage.py test

@@ -128,7 +128,6 @@ class TwoEndpointsRESTSearchTest(InterproRESTTestCase):
             ("/api/proteome/uniprot/set", "aspergillus"),
         ]
         for url in urls:
-            print(url)
             filtered = self.client.get("{}?search={}".format(url[0], url[1])).data[
                 "results"
             ]

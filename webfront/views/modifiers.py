@@ -366,9 +366,9 @@ def ida_search(value, general_handler):
     index = _get_index(general_handler)
 
     conserve_order = "ordered" in general_handler.request.query_params
-    entries = value.lower().split(",")
+    entries = value.upper().split(",")
     if conserve_order:
-        query = "*{}*".format("*".join(entries))
+        query = "ida:*{}*".format("*".join(entries))
     else:
         query = " && ".join(["ida:*{}*".format(e) for e in entries])
     if "ida_ignore" in general_handler.request.query_params:

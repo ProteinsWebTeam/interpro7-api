@@ -232,7 +232,10 @@ class FixtureReader:
         lower = []
         for doc in to_add:
             lower.append(
-                {k: v.lower() if type(v) == str else v for k, v in doc.items()}
+                {
+                    k: v.lower() if type(v) == str and k != "ida" else v
+                    for k, v in doc.items()
+                }
             )
         return lower
 

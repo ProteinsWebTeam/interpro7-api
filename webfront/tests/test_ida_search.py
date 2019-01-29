@@ -12,7 +12,7 @@ class IDASearchModifierTest(InterproRESTTestCase):
         self.assertGreater(response.data["count"], 0)
 
     def test_search_by_ordered_search(self):
-        response = self.client.get("/api/entry?ida_search=IPR003175,IPR003175&ordered")
+        response = self.client.get("/api/entry?ida_search=IPR003165,IPR003165&ordered")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.data)
         self.assertIn("count", response.data)

@@ -1,6 +1,6 @@
-Django==2.1.5
+Django==2.1.7
 djangorestframework==3.9.1
-PyYAML==3.13
+PyYAML==4.2b1
 jsonfield==2.0.2
 mysqlclient==1.4.1
 django-cors-headers==2.4.0

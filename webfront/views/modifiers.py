@@ -317,6 +317,7 @@ def get_domain_architectures(field, general_handler):
         res, length = searcher.get_list_of_endpoint(
             "protein", query, rows, index * rows - rows
         )
+        general_handler.modifiers.search_size = length
         return filter_queryset_accession_in(
             general_handler.queryset_manager.get_base_queryset("protein"), res
         )

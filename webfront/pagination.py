@@ -64,6 +64,8 @@ class CustomPagination(PageNumberPagination):
         return replace_query_param(url, self.page_query_param, page_number)
 
     def has_next(self):
+        if self.current_size is None:
+            return False
         return self.page.number * self.page_size < self.current_size
 
     def get_previous_link(self):

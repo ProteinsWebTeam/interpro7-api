@@ -195,7 +195,7 @@ class ProteinSerializer(ModelContentSerializer):
         }
         if protein["ida_accession"] is not None:
             protein["counters"]["similar_proteins"] = searcher.count_unique(
-                "ida_id:" + protein["ida_accession"], "protein_acc"
+                "ida_id:" + str(protein["ida_accession"]), "protein_acc"
             )
         return protein
 

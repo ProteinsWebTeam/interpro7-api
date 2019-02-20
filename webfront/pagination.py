@@ -66,7 +66,7 @@ class CustomPagination(PageNumberPagination):
     def has_next(self):
         if self.current_size is None:
             return False
-        return self.page.number * self.page_size < self.current_size
+        return self.page.number * self.page.paginator.per_page < self.current_size
 
     def get_previous_link(self):
         if not self.page.has_previous():

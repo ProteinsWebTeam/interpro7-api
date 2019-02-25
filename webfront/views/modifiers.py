@@ -4,7 +4,7 @@ from webfront.views.custom import is_single_endpoint
 from django.db.models import Count
 from webfront.models import Entry, EntryAnnotation, Alignment
 from webfront.views.custom import filter_queryset_accession_in
-
+from webfront.exceptions import EmptyQuerysetError
 from django.conf import settings
 
 go_terms = settings.INTERPRO_CONFIG.get("key_go_terms", {})
@@ -258,7 +258,22 @@ def filter_by_field_or_field_range(endpoint, field):
     return x
 
 
-def get_single_value(field):
+def get_single_value(field, from_elastic=False):
+    if from_elastic:
+
+        def x(value, general_handler):
+            q = general_handler.queryset_manager.get_searcher_query()
+            obj = general_handler.searcher._elastic_json_query(
+                "{} && _exists_:{}&size=1".format(q, field)
+            )
+            if obj["hits"]["total"] < 1:
+                raise EmptyQuerysetError(
+                    "No documents found with the current selection"
+                )
+            return {field: obj["hits"]["hits"][0]["_source"][field]}
+
+        return x
+
     def x(value, general_handler):
         queryset = general_handler.queryset_manager.get_queryset()
         first = queryset.first()

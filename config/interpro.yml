@@ -146,7 +146,7 @@ cross_references:
         'urlPattern': 'http://priam.prabi.fr/cgi-bin/ReqPRIAM_png.pl?priam_ac={accession}'
     'SCOP':
         'rank': 24
-        'urlPattern': 'http://scop.berkeley.edu/search/?ver=1.55&key={accession}'
+        'urlPattern': 'http://scop.berkeley.edu/search/?key={accession}'
         'description': 'The SCOP database, created by manual inspection and abetted by a battery of automated methods, aims to provide a detailed and comprehensive description of the structural and evolutionary relationships between all proteins whose structure is known.'
     'MODBASE':
         'rank': 32

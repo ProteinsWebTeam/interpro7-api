@@ -195,7 +195,9 @@ def get_aligments(clan, entry, limit=20):
     ]
     return {
         al.target_acc.accession: {
-            "set_acc": al.target_set_acc.accession,
+            "set_acc": None
+            if al.target_set_acc is None
+            else al.target_set_acc.accession,
             "score": al.score,
             "length": al.seq_length,
             "domains": al.domains,

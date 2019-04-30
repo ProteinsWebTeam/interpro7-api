@@ -332,8 +332,12 @@ def get_entry_annotation(field, general_handler):
 
 
 def get_set_alignment(field, general_handler):
-    qs = Alignment.objects.filter(
-        set_acc__in=general_handler.queryset_manager.get_queryset()
+    qs = (
+        Alignment.objects.filter(
+            set_acc__in=general_handler.queryset_manager.get_queryset()
+        )
+        .values_list("set_acc", "entry_acc")
+        .annotate(count=Count("target_acc"))
     )
     if field is not None and field != "":
         qs = qs.filter(entry_acc__accession__iexact=field)

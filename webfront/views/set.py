@@ -1,6 +1,6 @@
 from django.db.models import Count
 
-from webfront.models import Set
+from webfront.models import Set, Alignment
 from webfront.serializers.collection import SetSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -11,6 +11,8 @@ entry_sets = "|".join(settings.ENTRY_SETS) + "|all"
 entry_sets_accessions = r"^({})$".format(
     "|".join((set["accession"] for (_, set) in settings.ENTRY_SETS.items()))
 )
+
+
 #
 # class SetAlignmentHandler(CustomView):
 #     level_description = 'Set alignment level'
@@ -165,7 +167,6 @@ class SetHandler(CustomView):
         *args,
         **kwargs
     ):
-
         general_handler.queryset_manager.reset_filters("set", endpoint_levels)
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
 
@@ -186,3 +187,20 @@ class SetHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
         return queryset
+
+
+def get_aligments(clan, entry, limit=20):
+    qs = Alignment.objects.filter(set_acc=clan, entry_acc=entry).order_by("score")[
+        :limit
+    ]
+    return {
+        al.target_acc.accession: {
+            "set_acc": None
+            if al.target_set_acc is None
+            else al.target_set_acc.accession,
+            "score": al.score,
+            "length": al.seq_length,
+            "domains": al.domains,
+        }
+        for al in qs
+    }

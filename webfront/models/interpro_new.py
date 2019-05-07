@@ -132,9 +132,25 @@ class Release_Note(models.Model):
 
 class Alignment(models.Model):
     set_acc = models.ForeignKey(
-        Set, db_column="set_acc", on_delete=models.SET_NULL, null=True
+        "Set", db_column="set_acc", on_delete=models.SET_NULL, null=True
     )
     entry_acc = models.ForeignKey(
-        Entry, db_column="entry_acc", on_delete=models.SET_NULL, null=True
+        "Entry", db_column="entry_acc", on_delete=models.SET_NULL, null=True
     )
-    alignments = JSONField(null=True)
+    target_acc = models.ForeignKey(
+        "Entry",
+        db_column="target_acc",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="target_acc",
+    )
+    target_set_acc = models.ForeignKey(
+        "Set",
+        db_column="target_set_acc",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="target_set_acc",
+    )
+    score = models.FloatField(null=True)
+    seq_length = models.IntegerField(null=True)
+    domains = JSONField(null=True)

@@ -50,6 +50,9 @@ class UniprotAccessionHandler(CustomView):
             "structureinfo", get_single_value("structure"), use_model_as_payload=True
         )
         general_handler.modifiers.register(
+            "ida", get_single_value("ida", True), use_model_as_payload=True
+        )
+        general_handler.modifiers.register(
             "extra_features",
             get_single_value("extra_features"),
             use_model_as_payload=True,

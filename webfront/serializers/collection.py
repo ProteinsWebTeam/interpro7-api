@@ -45,6 +45,8 @@ class SetSerializer(ModelContentSerializer):
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
+        if detail_filters is None or len(detail_filters) == 0:
+            return representation
         s = self.searcher
         if SerializerDetail.ENTRY_OVERVIEW in detail_filters:
             representation["entries"] = self.to_entries_count_representation(instance)
@@ -216,9 +218,13 @@ class SetSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_alignment_representation(instance):
+        from webfront.views.set import get_aligments
+
+        (clan, entry, count) = instance
         return {
-            "accession": instance.entry_acc.accession,
-            "alignedTo": instance.alignments,
+            "accession": entry,
+            "alignments_count": count,
+            "alignedTo": get_aligments(clan, entry),
         }
 
     def to_entries_count_representation(self, instance):

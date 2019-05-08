@@ -256,14 +256,6 @@ class CustomView(GenericAPIView):
                 pass
 
     def get_counter_response(self, general_handler, searcher):
-        # Commented out to test if this query runs faster in elastic
-        # TODO: Removed the commented part if there are not issues with it by 22/04/2018
-        # TODO: or check why integratd is not part of the reply whn using mysql
-        # if is_single_endpoint(general_handler):
-        #     self.queryset = general_handler.queryset_manager.get_queryset().distinct()
-        #     obj = self.get_database_contributions(self.queryset)
-        #     return obj
-        # else:
         extra = [
             k
             for k, v in general_handler.filter_serializers.items()

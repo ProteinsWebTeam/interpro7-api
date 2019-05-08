@@ -62,7 +62,19 @@ def pagination_information(request):
     }
 
 
-def getDataForRoot(handlers):
+def getDataForRoot(handlers, queryset_manager, searcher):
+    qs = queryset_manager.get_base_queryset("entry")
+    elastic_query = searcher._elastic_json_query("*:*")
+    host_parts = settings.DATABASES["default"]["HOST"].split(".")[0].split("-")
+    host = ""
+    if len(host_parts) > 2:
+        if host_parts[0] == "mysql":
+            host = host_parts[2]
+        else:
+            host = host_parts[0]
+
+    elastic_host = searcher.server.split("-")[0]
+
     return {
         "endpoints": [x[0] for x in handlers],
         "databases": {
@@ -77,6 +89,13 @@ def getDataForRoot(handlers):
             for db in Database.objects.order_by("type").values(
                 "name", "name_long", "description", "version", "release_date", "type"
             )
+        },
+        "sources": {
+            "mysql": {"server": host, "status": "OK" if qs.exists() else "ERROR"},
+            "elasticsearch": {
+                "server": elastic_host,
+                "status": "OK" if elastic_query["hits"]["total"] > 0 else "ERROR",
+            },
         },
     }
 
@@ -120,8 +139,16 @@ class GeneralHandler(CustomView):
 
     def get(self, request, url="", *args, **kwargs):
         clean_url = url.strip()
+        self.queryset_manager = QuerysetManager()
+        self.searcher = self.get_search_controller(self.queryset_manager)
         if clean_url == "" or clean_url == "/":
-            return Response(getDataForRoot(self.available_endpoint_handlers))
+            return Response(
+                getDataForRoot(
+                    self.available_endpoint_handlers,
+                    self.queryset_manager,
+                    self.searcher,
+                )
+            )
         full_path = request.get_full_path()
         response = None
         caching_allowed = settings.INTERPRO_CONFIG.get("enable_caching", False)
@@ -141,8 +168,6 @@ class GeneralHandler(CustomView):
         endpoint_levels = map_url_to_levels(url)
         self.modifiers = ModifierManager(self)
         self.modifiers.register("search", self.search_modifier)
-        self.queryset_manager = QuerysetManager()
-        self.searcher = self.get_search_controller(self.queryset_manager)
         try:
 
             def query(args):

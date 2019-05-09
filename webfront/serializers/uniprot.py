@@ -170,8 +170,6 @@ class ProteinSerializer(ModelContentSerializer):
 
     @staticmethod
     def to_metadata_representation(instance, searcher, sq, counters=None):
-        # recategorise_go_terms(instance.go_terms)
-
         protein = {
             "accession": instance.accession,
             "id": instance.identifier,
@@ -186,26 +184,16 @@ class ProteinSerializer(ModelContentSerializer):
             "protein_evidence": 4,  # TODO
             "source_database": instance.source_database,
             "is_fragment": instance.is_fragment,
-            "ida_accession": ProteinSerializer.get_ida_accession(
-                instance, searcher, sq
-            ),
+            "ida_accession": instance.ida_id,
             "counters": ProteinSerializer.get_counters(instance, searcher, sq)
             if counters is None
             else counters,
         }
-        if protein["ida_accession"] is not None:
-            protein["counters"]["similar_proteins"] = searcher.count_unique(
-                "ida_id:" + str(protein["ida_accession"]), "protein_acc"
-            )
+        if instance.ida_id is not None:
+            protein["counters"]["similar_proteins"] = Protein.objects.filter(
+                ida_id=instance.ida_id
+            ).count()
         return protein
-
-    @staticmethod
-    def get_ida_accession(instance, searcher, sq):
-        # TODO: change this method to get this out of the instance once is in mysql
-        obj = searcher._elastic_json_query(sq + " && _exists_:ida_id&size=1")
-        if obj["hits"]["total"] < 1:
-            return None
-        return obj["hits"]["hits"][0]["_source"]["ida_id"]
 
     @staticmethod
     def get_counters(instance, searcher, sq):

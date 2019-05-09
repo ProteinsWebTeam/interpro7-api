@@ -402,5 +402,5 @@ class ExtraFeaturesModifierTest(InterproRESTTestCase):
     def test_extra_features_modifier(self):
         response2 = self.client.get("/api/protein/uniprot/a1cuj5?extra_features")
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
-        self.assertIn("feature", response2.data)
-        self.assertIn("EXTRA", response2.data["feature"])
+        self.assertIn("TMhelix", response2.data)
+        self.assertIn("locations", response2.data["TMhelix"])

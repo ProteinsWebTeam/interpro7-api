@@ -116,6 +116,8 @@ class FixtureReader:
                 + self.proteins[p]["source_database"]
                 + " "
                 + (" ".join(self.proteins[p]["description"])),
+                "ida_id": self.proteins[p]["ida_id"],
+                "ida": self.proteins[p]["ida"],
                 "tax_id": self.proteins[p]["organism"]["taxId"],
                 "tax_name": self.proteins[p]["organism"]["name"],
                 "tax_lineage": self.tax2lineage[self.proteins[p]["organism"]["taxId"]],
@@ -131,9 +133,9 @@ class FixtureReader:
             }
             obj["text_taxonomy"] = obj["tax_id"] + " " + (" ".join(obj["tax_lineage"]))
 
-            if "ida" in ep:
-                obj["ida"] = ep["ida"]
-                obj["ida_id"] = ep["ida_id"]
+            # if "ida" in ep:
+            #     obj["ida"] = ep["ida"]
+            #     obj["ida_id"] = ep["ida_id"]
 
             if p in self.protein_structure_list:
                 for sp in self.protein_structure_list[p]:

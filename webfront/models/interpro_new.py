@@ -69,6 +69,8 @@ class Protein(models.Model):
     is_fragment = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
     size = models.CharField(max_length=10, null=True)
+    ida_id = models.CharField(max_length=40, null=True)
+    ida = models.TextField(null=True)
     counts = JSONField(null=True)
 
 

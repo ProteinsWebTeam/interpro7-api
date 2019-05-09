@@ -4,7 +4,7 @@ from rest_framework import status
 
 class IDASearchModifierTest(InterproRESTTestCase):
     def test_search_by_a_single_accession(self):
-        response = self.client.get("/api/entry?ida_search=IPR001175")
+        response = self.client.get("/api/entry?ida_search=IPR003165")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.data)
         self.assertIn("count", response.data)

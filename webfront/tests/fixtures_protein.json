@@ -11,27 +11,55 @@
       },
       "name": "Carboxypeptidase Y homolog A",
       "other_names": [],
-      "description": ["Vacuolar carboxypeptidase involved in degradation of small peptides. Digests preferentially peptides containing an aliphatic or hydrophobic residue in P1' position, as well as methionine, leucine or phenylalanine in P1 position of ester substrate (By similarity)."],
+      "description": [
+        "Vacuolar carboxypeptidase involved in degradation of small peptides. Digests preferentially peptides containing an aliphatic or hydrophobic residue in P1' position, as well as methionine, leucine or phenylalanine in P1 position of ester substrate (By similarity)."
+      ],
       "sequence": "MRVLPATLLVGAATAAVPPFQQILGLPKKGADTLSKPLHDFQEQLKTLSDDARRLWDEVAKHFPDSMDHNPVFSLPKKHTRRPDSHWDHIVRGADVQSVWVTGANGEKEREVDGKLEAYDLRVKTTDPGALGIDPGVKQYTGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFLELGPSSIDSKIKPVYNDFAWNSNASVIFLDQPVNVGYSYSGSAVSDTVAAGKDVYALLTLFFKQFPEYAKQDFHIAGESYAGHYIPVFASEILSHKKRNINLKSVLIGNGLTDPLTQYDHYRPMACGDGGYPAVLDEASCQSMDNALPRCKSMIESCYNTESSWVCVPASIYCNNALIGPYQRTGQNVYDVRGKCEDESNLCYKGMGYVSEYLNKREVREAVGAEVDGYDSCNFDINRNFLFHGDWMKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEYASAELEDLVIEQNEHQGKKIGQIKSHGNFTFMRLYGGGHMVPMDQPEASLEFFNRWIGGEWF",
-      "length" : "543",
-      "size" : "medium",
+      "length": "543",
+      "size": "medium",
       "proteome": "UP000006701",
       "gene": "cpyA",
-      "go_terms": [{"identifier": "GO:0016740", "name": "transferase activity", "category": {"name": "molecular_function", "code": "F"}}],
+      "go_terms": [
+        {
+          "identifier": "GO:0016740",
+          "name": "transferase activity",
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
+        }
+      ],
       "evidence_code": 3,
       "source_database": "reviewed",
       "is_fragment": false,
       "residues": {},
-      "extra_features": { "feature": "EXTRA"},
+      "extra_features": {
+        "TMhelix": {
+          "accession": "TMhelix",
+          "source_database": "tmhmm",
+          "locations": [
+            {
+              "fragments": [
+                {
+                  "start": 265,
+                  "end": 287
+                }
+              ]
+            }
+          ]
+        }
+      },
       "counts": {
         "entries": {
-            "total": 5,
-            "pfam": 2,
-            "smart": 1
+          "total": 5,
+          "pfam": 2,
+          "smart": 1
         },
         "structures": 1,
         "sets": 2
-      }
+      },
+      "ida": "PF02171:IPR003165-PF02171:IPR003165",
+      "ida_id": 50134
     }
   },
   {
@@ -48,55 +76,82 @@
       "other_names": [],
       "description": [],
       "sequence": "MESGIIEILIRNGVSHMTEKPVFHINGYLGLILVLVILGLGVYLSVVGWGVLGVILVVLAVLAASSLTIIEPNQSKVLTFFGRYIGTIKESGLYLTVPLTTKTTVSLRVRNFNSAILKVNDLQGNPVEIAAVIVFKVVDTSKALFAVEDYEKFVEIQSESAIRHVASEYAYDNFGDHQALTLRSNPTEVSNHLTEELQARLEVAGVQIIETRLTHLAYATEIASAMLQRQQSQAILSARKIIVEGAVSITEGAIEQLAAETDLHLTDNQKLQLINNMMVSIINERGSQPVINTGKVE",
-      "length" : 297,
-      "size" : "small",
+      "length": 297,
+      "size": "small",
       "proteome": "UP000012042",
       "gene": "LVISKB_0797",
       "go_terms": [
         {
           "identifier": "GO:0016740",
           "name": "transferase activity",
-          "category": {"name": "molecular_function", "code": "F"}
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": {"name": "biological_process", "code": "P"}
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         },
         {
           "identifier": "GO:0016787",
           "name": "hydrolase activity",
-          "category": {"name": "molecular_function", "code": "F"}
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": {"name": "biological_process", "code": "P"}
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": {"name": "biological_process", "code": "P"}
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         },
         {
           "identifier": "GO:0003824",
           "name": "catalytic activity",
-          "category": {"name": "molecular_function", "code": "F"}
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": {"name": "biological_process", "code": "P"}
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         },
         {
           "identifier": "GO:0003824",
           "name": "catalytic activity",
-          "category": {"name": "molecular_function", "code": "F"}
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
         },
         {
           "identifier": "GO:0008152",
           "name": "metabolic process",
-          "category": {"name": "biological_process", "code": "P"}
+          "category": {
+            "name": "biological_process",
+            "code": "P"
+          }
         }
       ],
       "evidence_code": 1,
@@ -106,11 +161,13 @@
       "counts": {
         "entries": {
           "pfam": 1,
-          "total":1
+          "total": 1
         },
         "structures": 2,
         "sets": 1
-      }
+      },
+      "ida": "pf17180",
+      "ida_id": 59099
     }
   },
   {
@@ -127,17 +184,28 @@
       "other_names": [],
       "description": [],
       "sequence": "MRVLSTTLLVGAASAAAPSFQQVLGAHSEHAENVAQQGADAFKPLQHLQDQFKSLSSEARQLWEEVSNYFPESMGSAPMLSLPKKHTRRPDSHWDYHVSGAKVQDIWVSGAEGTKEREVDGKLEDYALRAKKVDPSALGIDPGVKQYSGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFMELGPSSIGANIKPIYNDFSWNNNASVIFLDQPINVGYSYSGSSVSDTVAAGKDVYALLTLFFKQFPEYATQDFHIAGESYAGHYIPVMASEILSHKKRNINLKSVLIGNGLTDGLTQYEYYRPMACGEGGYPAVLDESTCQSMDNALSRCQSMIQSCYNSESPWVCVPASIYCNNAMLGPYQRTGQNVYDVRGKCEDESNLCYKGLGYVSEYLGQESVREAVGAEVDGYDSCNFDINRNFLFNGDWFKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEFASAELEDLKIVQNEHVGKKIGQIKSHGNFTFMRIFGGGHMVPMDQPESGLEFFNRWIGGEWF",
-      "length" : "550",
-      "size" : "medium",
+      "length": "550",
+      "size": "medium",
       "proteome": "UP000030104",
       "gene": "PITC_084940",
-      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
+      "go_terms": [
+        {
+          "identifier": "GO:0005515",
+          "name": "protein binding",
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
+        }
+      ],
       "evidence_code": 1,
       "source_database": "unreviewed",
       "is_fragment": false,
       "residues": {},
-      "counts":{
-        "entries": {"total": 0},
+      "counts": {
+        "entries": {
+          "total": 0
+        },
         "structures": 2,
         "sets": 0
       }
@@ -154,14 +222,28 @@
         "taxId": "40296"
       },
       "name": "Lutropin-choriogonadotropic hormone receptor",
-      "other_names": ["Luteinizing hormone receptor", "LSH-R"],
-      "description": ["Receptor for lutropin-choriogonadotropic hormone. The activity of this receptor is mediated by G proteins which activate adenylate cyclase."],
+      "other_names": [
+        "Luteinizing hormone receptor",
+        "LSH-R"
+      ],
+      "description": [
+        "Receptor for lutropin-choriogonadotropic hormone. The activity of this receptor is mediated by G proteins which activate adenylate cyclase."
+      ],
       "sequence": "MRRRSLALRLLLALLLLPPPLPQTLLGAPCPEPCSCRPDGALRCPGPRAGLSRLSLTYLPIKVIPSQAFRGLNEVVKIEISQSDSLEKIEANAFDNLLNLSEILIQNTKNLVYIEPGAFTNLPRLKYLSICNTGIRKLPDVTKIFSSEFNFILEICDNLHITTVPANAFQGMNNESITLKLYGNGFEEIQSHAFNGTTLISLELKENAHLKKMHNDAFRGARGPSILDISSTKLQALPSYGLESIQTLIATSSYSLKKLPSREKFTNLLDATLTYPSHCCAFRNLPTKEQNFSFSIFKNFSKQCESTARRPNNETLYSAIFAESELSDWDYDYGFCSPKTLQCAPEPDAFNPCEDIMGYDFLRVLIWLINILAIMGNVTVLFVLLTSHYKLTVPRFLMCNLSFADFCMGLYLLLIASVDAQTKGQYYNHAIDWQTGNGCSVAGFFTVFASELSVYTLTVITLERWHTITYAIQLDQKLRLRHAIPIMLGGWLFSTLIAMLPLVGVSSYMKVSICLPMDVETTLSQVYILTILILNVVAFIIICACYIKIYFAVQNPELMATNKDTKIAKKMAVLIFTDFTCMAPISFFAISAALKVPLITVTNSKVLLVLFYPVNSCANPFLYAIFTKAFRRDFFLLLSKSGCCKHQAELYRRKDFSAYCKNGFTGSNKPSRSTLKLTTLQCQYSTVMDKTCYKDC",
-      "length" : 696,
-      "size" : "long",
+      "length": 696,
+      "size": "long",
       "proteome": "UP000030104",
       "gene": "LHCGR",
-      "go_terms": [{"identifier": "GO:0005515", "name": "protein binding", "category": {"name": "molecular_function", "code": "F"}}],
+      "go_terms": [
+        {
+          "identifier": "GO:0005515",
+          "name": "protein binding",
+          "category": {
+            "name": "molecular_function",
+            "code": "F"
+          }
+        }
+      ],
       "evidence_code": 4,
       "source_database": "unreviewed",
       "is_fragment": false,
@@ -173,7 +255,9 @@
         },
         "structures": 1,
         "sets": 0
-      }
+      },
+      "ida": "PF02171:IPR003165-PF02171:IPR003165-PF02171",
+      "ida_id": 590134
     }
   }
 ]

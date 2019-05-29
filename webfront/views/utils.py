@@ -1,5 +1,8 @@
 from webfront.models.interpro_new import Release_Note
 
+from webfront.response import Response
+from rest_framework import status
+
 from webfront.views.custom import CustomView
 from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
@@ -12,6 +15,66 @@ endpoints = [
     {"name": "proteome", "db": "uniprot", "accession": "proteome_acc"},
     {"name": "set", "db": "set_db", "accession": "set_acc"},
 ]
+
+
+class TimeoutHandler(CustomView):
+    level_description = "Timeout level"
+    from_model = False
+    many = False
+    serializer_class = ModelContentSerializer
+
+    def get(
+        self,
+        request,
+        endpoint_levels,
+        available_endpoint_handlers=None,
+        level=0,
+        parent_queryset=None,
+        handler=None,
+        general_handler=None,
+        *args,
+        **kwargs
+    ):
+        print("TIMING out")
+        content = {"detail": "This endpoint is always going to return a time-out"}
+        response = Response(content, status=status.HTTP_408_REQUEST_TIMEOUT)
+        return response
+
+
+class TestEndpointHandler(CustomView):
+    level_description = "Test level"
+    from_model = False
+    many = False
+    serializer_class = ModelContentSerializer
+    child_handlers = [(r".*", TimeoutHandler)]
+
+    def get(
+        self,
+        request,
+        endpoint_levels,
+        available_endpoint_handlers=None,
+        level=0,
+        parent_queryset=None,
+        handler=None,
+        general_handler=None,
+        *args,
+        **kwargs
+    ):
+
+        self.queryset = {"testing endpoints": ["timeout"]}
+
+        return super(TestEndpointHandler, self).get(
+            request._request,
+            endpoint_levels,
+            available_endpoint_handlers,
+            level,
+            self.queryset,
+            handler,
+            general_handler,
+            request,
+            *args,
+            **kwargs
+        )
 
 
 class AccessionHandler(CustomView):
@@ -202,6 +265,7 @@ class UtilsHandler(CustomView):
     child_handlers = [
         ("accession", AccessionEndpointHandler),
         ("release", ReleaseEndpointHandler),
+        ("test", TestEndpointHandler),
     ]
     many = False
     serializer_class = ModelContentSerializer

@@ -127,7 +127,7 @@ cross_references:
         'displayName': 'IUPHAR receptor code'
         'rank': 22
         'description': 'The IUPHAR database incorporates detailed pharmacological, functional and pathophysiological information on G Protein-Coupled Receptors, Voltage-Gated Ion Channels, Ligand-Gated Ion Channels and Nuclear Hormone Receptors.'
-        'urlPattern': 'http://www.iuphar-db.org/GPCR/ReceptorDisplayForward?receptorID={accession}'
+        'urlPattern': 'https://www.guidetopharmacology.org/GRAC/ObjectDisplayForward?objectId={accession}'
     'CAZY':
         'displayName': 'CAZy'
         'rank': 20
@@ -215,7 +215,7 @@ cross_references:
         'displayName': 'IUPHAR receptor code'
         'rank': 22
         'description': 'The IUPHAR database incorporates detailed pharmacological, functional and pathophysiological information on G Protein-Coupled Receptors, Voltage-Gated Ion Channels, Ligand-Gated Ion Channels and Nuclear Hormone Receptors.'
-        'urlPattern': 'http://www.iuphar-db.org/GPCR/ReceptorDisplayForward?receptorID={accession}'
+        'urlPattern': 'https://www.guidetopharmacology.org/GRAC/ObjectDisplayForward?objectId={accession}'
     'ADAN':
         'rank': 33
     'PDB':

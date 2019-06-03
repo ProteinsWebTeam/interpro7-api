@@ -129,6 +129,7 @@ class FixtureReader:
                 "entry_protein_locations": ep["coordinates"],
                 "protein_length": self.proteins[p]["length"],
                 "protein_size": self.proteins[p]["size"],
+                "protein_is_fragment": self.proteins[p]["is_fragment"],
                 "id": get_id(e, p),
             }
             obj["text_taxonomy"] = obj["tax_id"] + " " + (" ".join(obj["tax_lineage"]))

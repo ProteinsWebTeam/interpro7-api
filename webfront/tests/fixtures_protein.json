@@ -156,7 +156,7 @@
       ],
       "evidence_code": 1,
       "source_database": "reviewed",
-      "is_fragment": false,
+      "is_fragment": true,
       "residues": {},
       "counts": {
         "entries": {

@@ -61,6 +61,15 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertEqual(response.data["match_presence"]["true"], 3)
         self.assertEqual(response.data["match_presence"]["false"], 1)
 
+    def test_can_get_the_fragment_groups(self):
+        response = self.client.get("/api/protein?group_by=is_fragment")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("is_fragment", response.data)
+        self.assertIn("true", response.data["is_fragment"])
+        self.assertIn("false", response.data["is_fragment"])
+        self.assertEqual(response.data["is_fragment"]["true"], 1)
+        self.assertEqual(response.data["is_fragment"]["false"], 2)
+
     def test_can_group_proteomes_by_is_reference(self):
         response = self.client.get(
             "/api/proteome/uniprot?group_by=proteome_is_reference"
@@ -168,6 +177,22 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
                     self.assertGreater(entries, 0)
                 else:
                     self.assertEqual(entries, 0)
+
+    def test_can_filter_proteins_by_is_fragment(self):
+        urls = ["protein/uniprot", "protein/uniprot/entry"]
+        for url in urls:
+            options = [True, False]
+            for option in options:
+                response = self.client.get(
+                    "/api/{}?extra_fields=is_fragment&is_fragment={}".format(
+                        url, option
+                    )
+                )
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertIn("results", response.data)
+                for result in response.data["results"]:
+                    is_fragment = result["extra_fields"]["is_fragment"]
+                    self.assertEqual(is_fragment, option)
 
 
 class FilterByContainsFieldModifierTest(InterproRESTTestCase):

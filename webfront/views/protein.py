@@ -7,6 +7,7 @@ from webfront.views.modifiers import (
     group_by,
     sort_by,
     filter_by_field,
+    filter_by_boolean_field,
     get_single_value,
     get_domain_architectures,
     filter_by_contains_field,
@@ -217,6 +218,7 @@ class ProteinHandler(CustomView):
                     "go_terms": "text",
                     "size": "protein_size",
                     "match_presence": "match_presence",
+                    "is_fragment": "protein_is_fragment",
                 },
             ),
             use_model_as_payload=True,
@@ -247,6 +249,9 @@ class ProteinHandler(CustomView):
             filter_by_contains_field("protein", "go_terms", '"identifier": "{}"'),
         )
         general_handler.modifiers.register("match_presence", filter_by_match_presence)
+        general_handler.modifiers.register(
+            "is_fragment", filter_by_boolean_field("protein", "is_fragment")
+        )
 
         return super(ProteinHandler, self).get(
             request._request,

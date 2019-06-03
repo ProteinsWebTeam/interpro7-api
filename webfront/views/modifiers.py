@@ -98,6 +98,21 @@ def group_by_match_presence(general_handler, endpoint_queryset):
     return response
 
 
+def group_by_is_fragment(general_handler, endpoint_queryset):
+    searcher = general_handler.searcher
+    # qs = general_handler.queryset_manager.get_searcher_query()
+    result = searcher.get_grouped_object("protein", "protein_is_fragment")
+
+    response = {
+        "is_fragment": {
+            bucket["key_as_string"]: bucket["unique"]["value"]
+            for bucket in result["groups"]["buckets"]
+        }
+    }
+    # print(response)
+    return response
+
+
 def group_by_is_reference(general_handler, endpoint_queryset):
     searcher = general_handler.searcher
     qs = general_handler.queryset_manager.get_searcher_query()
@@ -148,6 +163,8 @@ def group_by(endpoint_queryset, fields):
             return group_by_organism(general_handler, endpoint_queryset)
         if "match_presence" == field:
             return group_by_match_presence(general_handler, endpoint_queryset)
+        if "is_fragment" == field:
+            return group_by_is_fragment(general_handler, endpoint_queryset)
         if "proteome_is_reference" == field:
             return group_by_is_reference(general_handler, endpoint_queryset)
         if (

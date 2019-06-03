@@ -228,7 +228,7 @@ class ProteinSerializer(ModelContentSerializer):
                 ): ProteinSerializer.serialize_counter_bucket(bucket, "proteins")
                 for bucket in instance["groups"]["buckets"]
             }
-        elif "match_presence" in instance:
+        elif "match_presence" in instance or "is_fragment" in instance:
             return instance
         else:
             return {

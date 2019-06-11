@@ -1,9 +1,9 @@
-Django==2.2.2
+Django==2.1.9
 djangorestframework==3.9.4
-PyYAML==4.2b1
+PyYAML==5.1.1
 jsonfield==2.0.2
 pymysql==0.9.3
-django-cors-headers==2.4.0
+django-cors-headers==3.0.2
 gunicorn==19.9.0
 django-redis==4.10.0
 redis==3.2.1

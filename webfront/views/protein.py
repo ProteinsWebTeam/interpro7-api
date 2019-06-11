@@ -13,6 +13,7 @@ from webfront.views.modifiers import (
     filter_by_contains_field,
     filter_by_match_presence,
     add_extra_fields,
+    get_isoforms,
 )
 from webfront.models import Protein
 from django.conf import settings
@@ -57,6 +58,9 @@ class UniprotAccessionHandler(CustomView):
             "extra_features",
             get_single_value("extra_features"),
             use_model_as_payload=True,
+        )
+        general_handler.modifiers.register(
+            "isoforms", get_isoforms, use_model_as_payload=True
         )
         return super(UniprotAccessionHandler, self).get(
             request._request,

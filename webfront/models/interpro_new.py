@@ -156,3 +156,14 @@ class Alignment(models.Model):
     score = models.FloatField(null=True)
     seq_length = models.IntegerField(null=True)
     domains = JSONField(null=True)
+
+
+class Isoforms(models.Model):
+    accession = models.CharField(max_length=20, primary_key=True)
+    protein_acc = models.CharField(max_length=20)
+    length = models.IntegerField(null=False)
+    sequence = models.TextField(null=False)
+    features = JSONField(null=True)
+
+    class Meta:
+        db_table = "webfront_varsplic"

@@ -2,7 +2,7 @@ from urllib.error import URLError
 from webfront.views.custom import is_single_endpoint
 
 from django.db.models import Count
-from webfront.models import Entry, EntryAnnotation, Alignment
+from webfront.models import Entry, EntryAnnotation, Alignment, Isoforms
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError
 from django.conf import settings
@@ -421,6 +421,28 @@ def ida_search(value, general_handler):
         start=index * rows - rows,
         inner_field_to_count="protein_acc",
     )
+
+
+def get_isoforms(value, general_handler):
+    isoforms = Isoforms.objects.filter(
+        protein_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    if value is not None and value != "":
+        isoforms = isoforms.filter(accession__iexact=value)
+        if len(isoforms) == 0:
+            raise EmptyQuerysetError(
+                "There aren't isoforms with accession {}".format(value)
+            )
+        isoform = isoforms.first()
+        return {
+            "accession": isoform.accession,
+            "protein_acc": isoform.protein_acc,
+            "length": isoform.length,
+            "sequence": isoform.sequence,
+            "features": isoform.features,
+        }
+
+    return {"results": [iso.accession for iso in isoforms], "count": len(isoforms)}
 
 
 def passing(x, y):

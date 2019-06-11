@@ -259,5 +259,46 @@
       "ida": "PF02171:IPR003165-PF02171:IPR003165-PF02171",
       "ida_id": 590134
     }
+  },
+    {
+    "model": "webfront.Isoforms",
+    "fields": {
+      "accession": "A1CUJ5-2",
+      "protein_acc": "A1CUJ5",
+      "sequence": "MRVLPATLLVGAATGLPKKGADTLSKPLHDFQEQLKTLSDDARRLWDEVAKHFPDSMDHNPVFSLPKKHTRRPDSHWDHIVRGADVQSVWVTGANGEKEREVDGKLEAYDLRVKTTDPGALGIDPGVKQYTGYLDDNENDKHLFYWFFESRNDPKNDPVVLWLNGGPGCSSLTGLFLELGPSSIDSKIKPVYNDFAWNSNASVIFLDQPVNVGYSYSGSAVSDTVAAGKDVYALLTLFFKQFPEYAKQDFHIAGESYAGHYIPVFASEILSHKKRNINLKSVLIGNGLTDPLTQYDHYRPMACGDGGYPAVLDEASCQSMDNALPRCKSMIESCYNTESSWVCVPASIYCNNALIGPYQRTGQNVYDVRGKCEDESNLCYKGMGYVSEYLNKREVREAVGAEVDGYDSCNFDINRNFLFHGDWMKPYHRLVPGLLEQIPVLIYAGDADFICNWLGNKAWSEALEWPGQKEYASAELEDLVIEQNEHQGKKIGQIKSHGNFTFMRLYGGGHMVPMDQPEASLEFFNRWIGGEWF",
+      "length": "533",
+      "features": {
+        "ipr001165": {
+          "accession": "ipr001165",
+          "name": "Qiwi domain",
+          "locations": [
+              {
+                  "fragments": [
+                    {
+                      "start": 138,
+                      "end": 191
+                    }
+                  ]
+              }
+          ],
+          "integrated": null
+        },
+        "pf17176": {
+          "accession": "pf17176",
+          "name": "Qiwi domain",
+          "locations": [
+              {
+                  "fragments": [
+                    {
+                      "start": 38,
+                      "end": 91
+                    }
+                  ]
+              }
+          ],
+          "integrated": "ipr001165"
+        }
+      }
+    }
   }
 ]

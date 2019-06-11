@@ -429,3 +429,22 @@ class ExtraFeaturesModifierTest(InterproRESTTestCase):
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertIn("TMhelix", response2.data)
         self.assertIn("locations", response2.data["TMhelix"])
+
+
+# class IsoformsModifiersTest(InterproRESTTestCase):
+#     def test_isoform_modifier(self):
+#         response = self.client.get("/api/protein/uniprot/a1cuj5?isoforms")
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertIn("results", response.data)
+#         # self.assertIn("count", response.data)
+#         # self.assertEqual(response.data["count"], len(response.data["results"]))
+#
+#     def test_isoform_detail_modifier(self):
+#         response = self.client.get("/api/protein/uniprot/a1cuj5?isoforms=a1cuj5-2")
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertIn("results", response.data)
+#         # self.assertIn("count", response.data)
+#         # self.assertEqual(response.data["count"], 1)
+#         # self.assertEqual(
+#         #     "a1cuj5", response.data["results"][0]["metadata"]["accession"].lower()
+#         # )

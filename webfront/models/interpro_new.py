@@ -86,6 +86,7 @@ class Structure(models.Model):
     source_database = models.CharField(max_length=10, default="pdb", db_index=True)
     resolution = models.FloatField(null=True)
     counts = JSONField(null=True)
+    secondary_structures = JSONField(null=True)
 
 
 class Taxonomy(models.Model):

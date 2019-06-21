@@ -8,6 +8,36 @@
       "experiment_type": "nmr",
       "release_date": "2009-02-24T00:00:00Z",
       "resolution": 2.5,
+      "secondary_structures": [
+        {
+          "accession": "A",
+          "locations": [
+            {
+              "fragments": [
+                {
+                  "start": 44,
+                  "end": 59,
+                  "shape": "strand"
+                }
+              ]
+            },
+            {
+              "fragments": [
+                {
+                  "start": 4,
+                  "end": 19,
+                  "shape": "helix"
+                },
+                {
+                  "start": 21,
+                  "end": 37,
+                  "shape": "helix"
+                }
+              ]
+            }
+          ]
+        }
+      ],
       "literature": {
         "PUB00020128": {
           "PMID": 15284453,
@@ -56,10 +86,10 @@
       "source_database": "pdb",
       "counts": {
         "entries": {
-            "total": 6,
-            "pfam": 3,
-            "interpro": 2,
-            "smart": 1
+          "total": 6,
+          "pfam": 3,
+          "interpro": 2,
+          "smart": 1
         },
         "proteins": 2,
         "taxa": 2,

@@ -105,7 +105,7 @@ def group_by_is_fragment(general_handler, endpoint_queryset):
 
     response = {
         "is_fragment": {
-            bucket["key_as_string"]: bucket["unique"]["value"]
+            str(bucket["key"]): bucket["unique"]["value"]
             for bucket in result["groups"]["buckets"]
         }
     }

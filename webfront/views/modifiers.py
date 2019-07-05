@@ -103,9 +103,22 @@ def group_by_is_fragment(general_handler, endpoint_queryset):
     # qs = general_handler.queryset_manager.get_searcher_query()
     result = searcher.get_grouped_object("protein", "protein_is_fragment")
 
+    boolean_tag = {
+        "0": "false",
+        0: "false",
+        False: "false",
+        "False": "false",
+        "false": "false",
+        "1": "true",
+        1: "true",
+        True: "true",
+        "True": "true",
+        "true": "true",
+    }
+
     response = {
         "is_fragment": {
-            str(bucket["key"]): bucket["unique"]["value"]
+            boolean_tag[bucket["key"]]: bucket["unique"]["value"]
             for bucket in result["groups"]["buckets"]
         }
     }

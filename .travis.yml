@@ -9,9 +9,6 @@ python:
 addons:
   chrome: stable
 before_install:
-#  - jdk_switcher use oraclejdk8
-  - "sh -e /etc/init.d/xvfb start"
-  - "export DISPLAY=:99.0"
   - "export BROWSER_TEST=chrome"
   - wget http://chromedriver.storage.googleapis.com/2.30/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip

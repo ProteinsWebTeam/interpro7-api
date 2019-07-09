@@ -6,7 +6,6 @@ try:
     import pymysql
 
     pymysql.install_as_MySQLdb()
-    pymysql.version_info = (5, 6, 36, "final", 0)
     print("running pymysql")
 
 except ImportError:

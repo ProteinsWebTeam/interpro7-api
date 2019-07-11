@@ -7,9 +7,21 @@ from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError
 from django.conf import settings
 
+from requests import Session
+from urllib import request, parse
+from json import loads
+
+# import ssl
+
+# MAQ bypassing SSL errors
+# ssl._create_default_https_context = ssl._create_unverified_context
+
 go_terms = settings.INTERPRO_CONFIG.get("key_go_terms", {})
 organisms = settings.INTERPRO_CONFIG.get("key_organisms", {})
 
+class SmartRedirectHandler(request.HTTPRedirectHandler):
+    def http_error_302(self, req, fp, code, msg, headers):
+        return headers
 
 def group_by_member_databases(general_handler):
     if is_single_endpoint(general_handler):
@@ -456,6 +468,129 @@ def get_isoforms(value, general_handler):
         }
 
     return {"results": [iso.accession for iso in isoforms], "count": len(isoforms)}
+
+def run_hmmscan(sequence):
+    """
+        run hmmscan for a given uniprot sequence
+    """
+    parameters = {'seq': sequence, 'hmmdb': 'pfam'}
+    enc_params = parse.urlencode(parameters).encode()
+    url = settings.INTERPRO_CONFIG.get('hmmerweb', 'https://www.ebi.ac.uk/Tools/hmmer/search/hmmscan')
+
+    req = request.Request(url=url, data=enc_params)
+    results_url = request.urlopen(req).get('Location')
+
+    downloadlink = results_url.replace('results', 'download')
+    downloadlink = f"{downloadlink}?format=json"
+
+    with Session() as session:
+        with session.get(downloadlink) as response:
+            phmmerResultsHMM = response.text
+            if response.status_code != 200:
+                print(f"FAILURE::{downloadlink}") # TODO change this to function with framework
+            phmmerResultsHMM = loads(phmmerResultsHMM)
+            hits = phmmerResultsHMM["results"]["hits"]
+    return hits
+
+def align_seq_to_model(domains, sequence):
+    """
+        align result of hmmscan with uniprot sequence
+    """
+    hmmfrom = domains["alihmmfrom"]
+    hmmto = domains["alihmmto"]
+    consensus = domains["alimodel"]
+    aliseq = domains["aliaseq"]
+    alisqfrom = domains["alisqfrom"]
+    alisqto = domains["alisqto"]
+
+    mappedseq = ""
+    modelseq = ""
+    if alisqfrom != 1:
+        mappedseq += sequence[0:alisqfrom-1]
+        for i in range(0, alisqfrom-1):
+            modelseq += "-"
+    mappedseq += aliseq.upper()
+    modelseq += consensus
+    if alisqfrom != 1:
+        mappedseq += sequence[alisqto:len(sequence)]
+        for i in range(alisqto, len(sequence)):
+            modelseq += "-"
+
+    return mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto
+
+def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmotif):
+    """
+        generate sequence matrix (i.e. matrix[res] = "conservation_score_seqAA_modelposition")
+    """
+    matrix = {}
+    count = hmmfrom
+    pos = 1
+    for res in range(0, len(seqmotif)):
+        if res < alisqfrom-1 or count > hmmto:
+            matrix[pos] = f"0_{seqmotif[res]}_None"
+            pos += 1
+        else:
+            if seqmotif[res] == '-':
+                count += 1
+            elif modelmotif[res] == '.':
+                matrix[pos] = f"-1_None_None"
+                pos += 1
+            else:
+                matrix[pos] = f"{logo[count]}_{seqmotif[res]}_{count}"
+                count += 1
+                pos += 1
+    return matrix
+
+def format_logo(matrix):
+    """
+    get color for each residue depending on the conservation score
+    """
+    output = []
+    for res in matrix:
+        score, aa, modelpos = matrix[res].split('_')
+        score = float(score)
+        modelpos = int(score)
+
+        # old protvista format
+        output.append({
+            "position": res,
+            "aa": aa,
+            "score": score,
+            "model_position": modelpos,
+        })
+    return output
+
+def calculate_residue_conservation(value, general_handler):
+    queryset = general_handler.queryset_manager.get_queryset()
+    # will always have one protein in queryset
+    protein = queryset[0]
+    sequence = protein.sequence
+    opener = request.build_opener(SmartRedirectHandler())
+    request.install_opener(opener)
+    hits = run_hmmscan(sequence)
+    alignments = {
+        "sequence": sequence,
+        "entries": {}
+    }
+
+    for hit in hits:
+        domains = hit["domains"][0]
+        pfam_hit_acc = hit["acc"]
+        (pfam_acc, _version) = pfam_hit_acc.split(".")
+        if pfam_acc not in alignments["entries"]:
+            alignments["entries"][pfam_acc] = []
+
+        entry_logo = EntryAnnotation.objects.filter(
+            accession_id = pfam_acc,
+            type = "logo",
+        )[0]
+        logo = entry_logo.value
+        mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(domains, sequence)
+        matrixseq = get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, mappedseq, modelseq)
+        formatted_matrix = format_logo(matrixseq)
+        alignments["entries"][pfam_acc].extend(formatted_matrix)
+
+    return alignments
 
 
 def passing(x, y):

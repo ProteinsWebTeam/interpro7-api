@@ -103,19 +103,25 @@ Assume we have a user account at /home/username
 8.  Load the fixture data into the SQLite DB.
     ```bash
     ../virtualenv/bin/python manage.py loaddata webfront/tests/fixtures_*.json
+    
+9.  Install Elasticsearch and load index. NB At the time of writing this must be version 6.8.
+
+    e.g for OSX: brew install elasticsearch@6.8
+    ```
+    curl -XPUT 'localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json
     ```
 
-9.  Run the tests. When running the tests, the API loads the fixtures in the existing elasticsearch instance, which is necessary to run the server with fixtures.
+10.  Run the tests. When running the tests, the API loads the fixtures in the existing elasticsearch instance, which is necessary to run the server with fixtures.
     ```
     ../virtualenv/bin/python manage.py test
     ```
 
-10.  Start the server
+11.  Start the server
     ```
     ../virtualenv/bin/python manage.py runserver 0.0.0.0:8000
     ```
 
-11.  _[Optional]_ Install precommit, black and the pre-commit hook, to enable the preformatiing of files with before each commit.
+12.  _[Optional]_ Install precommit, black and the pre-commit hook, to enable the preformatiing of files with before each commit.
     ```
     ../virtualenv/bin/pip install pre-commit black
     ../virtualenv/bin/pre-commit install

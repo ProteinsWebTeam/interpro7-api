@@ -39,3 +39,4 @@ branches:
   only:
     - master
     - dev
+    - pfam-residue-conservation

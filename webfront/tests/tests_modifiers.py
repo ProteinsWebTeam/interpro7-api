@@ -1,6 +1,8 @@
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from rest_framework import status
+import ssl
 
+ssl._create_default_https_context = ssl._create_unverified_context
 
 class GroupByModifierTest(InterproRESTTestCase):
     def test_can_get_the_entry_type_groups(self):
@@ -449,3 +451,25 @@ class IsoformsModifiersTest(InterproRESTTestCase):
     def test_isoform_detail_wrong_acc_modifier(self):
         response = self.client.get("/api/protein/uniprot/a1cuj5?isoforms=wrong")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+class EntryAnnotationModifiersTest(InterproRESTTestCase):
+    def test_annotation_modifier_hmm(self):
+        response = self.client.get("/api/entry/pfam/pf02171?annotation=hmm")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response['content-type'], "application/octet-stream")
+
+    def test_annotation_modifier_alignment(self):
+        response = self.client.get("/api/entry/pfam/pf02171?annotation=alignment")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response['content-type'], "application/octet-stream")
+
+    # TODO Problem encoding logo as byte-coded json
+    # def test_annotation_modifier_logo(self):
+    #     response = self.client.get("/api/entry/pfam/pf02171?annotation=logo")
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(response['content-type'], "application/json")
+
+    # TODO This test should fail but doesn't
+    # def test_annotation_wrong_acc_modifier(self):
+    #     response = self.client.get("/api/entry/pfam/pf00001?annotation=hmm")
+    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

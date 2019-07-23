@@ -30,15 +30,15 @@ class CustomPagination(PageNumberPagination):
     current_size = None
 
     def get_paginated_response(self, data):
+        self.current_size = (
+            self.page.paginator.count
+            if self.current_size is None
+            else self.current_size
+        )
         return Response(
             OrderedDict(
                 [
-                    (
-                        "count",
-                        self.page.paginator.count
-                        if self.current_size is None
-                        else self.current_size,
-                    ),
+                    ("count", self.current_size),
                     ("next", self.get_next_link()),
                     ("previous", self.get_previous_link()),
                     ("results", data),

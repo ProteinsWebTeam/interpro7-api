@@ -110,9 +110,9 @@ class IDAccessionHandler(UniprotAccessionHandler):
             only_main_endpoint=True
         )
         if len(queryset) > 0:
-            new_url = re.sub(
-                r"\/api\/?", "", settings.INTERPRO_CONFIG["api_url"]
-            ) + request.get_full_path().replace(
+            new_url = settings.INTERPRO_CONFIG[
+                "url_path_prefix"
+            ] + request.get_full_path().replace(
                 endpoint_levels[level - 1], queryset.first().accession
             )
 

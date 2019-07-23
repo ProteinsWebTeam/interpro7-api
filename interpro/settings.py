@@ -130,7 +130,7 @@ TESTING = sys.argv[1:2] == ["test"] or INTERPRO_CONFIG.get("use_test_db", True)
 if TESTING:
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "../database/dbTest.sqlite3",
+        "NAME": "../database/db.sqlite3",
     }
 
 

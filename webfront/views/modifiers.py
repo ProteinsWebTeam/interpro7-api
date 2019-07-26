@@ -523,10 +523,11 @@ def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmoti
         generate sequence matrix (i.e. matrix[res] = "conservation_score_seqAA_modelposition")
     """
     matrix = {}
-    count = hmmfrom
+    count = hmmfrom-1
     pos = 0
+    logo_len = len(logo)
     for res in range(0, len(seqmotif)):
-        if res < alisqfrom-1 or count > hmmto:
+        if res < alisqfrom-1 or count > hmmto-1:
             matrix[pos] = f"0_{seqmotif[res]}_0"
             pos += 1
         else:
@@ -536,7 +537,9 @@ def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmoti
                 matrix[pos] = f"-1_None_0"
                 pos += 1
             else:
-                matrix[pos] = f"{logo[count]}_{seqmotif[res]}_{count}"
+                logo_score = logo[count]
+                seq_res = seqmotif[res]
+                matrix[pos] = f"{logo_score}_{seq_res}_{count}"
                 count += 1
                 pos += 1
     return matrix

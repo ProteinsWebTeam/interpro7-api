@@ -473,7 +473,7 @@ def run_hmmscan(sequence):
     """
         run hmmscan for a given uniprot sequence
     """
-    parameters = {'seq': sequence, 'hmmdb': 'pfam'}
+    parameters = {'seq': sequence, 'hmmdb': 'pfam', 'threshold': 'cut_ga'}
     enc_params = parse.urlencode(parameters).encode()
     url = settings.INTERPRO_CONFIG.get('hmmerweb', 'https://www.ebi.ac.uk/Tools/hmmer/search/hmmscan')
 
@@ -524,16 +524,16 @@ def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmoti
     """
     matrix = {}
     count = hmmfrom
-    pos = 1
+    pos = 0
     for res in range(0, len(seqmotif)):
         if res < alisqfrom-1 or count > hmmto:
-            matrix[pos] = f"0_{seqmotif[res]}_None"
+            matrix[pos] = f"0_{seqmotif[res]}_0"
             pos += 1
         else:
             if seqmotif[res] == '-':
                 count += 1
             elif modelmotif[res] == '.':
-                matrix[pos] = f"-1_None_None"
+                matrix[pos] = f"-1_None_0"
                 pos += 1
             else:
                 matrix[pos] = f"{logo[count]}_{seqmotif[res]}_{count}"
@@ -543,15 +543,14 @@ def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmoti
 
 def format_logo(matrix):
     """
-    get color for each residue depending on the conservation score
+        re-arrange the data
     """
     output = []
     for res in matrix:
         score, aa, modelpos = matrix[res].split('_')
         score = float(score)
-        modelpos = int(score)
+        modelpos = int(modelpos)
 
-        # old protvista format
         output.append({
             "position": res,
             "aa": aa,
@@ -559,6 +558,42 @@ def format_logo(matrix):
             "model_position": modelpos,
         })
     return output
+
+def filter_entries(hits):
+    """
+    Removes entries and hits which would be filtered out by Hmmerweb Pfam post-processing
+    :param entries: A dictionary of entries containing lists of domain hits
+    :return: A dictionary containing filtered entries and list of domain hits where display == 1
+    """
+    filtered_hits = []
+    for hit in hits:
+        filtered_domains = list(filter(lambda x: x["display"]==1, hit["domains"]))
+        if len(filtered_domains) > 0:
+            hit["domains"] = filtered_domains
+            filtered_hits.append(hit)
+    return filtered_hits
+
+def calculate_conservation_scores(pfam_acc):
+    """
+    Get HMM Logo and convert it to conservation score
+    :param pfam_acc:
+    :return: list of scores
+    """
+    logo_data = EntryAnnotation.objects.filter(
+        accession_id = pfam_acc,
+        type = "logo",
+    )[0]
+    logo_string = logo_data.value.decode("utf8")
+    logo = loads(logo_string)
+    max_height = logo['max_height_theory']
+    scores = []
+    for pos, values in enumerate(logo['height_arr']):
+        total = 0
+        for value in values:
+            total += float(value.split(":")[1])
+        score = round((total / max_height) * 10, 2)
+        scores.append(score)
+    return scores
 
 def calculate_residue_conservation(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
@@ -568,27 +603,28 @@ def calculate_residue_conservation(value, general_handler):
     opener = request.build_opener(SmartRedirectHandler())
     request.install_opener(opener)
     hits = run_hmmscan(sequence)
+    filtered_entries = filter_entries(hits)
+    # allow option for processing more than just pfam in future
     alignments = {
         "sequence": sequence,
-        "entries": {}
+        "pfam": {
+            "entries": {}
+        },
     }
 
-    for hit in hits:
-        domains = hit["domains"][0]
-        pfam_hit_acc = hit["acc"]
+    for entry in filtered_entries:
+        pfam_hit_acc = entry["acc"]
         (pfam_acc, _version) = pfam_hit_acc.split(".")
-        if pfam_acc not in alignments["entries"]:
-            alignments["entries"][pfam_acc] = []
+        if pfam_acc not in alignments["pfam"]["entries"]:
+            alignments["pfam"]["entries"][pfam_acc] = []
 
-        entry_logo = EntryAnnotation.objects.filter(
-            accession_id = pfam_acc,
-            type = "logo",
-        )[0]
-        logo = entry_logo.value
-        mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(domains, sequence)
-        matrixseq = get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, mappedseq, modelseq)
-        formatted_matrix = format_logo(matrixseq)
-        alignments["entries"][pfam_acc].extend(formatted_matrix)
+        logo_score = calculate_conservation_scores(pfam_acc)
+        for hit in entry["domains"]:
+            # calculate scores for each domain hit for each entry
+            mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(hit, sequence)
+            matrixseq = get_hmm_matrix(logo_score, alisqfrom, alisqto, hmmfrom, hmmto, mappedseq, modelseq)
+            formatted_matrix = format_logo(matrixseq)
+            alignments["pfam"]["entries"][pfam_acc].append(formatted_matrix)
 
     return alignments
 

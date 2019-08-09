@@ -469,13 +469,14 @@ def get_isoforms(value, general_handler):
 
     return {"results": [iso.accession for iso in isoforms], "count": len(isoforms)}
 
+
 def run_hmmscan(sequence):
     """
         run hmmscan for a given uniprot sequence
     """
     parameters = {'seq': sequence, 'hmmdb': 'pfam', 'threshold': 'cut_ga'}
     enc_params = parse.urlencode(parameters).encode()
-    url = settings.INTERPRO_CONFIG.get('hmmerweb', 'https://www.ebi.ac.uk/Tools/hmmer/search/hmmscan')
+    url = settings.INTERPRO_CONFIG.get('hmmerweb', 'http://www.ebi.ac.uk/Tools/hmmer/search/hmmscan')
 
     req = request.Request(url=url, data=enc_params)
     results_url = request.urlopen(req).get('Location')
@@ -491,6 +492,45 @@ def run_hmmscan(sequence):
             phmmerResultsHMM = loads(phmmerResultsHMM)
             hits = phmmerResultsHMM["results"]["hits"]
     return hits
+
+
+def filter_entries(hits):
+    """
+    Removes entries and hits which would be filtered out by Hmmerweb Pfam post-processing
+    :param entries: A dictionary of entries containing lists of domain hits
+    :return: A dictionary containing filtered entries and list of domain hits where display == 1
+    """
+    filtered_hits = []
+    for hit in hits:
+        filtered_domains = list(filter(lambda x: x["display"]==1, hit["domains"]))
+        if len(filtered_domains) > 0:
+            hit["domains"] = filtered_domains
+            filtered_hits.append(hit)
+    return filtered_hits
+
+
+def calculate_conservation_scores(pfam_acc):
+    """
+    Get HMM Logo and convert it to conservation score
+    :param pfam_acc:
+    :return: list of scores
+    """
+    logo_data = EntryAnnotation.objects.filter(
+        accession_id = pfam_acc,
+        type = "logo",
+    )[0]
+    logo_string = logo_data.value.decode("utf8")
+    logo = loads(logo_string)
+    max_height = logo['max_height_theory']
+    scores = []
+    for pos, values in enumerate(logo['height_arr']):
+        total = 0
+        for value in values:
+            total += float(value.split(":")[1])
+        score = round((total / max_height) * 10, 2)
+        scores.append(score)
+    return scores
+
 
 def align_seq_to_model(domains, sequence):
     """
@@ -518,17 +558,18 @@ def align_seq_to_model(domains, sequence):
 
     return mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto
 
+
 def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmotif):
     """
         generate sequence matrix (i.e. matrix[res] = "conservation_score_seqAA_modelposition")
     """
     matrix = {}
-    count = hmmfrom-1
-    pos = 0
+    count = hmmfrom
+    pos = 1
     logo_len = len(logo)
     for res in range(0, len(seqmotif)):
         if res < alisqfrom-1 or count > hmmto-1:
-            matrix[pos] = f"0_{seqmotif[res]}_0"
+            #matrix[pos] = f"0_{seqmotif[res]}_0"
             pos += 1
         else:
             if seqmotif[res] == '-':
@@ -543,6 +584,7 @@ def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmoti
                 count += 1
                 pos += 1
     return matrix
+
 
 def format_logo(matrix):
     """
@@ -562,43 +604,14 @@ def format_logo(matrix):
         })
     return output
 
-def filter_entries(hits):
-    """
-    Removes entries and hits which would be filtered out by Hmmerweb Pfam post-processing
-    :param entries: A dictionary of entries containing lists of domain hits
-    :return: A dictionary containing filtered entries and list of domain hits where display == 1
-    """
-    filtered_hits = []
-    for hit in hits:
-        filtered_domains = list(filter(lambda x: x["display"]==1, hit["domains"]))
-        if len(filtered_domains) > 0:
-            hit["domains"] = filtered_domains
-            filtered_hits.append(hit)
-    return filtered_hits
-
-def calculate_conservation_scores(pfam_acc):
-    """
-    Get HMM Logo and convert it to conservation score
-    :param pfam_acc:
-    :return: list of scores
-    """
-    logo_data = EntryAnnotation.objects.filter(
-        accession_id = pfam_acc,
-        type = "logo",
-    )[0]
-    logo_string = logo_data.value.decode("utf8")
-    logo = loads(logo_string)
-    max_height = logo['max_height_theory']
-    scores = []
-    for pos, values in enumerate(logo['height_arr']):
-        total = 0
-        for value in values:
-            total += float(value.split(":")[1])
-        score = round((total / max_height) * 10, 2)
-        scores.append(score)
-    return scores
 
 def calculate_residue_conservation(value, general_handler):
+    """
+    Calculate the conservancy score of each Pfam entry matching the protein sequence
+    :param value:
+    :param general_handler:
+    :return: An object with an array of hits and conservancy scores
+    """
     queryset = general_handler.queryset_manager.get_queryset()
     # will always have one protein in queryset
     protein = queryset[0]

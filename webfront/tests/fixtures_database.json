@@ -81,11 +81,11 @@
       "version": "70.0",
       "release_date": "2018-01-22T00:00:00Z",
       "content": {
-        "new_entries": [],
         "new_databases": [],
         "database_updates": [],
         "integration": [],
         "interpro": {
+          "new_entries": ["IPR003165"],
           "last_entry": "ipr040122",
           "types": [
             {

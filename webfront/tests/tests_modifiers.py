@@ -449,3 +449,14 @@ class IsoformsModifiersTest(InterproRESTTestCase):
     def test_isoform_detail_wrong_acc_modifier(self):
         response = self.client.get("/api/protein/uniprot/a1cuj5?isoforms=wrong")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class LatestEntriesModifiersTest(InterproRESTTestCase):
+    def test_can_read_entry_interpro_new_entries(self):
+        response = self.client.get("/api/entry/interpro?latest_entries")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        self.assertEqual(
+            response.data["results"][0]["metadata"]["accession"], "IPR003165"
+        )

@@ -71,7 +71,7 @@ This way, any future duplicate request will get the value from the cache alomos 
 All *block* handlers inherit from `CustomView` and have to implement their `get()` method.
 
 
-####main-endpoint-block
+#### main-endpoint-block
  
 Basically the task of the `get()` method in `CustomView` is to find what is the most apropiate 
 handler for the current block, and once it founds it invokes the `get()` method of such handler.
@@ -88,7 +88,7 @@ The usual tasks of a handler and in particular of the `get()` method are:
 
 Once all the *blocks* of the main endpoint have been exhausted, is is time to process the filters:
  
- ####filter-endpoint-blocks
+ #### filter-endpoint-blocks
  The logic is very similar, but now the method to call in all the handlers is `filter()`.
  The `filter()` method should be defined as _static_ and should return the filtered queryset.
  This is then repeated for the rest of the *endpoint-blocks*

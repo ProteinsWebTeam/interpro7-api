@@ -515,7 +515,10 @@ class EntrySerializer(ModelContentSerializer):
         obj, for_structure=False, include_entry=False, searcher=None, sq=None
     ):
         header = {
-            "accession": obj["entry_acc"],
+            # Only CDD accession are lowercase.
+            "accession": obj["entry_acc"]
+            if obj["entry_db"] == "cdd"
+            else obj["entry_acc"].upper(),
             "entry_protein_locations": obj["entry_protein_locations"],
             "protein_length": obj["protein_length"],
             "source_database": obj["entry_db"],

@@ -18,7 +18,6 @@ class ElasticsearchController(SearchController):
         self.port = url.port
         parts = url.path.split("/")
         self.index = parts[1]
-        self.type = parts[2]
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
         self.connection = http.client.HTTPConnection(self.server, self.port)
@@ -27,24 +26,19 @@ class ElasticsearchController(SearchController):
         body = ""
         for doc in docs:
             body += (
-                '{ "index": { "_type": "'
-                + self.type
-                + '", "_id":"'
-                + doc["id"]
-                + '"}}\n'
-                + json.dumps(doc)
-                + "\n"
+                '{ "index": { "_id":"' + doc["id"] + '"}}\n' + json.dumps(doc) + "\n"
             )
         conn = http.client.HTTPConnection(self.server, self.port)
         conn.request("POST", "/" + self.index + "/_bulk/", body, self.headers)
-        return conn.getresponse()
+        response = conn.getresponse()
+        return response
 
     def clear_all_docs(self):
         body = '{ "query": { "match_all": {} } }'
         conn = http.client.HTTPConnection(self.server, self.port)
         conn.request(
             "POST",
-            "/" + self.index + "/" + self.type + "/_delete_by_query?conflicts=proceed",
+            "/" + self.index + "/_delete_by_query?conflicts=proceed",
             body,
             self.headers,
         )
@@ -327,8 +321,6 @@ class ElasticsearchController(SearchController):
         path = (
             "/"
             + self.index
-            + "/"
-            + self.type
             + "/_search?request_cache=true&q="
             + q
             + "&size="
@@ -351,7 +343,7 @@ class ElasticsearchController(SearchController):
             .replace(" or ", "%20OR%20")
             .replace(" || ", "%20OR%20")
         )
-        path = "/" + self.index + "/" + self.type + "/_search?request_cache=true&q=" + q
+        path = "/" + self.index + "/_search?request_cache=true&q=" + q
         logger.debug("URL:" + path)
         self.connection.request("GET", path, json.dumps(query_obj), self.headers)
         response = self.connection.getresponse()

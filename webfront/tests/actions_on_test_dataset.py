@@ -384,8 +384,8 @@ def extend_obj_with_other_endpoints(data, endpoints, dbs, accs, instance, ep):
                 ep == "structure"
                 or current_ep == "structure",  # and current_acc is None
             )[
-                :10
-            ]  # the API only returns up to 10 items in a sublist
+                :20
+            ]  # the API only returns up to 20 items in a sublist
 
 
 def get_db_payload(data, endpoints, dbs, accs=None):

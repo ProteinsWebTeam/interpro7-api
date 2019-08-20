@@ -127,7 +127,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chain=include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=10
+                None, fields, fq=query, rows=20
             )["groups"]
         ]
 
@@ -143,7 +143,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=10
+                None, fields, fq=query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -168,7 +168,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 base_query=base_query,
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, field, fq=query, rows=10
+                None, field, fq=query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -185,13 +185,13 @@ class ModelContentSerializer(serializers.ModelSerializer):
         base_query=None,
     ):
         if include_chains:
-            # search = searcher.execute_query(None, fq=searcher_query, rows=10)
+            # search = searcher.execute_query(None, fq=searcher_query, rows=20)
             search = searcher.get_group_obj_of_field_by_query(
-                None, ["structure_chain", "entry_acc"], fq=searcher_query, rows=10
+                None, ["structure_chain", "entry_acc"], fq=searcher_query, rows=20
             )["groups"]
         else:
             search = searcher.get_group_obj_of_field_by_query(
-                None, "entry_acc", fq=searcher_query, rows=10
+                None, "entry_acc", fq=searcher_query, rows=20
             )["groups"]
 
         response = [
@@ -231,7 +231,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 sq=base_query,
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, field, fq=searcher_query, rows=10
+                None, field, fq=searcher_query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -248,7 +248,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chain=include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=10
+                None, fields, fq=query, rows=20
             )["groups"]
         ]
         if len(response) == 0:

@@ -242,7 +242,9 @@ class ElasticsearchController(SearchController):
 
         return output
 
-    def get_list_of_endpoint(self, endpoint, query=None, rows=10, start=0):
+    def get_list_of_endpoint(
+        self, endpoint, query=None, rows=10, start=0, after=None, before=None
+    ):
         qs = self.queryset_manager.get_searcher_query() if query is None else query
         if qs == "":
             qs = "*:*"
@@ -250,34 +252,85 @@ class ElasticsearchController(SearchController):
             "aggs": {
                 "ngroups": {"cardinality": {"field": endpoint + "_acc"}},
                 "rscount": {
-                    "terms": {
-                        "field": "{}_acc".format(endpoint),
-                        "size": start + rows,
-                        "order": {"_term": "asc"},
-                        "execution_hint": "map",
+                    "composite": {
+                        "size": rows,
+                        "sources": [
+                            {"source": {"terms": {"field": "{}_acc".format(endpoint)}}}
+                        ],
                     }
                 },
             },
             "size": 0,
         }
+        if after is not None:
+            facet["aggs"]["rscount"]["composite"]["after"] = {"source": after.lower()}
+        elif before is not None:
+            facet["aggs"]["rscount"]["composite"]["after"] = {"source": before.lower()}
+            facet["aggs"]["rscount"]["composite"]["sources"][0]["source"]["terms"][
+                "order"
+            ] = "desc"
         if endpoint == "organism" or endpoint == "taxonomy":
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "tax_id"
-            facet["aggs"]["rscount"]["terms"]["field"] = "tax_id"
+            facet["aggs"]["rscount"]["composite"]["sources"][0]["source"]["terms"][
+                "field"
+            ] = "tax_id"
         elif endpoint == "proteome":
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "proteome_acc"
-            facet["aggs"]["rscount"]["terms"]["field"] = "proteome_acc"
+            facet["aggs"]["rscount"]["composite"]["sources"][0]["source"]["terms"][
+                "field"
+            ] = "proteome_acc"
         response = self._elastic_json_query(qs, facet)
-        count = len(response["aggregations"]["rscount"]["buckets"])
-        if count == start + rows:
-            count = response["aggregations"]["ngroups"]["value"]
-        # TODO: return only the subset of interest [start:] This however requires to re think the way pagination works
-        return (
-            [
-                str(x["key"]).lower()
-                for x in response["aggregations"]["rscount"]["buckets"]
-            ],
-            count,
-        )
+        # count = len(response["aggregations"]["rscount"]["buckets"])
+        # if count == start + rows:
+        #     count = response["aggregations"]["ngroups"]["value"]
+        count = response["aggregations"]["ngroups"]["value"]
+        accessions = [
+            str(x["key"]["source"]).lower()
+            for x in response["aggregations"]["rscount"]["buckets"]
+        ]
+        after_key = None
+        if before is not None:
+            try:
+                after_key = response["aggregations"]["rscount"]["buckets"][0]["key"][
+                    "source"
+                ]
+            except:
+                pass
+        elif "after_key" in response["aggregations"]["rscount"]:
+            after_key = response["aggregations"]["rscount"]["after_key"]["source"]
+
+        if after_key is not None:
+            facet["aggs"]["rscount"]["composite"]["after"] = {"source": after_key}
+            facet["aggs"]["rscount"]["composite"]["sources"][0]["source"]["terms"][
+                "order"
+            ] = "asc"
+            next_response = self._elastic_json_query(qs, facet)
+            if len(next_response["aggregations"]["rscount"]["buckets"]) == 0:
+                after_key = None
+
+        before_key = None
+        # if after is not None or before is not None:
+        try:
+            if before is not None:
+                before_key = response["aggregations"]["rscount"]["buckets"][-1]["key"][
+                    "source"
+                ]
+            else:
+                before_key = response["aggregations"]["rscount"]["buckets"][0]["key"][
+                    "source"
+                ]
+        except:
+            pass
+        if before_key is not None:
+            facet["aggs"]["rscount"]["composite"]["after"] = {"source": before_key}
+            facet["aggs"]["rscount"]["composite"]["sources"][0]["source"]["terms"][
+                "order"
+            ] = "desc"
+            prev_response = self._elastic_json_query(qs, facet)
+            if len(prev_response["aggregations"]["rscount"]["buckets"]) == 0:
+                before_key = None
+
+        return accessions, count, after_key, before_key
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()

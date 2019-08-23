@@ -2,7 +2,7 @@ from collections import OrderedDict
 from django.core.paginator import Paginator as DjangoPaginator
 
 from webfront.response import Response
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework.utils.urls import replace_query_param, remove_query_param
 from django.conf import settings
 
@@ -21,7 +21,80 @@ class CustomPaginator(DjangoPaginator):
         )
 
 
-class CustomPagination(PageNumberPagination):
+class CustomPagination(CursorPagination):
+    page_size = settings.INTERPRO_CONFIG.get("default_page_size", 20)
+    page_size_query_param = "page_size"
+    ordering = "accession"
+    current_size = None
+    after_key = None
+    before_key = None
+
+    def get_paginated_response(self, data):
+        return Response(
+            OrderedDict(
+                [
+                    ("count", self.current_size),
+                    ("next", self.get_next_link()),
+                    ("previous", self.get_previous_link()),
+                    ("results", data),
+                ]
+            )
+        )
+
+    def paginate_queryset(self, queryset, request, **kwargs):
+        self.current_size = None
+        self.after_key = None
+        if (
+            "model" in queryset
+            and queryset.model._meta.ordering != []
+            and queryset.model._meta.ordering != ""
+            and queryset.model._meta.ordering is not None
+        ):
+            self.ordering = queryset.model._meta.ordering
+        if "search_size" in kwargs and kwargs["search_size"] is not None:
+            if not queryset.ordered:
+                queryset = queryset.order_by("accession")
+            self.current_size = kwargs["search_size"]
+        if "after_key" in kwargs and kwargs["after_key"] is not None:
+            self.after_key = kwargs["after_key"]
+        if "before_key" in kwargs and kwargs["before_key"] is not None:
+            self.before_key = kwargs["before_key"]
+        return super(CustomPagination, self).paginate_queryset(
+            queryset, request, kwargs["view"]
+        )
+
+    def has_next_page(self):
+        if self.after_key is None:
+            return self.has_next
+        return True
+
+    def has_prev_page(self):
+        if self.before_key is None:
+            return self.has_previous
+        return True
+
+    def get_next_link(self):
+        if not self.has_next_page():
+            return None
+        if self.after_key is None:
+            return super(CustomPagination, self).get_next_link()
+        url = replace_url_host(self.base_url)
+        return remove_query_param(
+            replace_query_param(url, "after", self.after_key), "before"
+        )
+
+    def get_previous_link(self):
+        if not self.has_prev_page():
+            return None
+        if self.before_key is None:
+            return super(CustomPagination, self).get_previous_link()
+        url = replace_url_host(self.base_url)
+        return remove_query_param(
+            replace_query_param(url, "before", self.before_key), "after"
+        )
+
+
+class CustomPaginationOld(PageNumberPagination):
     page_size = settings.INTERPRO_CONFIG.get("default_page_size", 20)
     page_size_query_param = "page_size"
     max_page_size = 200

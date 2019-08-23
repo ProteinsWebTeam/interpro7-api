@@ -59,6 +59,8 @@ def pagination_information(request):
                 "page_size", settings.INTERPRO_CONFIG.get("default_page_size", 20)
             )
         ),
+        "after": request.GET.get("after", None),
+        "before": request.GET.get("before", None),
     }
 
 

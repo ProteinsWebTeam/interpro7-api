@@ -8,3 +8,8 @@ class DeletedEntryError(Exception):
 class EmptyQuerysetError(Exception):
     def __init__(self, message):
         self.message = message
+
+
+class BadURLParameterError(Exception):
+    def __init__(self, message):
+        self.message = message

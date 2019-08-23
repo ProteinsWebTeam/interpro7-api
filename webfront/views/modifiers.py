@@ -336,32 +336,17 @@ def filter_by_latest_entries(value, general_handler):
     general_handler.queryset_manager.add_filter("entry", accession__in=new_entries)
 
 
-def _get_rows(general_handler):
-    return (
-        general_handler.pagination["size"]
-        if "size" in general_handler.pagination
-        else settings.INTERPRO_CONFIG.get("default_page_size", 20)
-    )
-
-
-def _get_index(general_handler):
-    return (
-        general_handler.pagination["index"]
-        if "index" in general_handler.pagination
-        else 1
-    )
-
-
 def get_domain_architectures(field, general_handler):
     searcher = general_handler.searcher
-    rows = _get_rows(general_handler)
-    index = _get_index(general_handler)
+    size = general_handler.pagination["size"]
+    after = general_handler.pagination["after"]
+    before = general_handler.pagination["before"]
     if field is None or field.strip() == "":
         return searcher.get_group_obj_of_field_by_query(
             None,
             "ida_id",
-            rows=rows,
-            start=index * rows - rows,
+            rows=size,
+            start=1,  # index * rows - rows,
             inner_field_to_count="protein_acc",
         )
     else:
@@ -370,10 +355,12 @@ def get_domain_architectures(field, general_handler):
             + " && ida_id:"
             + field
         )
-        res, length = searcher.get_list_of_endpoint(
-            "protein", query, rows, index * rows - rows
+        res, length, after_key, before_key = searcher.get_list_of_endpoint(
+            "protein", rows=size, query=query, after=after, before=before
         )
         general_handler.modifiers.search_size = length
+        general_handler.modifiers.after_key = after_key
+        general_handler.modifiers.before_key = before_key
         return filter_queryset_accession_in(
             general_handler.queryset_manager.get_base_queryset("protein"), res
         )

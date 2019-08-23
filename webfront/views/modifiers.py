@@ -342,11 +342,12 @@ def get_domain_architectures(field, general_handler):
     after = general_handler.pagination["after"]
     before = general_handler.pagination["before"]
     if field is None or field.strip() == "":
-        return searcher.get_group_obj_of_field_by_query(
+        return searcher.get_group_obj_copy_of_field_by_query(
             None,
             "ida_id",
             rows=size,
-            start=1,  # index * rows - rows,
+            after=after,
+            before=before,
             inner_field_to_count="protein_acc",
         )
     else:
@@ -410,8 +411,9 @@ def add_extra_fields(endpoint, *argv):
 
 def ida_search(value, general_handler):
     searcher = general_handler.searcher
-    rows = _get_rows(general_handler)
-    index = _get_index(general_handler)
+    size = general_handler.pagination["size"]
+    after = general_handler.pagination["after"]
+    before = general_handler.pagination["before"]
 
     conserve_order = "ordered" in general_handler.request.query_params
     entries = value.upper().split(",")
@@ -425,11 +427,12 @@ def ida_search(value, general_handler):
             query = "({}) && ({})".format(
                 query, " && ".join(["!ida:*{}*".format(e) for e in ignore_list])
             )
-    return searcher.get_group_obj_of_field_by_query(
+    return searcher.get_group_obj_copy_of_field_by_query(
         query,
         "ida_id",
-        rows=rows,
-        start=index * rows - rows,
+        rows=size,
+        after=after,
+        before=before,
         inner_field_to_count="protein_acc",
     )
 

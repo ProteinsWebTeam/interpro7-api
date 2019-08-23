@@ -45,7 +45,7 @@ class CustomPagination(CursorPagination):
         self.current_size = None
         self.after_key = None
         if (
-            "model" in queryset
+            hasattr(queryset, "model")
             and queryset.model._meta.ordering != []
             and queryset.model._meta.ordering != ""
             and queryset.model._meta.ordering is not None

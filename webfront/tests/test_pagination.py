@@ -155,3 +155,79 @@ class PaginationOverMultipleEnpointTest(InterproRESTTestCase):
                 previous_url = get_previous_value_from_response(response)
                 start = start - size
             self.assertEqual(count, 0)
+
+
+class PaginationOverIDASearch(InterproRESTTestCase):
+    def test_pagesize(self):
+        for size in range(1, 2):
+            response = self.client.get(
+                "/api/entry?ida_search=IPR003165&page_size={}".format(size)
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data["results"]), size)
+
+    def test_pagesize_larger_than_total(self):
+        size = 20
+        response = self.client.get(
+            "/api/entry?ida_search=IPR003165&page_size={}".format(size)
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], len(response.data["results"]))
+        self.assertLess(response.data["count"], size)
+
+    def test_next_and_back_should_be_the_same(self):
+        response = self.client.get("/api/entry?ida_search=IPR003165&page_size=1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        next_url = get_next_value_from_response(response)
+        self.assertIsNotNone(next_url)
+        next_response = self.client.get(next_url)
+        self.assertEqual(next_response.status_code, status.HTTP_200_OK)
+        previous_url = get_previous_value_from_response(next_response)
+        self.assertIsNotNone(previous_url)
+        previous_response = self.client.get(previous_url)
+        self.assertEqual(previous_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], previous_response.data["count"])
+        self.assertEqual(response.data["results"], previous_response.data["results"])
+        self.assertEqual(response.data["next"], previous_response.data["next"])
+
+    def test_search_by_a_single_accession_paginated(self):
+        response = self.client.get("/api/entry?ida_search=IPR003165&page_size=1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class PaginationOverEntryIDA(InterproRESTTestCase):
+    def test_pagesize(self):
+        for size in range(1, 2):
+            response = self.client.get(
+                "/api/entry/interpro/IPR003165?ida&page_size={}".format(size)
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data["results"]), size)
+
+    def test_pagesize_larger_than_total(self):
+        size = 20
+        response = self.client.get(
+            "/api/entry/interpro/IPR003165?ida&page_size={}".format(size)
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], len(response.data["results"]))
+        self.assertLess(response.data["count"], size)
+
+    def test_next_and_back_should_be_the_same(self):
+        response = self.client.get("/api/entry/interpro/IPR003165?ida&page_size=1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        next_url = get_next_value_from_response(response)
+        self.assertIsNotNone(next_url)
+        next_response = self.client.get(next_url)
+        self.assertEqual(next_response.status_code, status.HTTP_200_OK)
+        previous_url = get_previous_value_from_response(next_response)
+        self.assertIsNotNone(previous_url)
+        previous_response = self.client.get(previous_url)
+        self.assertEqual(previous_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], previous_response.data["count"])
+        self.assertEqual(response.data["results"], previous_response.data["results"])
+        self.assertEqual(response.data["next"], previous_response.data["next"])
+
+    def test_search_by_a_single_accession_paginated(self):
+        response = self.client.get("/api/entry/interpro/IPR003165?ida&page_size=1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

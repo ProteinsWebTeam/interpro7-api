@@ -1,4 +1,5 @@
 from django.db.models import Count
+from webfront.models.interpro_new import Release_Note
 
 from webfront.exceptions import DeletedEntryError
 from webfront.models import Entry
@@ -13,6 +14,7 @@ from webfront.views.modifiers import (
     get_entry_annotation,
     add_extra_fields,
     ida_search,
+    filter_by_latest_entries,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -364,6 +366,7 @@ class InterproHandler(CustomView):
             filter_by_contains_field("entry", "member_databases", '"{}"'),
             works_in_multiple_endpoint=False,
         )
+        general_handler.modifiers.register("latest_entries", filter_by_latest_entries)
         return super(InterproHandler, self).get(
             request._request,
             endpoint_levels,

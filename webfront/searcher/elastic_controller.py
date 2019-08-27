@@ -200,7 +200,7 @@ class ElasticsearchController(SearchController):
             "aggs": {
                 "ngroups": {"cardinality": {"field": field}},
                 "groups": {
-                    "terms": {"field": field, "execution_hint": "map"},
+                    "terms": {"field": field, "size": rows, "execution_hint": "map"},
                     "aggs": {"tops": {"top_hits": {"size": 1}}},
                 },
             },

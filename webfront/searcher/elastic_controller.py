@@ -11,6 +11,17 @@ import logging
 es_results = list()
 
 
+def getAfterBeforeFromCursor(cursor):
+    after = None
+    before = None
+    if cursor is not None:
+        if cursor[0] == "-":
+            before = cursor[1:]
+        else:
+            after = cursor
+    return after, before
+
+
 class ElasticsearchController(SearchController):
     def __init__(self, queryset_manager=None):
         url = urllib.parse.urlparse(settings.SEARCHER_URL)
@@ -236,14 +247,7 @@ class ElasticsearchController(SearchController):
         return output
 
     def get_group_obj_copy_of_field_by_query(
-        self,
-        query,
-        field,
-        fq=None,
-        rows=1,
-        after=None,
-        before=None,
-        inner_field_to_count=None,
+        self, query, field, fq=None, rows=1, cursor=None, inner_field_to_count=None
     ):
         # TODO: change to new pagination
         query = self.queryset_manager.get_searcher_query() if query is None else query
@@ -260,6 +264,7 @@ class ElasticsearchController(SearchController):
             },
             "size": 0,
         }
+        after, before = getAfterBeforeFromCursor(cursor)
         self.addAfterKeyToQueryComposite(
             facet["aggs"]["groups"]["composite"], after, before
         )
@@ -291,9 +296,7 @@ class ElasticsearchController(SearchController):
 
         return output
 
-    def get_list_of_endpoint(
-        self, endpoint, query=None, rows=10, start=0, after=None, before=None
-    ):
+    def get_list_of_endpoint(self, endpoint, query=None, rows=10, start=0, cursor=None):
         qs = self.queryset_manager.get_searcher_query() if query is None else query
         if qs == "":
             qs = "*:*"
@@ -311,6 +314,7 @@ class ElasticsearchController(SearchController):
             },
             "size": 0,
         }
+        after, before = getAfterBeforeFromCursor(cursor)
         self.addAfterKeyToQueryComposite(
             facet["aggs"]["groups"]["composite"], after, before
         )

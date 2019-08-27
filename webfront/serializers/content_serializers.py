@@ -290,11 +290,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         next_page = None
         previous = None
         if obj["after_key"] is not None:
-            next_page = remove_query_param(
-                replace_query_param(url, "after", obj["after_key"]), "before"
-            )
+            next_page = replace_query_param(url, "cursor", obj["after_key"])
         if obj["before_key"] is not None:
-            previous = remove_query_param(
-                replace_query_param(url, "before", obj["before_key"]), "after"
-            )
+            previous = replace_query_param(url, "cursor", "-" + obj["before_key"])
         return {"next": next_page, "previous": previous, **payload}

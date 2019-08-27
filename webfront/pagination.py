@@ -6,6 +6,8 @@ from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework.utils.urls import replace_query_param, remove_query_param
 from django.conf import settings
 
+from django.http import QueryDict
+
 
 def replace_url_host(url):
     host = settings.INTERPRO_CONFIG.get("api_url", "http://localhost:8007/api/")
@@ -63,6 +65,11 @@ class CustomPagination(CursorPagination):
             queryset, request, kwargs["view"]
         )
 
+    def decode_cursor(self, request):
+        if self.after_key is not None or self.before_key is not None:
+            return None
+        return super(CustomPagination, self).decode_cursor(request)
+
     def has_next_page(self):
         if self.after_key is None:
             return self.has_next
@@ -79,9 +86,7 @@ class CustomPagination(CursorPagination):
         if self.after_key is None:
             return super(CustomPagination, self).get_next_link()
         url = replace_url_host(self.base_url)
-        return remove_query_param(
-            replace_query_param(url, "after", self.after_key), "before"
-        )
+        return replace_query_param(url, "cursor", self.after_key)
 
     def get_previous_link(self):
         if not self.has_prev_page():
@@ -89,9 +94,7 @@ class CustomPagination(CursorPagination):
         if self.before_key is None:
             return super(CustomPagination, self).get_previous_link()
         url = replace_url_host(self.base_url)
-        return remove_query_param(
-            replace_query_param(url, "before", self.before_key), "after"
-        )
+        return replace_query_param(url, "cursor", "-" + self.before_key)
 
 
 class CustomPaginationOld(PageNumberPagination):
@@ -125,6 +128,7 @@ class CustomPaginationOld(PageNumberPagination):
             if not queryset.ordered:
                 queryset = queryset.order_by("accession")
             self.current_size = kwargs["search_size"]
+
         return super(CustomPagination, self).paginate_queryset(
             queryset, request, kwargs["view"]
         )

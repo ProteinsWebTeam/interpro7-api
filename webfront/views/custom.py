@@ -293,15 +293,11 @@ class CustomView(GenericAPIView):
     def update_queryset_from_search(self, searcher, general_handler):
         ep = general_handler.queryset_manager.main_endpoint
         s = general_handler.pagination["size"]
-        after = general_handler.pagination["after"]
-        before = general_handler.pagination["before"]
-        if after is not None and before is not None:
-            raise BadURLParameterError(
-                "You can't use 'after' and 'before' together. Use only one of them."
-            )
+        cursor = general_handler.pagination["cursor"]
+
         qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
         res, length, after_key, before_key = searcher.get_list_of_endpoint(
-            ep, rows=s, query=qs, after=after, before=before
+            ep, rows=s, query=qs, cursor=cursor
         )
         self.queryset = general_handler.queryset_manager.get_base_queryset(ep)
 

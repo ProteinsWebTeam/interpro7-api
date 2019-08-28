@@ -89,7 +89,8 @@ class CustomView(GenericAPIView):
                         drf_request,
                         view=self,
                         search_size=self.search_size,
-                        # after_key=self.after_key,
+                        after_key=general_handler.modifiers.after_key,
+                        before_key=general_handler.modifiers.before_key,
                     )
 
             elif self.from_model:

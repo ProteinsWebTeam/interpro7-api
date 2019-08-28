@@ -94,7 +94,7 @@ class CustomPagination(CursorPagination):
         if self.before_key is None:
             return super(CustomPagination, self).get_previous_link()
         url = replace_url_host(self.base_url)
-        return replace_query_param(url, "cursor", "-" + self.before_key)
+        return replace_query_param(url, "cursor", "-{}".format(self.before_key))
 
 
 class CustomPaginationOld(PageNumberPagination):

@@ -9,6 +9,8 @@ class ModifierManager:
         self.serializer = None
         self.many = False
         self.search_size = None
+        self.after_key = None
+        self.before_key = None
 
     def register(
         self,

@@ -296,7 +296,11 @@ def get_single_value(field, from_elastic=False):
             obj = general_handler.searcher._elastic_json_query(
                 "{} && _exists_:{}&size=1".format(q, field)
             )
-            if obj["hits"]["total"] < 1:
+            total = obj["hits"]["total"]
+            if type(total) == dict:
+                total = obj["hits"]["total"]["value"]
+
+            if total < 1:
                 raise EmptyQuerysetError(
                     "No documents found with the current selection"
                 )

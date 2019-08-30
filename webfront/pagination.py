@@ -43,6 +43,13 @@ class CustomPagination(CursorPagination):
             )
         )
 
+    def _get_position_from_instance(self, instance, ordering):
+        if type(instance) == tuple:
+            return instance[0]
+        return super(CustomPagination, self)._get_position_from_instance(
+            instance, ordering
+        )
+
     def paginate_queryset(self, queryset, request, **kwargs):
         self.current_size = None
         self.after_key = None

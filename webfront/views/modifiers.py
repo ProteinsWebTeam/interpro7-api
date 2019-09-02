@@ -2,7 +2,7 @@ from urllib.error import URLError
 from webfront.views.custom import is_single_endpoint
 
 from django.db.models import Count
-from webfront.models import Entry, EntryAnnotation, Alignment, Isoforms
+from webfront.models import Entry, EntryAnnotation, Alignment, Isoforms, Release_Note
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError
 from django.conf import settings
@@ -335,6 +335,17 @@ def filter_by_match_presence(value, general_handler):
     general_handler.queryset_manager.add_filter(
         "entry", **{"source_database__isnull": value.lower() != "true"}
     )
+
+
+def filter_by_latest_entries(value, general_handler):
+    notes = Release_Note.objects.all()
+    notes = notes.order_by("-release_date")
+    if notes.count() == 0:
+        raise ReferenceError("There are not release Notes")
+    note = notes.first()
+    new_entries = note.content["interpro"]["new_entries"]
+
+    general_handler.queryset_manager.add_filter("entry", accession__in=new_entries)
 
 
 def _get_rows(general_handler):

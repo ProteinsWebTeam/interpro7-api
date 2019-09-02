@@ -1,10 +1,10 @@
 Django==2.1.10
-djangorestframework==3.9.4
-PyYAML==5.1.1
+djangorestframework==3.10.2
+PyYAML==5.1.2
 jsonfield==2.0.2
 pymysql==0.9.3
-django-cors-headers==3.0.2
+django-cors-headers==3.1.0
 gunicorn==19.9.0
 django-redis==4.10.0
-redis==3.2.1
+redis==3.3.7
 requests==2.22.0

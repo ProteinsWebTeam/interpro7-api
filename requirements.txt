@@ -7,3 +7,4 @@ django-cors-headers==3.0.2
 gunicorn==19.9.0
 django-redis==4.10.0
 redis==3.2.1
+requests==2.22.0

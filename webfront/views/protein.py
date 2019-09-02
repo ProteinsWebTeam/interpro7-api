@@ -1,5 +1,6 @@
 from django.db.models import Count
 from django.shortcuts import redirect
+import re
 
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
@@ -17,6 +18,7 @@ from webfront.views.modifiers import (
     calculate_residue_conservation,
 )
 from webfront.models import Protein
+from webfront.exceptions import EmptyQuerysetError
 from django.conf import settings
 
 entry_db_members = "|".join(settings.DB_MEMBERS)
@@ -98,16 +100,39 @@ class IDAccessionHandler(UniprotAccessionHandler):
         level=0,
         parent_queryset=None,
         handler=None,
+        general_handler=None,
         *args,
         **kwargs
     ):
         if parent_queryset is not None:
             self.queryset = parent_queryset
-        self.queryset = self.queryset.filter(identifier=endpoint_levels[level - 1])
-        new_url = request.get_full_path().replace(
-            endpoint_levels[level - 1], self.queryset.first().accession
+
+        general_handler.queryset_manager.add_filter(
+            "protein", identifier=endpoint_levels[level - 1]
         )
-        return redirect(new_url)
+        queryset = general_handler.queryset_manager.get_queryset(
+            only_main_endpoint=True
+        )
+        if len(queryset) > 0:
+            new_url = settings.INTERPRO_CONFIG[
+                "url_path_prefix"
+            ] + request.get_full_path().replace(
+                endpoint_levels[level - 1], queryset.first().accession
+            )
+
+            return redirect(new_url)
+        return super(IDAccessionHandler, self).get(
+            request._request,
+            endpoint_levels,
+            available_endpoint_handlers,
+            level,
+            self.queryset,
+            handler,
+            general_handler,
+            request,
+            *args,
+            **kwargs
+        )
 
 
 class UniprotHandler(CustomView):

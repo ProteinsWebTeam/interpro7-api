@@ -1,5 +1,5 @@
 selenium==3.141.0
-django-debug-toolbar==1.11
+django-debug-toolbar==2.0
 ipdb==0.12
-coveralls==1.8.0
-tqdm==4.32.1
+coveralls==1.8.1
+tqdm==4.32.2

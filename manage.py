@@ -7,6 +7,7 @@ try:
 
     pymysql.install_as_MySQLdb()
     print("running pymysql")
+
 except ImportError:
     pass
 

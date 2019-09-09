@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.utils.urls import replace_query_param, remove_query_param
 
 from webfront.exceptions import EmptyQuerysetError
 from webfront.views.custom import SerializerDetail
@@ -127,7 +128,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chain=include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=10
+                None, fields, fq=query, rows=20
             )["groups"]
         ]
 
@@ -143,7 +144,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=10
+                None, fields, fq=query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -168,7 +169,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 base_query=base_query,
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, field, fq=query, rows=10
+                None, field, fq=query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -185,13 +186,13 @@ class ModelContentSerializer(serializers.ModelSerializer):
         base_query=None,
     ):
         if include_chains:
-            # search = searcher.execute_query(None, fq=searcher_query, rows=10)
+            # search = searcher.execute_query(None, fq=searcher_query, rows=20)
             search = searcher.get_group_obj_of_field_by_query(
-                None, ["structure_chain", "entry_acc"], fq=searcher_query, rows=10
+                None, ["structure_chain", "entry_acc"], fq=searcher_query, rows=20
             )["groups"]
         else:
             search = searcher.get_group_obj_of_field_by_query(
-                None, "entry_acc", fq=searcher_query, rows=10
+                None, "entry_acc", fq=searcher_query, rows=20
             )["groups"]
 
         response = [
@@ -231,7 +232,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 sq=base_query,
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, field, fq=searcher_query, rows=10
+                None, field, fq=searcher_query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -248,7 +249,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chain=include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=10
+                None, fields, fq=query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -283,3 +284,13 @@ class ModelContentSerializer(serializers.ModelSerializer):
             counters["entries"] = counters["entries"]["total"]
         else:
             counters["entries"] = sum(counters["entries"].values())
+
+    def add_pagination(self, payload, obj):
+        url = self.context["request"].build_absolute_uri()
+        next_page = None
+        previous = None
+        if obj["after_key"] is not None:
+            next_page = replace_query_param(url, "cursor", obj["after_key"])
+        if obj["before_key"] is not None:
+            previous = replace_query_param(url, "cursor", "-" + obj["before_key"])
+        return {"next": next_page, "previous": previous, **payload}

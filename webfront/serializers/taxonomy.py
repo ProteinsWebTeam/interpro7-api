@@ -161,7 +161,10 @@ class TaxonomySerializer(ModelContentSerializer):
         def filter_children(child):
             q = "{} && tax_lineage:{}".format(query, child)
             response = self.searcher._elastic_json_query(q, {"size": 0})
-            return response["hits"]["total"] > 0
+            value = response["hits"]["total"]
+            if type(value) == dict:
+                value = response["hits"]["total"]["value"]
+            return value > 0
 
         return filter_children
 

@@ -484,6 +484,8 @@ def get_isoforms(value, general_handler):
 def run_hmmscan(sequence):
     """
         run hmmscan for a given uniprot sequence
+        NOTE: HmmerWeb refuses to accept proteins > 4k residues
+
     """
     parameters = {'seq': sequence, 'hmmdb': 'pfam', 'threshold': 'cut_ga'}
     enc_params = parse.urlencode(parameters).encode()

@@ -90,18 +90,20 @@ class CustomPagination(CursorPagination):
     def get_next_link(self):
         if not self.has_next_page():
             return None
+        self.base_url = replace_url_host(self.base_url)
         if self.after_key is None:
             return super(CustomPagination, self).get_next_link()
-        url = replace_url_host(self.base_url)
-        return replace_query_param(url, "cursor", self.after_key)
+        return replace_query_param(self.base_url, "cursor", self.after_key)
 
     def get_previous_link(self):
         if not self.has_prev_page():
             return None
+        self.base_url = replace_url_host(self.base_url)
         if self.before_key is None:
             return super(CustomPagination, self).get_previous_link()
-        url = replace_url_host(self.base_url)
-        return replace_query_param(url, "cursor", "-{}".format(self.before_key))
+        return replace_query_param(
+            self.base_url, "cursor", "-{}".format(self.before_key)
+        )
 
 
 class CustomPaginationOld(PageNumberPagination):

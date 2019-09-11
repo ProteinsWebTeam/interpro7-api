@@ -55,6 +55,13 @@ class UtilsAccessionTest(InterproRESTTestCase):
         self.assertEqual(response.data["endpoint"], "taxonomy")
         self.assertEqual(response.data["source_database"], "uniprot")
 
+    def test_accession_endpoint_with_protein_id(self):
+        response = self.client.get("/api/utils/accession/CBPYA_ASPCL")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["endpoint"], "protein")
+        self.assertEqual(response.data["source_database"], "reviewed")
+        self.assertEqual(response.data["accession"], "A1CUJ5")
+
 
 class UtilsReleaseTest(InterproRESTTestCase):
     def test_can_read_structure_overview(self):

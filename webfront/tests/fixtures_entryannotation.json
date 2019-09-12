@@ -1,0 +1,32 @@
+[
+  {
+    "model": "webfront.EntryAnnotation",
+    "fields": {
+      "annotation_id": "PF02171_hmm",
+      "accession": "PF02171",
+      "type": "hmm",
+      "value": "",
+      "mime_type": "application/octet-stream"
+    }
+  },
+  {
+    "model": "webfront.EntryAnnotation",
+    "fields": {
+      "annotation_id": "PF02171_alignment",
+      "accession": "PF02171",
+      "type": "alignment",
+      "value": "",
+      "mime_type": "application/octet-stream"
+    }
+  },
+  {
+    "model": "webfront.EntryAnnotation",
+    "fields": {
+      "annotation_id": "PF02171_logo",
+      "accession": "PF02171",
+      "type": "alignment",
+      "value": "",
+      "mime_type": "application/json"
+    }
+  }
+]

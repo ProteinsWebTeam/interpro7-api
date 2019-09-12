@@ -4,11 +4,13 @@ class DeletedEntryError(Exception):
         self.message = message
         self.date = date
 
-
 class EmptyQuerysetError(Exception):
     def __init__(self, message):
         self.message = message
 
+class HmmerWebError(Exception):
+  def __init__(self, message):
+        self.message = message
 
 class BadURLParameterError(Exception):
     def __init__(self, message):

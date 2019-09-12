@@ -6,7 +6,7 @@ from webfront.views.queryset_manager import escape
 class SearchController(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_group_obj_of_field_by_query(
-        self, query, fields, fq=None, rows=0, start=0, inner_field_to_count=None
+        self, query, fields, fq=None, rows=0, inner_field_to_count=None
     ):
         raise NotImplementedError(
             "users must define get_group_obj_of_field_by_query to use this base class"

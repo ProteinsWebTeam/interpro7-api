@@ -308,7 +308,11 @@ def get_single_value(field, from_elastic=False):
             obj = general_handler.searcher._elastic_json_query(
                 "{} && _exists_:{}&size=1".format(q, field)
             )
-            if obj["hits"]["total"] < 1:
+            total = obj["hits"]["total"]
+            if type(total) == dict:
+                total = obj["hits"]["total"]["value"]
+
+            if total < 1:
                 raise EmptyQuerysetError(
                     "No documents found with the current selection"
                 )
@@ -348,33 +352,14 @@ def filter_by_latest_entries(value, general_handler):
     general_handler.queryset_manager.add_filter("entry", accession__in=new_entries)
 
 
-def _get_rows(general_handler):
-    return (
-        general_handler.pagination["size"]
-        if "size" in general_handler.pagination
-        else settings.INTERPRO_CONFIG.get("default_page_size", 20)
-    )
-
-
-def _get_index(general_handler):
-    return (
-        general_handler.pagination["index"]
-        if "index" in general_handler.pagination
-        else 1
-    )
-
-
 def get_domain_architectures(field, general_handler):
     searcher = general_handler.searcher
-    rows = _get_rows(general_handler)
-    index = _get_index(general_handler)
+    size = general_handler.pagination["size"]
+    cursor = general_handler.pagination["cursor"]
+
     if field is None or field.strip() == "":
-        return searcher.get_group_obj_of_field_by_query(
-            None,
-            "ida_id",
-            rows=rows,
-            start=index * rows - rows,
-            inner_field_to_count="protein_acc",
+        return searcher.get_group_obj_copy_of_field_by_query(
+            None, "ida_id", rows=size, cursor=cursor, inner_field_to_count="protein_acc"
         )
     else:
         query = (
@@ -382,10 +367,12 @@ def get_domain_architectures(field, general_handler):
             + " && ida_id:"
             + field
         )
-        res, length = searcher.get_list_of_endpoint(
-            "protein", query, rows, index * rows - rows
+        res, length, after_key, before_key = searcher.get_list_of_endpoint(
+            "protein", rows=size, query=query, cursor=cursor
         )
         general_handler.modifiers.search_size = length
+        general_handler.modifiers.after_key = after_key
+        general_handler.modifiers.before_key = before_key
         return filter_queryset_accession_in(
             general_handler.queryset_manager.get_base_queryset("protein"), res
         )
@@ -435,8 +422,8 @@ def add_extra_fields(endpoint, *argv):
 
 def ida_search(value, general_handler):
     searcher = general_handler.searcher
-    rows = _get_rows(general_handler)
-    index = _get_index(general_handler)
+    size = general_handler.pagination["size"]
+    cursor = general_handler.pagination["cursor"]
 
     conserve_order = "ordered" in general_handler.request.query_params
     entries = value.upper().split(",")
@@ -450,12 +437,8 @@ def ida_search(value, general_handler):
             query = "({}) && ({})".format(
                 query, " && ".join(["!ida:*{}*".format(e) for e in ignore_list])
             )
-    return searcher.get_group_obj_of_field_by_query(
-        query,
-        "ida_id",
-        rows=rows,
-        start=index * rows - rows,
-        inner_field_to_count="protein_acc",
+    return searcher.get_group_obj_copy_of_field_by_query(
+        query, "ida_id", rows=size, cursor=cursor, inner_field_to_count="protein_acc"
     )
 
 

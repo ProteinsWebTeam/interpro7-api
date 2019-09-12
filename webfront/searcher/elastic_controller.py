@@ -11,6 +11,17 @@ import logging
 es_results = list()
 
 
+def getAfterBeforeFromCursor(cursor):
+    after = None
+    before = None
+    if cursor is not None:
+        if cursor[0] == "-":
+            before = cursor[1:]
+        else:
+            after = cursor
+    return after, before
+
+
 class ElasticsearchController(SearchController):
     def __init__(self, queryset_manager=None):
         url = urllib.parse.urlparse(settings.SEARCHER_URL)
@@ -18,7 +29,6 @@ class ElasticsearchController(SearchController):
         self.port = url.port
         parts = url.path.split("/")
         self.index = parts[1]
-        self.type = parts[2]
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
         self.connection = http.client.HTTPConnection(self.server, self.port)
@@ -27,24 +37,19 @@ class ElasticsearchController(SearchController):
         body = ""
         for doc in docs:
             body += (
-                '{ "index": { "_type": "'
-                + self.type
-                + '", "_id":"'
-                + doc["id"]
-                + '"}}\n'
-                + json.dumps(doc)
-                + "\n"
+                '{ "index": { "_id":"' + doc["id"] + '"}}\n' + json.dumps(doc) + "\n"
             )
         conn = http.client.HTTPConnection(self.server, self.port)
         conn.request("POST", "/" + self.index + "/_bulk/", body, self.headers)
-        return conn.getresponse()
+        response = conn.getresponse()
+        return response
 
     def clear_all_docs(self):
         body = '{ "query": { "match_all": {} } }'
         conn = http.client.HTTPConnection(self.server, self.port)
         conn.request(
             "POST",
-            "/" + self.index + "/" + self.type + "/_delete_by_query?conflicts=proceed",
+            "/" + self.index + "/_delete_by_query?conflicts=proceed",
             body,
             self.headers,
         )
@@ -197,7 +202,7 @@ class ElasticsearchController(SearchController):
         }
 
     def get_group_obj_of_field_by_query(
-        self, query, fields, fq=None, rows=1, start=0, inner_field_to_count=None
+        self, query, fields, fq=None, rows=1, inner_field_to_count=None
     ):
         query = self.queryset_manager.get_searcher_query() if query is None else query
         check_multiple_fields = type(fields) is list
@@ -206,11 +211,7 @@ class ElasticsearchController(SearchController):
             "aggs": {
                 "ngroups": {"cardinality": {"field": field}},
                 "groups": {
-                    "terms": {
-                        "field": field,
-                        "size": start + rows,
-                        "execution_hint": "map",
-                    },
+                    "terms": {"field": field, "size": rows, "execution_hint": "map"},
                     "aggs": {"tops": {"top_hits": {"size": 1}}},
                 },
             },
@@ -223,7 +224,7 @@ class ElasticsearchController(SearchController):
         if check_multiple_fields:
             obj = facet["aggs"]["groups"]
             for f in fields[1:]:
-                self.add_subterm_aggs(obj, f, start + rows)
+                self.add_subterm_aggs(obj, f, rows)
                 obj = obj["aggs"]["subgroups"]
         if fq is not None:
             query += " && " + fq
@@ -233,57 +234,109 @@ class ElasticsearchController(SearchController):
             buckets = [b for sb in buckets for b in sb["subgroups"]["buckets"]]
         output = {
             "groups": [
-                bucket["tops"]["hits"]["hits"][0]["_source"]
-                for bucket in buckets[start : start + rows]
+                bucket["tops"]["hits"]["hits"][0]["_source"] for bucket in buckets
             ],
             "ngroups": response["aggregations"]["ngroups"],
         }
         if inner_field_to_count is not None:
             i = 0
-            for bucket in response["aggregations"]["groups"]["buckets"][
-                start : start + rows
-            ]:
+            for bucket in response["aggregations"]["groups"]["buckets"]:
                 output["groups"][i]["unique"] = bucket["unique"]
                 i += 1
 
         return output
 
-    def get_list_of_endpoint(self, endpoint, query=None, rows=10, start=0):
+    def get_group_obj_copy_of_field_by_query(
+        self, query, field, fq=None, rows=1, cursor=None, inner_field_to_count=None
+    ):
+        # TODO: change to new pagination
+        query = self.queryset_manager.get_searcher_query() if query is None else query
+        facet = {
+            "aggs": {
+                "ngroups": {"cardinality": {"field": field}},
+                "groups": {
+                    "composite": {
+                        "size": rows,
+                        "sources": [{"source": {"terms": {"field": field}}}],
+                    },
+                    "aggs": {"tops": {"top_hits": {"size": 1}}},
+                },
+            },
+            "size": 0,
+        }
+        after, before = getAfterBeforeFromCursor(cursor)
+        self.addAfterKeyToQueryComposite(
+            facet["aggs"]["groups"]["composite"], after, before
+        )
+        if inner_field_to_count is not None:
+            facet["aggs"]["groups"]["aggs"]["unique"] = {
+                "cardinality": {"field": inner_field_to_count}
+            }
+        if fq is not None:
+            query += " && " + fq
+        response = self._elastic_json_query(query, facet)
+        after_key = self.getAfterKey(response, facet, before, query)
+        before_key = self.getBeforeKey(response, facet, before, query)
+        buckets = response["aggregations"]["groups"]["buckets"]
+        if len(buckets) > 0 and "tops" not in buckets[0]:
+            buckets = [b for sb in buckets for b in sb["subgroups"]["buckets"]]
+        output = {
+            "groups": [
+                bucket["tops"]["hits"]["hits"][0]["_source"] for bucket in buckets
+            ],
+            "ngroups": response["aggregations"]["ngroups"],
+            "after_key": after_key,
+            "before_key": before_key,
+        }
+        if inner_field_to_count is not None:
+            i = 0
+            for bucket in response["aggregations"]["groups"]["buckets"]:
+                output["groups"][i]["unique"] = bucket["unique"]
+                i += 1
+
+        return output
+
+    def get_list_of_endpoint(self, endpoint, query=None, rows=10, start=0, cursor=None):
         qs = self.queryset_manager.get_searcher_query() if query is None else query
         if qs == "":
             qs = "*:*"
         facet = {
             "aggs": {
                 "ngroups": {"cardinality": {"field": endpoint + "_acc"}},
-                "rscount": {
-                    "terms": {
-                        "field": "{}_acc".format(endpoint),
-                        "size": start + rows,
-                        "order": {"_term": "asc"},
-                        "execution_hint": "map",
+                "groups": {
+                    "composite": {
+                        "size": rows,
+                        "sources": [
+                            {"source": {"terms": {"field": "{}_acc".format(endpoint)}}}
+                        ],
                     }
                 },
             },
             "size": 0,
         }
+        after, before = getAfterBeforeFromCursor(cursor)
+        self.addAfterKeyToQueryComposite(
+            facet["aggs"]["groups"]["composite"], after, before
+        )
         if endpoint == "organism" or endpoint == "taxonomy":
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "tax_id"
-            facet["aggs"]["rscount"]["terms"]["field"] = "tax_id"
+            facet["aggs"]["groups"]["composite"]["sources"][0]["source"]["terms"][
+                "field"
+            ] = "tax_id"
         elif endpoint == "proteome":
             facet["aggs"]["ngroups"]["cardinality"]["field"] = "proteome_acc"
-            facet["aggs"]["rscount"]["terms"]["field"] = "proteome_acc"
+            facet["aggs"]["groups"]["composite"]["sources"][0]["source"]["terms"][
+                "field"
+            ] = "proteome_acc"
         response = self._elastic_json_query(qs, facet)
-        count = len(response["aggregations"]["rscount"]["buckets"])
-        if count == start + rows:
-            count = response["aggregations"]["ngroups"]["value"]
-        # TODO: return only the subset of interest [start:] This however requires to re think the way pagination works
-        return (
-            [
-                str(x["key"]).lower()
-                for x in response["aggregations"]["rscount"]["buckets"]
-            ],
-            count,
-        )
+        count = response["aggregations"]["ngroups"]["value"]
+        accessions = [
+            str(x["key"]["source"]).lower()
+            for x in response["aggregations"]["groups"]["buckets"]
+        ]
+        after_key = self.getAfterKey(response, facet, before, qs)
+        before_key = self.getBeforeKey(response, facet, before, qs)
+        return accessions, count, after_key, before_key
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()
@@ -327,8 +380,6 @@ class ElasticsearchController(SearchController):
         path = (
             "/"
             + self.index
-            + "/"
-            + self.type
             + "/_search?request_cache=true&q="
             + q
             + "&size="
@@ -351,7 +402,7 @@ class ElasticsearchController(SearchController):
             .replace(" or ", "%20OR%20")
             .replace(" || ", "%20OR%20")
         )
-        path = "/" + self.index + "/" + self.type + "/_search?request_cache=true&q=" + q
+        path = "/" + self.index + "/_search?request_cache=true&q=" + q
         logger.debug("URL:" + path)
         self.connection.request("GET", path, json.dumps(query_obj), self.headers)
         response = self.connection.getresponse()
@@ -360,3 +411,55 @@ class ElasticsearchController(SearchController):
         if settings.DEBUG:
             es_results.append(obj)
         return obj
+
+    def addAfterKeyToQueryComposite(self, composite, after, before):
+        if after is not None:
+            composite["after"] = {"source": after.lower()}
+        elif before is not None:
+            composite["after"] = {"source": before.lower()}
+            composite["sources"][0]["source"]["terms"]["order"] = "desc"
+
+    def getAfterKey(self, response, facet, before, qs):
+        after_key = None
+        if before is not None:
+            try:
+                after_key = response["aggregations"]["groups"]["buckets"][0]["key"][
+                    "source"
+                ]
+            except:
+                pass
+        elif "after_key" in response["aggregations"]["groups"]:
+            after_key = response["aggregations"]["groups"]["after_key"]["source"]
+
+        if after_key is not None:
+            facet["aggs"]["groups"]["composite"]["after"] = {"source": after_key}
+            facet["aggs"]["groups"]["composite"]["sources"][0]["source"]["terms"][
+                "order"
+            ] = "asc"
+            next_response = self._elastic_json_query(qs, facet)
+            if len(next_response["aggregations"]["groups"]["buckets"]) == 0:
+                after_key = None
+        return after_key
+
+    def getBeforeKey(self, response, facet, before, qs):
+        before_key = None
+        try:
+            if before is not None:
+                before_key = response["aggregations"]["groups"]["buckets"][-1]["key"][
+                    "source"
+                ]
+            else:
+                before_key = response["aggregations"]["groups"]["buckets"][0]["key"][
+                    "source"
+                ]
+        except:
+            pass
+        if before_key is not None:
+            facet["aggs"]["groups"]["composite"]["after"] = {"source": before_key}
+            facet["aggs"]["groups"]["composite"]["sources"][0]["source"]["terms"][
+                "order"
+            ] = "desc"
+            prev_response = self._elastic_json_query(qs, facet)
+            if len(prev_response["aggregations"]["groups"]["buckets"]) == 0:
+                before_key = None
+        return before_key

@@ -5,7 +5,6 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from webfront.serializers.content_serializers import ModelContentSerializer
 
-
 api_test_map = {
     "entry": {
         "interpro": ["IPR003165", "IPR001165"],
@@ -196,16 +195,8 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                 for db in api_test_map[endpoint1]:
                     for acc in api_test_map[endpoint1][db]:
                         # [endpoint]/[endpoint]/[db]/[acc]
-                        current = (
-                            "/api/"
-                            + endpoint2
-                            + "/"
-                            + endpoint1
-                            + "/"
-                            + db
-                            + "/"
-                            + acc
-                            + "/"
+                        current = "/api/{}/{}/{}/{}/".format(
+                            endpoint2, endpoint1, db, acc
                         )
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
@@ -217,10 +208,6 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                             self._check_counter_by_endpoint(
                                 endpoint2, response.data, "URL : [{}]".format(current)
                             )
-                            # self._check_count_overview_per_endpoints(response.data,
-                            #                                          plurals[endpoint1],
-                            #                                          plurals[endpoint2],
-                            #                                          "URL : [{}]".format(current))
                             self._check_structure_chains_as_counter_filter(
                                 endpoint1,
                                 db,
@@ -277,17 +264,8 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     for db2 in api_test_map[endpoint2]:
                         for acc in api_test_map[endpoint1][db]:
                             # [endpoint]/[db]/[endpoint]/[db]/[acc]
-                            current = (
-                                "/api/"
-                                + endpoint2
-                                + "/"
-                                + db2
-                                + "/"
-                                + endpoint1
-                                + "/"
-                                + db
-                                + "/"
-                                + acc
+                            current = "/api/{}/{}/{}/{}/{}/".format(
+                                endpoint2, db2, endpoint1, db, acc
                             )
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
@@ -386,19 +364,8 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                         for acc in api_test_map[endpoint1][db]:
                             # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
                             for acc2 in api_test_map[endpoint2][db2]:
-                                current = (
-                                    "/api/"
-                                    + endpoint1
-                                    + "/"
-                                    + db
-                                    + "/"
-                                    + acc
-                                    + "/"
-                                    + endpoint2
-                                    + "/"
-                                    + db2
-                                    + "/"
-                                    + acc2
+                                current = "/api/{}/{}/{}/{}/{}/{}".format(
+                                    endpoint1, db, acc, endpoint2, db2, acc2
                                 )
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:

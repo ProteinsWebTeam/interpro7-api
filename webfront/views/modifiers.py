@@ -4,7 +4,7 @@ from webfront.views.custom import is_single_endpoint
 from django.db.models import Count
 from webfront.models import Entry, EntryAnnotation, Alignment, Isoforms, Release_Note
 from webfront.views.custom import filter_queryset_accession_in
-from webfront.exceptions import EmptyQuerysetError
+from webfront.exceptions import EmptyQuerysetError, HmmerWebError
 from django.conf import settings
 
 from requests import Session
@@ -501,7 +501,7 @@ def run_hmmscan(sequence):
         with session.get(downloadlink) as response:
             phmmerResultsHMM = response.text
             if response.status_code != 200:
-                print(f"FAILURE::{downloadlink}") # TODO change this to function with framework
+                raise HmmerWebError(f"Failure getting Hmmer results from {downloadlink}")
             phmmerResultsHMM = loads(phmmerResultsHMM)
             hits = phmmerResultsHMM["results"]["hits"]
     return hits
@@ -540,6 +540,7 @@ def calculate_conservation_scores(pfam_acc):
         total = 0
         for value in values:
             total += float(value.split(":")[1])
+        #scale the total /max height ratio up by an order of magnitude
         score = round((total / max_height) * 10, 2)
         scores.append(score)
     return scores

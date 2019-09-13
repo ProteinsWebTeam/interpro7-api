@@ -59,6 +59,7 @@ def pagination_information(request):
                 "page_size", settings.INTERPRO_CONFIG.get("default_page_size", 20)
             )
         ),
+        "cursor": request.GET.get("cursor", None),
     }
 
 
@@ -74,6 +75,9 @@ def getDataForRoot(handlers, queryset_manager, searcher):
             host = host_parts[0]
 
     elastic_host = searcher.server.split("-")[0]
+    total = elastic_query["hits"]["total"]
+    if type(total) == dict:
+        total = elastic_query["hits"]["total"]["value"]
 
     return {
         "endpoints": [x[0] for x in handlers],
@@ -94,7 +98,7 @@ def getDataForRoot(handlers, queryset_manager, searcher):
             "mysql": {"server": host, "status": "OK" if qs.exists() else "ERROR"},
             "elasticsearch": {
                 "server": elastic_host,
-                "status": "OK" if elastic_query["hits"]["total"] > 0 else "ERROR",
+                "status": "OK" if total > 0 else "ERROR",
             },
         },
     }

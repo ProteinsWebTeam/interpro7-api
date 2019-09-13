@@ -537,20 +537,22 @@ class EntrySerializer(ModelContentSerializer):
 
         return header
 
-    @staticmethod
-    def to_ida_list_representation(obj):
+    def to_ida_list_representation(self, obj):
         # return obj
-        return {
-            "count": obj["ngroups"]["value"],
-            "results": [
-                {
-                    "ida": o["ida"],
-                    "ida_id": o["ida_id"],
-                    "unique_proteins": o["unique"]["value"],
-                }
-                for o in obj["groups"]
-            ],
-        }
+        return self.add_pagination(
+            {
+                "count": obj["ngroups"]["value"],
+                "results": [
+                    {
+                        "ida": o["ida"],
+                        "ida_id": o["ida_id"],
+                        "unique_proteins": o["unique"]["value"],
+                    }
+                    for o in obj["groups"]
+                ],
+            },
+            obj,
+        )
 
     class Meta:
         model = Entry

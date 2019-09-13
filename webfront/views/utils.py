@@ -1,4 +1,4 @@
-from webfront.models.interpro_new import Release_Note
+from webfront.models.interpro_new import Release_Note, Protein
 
 from webfront.response import Response
 from rest_framework import status
@@ -100,24 +100,35 @@ class AccessionHandler(CustomView):
         acc = endpoint_levels[level - 1].lower()
         docs = general_handler.searcher.get_document_by_any_accession(acc)
 
+        self.queryset = {}
         if len(docs["hits"]["hits"]) == 0:
+            qs = Protein.objects.filter(identifier__iexact=acc)
+            if qs.count() > 0:
+                first = qs.first()
+                self.queryset = {
+                    "endpoint": "protein",
+                    "source_database": first.source_database,
+                    "accession": first.accession,
+                }
+        else:
+            hit = docs["hits"]["hits"][0]["_source"]
+
+            for ep in endpoints:
+                if ep["accession"] in hit and hit[ep["accession"]] == acc:
+                    db = ep["db"]
+                    if ep["name"] in ["entry", "protein", "set"]:
+                        db = hit[ep["db"]]
+                    if not (db.lower() == "cdd" or db.lower() == "pdb"):
+                        acc = acc.upper()
+                    self.queryset = {
+                        "endpoint": ep["name"],
+                        "source_database": db,
+                        "accession": acc,
+                    }
+        if self.queryset == {}:
             raise EmptyQuerysetError(
                 "No accessions matching {} can be found in our data".format(acc)
             )
-
-        hit = docs["hits"]["hits"][0]["_source"]
-
-        self.queryset = {}
-        for ep in endpoints:
-            if ep["accession"] in hit and hit[ep["accession"]] == acc:
-                db = ep["db"]
-                if ep["name"] in ["entry", "protein", "set"]:
-                    db = hit[ep["db"]]
-                self.queryset = {
-                    "endpoint": ep["name"],
-                    "source_database": db,
-                    "accession": acc,
-                }
 
         return super(AccessionHandler, self).get(
             request._request,

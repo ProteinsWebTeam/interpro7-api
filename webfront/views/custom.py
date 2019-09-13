@@ -8,7 +8,7 @@ from django.db.models import Q
 from functools import reduce
 from operator import or_
 
-from webfront.exceptions import EmptyQuerysetError
+from webfront.exceptions import EmptyQuerysetError, BadURLParameterError
 from webfront.response import Response
 from webfront.constants import SerializerDetail
 from webfront.models import Entry
@@ -48,6 +48,8 @@ class CustomView(GenericAPIView):
     # and protein details showing only the accession in the first case
     serializer_detail = SerializerDetail.ALL
     serializer_detail_filter = SerializerDetail.ALL
+    after_key = None
+    before_key = None
 
     def get(
         self,
@@ -87,10 +89,11 @@ class CustomView(GenericAPIView):
                         drf_request,
                         view=self,
                         search_size=self.search_size,
+                        after_key=general_handler.modifiers.after_key,
+                        before_key=general_handler.modifiers.before_key,
                     )
 
             elif self.from_model:
-
                 if (
                     is_single_endpoint(general_handler)
                     or not self.expected_response_is_list()
@@ -98,6 +101,7 @@ class CustomView(GenericAPIView):
                     self.queryset = general_handler.queryset_manager.get_queryset(
                         only_main_endpoint=True
                     )
+                    self.search_size = self.queryset.count()
                 else:
                     self.update_queryset_from_search(searcher, general_handler)
 
@@ -117,6 +121,8 @@ class CustomView(GenericAPIView):
                         drf_request,
                         view=self,
                         search_size=self.search_size,
+                        after_key=self.after_key,
+                        before_key=self.before_key,
                     )
                 else:
                     self.queryset = self.get_queryset().first()
@@ -288,16 +294,19 @@ class CustomView(GenericAPIView):
     def update_queryset_from_search(self, searcher, general_handler):
         ep = general_handler.queryset_manager.main_endpoint
         s = general_handler.pagination["size"]
-        i = general_handler.pagination["index"]
-        r = 100 if s <= 100 else s
-        st = r * ((s * i) // r)
+        cursor = general_handler.pagination["cursor"]
+
         qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
-        res, length = searcher.get_list_of_endpoint(ep, rows=r, start=st, query=qs)
+        res, length, after_key, before_key = searcher.get_list_of_endpoint(
+            ep, rows=s, query=qs, cursor=cursor
+        )
         self.queryset = general_handler.queryset_manager.get_base_queryset(ep)
 
         self.queryset = filter_queryset_accession_in(self.queryset, res)
 
         self.search_size = length
+        self.after_key = after_key
+        self.before_key = before_key
 
 
 def filter_queryset_accession_in(queryset, list):

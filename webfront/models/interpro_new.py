@@ -134,6 +134,9 @@ class Release_Note(models.Model):
 
 
 class Alignment(models.Model):
+    class Meta:
+        ordering = ["set_acc", "entry_acc"]
+
     set_acc = models.ForeignKey(
         "Set", db_column="set_acc", on_delete=models.SET_NULL, null=True
     )

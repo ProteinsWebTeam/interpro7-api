@@ -236,7 +236,9 @@ class FixtureReader:
         for doc in to_add:
             lower.append(
                 {
-                    k: v.lower() if type(v) == str and k != "ida" else v
+                    k: v.lower()
+                    if type(v) == str and k != "ida" and "date" not in k
+                    else v
                     for k, v in doc.items()
                 }
             )

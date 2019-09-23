@@ -23,6 +23,7 @@ class InterproRESTTestCase(APITransactionTestCase):
         "webfront/tests/fixtures_organisms.json",
         "webfront/tests/fixtures_set.json",
         "webfront/tests/fixtures_database.json",
+        "webfront/tests/fixtures_entryannotation.json",
     ]
     links_fixtures = "webfront/tests/relationship_features.json"
 

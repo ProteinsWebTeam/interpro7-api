@@ -19,6 +19,7 @@ class FixtureReader:
     tax2rank = {}
     sets = {}
     proteomes = {}
+    entry_annotations = {}
     search = None
 
     def __init__(self, fixture_paths):
@@ -59,6 +60,8 @@ class FixtureReader:
                 ]
             elif fixture["model"] == "webfront.Set":
                 self.sets[fixture["fields"]["accession"].lower()] = fixture["fields"]
+            elif fixture["model"] == "webfront.EntryAnnotation":
+                self.entry_annotations[fixture["fields"]["accession"].lower()] = fixture["fields"]
 
     def get_entry2set(self):
         e2s = {}

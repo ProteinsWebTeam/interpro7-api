@@ -111,7 +111,7 @@ class CustomView(GenericAPIView):
                     #                     .format(endpoint_levels))
 
                     raise EmptyQuerysetError(
-                        "The URL requested didn't have any data related.\nList of endpoints: {}".format(
+                        "There is no data associated with the requested URL.\nList of endpoints: {}".format(
                             endpoint_levels
                         )
                     )

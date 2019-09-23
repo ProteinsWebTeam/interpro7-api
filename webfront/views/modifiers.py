@@ -4,12 +4,24 @@ from webfront.views.custom import is_single_endpoint
 from django.db.models import Count
 from webfront.models import Entry, EntryAnnotation, Alignment, Isoforms, Release_Note
 from webfront.views.custom import filter_queryset_accession_in
-from webfront.exceptions import EmptyQuerysetError
+from webfront.exceptions import EmptyQuerysetError, HmmerWebError
 from django.conf import settings
+
+from requests import Session
+from urllib import request, parse
+from json import loads
+
+# import ssl
+
+# MAQ bypassing SSL errors
+# ssl._create_default_https_context = ssl._create_unverified_context
 
 go_terms = settings.INTERPRO_CONFIG.get("key_go_terms", {})
 organisms = settings.INTERPRO_CONFIG.get("key_organisms", {})
 
+class SmartRedirectHandler(request.HTTPRedirectHandler):
+    def http_error_302(self, req, fp, code, msg, headers):
+        return headers
 
 def group_by_member_databases(general_handler):
     if is_single_endpoint(general_handler):
@@ -450,6 +462,184 @@ def get_isoforms(value, general_handler):
         }
 
     return {"results": [iso.accession for iso in isoforms], "count": len(isoforms)}
+
+
+def run_hmmscan(sequence):
+    """
+        run hmmscan for a given uniprot sequence
+        NOTE: HmmerWeb refuses to accept proteins > 4k residues
+
+    """
+    parameters = {'seq': sequence, 'hmmdb': 'pfam', 'threshold': 'cut_ga'}
+    enc_params = parse.urlencode(parameters).encode()
+    url = settings.INTERPRO_CONFIG.get('hmmerweb', 'http://www.ebi.ac.uk/Tools/hmmer/search/hmmscan')
+
+    req = request.Request(url=url, data=enc_params)
+    results_url = request.urlopen(req).get('Location')
+
+    downloadlink = results_url.replace('results', 'download')
+    downloadlink = f"{downloadlink}?format=json"
+
+    with Session() as session:
+        with session.get(downloadlink) as response:
+            phmmerResultsHMM = response.text
+            if response.status_code != 200:
+                raise HmmerWebError(f"Failure getting Hmmer results from {downloadlink}")
+            phmmerResultsHMM = loads(phmmerResultsHMM)
+            hits = phmmerResultsHMM["results"]["hits"]
+    return hits
+
+
+def filter_entries(hits):
+    """
+    Removes entries and hits which would be filtered out by Hmmerweb Pfam post-processing
+    :param entries: A dictionary of entries containing lists of domain hits
+    :return: A dictionary containing filtered entries and list of domain hits where display == 1
+    """
+    filtered_hits = []
+    for hit in hits:
+        filtered_domains = list(filter(lambda x: x["display"]==1, hit["domains"]))
+        if len(filtered_domains) > 0:
+            hit["domains"] = filtered_domains
+            filtered_hits.append(hit)
+    return filtered_hits
+
+
+def calculate_conservation_scores(pfam_acc):
+    """
+    Get HMM Logo and convert it to conservation score
+    :param pfam_acc:
+    :return: list of scores
+    """
+    logo_data = EntryAnnotation.objects.filter(
+        accession_id = pfam_acc,
+        type = "logo",
+    )[0]
+    logo_string = logo_data.value.decode("utf8")
+    logo = loads(logo_string)
+    max_height = logo['max_height_theory']
+    scores = []
+    for pos, values in enumerate(logo['height_arr']):
+        total = 0
+        for value in values:
+            total += float(value.split(":")[1])
+        #scale the total /max height ratio up by an order of magnitude
+        score = round((total / max_height) * 10, 2)
+        scores.append(score)
+    return scores
+
+
+def align_seq_to_model(domains, sequence):
+    """
+        align result of hmmscan with uniprot sequence
+    """
+    hmmfrom = domains["alihmmfrom"]
+    hmmto = domains["alihmmto"]
+    consensus = domains["alimodel"]
+    aliseq = domains["aliaseq"]
+    alisqfrom = domains["alisqfrom"]
+    alisqto = domains["alisqto"]
+
+    mappedseq = ""
+    modelseq = ""
+    if alisqfrom != 1:
+        mappedseq += sequence[0:alisqfrom-1]
+        for i in range(0, alisqfrom-1):
+            modelseq += "-"
+    mappedseq += aliseq.upper()
+    modelseq += consensus
+    if alisqfrom != 1:
+        mappedseq += sequence[alisqto:len(sequence)]
+        for i in range(alisqto, len(sequence)):
+            modelseq += "-"
+
+    return mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto
+
+
+def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmotif):
+    """
+        generate sequence matrix (i.e. matrix[res] = "conservation_score_seqAA_modelposition")
+    """
+    matrix = {}
+    count = hmmfrom-1
+    pos = 0
+    logo_len = len(logo)
+    for res in range(0, len(seqmotif)):
+        if res < alisqfrom-1 or count >= hmmto:
+            #matrix[pos] = f"0_{seqmotif[res]}_0"
+            pos += 1
+        else:
+            if seqmotif[res] == '-':
+                count += 1
+            elif modelmotif[res] == '.':
+                pos += 1
+                matrix[pos] = f"-1_None_0"
+            else:
+                logo_score = logo[count]
+                seq_res = seqmotif[res]
+                pos += 1
+                matrix[pos] = f"{logo_score}_{seq_res}_{count}"
+                count += 1
+    return matrix
+
+
+def format_logo(matrix):
+    """
+        re-arrange the data
+    """
+    output = []
+    for res in matrix:
+        score, aa, modelpos = matrix[res].split('_')
+        score = float(score)
+        modelpos = int(modelpos)
+
+        output.append({
+            "position": res,
+            "aa": aa,
+            "score": score,
+            "model_position": modelpos,
+        })
+    return output
+
+
+def calculate_residue_conservation(value, general_handler):
+    """
+    Calculate the conservancy score of each Pfam entry matching the protein sequence
+    :param value:
+    :param general_handler:
+    :return: An object with an array of hits and conservancy scores
+    """
+    queryset = general_handler.queryset_manager.get_queryset()
+    # will always have one protein in queryset
+    protein = queryset[0]
+    sequence = protein.sequence
+    opener = request.build_opener(SmartRedirectHandler())
+    request.install_opener(opener)
+    hits = run_hmmscan(sequence)
+    filtered_entries = filter_entries(hits)
+    # allow option for processing more than just pfam in future
+    alignments = {
+        "sequence": sequence,
+        "pfam": {
+            "entries": {}
+        },
+    }
+
+    for entry in filtered_entries:
+        pfam_hit_acc = entry["acc"]
+        (pfam_acc, _version) = pfam_hit_acc.split(".")
+        if pfam_acc not in alignments["pfam"]["entries"]:
+            alignments["pfam"]["entries"][pfam_acc] = []
+
+        logo_score = calculate_conservation_scores(pfam_acc)
+        for hit in entry["domains"]:
+            # calculate scores for each domain hit for each entry
+            mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(hit, sequence)
+            matrixseq = get_hmm_matrix(logo_score, alisqfrom, alisqto, hmmfrom, hmmto, mappedseq, modelseq)
+            formatted_matrix = format_logo(matrixseq)
+            alignments["pfam"]["entries"][pfam_acc].append(formatted_matrix)
+
+    return alignments
 
 
 def passing(x, y):

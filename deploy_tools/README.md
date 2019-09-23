@@ -57,14 +57,14 @@ Assume we have a user account at /home/username
     ```bash
     ../virtualenv/bin/pip install -r requirements.txt
     ```
-    
+
     *  [Optional] Install requirements for development
 
         ```bash
         ../virtualenv/bin/pip install -r dev_requirements.txt
         ```
 
-5.  Create a local configuration file in `config/interpro.local.yml`. 
+5.  Create a local configuration file in `config/interpro.local.yml`.
     In this file you can overwite any of the settings included in the read-only file `config/interpro.yml`.
     Below is an example of the local config that will run in debug mode using the test DB with SQLite, a local instance of elasticsearch without redis:
     ```yaml
@@ -78,14 +78,20 @@ Assume we have a user account at /home/username
     enable_cache_write: false
 
     ```
-    
+
     *   This configuration assumes a running instance of elasticsearch in port 9200. For details on how to install elasticsearch go
         [HERE](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html)
- 
+
 6.  Migrate the database models (For SQLite)
 
     ```bash
      ../virtualenv/bin/python manage.py migrate
+    ```
+
+    If anything goes wrong check that the database directory exists
+
+    ```bash
+     ls ../database
     ```
 
 7.  Collect the static files. Only necessary for server deployment.
@@ -97,26 +103,32 @@ Assume we have a user account at /home/username
 8.  Load the fixture data into the SQLite DB.
     ```bash
     ../virtualenv/bin/python manage.py loaddata webfront/tests/fixtures_*.json
+    
+9.  Install Elasticsearch and load index. NB At the time of writing this must be version 6.8.
+
+    e.g for OSX: brew install elasticsearch@6.8
+    ```
+    curl -XPUT 'localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json
     ```
 
-9.  Run the tests. When running the tests, the API loads the fixtures in the existing elasticsearch instance, which is necessary to run the server with fixtures.
+10.  Run the tests. When running the tests, the API loads the fixtures in the existing elasticsearch instance, which is necessary to run the server with fixtures.
     ```
     ../virtualenv/bin/python manage.py test
     ```
 
-10.  Start the server
+11.  Start the server
     ```
     ../virtualenv/bin/python manage.py runserver 0.0.0.0:8000
     ```
 
-11.  _[Optional]_ Install precommit, black and the pre-commit hook, to enable the preformatiing of files with before each commit.
+12.  _[Optional]_ Install precommit, black and the pre-commit hook, to enable the preformatiing of files with before each commit.
     ```
     ../virtualenv/bin/pip install pre-commit black
     ../virtualenv/bin/pre-commit install
     ```  
     *Note 1*: We are not including black and precommit in the dev_requirements because we run the tests on python 3.5 and black requires 3.6.
     *Note 2*:It is importan to run the test in Python 3.5 because the VMs where the API runs uses that version.
-      
+
 
 
 ## Testing
@@ -138,18 +150,18 @@ All the test can be run at the same time:
 
 ## Setting up real data (MySQL - elasticsearch)
 
-For the next steps you need an installation of MySQL with a database compatible with the defined [model](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/webfront/models/interpro_new.py). 
+For the next steps you need an installation of MySQL with a database compatible with the defined [model](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/webfront/models/interpro_new.py).
 
-1.  Remove the line `use_test_db: true` from the `config/interpro.local.yml` file. 
+1.  Remove the line `use_test_db: true` from the `config/interpro.local.yml` file.
     You could also set the value to false, but given that false is the default value, you can just remove it.
 
 2.  Edit the same `config/interpro.local.yml` file, changing the `searcher_path` setting for one with the elastic search instance that corresponds with the data in MySQL.
 
 3.  Copy the template mysql configuration file into `config/mysql.yml` and edit the file with your data.
     ```bash
-    cp config/mysql.template.yml config/mysql.yml 
+    cp config/mysql.template.yml config/mysql.yml
     ```
-    
+
 3.  Start the server
     ```
     ../virtualenv/bin/python manage.py runserver 0.0.0.0:8000

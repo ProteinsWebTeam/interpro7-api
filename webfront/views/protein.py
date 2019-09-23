@@ -15,6 +15,7 @@ from webfront.views.modifiers import (
     filter_by_match_presence,
     add_extra_fields,
     get_isoforms,
+    calculate_residue_conservation,
 )
 from webfront.models import Protein
 from webfront.exceptions import EmptyQuerysetError
@@ -63,6 +64,9 @@ class UniprotAccessionHandler(CustomView):
         )
         general_handler.modifiers.register(
             "isoforms", get_isoforms, use_model_as_payload=True
+        )
+        general_handler.modifiers.register(
+            "conservation", calculate_residue_conservation, use_model_as_payload=True
         )
         return super(UniprotAccessionHandler, self).get(
             request._request,

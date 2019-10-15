@@ -38,4 +38,4 @@ branches:
   only:
     - master
     - dev
-    - elastic7
+    - precalculate_tax

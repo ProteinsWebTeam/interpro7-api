@@ -1,7 +1,12 @@
 from webfront.models import Taxonomy
 from webfront.serializers.taxonomy import TaxonomySerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.views.modifiers import passing, add_extra_fields, filter_by_key_species
+from webfront.views.modifiers import (
+    passing,
+    add_extra_fields,
+    filter_by_key_species,
+    filter_by_entry,
+)
 
 
 class TaxonomyAccessionHandler(CustomView):
@@ -28,6 +33,12 @@ class TaxonomyAccessionHandler(CustomView):
         )
         general_handler.modifiers.register(
             "with_names", passing, serializer=SerializerDetail.TAXONOMY_DETAIL_NAMES
+        )
+        general_handler.modifiers.register(
+            "filter_by_entry",
+            filter_by_entry,
+            serializer=SerializerDetail.TAXONOMY_PER_ENTRY,
+            use_model_as_payload=True,
         )
 
         return super(TaxonomyAccessionHandler, self).get(
@@ -71,7 +82,6 @@ class UniprotHandler(CustomView):
         *args,
         **kwargs
     ):
-
         general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Taxonomy, "counters")
@@ -121,7 +131,6 @@ class TaxonomyHandler(CustomView):
         *args,
         **kwargs
     ):
-
         general_handler.queryset_manager.reset_filters("taxonomy", endpoint_levels)
 
         return super(TaxonomyHandler, self).get(

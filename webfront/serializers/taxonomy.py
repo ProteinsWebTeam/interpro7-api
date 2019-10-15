@@ -1,7 +1,7 @@
 from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
-from webfront.models import Taxonomy
+from webfront.models import Taxonomy, TaxonomyPerEntry
 import webfront.serializers.interpro
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
@@ -42,6 +42,11 @@ class TaxonomySerializer(ModelContentSerializer):
         elif detail == SerializerDetail.TAXONOMY_DETAIL_NAMES:
             representation = self.to_full_representation(instance)
             representation["names"] = self.get_names_map(instance)
+        elif detail == SerializerDetail.TAXONOMY_PER_ENTRY:
+            representation = self.to_full_representation(instance.taxonomy)
+            representation["metadata"]["counters"] = instance.counts
+            representation["names"] = self.get_names_map(instance.taxonomy)
+            representation["children"] = self.get_counter_for_children(instance)
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -307,3 +312,10 @@ class TaxonomySerializer(ModelContentSerializer):
         return {
             t.accession: {"name": t.scientific_name, "short": t.full_name} for t in qs
         }
+
+    @staticmethod
+    def get_counter_for_children(instance):
+        qs = TaxonomyPerEntry.objects.filter(
+            taxonomy__in=instance.taxonomy.children
+        ).filter(entry_acc=instance.entry_acc)
+        return {match.taxonomy.accession: match.counts for match in qs}

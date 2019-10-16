@@ -488,5 +488,200 @@
         "proteomes": 1
       }
     }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "1",
+      "entry_db": "interpro",
+      "counts": {
+        "entries": 2,
+        "structures": 2,
+        "proteins": 2,
+        "proteomes": 2
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "2579",
+      "entry_db": "interpro",
+      "counts": {
+        "entries": 2,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "344612",
+      "entry_db": "interpro",
+      "counts": {
+        "entries": 2,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "2",
+      "entry_db": "interpro",
+      "counts": {
+        "entries": 1,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "40296",
+      "entry_db": "interpro",
+      "counts": {
+        "entries": 1,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "1",
+      "entry_db": "pfam",
+      "counts": {
+        "entries": 3,
+        "structures": 2,
+        "proteins": 2,
+        "proteomes": 2
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "2579",
+      "entry_db": "pfam",
+      "counts": {
+        "entries": 3,
+        "structures": 2,
+        "proteins": 2,
+        "proteomes": 2
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "344612",
+      "entry_db": "pfam",
+      "counts": {
+        "entries": 2,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "1001583",
+      "entry_db": "pfam",
+      "counts": {
+        "entries": 1,
+        "structures": 2,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "1",
+      "entry_db": "profile",
+      "counts": {
+        "entries": 1,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "2",
+      "entry_db": "profile",
+      "counts": {
+        "entries": 1,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "40296",
+      "entry_db": "profile",
+      "counts": {
+        "entries": 1,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "1",
+      "entry_db": "smart",
+      "counts": {
+        "entries": 1,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "2579",
+      "entry_db": "smart",
+      "counts": {
+        "entries": 1,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.TaxonomyPerEntryDB",
+    "fields": {
+      "taxonomy": "344612",
+      "entry_db": "smart",
+      "counts": {
+        "entries": 1,
+        "structures": 1,
+        "proteins": 1,
+        "proteomes": 1
+      }
+    }
   }
 ]

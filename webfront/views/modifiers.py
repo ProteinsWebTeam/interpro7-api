@@ -9,6 +9,7 @@ from webfront.models import (
     Isoforms,
     Release_Note,
     TaxonomyPerEntry,
+    TaxonomyPerEntryDB,
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError, HmmerWebError
@@ -255,6 +256,15 @@ def filter_by_entry(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
     return (
         TaxonomyPerEntry.objects.filter(entry_acc=value)
+        .filter(taxonomy__in=queryset)
+        .first()
+    )
+
+
+def filter_by_entry_db(value, general_handler):
+    queryset = general_handler.queryset_manager.get_queryset()
+    return (
+        TaxonomyPerEntryDB.objects.filter(entry_db=value)
         .filter(taxonomy__in=queryset)
         .first()
     )

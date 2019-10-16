@@ -6,6 +6,7 @@ from webfront.views.modifiers import (
     add_extra_fields,
     filter_by_key_species,
     filter_by_entry,
+    filter_by_entry_db,
 )
 
 
@@ -38,6 +39,12 @@ class TaxonomyAccessionHandler(CustomView):
             "filter_by_entry",
             filter_by_entry,
             serializer=SerializerDetail.TAXONOMY_PER_ENTRY,
+            use_model_as_payload=True,
+        )
+        general_handler.modifiers.register(
+            "filter_by_entry_db",
+            filter_by_entry_db,
+            serializer=SerializerDetail.TAXONOMY_PER_ENTRY_DB,
             use_model_as_payload=True,
         )
 

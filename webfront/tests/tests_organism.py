@@ -1342,3 +1342,30 @@ class TaxonomyPerEntryTest(InterproRESTTestCase):
                 tax = children[0] if len(children) > 0 else ""
                 payload_lineage = response.data["metadata"]["lineage"]
             self.assertEqual(payload_lineage.strip(), lineage.strip())
+
+
+class TaxonomyPerEntryDBTest(InterproRESTTestCase):
+    def test_can_get_the_root_per_interpro(self):
+        response = self.client.get(
+            "/api/taxonomy/uniprot/1?filter_by_entry_db=interpro"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_taxonomy_details(response.data["metadata"])
+        self.assertEqual(response.data["metadata"]["counters"]["entries"], 2)
+        self.assertIsInstance(response.data["children"], dict)
+
+    def test_can_browse_lineage_with_children_key(self):
+        dbs = ["interpro", "pfam", "profile", "smart"]
+        for db in dbs:
+            tax = "1"
+            lineage = ""
+            payload_lineage = ""
+            while tax != "":
+                lineage += f" {tax}"
+                path = f"/api/taxonomy/uniprot/{tax}?filter_by_entry_db={db}"
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                children = list(response.data["children"].keys())
+                tax = children[0] if len(children) > 0 else ""
+                payload_lineage = response.data["metadata"]["lineage"]
+            self.assertEqual(payload_lineage.strip(), lineage.strip())

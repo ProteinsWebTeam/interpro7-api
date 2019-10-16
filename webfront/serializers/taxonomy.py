@@ -1,7 +1,7 @@
 from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
-from webfront.models import Taxonomy, TaxonomyPerEntry
+from webfront.models import Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
 import webfront.serializers.interpro
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
@@ -46,7 +46,19 @@ class TaxonomySerializer(ModelContentSerializer):
             representation = self.to_full_representation(instance.taxonomy)
             representation["metadata"]["counters"] = instance.counts
             representation["names"] = self.get_names_map(instance.taxonomy)
-            representation["children"] = self.get_counter_for_children(instance)
+            representation["children"] = self.get_counter_for_children_filtered_by_acc(
+                instance
+            )
+            representation["metadata"]["children"] = list(
+                representation["children"].keys()
+            )
+        elif detail == SerializerDetail.TAXONOMY_PER_ENTRY_DB:
+            representation = self.to_full_representation(instance.taxonomy)
+            representation["metadata"]["counters"] = instance.counts
+            representation["names"] = self.get_names_map(instance.taxonomy)
+            representation["children"] = self.get_counter_for_children_filtered_by_db(
+                instance
+            )
             representation["metadata"]["children"] = list(
                 representation["children"].keys()
             )
@@ -317,8 +329,15 @@ class TaxonomySerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def get_counter_for_children(instance):
+    def get_counter_for_children_filtered_by_acc(instance):
         qs = TaxonomyPerEntry.objects.filter(
             taxonomy__in=instance.taxonomy.children
         ).filter(entry_acc=instance.entry_acc)
+        return {match.taxonomy.accession: match.counts for match in qs}
+
+    @staticmethod
+    def get_counter_for_children_filtered_by_db(instance):
+        qs = TaxonomyPerEntryDB.objects.filter(
+            taxonomy__in=instance.taxonomy.children
+        ).filter(entry_db=instance.entry_db)
         return {match.taxonomy.accession: match.counts for match in qs}

@@ -47,6 +47,9 @@ class TaxonomySerializer(ModelContentSerializer):
             representation["metadata"]["counters"] = instance.counts
             representation["names"] = self.get_names_map(instance.taxonomy)
             representation["children"] = self.get_counter_for_children(instance)
+            representation["metadata"]["children"] = list(
+                representation["children"].keys()
+            )
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):

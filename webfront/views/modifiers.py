@@ -254,20 +254,23 @@ def filter_by_key_species(value, general_handler):
 
 def filter_by_entry(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
-    return (
-        TaxonomyPerEntry.objects.filter(entry_acc=value)
-        .filter(taxonomy__in=queryset)
-        .first()
+    response = TaxonomyPerEntry.objects.filter(taxonomy__in=queryset).filter(
+        entry_acc__accession__iexact=value
     )
+    if len(response) == 0:
+        raise EmptyQuerysetError("No documents found with the current selection")
+    return response.first()
 
 
 def filter_by_entry_db(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
-    return (
-        TaxonomyPerEntryDB.objects.filter(entry_db=value)
-        .filter(taxonomy__in=queryset)
-        .first()
+    response = TaxonomyPerEntryDB.objects.filter(taxonomy__in=queryset).filter(
+        entry_db__iexact=value
     )
+    if len(response) == 0:
+        raise EmptyQuerysetError("No documents found with the current selection")
+
+    return response.first()
 
 
 def filter_by_boolean_field(endpoint, field):

@@ -265,7 +265,7 @@ def filter_by_entry(value, general_handler):
 def filter_by_entry_db(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
     response = TaxonomyPerEntryDB.objects.filter(taxonomy__in=queryset).filter(
-        entry_db__iexact=value
+        source_database__iexact=value
     )
     if len(response) == 0:
         raise EmptyQuerysetError("No documents found with the current selection")

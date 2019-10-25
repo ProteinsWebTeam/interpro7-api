@@ -339,5 +339,5 @@ class TaxonomySerializer(ModelContentSerializer):
     def get_counter_for_children_filtered_by_db(instance):
         qs = TaxonomyPerEntryDB.objects.filter(
             taxonomy__in=instance.taxonomy.children
-        ).filter(entry_db=instance.entry_db)
+        ).filter(source_database=instance.source_database)
         return {match.taxonomy.accession: match.counts for match in qs}

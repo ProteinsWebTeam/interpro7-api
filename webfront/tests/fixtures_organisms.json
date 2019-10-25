@@ -493,7 +493,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "1",
-      "entry_db": "interpro",
+      "source_database": "interpro",
       "counts": {
         "entries": 2,
         "structures": 2,
@@ -506,7 +506,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "2579",
-      "entry_db": "interpro",
+      "source_database": "interpro",
       "counts": {
         "entries": 2,
         "structures": 1,
@@ -519,7 +519,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "344612",
-      "entry_db": "interpro",
+      "source_database": "interpro",
       "counts": {
         "entries": 2,
         "structures": 1,
@@ -532,7 +532,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "2",
-      "entry_db": "interpro",
+      "source_database": "interpro",
       "counts": {
         "entries": 1,
         "structures": 1,
@@ -545,7 +545,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "40296",
-      "entry_db": "interpro",
+      "source_database": "interpro",
       "counts": {
         "entries": 1,
         "structures": 1,
@@ -558,7 +558,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "1",
-      "entry_db": "pfam",
+      "source_database": "pfam",
       "counts": {
         "entries": 3,
         "structures": 2,
@@ -571,7 +571,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "2579",
-      "entry_db": "pfam",
+      "source_database": "pfam",
       "counts": {
         "entries": 3,
         "structures": 2,
@@ -584,7 +584,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "344612",
-      "entry_db": "pfam",
+      "source_database": "pfam",
       "counts": {
         "entries": 2,
         "structures": 1,
@@ -597,7 +597,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "1001583",
-      "entry_db": "pfam",
+      "source_database": "pfam",
       "counts": {
         "entries": 1,
         "structures": 2,
@@ -610,7 +610,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "1",
-      "entry_db": "profile",
+      "source_database": "profile",
       "counts": {
         "entries": 1,
         "structures": 1,
@@ -623,7 +623,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "2",
-      "entry_db": "profile",
+      "source_database": "profile",
       "counts": {
         "entries": 1,
         "structures": 1,
@@ -636,7 +636,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "40296",
-      "entry_db": "profile",
+      "source_database": "profile",
       "counts": {
         "entries": 1,
         "structures": 1,
@@ -649,7 +649,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "1",
-      "entry_db": "smart",
+      "source_database": "smart",
       "counts": {
         "entries": 1,
         "structures": 1,
@@ -662,7 +662,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "2579",
-      "entry_db": "smart",
+      "source_database": "smart",
       "counts": {
         "entries": 1,
         "structures": 1,
@@ -675,7 +675,7 @@
     "model": "webfront.TaxonomyPerEntryDB",
     "fields": {
       "taxonomy": "344612",
-      "entry_db": "smart",
+      "source_database": "smart",
       "counts": {
         "entries": 1,
         "structures": 1,

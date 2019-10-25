@@ -104,7 +104,7 @@ class Taxonomy(models.Model):
 
 class TaxonomyPerEntry(models.Model):
     taxonomy = models.ForeignKey(
-        "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True
+        "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True, db_column="tax_id"
     )
     entry_acc = models.ForeignKey(
         "Entry", db_column="entry_acc", on_delete=models.SET_NULL, null=True
@@ -114,9 +114,9 @@ class TaxonomyPerEntry(models.Model):
 
 class TaxonomyPerEntryDB(models.Model):
     taxonomy = models.ForeignKey(
-        "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True
+        "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True, db_column="tax_id"
     )
-    entry_db = models.CharField(max_length=100, db_index=True)
+    source_database = models.CharField(max_length=100, db_index=True)
     counts = JSONField(null=True)
 
 

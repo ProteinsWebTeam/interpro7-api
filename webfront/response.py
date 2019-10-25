@@ -35,7 +35,10 @@ class Response(R):
 
             headers["Server-Timing"] = ",".join(timings)
 
-        headers["InterPro-Version"] = Database.objects.get(pk="interpro").version
+        if not hasattr(settings, "CACHED_VERSION"):
+            settings.CACHED_VERSION = Database.objects.get(pk="interpro").version
+
+        headers["InterPro-Version"] = settings.CACHED_VERSION
         headers["InterPro-Version-Minor"] = settings.MINOR_VERSION
 
         super(Response, self).__init__(

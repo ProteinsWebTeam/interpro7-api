@@ -16,3 +16,4 @@ config/mysql_test.yml
 config/~mysql.yml
 *.db
 *.iml
+gunicorn.local.conf.py

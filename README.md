@@ -10,9 +10,9 @@
 
 InterPro provides functional analysis of proteins by classifying them into families and predicting domains and important sites. 
 
-This is the repository for the source code running the InterPro Rest API, which is currently available at [https://www.ebi.ac.uk/interpro/beta/api].
+This is the repository for the source code running the InterPro Rest API, which is currently available at [https://www.ebi.ac.uk/interpro/api/].
 
-This API provides the data that the new InterPro website uses. You can explore the website at [www.ebi.ac.uk/interpro/beta].
+This API provides the data that the new InterPro website uses. You can explore the website at [www.ebi.ac.uk/interpro].
 
 The repository for the InterPro Website can be found at [https://github.com/ProteinsWebTeam/interpro7-client].
 

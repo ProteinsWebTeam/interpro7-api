@@ -102,6 +102,24 @@ class Taxonomy(models.Model):
     counts = JSONField(null=True)
 
 
+class TaxonomyPerEntry(models.Model):
+    taxonomy = models.ForeignKey(
+        "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True, db_column="tax_id"
+    )
+    entry_acc = models.ForeignKey(
+        "Entry", db_column="entry_acc", on_delete=models.SET_NULL, null=True
+    )
+    counts = JSONField(null=True)
+
+
+class TaxonomyPerEntryDB(models.Model):
+    taxonomy = models.ForeignKey(
+        "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True, db_column="tax_id"
+    )
+    source_database = models.CharField(max_length=100, db_index=True)
+    counts = JSONField(null=True)
+
+
 class Proteome(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=512)

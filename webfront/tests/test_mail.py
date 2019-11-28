@@ -7,8 +7,9 @@ class TestMail(TestCase):
         self.client = Client()
         response = self.client.post('/mail/',
                           {
+                              'path': 'echo',
                               'subject': 'Add annotation test from API',
                               'message': 'Test',
                               'from_email': 'swaathik@ebi.ac.uk'
                            })
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['from'], 'swaathik@ebi.ac.uk')

@@ -5,7 +5,7 @@ from django.test import Client
 class TestMail(TestCase):
     def test_mail(self):
         self.client = Client()
-        response = self.client.post('/mail/',
+        response = self.client.post('/api/mail/',
                           {
                               'path': 'echo',
                               'subject': 'Add annotation test from API',

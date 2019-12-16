@@ -9,7 +9,7 @@ addons:
   chrome: stable
 before_install:
   - "export BROWSER_TEST=chrome"
-  - wget http://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_linux64.zip
+  - wget http://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
   - sudo cp chromedriver /usr/local/bin/. && sudo chmod 755 /usr/local/bin/chromedriver
   - sleep 3

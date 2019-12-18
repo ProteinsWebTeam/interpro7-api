@@ -12,7 +12,7 @@ def mail_interhelp(request):
     ip_address = get_client_ip(request)
     now = datetime.now()
     if not hasattr(settings, 'credentials'):
-        return store_credentials(request, ip_address, now)
+        return store_credentials_and_mail(request, ip_address, now)
     else:
         last_accessed = settings.credentials
         if last_accessed['ip'] == ip_address:
@@ -20,14 +20,14 @@ def mail_interhelp(request):
             time_diff = now - then
             elapsed_min = time_diff / timedelta(minutes=1)
             if elapsed_min >= 1:
-                return store_credentials(request, ip_address, now)
+                return store_credentials_and_mail(request, ip_address, now)
             else:
                 data = {
                     'error': 'Request Aborted',
                 }
-                return JsonResponse(data)
+                return JsonResponse(data, status=429)
         else:
-            return store_credentials(request, ip_address, now)
+            return store_credentials_and_mail(request, ip_address, now)
 
 
 def get_client_ip(request):
@@ -39,7 +39,7 @@ def get_client_ip(request):
     return ip
 
 
-def store_credentials(request, ip, time):
+def store_credentials_and_mail(request, ip, time):
     settings.credentials = {
         'ip': ip,
         'time': time.strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -68,4 +68,4 @@ def mail(request):
         data = {
             'error': 'Make sure all fields are entered and valid',
         }
-        return JsonResponse(data)
+        return JsonResponse(data, status=400)

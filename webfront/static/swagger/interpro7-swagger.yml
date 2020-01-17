@@ -13,7 +13,9 @@ info:
     The combined URL `/entry/interpro/protein/uniprot/p99999` will list all the interpro entries that have a match in that particular protein.
   version: 0.0.1
 servers:
-  - url: https://wwwdev.ebi.ac.uk/interpro7/api/
+  - url: https://www.ebi.ac.uk/interpro/api/
+    description: Live server
+  - url: https://wwwdev.ebi.ac.uk/interpro/api/
     description: Dev server
   - url: http://localhost:8007/api/
     description: Local server

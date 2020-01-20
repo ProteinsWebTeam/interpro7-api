@@ -188,6 +188,10 @@ class GeneralHandler(CustomView):
                     drf_request=drf_request,
                 )
                 self._set_in_cache(caching_allowed, full_path, response)
+                # Forcing to close the connection because django is not closing it when this query is ran as future
+                from django.db import connection
+
+                connection.close()
                 return response
 
             def timer(caching_allowed):

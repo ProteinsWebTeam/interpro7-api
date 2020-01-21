@@ -8,8 +8,7 @@ from webfront.exceptions import DeletedEntryError, EmptyQuerysetError
 from webfront.response import Response
 
 from django.conf import settings
-from django.http import HttpRequest
-from rest_framework.request import Request
+from django.db import connection
 from webfront.views.custom import CustomView
 from webfront.views.modifier_manager import ModifierManager
 from webfront.views.queryset_manager import QuerysetManager
@@ -165,6 +164,8 @@ class GeneralHandler(CustomView):
                         "Failed getting {} from cache: {}".format(full_path, e)
                     )
         if response:
+            # Forcing to close the connection because django is not closing it when this query is ran as future
+            connection.close()
             return response
 
         self.filter_serializers = {}
@@ -189,8 +190,6 @@ class GeneralHandler(CustomView):
                 )
                 self._set_in_cache(caching_allowed, full_path, response)
                 # Forcing to close the connection because django is not closing it when this query is ran as future
-                from django.db import connection
-
                 connection.close()
                 return response
 
@@ -198,6 +197,8 @@ class GeneralHandler(CustomView):
                 sleep(QUERY_TIMEOUT)
                 content = {"detail": "Query timed out"}
                 response = Response(content, status=status.HTTP_408_REQUEST_TIMEOUT)
+                # Forcing to close the connection because django is not closing it when this query is ran as future
+                connection.close()
                 return response
 
             drf_request = request

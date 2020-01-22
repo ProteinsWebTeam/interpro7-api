@@ -17,6 +17,7 @@ allowed_host: []
 static_url: "/interpro7/api/static_files/"
 hmmerweb: 'https://www.ebi.ac.uk/Tools/hmmer/search/hmmscan'
 sendmail_path: "/usr/sbin/sendmail"
+http_proxy: ""
 
 members:
   cathgene3d:

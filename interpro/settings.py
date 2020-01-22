@@ -45,6 +45,7 @@ SECRET_KEY = "#*-7w_j1le-j(_#=g4ii!knr&w5!9ocpw*#7hq9+_osc5@19vs"
 DEBUG = INTERPRO_CONFIG.get("debug", False)
 
 MINOR_VERSION = INTERPRO_CONFIG.get("minor_version", 0)
+HTTP_PROXY = INTERPRO_CONFIG.get("http_proxy", "")
 
 ALLOWED_HOSTS = INTERPRO_CONFIG.get("allowed_host", [])
 

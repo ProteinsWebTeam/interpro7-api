@@ -1,4 +1,3 @@
-from django.conf import settings
 import http.client
 import json
 import urllib.parse
@@ -25,13 +24,19 @@ def getAfterBeforeFromCursor(cursor):
 class ElasticsearchController(SearchController):
     def __init__(self, queryset_manager=None):
         url = urllib.parse.urlparse(settings.SEARCHER_URL)
+        proxy = settings.HTTP_PROXY
         self.server = url.hostname
         self.port = url.port
         parts = url.path.split("/")
         self.index = parts[1]
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
-        self.connection = http.client.HTTPConnection(self.server, self.port)
+        if proxy is not None and proxy != "":
+            proxy = urllib.parse.urlparse(proxy)
+            self.connection = http.client.HTTPConnection(proxy.hostname, proxy.port)
+            self.connection.set_tunnel(self.server, self.port)
+        else:
+            self.connection = http.client.HTTPConnection(self.server, self.port)
 
     def add(self, docs):
         body = ""

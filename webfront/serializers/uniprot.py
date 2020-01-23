@@ -174,7 +174,7 @@ class ProteinSerializer(ModelContentSerializer):
             "accession": instance.accession,
             "id": instance.identifier,
             "source_organism": instance.organism,
-            "name": {"name": instance.name, "other": instance.other_names},
+            "name": instance.name,
             "description": instance.description,
             "length": instance.length,
             "sequence": instance.sequence,

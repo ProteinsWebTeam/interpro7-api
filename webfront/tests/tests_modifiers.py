@@ -5,6 +5,7 @@ import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
+
 class GroupByModifierTest(InterproRESTTestCase):
     def test_can_get_the_entry_type_groups(self):
         response = self.client.get("/api/entry?group_by=type")
@@ -29,26 +30,6 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertIn("pfam", response.data)
         self.assertIn("smart", response.data)
         self.assertIn("profile", response.data)
-
-    def test_can_get_the_protein_size_groups(self):
-        response = self.client.get("/api/protein?group_by=size")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("long", response.data)
-        self.assertIn("small", response.data)
-        self.assertIn("medium", response.data)
-        self.assertEqual(response.data["small"], 1)
-        self.assertEqual(response.data["medium"], 2)
-        self.assertEqual(response.data["long"], 1)
-
-    def test_can_get_the_integrated_protein_size_groups(self):
-        response = self.client.get("/api/protein/entry?group_by=size")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("long", response.data)
-        self.assertIn("small", response.data)
-        self.assertIn("medium", response.data)
-        self.assertEqual(response.data["small"], 1)
-        self.assertEqual(response.data["medium"], 1)
-        self.assertEqual(response.data["long"], 1)
 
     def test_wrong_field_for_group_by_should_fail(self):
         self._check_HTTP_response_code(
@@ -111,60 +92,6 @@ class FilterByFieldModifierTest(InterproRESTTestCase):
             self.assertIn("results", response.data)
             for result in response.data["results"]:
                 self.assertEqual(result["metadata"]["type"], entry_type)
-
-    def _get_size_group(self, length):
-        l = int(length)
-        if l < 300:
-            return "small"
-        elif l < 600:
-            return "medium"
-        return "long"
-
-    def test_can_filter_protein_by_size(self):
-        sizes = ["small", "medium", "long"]
-        for size in sizes:
-            response = self.client.get("/api/protein/uniprot?size=" + size)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIn("results", response.data)
-            for result in response.data["results"]:
-                size_g = self._get_size_group(result["metadata"]["length"])
-                self.assertEqual(size_g, size)
-
-    def test_can_filter_reviewed_protein_by_size(self):
-        sizes = ["small", "medium", "long"]
-        for size in sizes:
-            response = self.client.get("/api/protein/reviewed?size=" + size)
-            if response.status_code == status.HTTP_204_NO_CONTENT:
-                self.assertEqual("long", size)
-            else:
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertIn("results", response.data)
-                for result in response.data["results"]:
-                    size_g = self._get_size_group(result["metadata"]["length"])
-                    self.assertEqual(size_g, size)
-
-    def test_can_filter_unreviewed_protein_by_size(self):
-        sizes = ["small", "medium", "long"]
-        for size in sizes:
-            response = self.client.get("/api/protein/unreviewed?size=" + size)
-            if response.status_code == status.HTTP_204_NO_CONTENT:
-                self.assertEqual("small", size)
-            else:
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertIn("results", response.data)
-                for result in response.data["results"]:
-                    size_g = self._get_size_group(result["metadata"]["length"])
-                    self.assertEqual(size_g, size)
-
-    def test_can_filter_by_size_protein_with_entry_filter(self):
-        sizes = ["small", "medium", "long"]
-        for size in sizes:
-            response = self.client.get("/api/protein/uniprot/entry?size=" + size)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIn("results", response.data)
-            for result in response.data["results"]:
-                size_g = self._get_size_group(result["metadata"]["length"])
-                self.assertEqual(size_g, size)
 
     def test_can_filter_proteins_by_match_presence(self):
         options = ["true", "false"]
@@ -299,7 +226,6 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             "identifier",
             "organism",
             "name",
-            "other_names",
             "description",
             "sequence",
             "length",
@@ -452,16 +378,17 @@ class LatestEntriesModifiersTest(InterproRESTTestCase):
             response.data["results"][0]["metadata"]["accession"], "IPR003165"
         )
 
+
 class EntryAnnotationModifiersTest(InterproRESTTestCase):
     def test_annotation_modifier_hmm(self):
         response = self.client.get("/api/entry/pfam/pf02171?annotation=hmm")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response['content-type'], "application/octet-stream")
+        self.assertEqual(response["content-type"], "application/octet-stream")
 
     def test_annotation_modifier_alignment(self):
         response = self.client.get("/api/entry/pfam/pf02171?annotation=alignment")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response['content-type'], "application/octet-stream")
+        self.assertEqual(response["content-type"], "application/octet-stream")
 
     # TODO Problem encoding logo as byte-coded json
     # def test_annotation_modifier_logo(self):

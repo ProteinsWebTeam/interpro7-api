@@ -150,8 +150,6 @@ class QuerysetManager:
                     blocks.append("tax_lineage:{}".format(escape(v).strip()))
                 elif "experiment_type__" in k:
                     blocks.append("structure_evidence:{}".format(escape(v).strip()))
-                elif ep == "protein" and "size__" in k:
-                    blocks.append("protein_size:{}".format(escape(v).strip()))
                 elif "__gt" in k:
                     filter_k = "protein_" + k if k.startswith("length_") else k
                     blocks.append(

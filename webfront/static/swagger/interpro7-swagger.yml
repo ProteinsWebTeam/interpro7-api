@@ -208,7 +208,6 @@ paths:
             enum:
             - counters
             - identifier
-            - other_names
             - description
             - sequence
             - gene
@@ -217,7 +216,6 @@ paths:
             - residues
             - fragment
             - tax_id
-            - size
         - $ref: '#/components/parameters/proteinGroupBy'
         - $ref: '#/components/parameters/proteinSortBy'
       responses:

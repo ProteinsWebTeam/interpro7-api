@@ -145,6 +145,7 @@ class GeneralHandler(CustomView):
         self.queryset_manager = QuerysetManager()
         self.searcher = self.get_search_controller(self.queryset_manager)
         if clean_url == "" or clean_url == "/":
+            connection.close()
             return Response(
                 getDataForRoot(
                     self.available_endpoint_handlers,
@@ -240,16 +241,19 @@ class GeneralHandler(CustomView):
             if settings.DEBUG:
                 raise
             content = {"detail": e.args[2], "accession": e.args[0], "date": e.args[1]}
+            connection.close()
             response = Response(content, status=status.HTTP_410_GONE)
         except EmptyQuerysetError as e:
             if settings.DEBUG:
                 raise
             content = {"detail": e.args[0]}
+            connection.close()
             response = Response(content, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             if settings.DEBUG:
                 raise
             content = {"Error": e.args[0]}
+            connection.close()
             response = Response(content, status=status.HTTP_404_NOT_FOUND)
         return response
 

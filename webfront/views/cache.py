@@ -43,6 +43,8 @@ class InterProCache:
         ) and settings.INTERPRO_CONFIG.get("enable_cache_write", False):
             if response.data and (
                 response.status_code == status.HTTP_200_OK
+                or response.status_code == status.HTTP_204_NO_CONTENT
+                or response.status_code == status.HTTP_410_GONE
                 or response.status_code == status.HTTP_408_REQUEST_TIMEOUT
             ):
                 key = canonical(key)

@@ -11,7 +11,8 @@ from django.http import QueryDict
 
 def replace_url_host(url):
     host = settings.INTERPRO_CONFIG.get("api_url", "http://localhost:8007/api/")
-    return host + url.split("/api/")[1]
+    divider = "/wwwapi/" if "/wwwapi/" in url else "/api/"
+    return host + url.split(divider)[1]
 
 
 class CustomPaginator(DjangoPaginator):

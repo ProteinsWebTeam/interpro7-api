@@ -145,6 +145,7 @@ class GeneralHandler(CustomView):
         self.queryset_manager = QuerysetManager()
         self.searcher = self.get_search_controller(self.queryset_manager)
         if clean_url == "" or clean_url == "/":
+            connection.close()
             return Response(
                 getDataForRoot(
                     self.available_endpoint_handlers,

@@ -134,7 +134,8 @@
         "proteomes": 2,
         "sets": 0,
         "domain_architectures": 2
-      }
+      },
+      "interactions": null
     }
   },
   {
@@ -215,6 +216,40 @@
         "proteomes": 1,
         "sets": 0,
         "domain_architectures": 1
+      },
+      "interactions": [
+        {
+          "intact_id": "EBI-0000",
+          "pubmed_id": 1111,
+          "molecule_1": {
+            "accession": "PXXX",
+            "identifier": "PXXXX",
+            "type": "protein"
+          },
+          "molecule_2": {
+            "accession": "PYYYY-2",
+            "identifier": "PYYYY-2",
+            "type": "protein"
+          }
+        }
+      ],
+      "pathways": {
+        "metacyc": [
+          {
+            "id": "PWY-7511",
+            "name": "protein ubiquitination"
+          }
+        ],
+        "reactome": [
+          {
+            "id": "R-BTA-3065676",
+            "name": "SUMO is conjugated to E1 (UBA2:SAE1)"
+          },
+          {
+            "id": "R-XTR-3065678",
+            "name": "SUMO is transferred from E1 to E2 (UBE2I, UBC9)"
+          }
+        ]
       }
     }
   },

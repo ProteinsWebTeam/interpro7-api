@@ -15,6 +15,7 @@ from webfront.views.modifiers import (
     add_extra_fields,
     ida_search,
     filter_by_latest_entries,
+    get_value_for_field,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -197,6 +198,15 @@ class AccessionHandler(CustomView):
             use_model_as_payload=True,
             serializer=SerializerDetail.IDA_LIST,
         )
+        general_handler.modifiers.register(
+            "interactions",
+            get_value_for_field("interactions"),
+            use_model_as_payload=True,
+        )
+        general_handler.modifiers.register(
+            "pathways", get_value_for_field("pathways"), use_model_as_payload=True
+        )
+
         return super(AccessionHandler, self).get(
             request._request,
             endpoint_levels,

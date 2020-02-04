@@ -400,3 +400,28 @@ class EntryAnnotationModifiersTest(InterproRESTTestCase):
     # def test_annotation_wrong_acc_modifier(self):
     #     response = self.client.get("/api/entry/pfam/pf00001?annotation=hmm")
     #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class ValueForFieldModifiersTest(InterproRESTTestCase):
+    def test_interactions_modifier(self):
+        response = self.client.get("/api/entry/interpro/IPR001165?interactions")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("interactions", response.data)
+        self.assertIsInstance(response.data["interactions"], list)
+        self.assertEqual(1, len(response.data["interactions"]))
+
+    def test_no_interactions_modifier(self):
+        response = self.client.get("/api/entry/interpro/IPR003165?interactions")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_pathways_modifier(self):
+        response = self.client.get("/api/entry/interpro/IPR001165?pathways")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("pathways", response.data)
+        self.assertIsInstance(response.data["pathways"], object)
+        self.assertIn("reactome", response.data["pathways"])
+        self.assertEqual(2, len(response.data["pathways"]["reactome"]))
+
+    def test_no_pathways_modifier(self):
+        response = self.client.get("/api/entry/interpro/IPR003165?pathways")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

@@ -65,9 +65,10 @@ class EntryRESTTest(InterproRESTTestCase):
         )
 
     def test_gets_410_for_deleted_entry(self):
-        self._check_HTTP_response_code(
-            "/api/entry/interpro/ipr123456", code=status.HTTP_410_GONE
-        )
+        url = "/api/entry/interpro/ipr123456"
+        self._check_HTTP_response_code(url, code=status.HTTP_410_GONE)
+        response = self.client.get(url)
+        self.assertIn("history", response.data)
 
     def test_bad_entry_point(self):
         self._check_HTTP_response_code(

@@ -547,7 +547,42 @@
       "entry_date": "1994-04-21T00:00:00Z",
       "deletion_date": "1994-04-21T00:00:00Z",
       "is_alive": false,
-      "source_database": "interpro"
+      "source_database": "interpro",
+      "history": {
+        "names": [
+          "AraC type helix-turn-helix domain",
+          "AraC type helix-turn-helix",
+          "Helix-turn-helix, AraC type",
+          "HTH transcriptional regulator, AraC"
+        ],
+        "signatures": [
+          {
+            "accession": "PS00041",
+            "exists": true,
+            "integrated_id": "IPR018062"
+          },
+          {
+            "accession": "PR00032",
+            "exists": true,
+            "integrated_id": "IPR020449"
+          },
+          {
+            "accession": "PF00165",
+            "exists": true,
+            "integrated_id": "IPR018060"
+          },
+          {
+            "accession": "PS01124",
+            "exists": true,
+            "integrated_id": "IPR018060"
+          },
+          {
+            "accession": "SM00342",
+            "exists": true,
+            "integrated_id": "IPR018060"
+          }
+        ]
+      }
     }
   }
 ]

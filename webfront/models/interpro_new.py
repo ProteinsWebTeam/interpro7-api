@@ -39,6 +39,7 @@ class Entry(models.Model):
     counts = JSONField(null=True)
     interactions = JSONField(null=True)
     pathways = JSONField(null=True)
+    history = JSONField(null=True)
 
 
 class EntryAnnotation(models.Model):

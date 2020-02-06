@@ -145,6 +145,7 @@ class GeneralHandler(CustomView):
         self.queryset_manager = QuerysetManager()
         self.searcher = self.get_search_controller(self.queryset_manager)
         if clean_url == "" or clean_url == "/":
+            connection.close()
             return Response(
                 getDataForRoot(
                     self.available_endpoint_handlers,
@@ -173,12 +174,12 @@ class GeneralHandler(CustomView):
         endpoint_levels = map_url_to_levels(url)
         self.modifiers = ModifierManager(self)
         self.modifiers.register("search", self.search_modifier)
-        try:
 
-            def query(args):
-                self, request, endpoint_levels, full_path, drf_request, caching_allowed = (
-                    args
-                )
+        def query(args):
+            self, request, endpoint_levels, full_path, drf_request, caching_allowed = (
+                args
+            )
+            try:
                 response = super(GeneralHandler, self).get(
                     request,
                     endpoint_levels,
@@ -191,42 +192,46 @@ class GeneralHandler(CustomView):
                 self._set_in_cache(caching_allowed, full_path, response)
                 # Forcing to close the connection because django is not closing it when this query is ran as future
                 connection.close()
-                return response
-
-            def timer(caching_allowed):
-                sleep(QUERY_TIMEOUT)
-                content = {"detail": "Query timed out"}
-                response = Response(content, status=status.HTTP_408_REQUEST_TIMEOUT)
-                # Forcing to close the connection because django is not closing it when this query is ran as future
+            except DeletedEntryError as e:
+                if settings.DEBUG:
+                    raise
+                content = {
+                    "detail": e.args[2],
+                    "accession": e.args[0],
+                    "date": e.args[1],
+                }
                 connection.close()
-                return response
+                response = Response(content, status=status.HTTP_410_GONE)
+                self._set_in_cache(caching_allowed, full_path, response)
+            except EmptyQuerysetError as e:
+                if settings.DEBUG:
+                    raise
+                content = {"detail": e.args[0]}
+                connection.close()
+                response = Response(content, status=status.HTTP_204_NO_CONTENT)
+                self._set_in_cache(caching_allowed, full_path, response)
+            except Exception as e:
+                if settings.DEBUG:
+                    raise
+                content = {"Error": e.args[0]}
+                connection.close()
+                response = Response(content, status=status.HTTP_404_NOT_FOUND)
+            return response
 
-            drf_request = request
-            if caching_allowed:
-                pool = ThreadPoolExecutor(2)
-                futures = [
-                    pool.submit(
-                        query,
-                        (
-                            self,
-                            request._request,
-                            endpoint_levels,
-                            full_path,
-                            drf_request,
-                            caching_allowed,
-                        ),
-                    ),
-                    pool.submit(timer, caching_allowed),
-                ]
-                result = wait(futures, return_when=FIRST_COMPLETED)
-                response = result.done.pop().result()
-                if response.status_code == status.HTTP_408_REQUEST_TIMEOUT:
-                    self._set_in_cache(
-                        caching_allowed, full_path, response, timeout=CACHE_TIMEOUT
-                    )
+        def timer(caching_allowed):
+            sleep(QUERY_TIMEOUT)
+            content = {"detail": "Query timed out"}
+            response = Response(content, status=status.HTTP_408_REQUEST_TIMEOUT)
+            # Forcing to close the connection because django is not closing it when this query is ran as future
+            connection.close()
+            return response
 
-            else:
-                response = query(
+        drf_request = request
+        if caching_allowed:
+            pool = ThreadPoolExecutor(2)
+            futures = [
+                pool.submit(
+                    query,
                     (
                         self,
                         request._request,
@@ -234,24 +239,28 @@ class GeneralHandler(CustomView):
                         full_path,
                         drf_request,
                         caching_allowed,
-                    )
+                    ),
+                ),
+                pool.submit(timer, caching_allowed),
+            ]
+            result = wait(futures, return_when=FIRST_COMPLETED)
+            response = result.done.pop().result()
+            if response.status_code == status.HTTP_408_REQUEST_TIMEOUT:
+                self._set_in_cache(
+                    caching_allowed, full_path, response, timeout=CACHE_TIMEOUT
                 )
-        except DeletedEntryError as e:
-            if settings.DEBUG:
-                raise
-            content = {"detail": e.args[2], "accession": e.args[0], "date": e.args[1]}
-            response = Response(content, status=status.HTTP_410_GONE)
-        except EmptyQuerysetError as e:
-            if settings.DEBUG:
-                raise
-            content = {"detail": e.args[0]}
-            response = Response(content, status=status.HTTP_204_NO_CONTENT)
-        except Exception as e:
-            if settings.DEBUG:
-                raise
-            content = {"Error": e.args[0]}
-            response = Response(content, status=status.HTTP_404_NOT_FOUND)
-        return response
+            return response
+        else:
+            return query(
+                (
+                    self,
+                    request._request,
+                    endpoint_levels,
+                    full_path,
+                    drf_request,
+                    caching_allowed,
+                )
+            )
 
     def _set_in_cache(self, caching_allowed, full_path, response, timeout=None):
         if caching_allowed:

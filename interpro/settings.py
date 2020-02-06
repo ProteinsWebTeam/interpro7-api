@@ -122,6 +122,7 @@ DATABASES = {
         "PASSWORD": MYSQL_CONFIG.get("password"),
         "HOST": MYSQL_CONFIG.get("host"),
         "PORT": MYSQL_CONFIG.get("port"),
+        "CONN_MAX_AGE": MYSQL_CONFIG.get("conn_max_age", 0),
         "TEST": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": os.path.join(os.path.dirname(__file__), "test.db"),

@@ -200,6 +200,8 @@ class GeneralHandler(CustomView):
                     "accession": e.args[0],
                     "date": e.args[1],
                 }
+                if len(e.args) > 3 and e.args[3] is not None:
+                    content["history"] = e.args[3]
                 connection.close()
                 response = Response(content, status=status.HTTP_410_GONE)
                 self._set_in_cache(caching_allowed, full_path, response)

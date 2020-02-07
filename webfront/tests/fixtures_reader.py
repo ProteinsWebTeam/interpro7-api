@@ -61,7 +61,9 @@ class FixtureReader:
             elif fixture["model"] == "webfront.Set":
                 self.sets[fixture["fields"]["accession"].lower()] = fixture["fields"]
             elif fixture["model"] == "webfront.EntryAnnotation":
-                self.entry_annotations[fixture["fields"]["accession"].lower()] = fixture["fields"]
+                self.entry_annotations[
+                    fixture["fields"]["accession"].lower()
+                ] = fixture["fields"]
 
     def get_entry2set(self):
         e2s = {}
@@ -131,7 +133,6 @@ class FixtureReader:
                 "text_proteome": proteome + " " + self.proteomes[proteome]["name"],
                 "entry_protein_locations": ep["coordinates"],
                 "protein_length": self.proteins[p]["length"],
-                "protein_size": self.proteins[p]["size"],
                 "protein_is_fragment": self.proteins[p]["is_fragment"],
                 "id": get_id(e, p),
             }
@@ -216,7 +217,6 @@ class FixtureReader:
                                 "is_reference"
                             ],
                             "protein_length": self.proteins[p]["length"],
-                            "protein_size": self.proteins[p]["size"],
                             "id": get_id(None, p, sp["structure"], sp["chain"]),
                             "structure_acc": sp["structure"],
                             "structure_evidence": self.structures[sp["structure"]][

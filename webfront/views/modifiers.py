@@ -670,5 +670,15 @@ def calculate_residue_conservation(value, general_handler):
     return alignments
 
 
+def get_value_for_field(field):
+    def x(value, general_handler):
+        queryset = general_handler.queryset_manager.get_queryset().first()
+        if queryset.__getattribute__(field) is None:
+            raise EmptyQuerysetError("This entity doesn't have " + field)
+        return {field: queryset.__getattribute__(field)}
+
+    return x
+
+
 def passing(x, y):
     pass

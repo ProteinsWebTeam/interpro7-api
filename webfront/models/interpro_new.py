@@ -37,6 +37,9 @@ class Entry(models.Model):
     is_alive = models.BooleanField(default=False)
     deletion_date = models.DateTimeField(null=True)
     counts = JSONField(null=True)
+    interactions = JSONField(null=True)
+    pathways = JSONField(null=True)
+    history = JSONField(null=True)
 
 
 class EntryAnnotation(models.Model):
@@ -52,7 +55,6 @@ class Protein(models.Model):
     identifier = models.CharField(max_length=16, unique=True, null=False)
     organism = JSONField(null=True)
     name = models.CharField(max_length=20)
-    other_names = JSONField(null=True)
     description = JSONField(null=True)
     sequence = models.TextField(null=False)
     length = models.IntegerField(null=False)
@@ -68,7 +70,6 @@ class Protein(models.Model):
     structure = JSONField(default={})
     is_fragment = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
-    size = models.CharField(max_length=10, null=True)
     ida_id = models.CharField(max_length=40, null=True)
     ida = models.TextField(null=True)
     counts = JSONField(null=True)

@@ -54,9 +54,6 @@
       "protein_length": {
         "type": "long"
       },
-      "protein_size": {
-        "type": "keyword"
-      },
       "protein_db": {
         "type": "keyword"
       },

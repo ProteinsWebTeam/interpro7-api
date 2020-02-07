@@ -249,7 +249,6 @@ class ProteinHandler(CustomView):
                     "protein_evidence": None,
                     "source_database": "protein_db",
                     "go_terms": "text",
-                    "size": "protein_size",
                     "match_presence": "match_presence",
                     "is_fragment": "protein_is_fragment",
                 },

@@ -23,6 +23,7 @@ class FixtureReader:
     search = None
 
     def __init__(self, fixture_paths):
+        self.ida_to_add = {}
         for path in fixture_paths:
             with open(path) as data_file:
                 data = json.load(data_file)
@@ -37,6 +38,17 @@ class FixtureReader:
                     "fields"
                 ]
                 self.protein_structure_list[fixture["fields"]["accession"].lower()] = []
+                if "ida_id" in fixture["fields"]:
+                    ida_id = fixture["fields"]["ida_id"]
+                    if ida_id not in self.ida_to_add:
+                        self.ida_to_add[ida_id] = {
+                            "id": ida_id,
+                            "ida_id": ida_id,
+                            "ida": fixture["fields"]["ida"],
+                            "proteins": 0,
+                        }
+                    self.ida_to_add[ida_id]["proteins"] += 1
+
             elif fixture["model"] == "webfront.Structure":
                 self.structures[fixture["fields"]["accession"].lower()] = fixture[
                     "fields"
@@ -250,6 +262,7 @@ class FixtureReader:
     def add_to_search_engine(self, docs):
         self.search = ElasticsearchController()
         self.search.add(docs)
+        self.search.add(self.ida_to_add.values(), True)
 
     def clear_search_engine(self):
         self.search.clear_all_docs()

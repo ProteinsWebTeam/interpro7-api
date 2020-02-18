@@ -389,9 +389,10 @@ def get_domain_architectures(field, general_handler):
     cursor = general_handler.pagination["cursor"]
 
     if field is None or field.strip() == "":
-        return searcher.get_group_obj_copy_of_field_by_query(
-            None, "ida_id", rows=size, cursor=cursor, inner_field_to_count="protein_acc"
-        )
+        return searcher._elastic_json_query(None, None, True)
+        # return searcher.get_group_obj_copy_of_field_by_query(
+        #     None, "ida_id", rows=size, cursor=cursor, inner_field_to_count="protein_acc"
+        # )
     else:
         query = (
             general_handler.queryset_manager.get_searcher_query()
@@ -468,9 +469,10 @@ def ida_search(value, general_handler):
             query = "({}) && ({})".format(
                 query, " && ".join(["!ida:*{}*".format(e) for e in ignore_list])
             )
-    return searcher.get_group_obj_copy_of_field_by_query(
-        query, "ida_id", rows=size, cursor=cursor, inner_field_to_count="protein_acc"
-    )
+    return searcher._elastic_json_query(query, None, True)
+    # return searcher.get_group_obj_copy_of_field_by_query(
+    #     query, "ida_id", rows=size, cursor=cursor, inner_field_to_count="protein_acc"
+    # )
 
 
 def get_isoforms(value, general_handler):

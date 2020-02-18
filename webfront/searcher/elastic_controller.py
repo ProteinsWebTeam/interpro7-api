@@ -27,8 +27,7 @@ class ElasticsearchController(SearchController):
         proxy = settings.HTTP_PROXY
         self.server = url.hostname
         self.port = url.port
-        parts = url.path.split("/")
-        self.index = parts[1]
+        self.index = settings.SEARCHER_INDEX
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
         if proxy is not None and proxy != "":
@@ -38,14 +37,19 @@ class ElasticsearchController(SearchController):
         else:
             self.connection = http.client.HTTPConnection(self.server, self.port)
 
-    def add(self, docs):
+    def add(self, docs, is_ida=False):
         body = ""
         for doc in docs:
             body += (
-                '{ "index": { "_id":"' + doc["id"] + '"}}\n' + json.dumps(doc) + "\n"
+                '{ "index": { "_id":"'
+                + str(doc["id"])
+                + '"}}\n'
+                + json.dumps(doc)
+                + "\n"
             )
         conn = http.client.HTTPConnection(self.server, self.port)
-        conn.request("POST", "/" + self.index + "/_bulk/", body, self.headers)
+        index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
+        conn.request("POST", "/" + index + "/_bulk/", body, self.headers)
         response = conn.getresponse()
         return response
 
@@ -367,7 +371,7 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]["ngroups"]["value"]
 
-    # TODO: Used only for the tests... Move it there
+    # TODO: Used only for the tests... Move it there?
     def execute_query(self, query, fq=None, rows=0, start=0):
         logger = logging.getLogger("interpro.elastic")
         q = query = (
@@ -397,7 +401,7 @@ class ElasticsearchController(SearchController):
         obj = json.loads(data)
         return [o["_source"] for o in obj["hits"]["hits"]]
 
-    def _elastic_json_query(self, q, query_obj=None):
+    def _elastic_json_query(self, q, query_obj=None, is_ida=False):
         logger = logging.getLogger("interpro.elastic")
         if query_obj is None:
             query_obj = {"from": 0}
@@ -407,7 +411,8 @@ class ElasticsearchController(SearchController):
             .replace(" or ", "%20OR%20")
             .replace(" || ", "%20OR%20")
         )
-        path = "/" + self.index + "/_search?request_cache=true&q=" + q
+        index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
+        path = "/" + index + "/_search?request_cache=true&q=" + q
         logger.debug("URL:" + path)
         self.connection.request("GET", path, json.dumps(query_obj), self.headers)
         response = self.connection.getresponse()

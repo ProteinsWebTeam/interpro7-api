@@ -541,14 +541,14 @@ class EntrySerializer(ModelContentSerializer):
         # return obj
         return self.add_pagination(
             {
-                "count": obj["ngroups"]["value"],
+                "count": obj["hits"]["total"]["value"],
                 "results": [
                     {
-                        "ida": o["ida"],
-                        "ida_id": o["ida_id"],
-                        "unique_proteins": o["unique"]["value"],
+                        "ida": o["_source"]["ida"],
+                        "ida_id": o["_source"]["ida_id"],
+                        "unique_proteins": o["_source"]["proteins"],
                     }
-                    for o in obj["groups"]
+                    for o in obj["hits"]["hits"]
                 ],
             },
             obj,

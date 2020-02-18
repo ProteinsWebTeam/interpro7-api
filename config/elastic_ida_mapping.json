@@ -1,0 +1,15 @@
+{
+  "mappings": {
+    "properties": {
+      "ida_id": {
+        "type": "keyword"
+      },
+      "ida": {
+        "type": "keyword"
+      },
+      "counter": {
+        "type": "long"
+      }
+    }
+  }
+}

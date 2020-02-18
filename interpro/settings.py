@@ -55,7 +55,6 @@ import django_redis.client
 # Application definition
 
 INSTALLED_APPS = (
-    #'django.contrib.admin',
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -73,13 +72,13 @@ MIDDLEWARE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    #'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    #'django.middleware.cache.UpdateCacheMiddleware',
-    #'django.middleware.common.CommonMiddleware',
-    #'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.common.CommonMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 if INTERPRO_CONFIG.get("django_cors", False):
@@ -87,7 +86,6 @@ if INTERPRO_CONFIG.get("django_cors", False):
     MIDDLEWARE = ("corsheaders.middleware.CorsMiddleware",) + MIDDLEWARE
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = False
-
 
 ROOT_URLCONF = "interpro.urls"
 
@@ -108,7 +106,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "interpro.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -137,15 +134,13 @@ if TESTING:
         "NAME": "../database/db.sqlite3",
     }
 
-
-SEARCHER_URL = INTERPRO_CONFIG.get(
-    "searcher_path", "http://127.0.0.1:9200/interpro_sp/relationship"
-)
-SEARCHER_TEST_URL = INTERPRO_CONFIG.get(
-    "searcher_test_path", "http://127.0.0.1:9200/interpro_sp/relationship"
-)
+SEARCHER_URL = INTERPRO_CONFIG.get("searcher_path", "http://127.0.0.1:9200")
+SEARCHER_TEST_URL = INTERPRO_CONFIG.get("searcher_test_path", "http://127.0.0.1:9200")
+SEARCHER_INDEX = INTERPRO_CONFIG.get("searcher_index", "current")
+SEARCHER_IDA_INDEX = INTERPRO_CONFIG.get("searcher_ida_index", "ida")
 if INTERPRO_CONFIG.get("use_test_db", True):
     SEARCHER_URL = SEARCHER_TEST_URL
+    SEARCHER_INDEX = "test"
 TEST_RUNNER = "webfront.tests.managed_model_test_runner.UnManagedModelTestRunner"
 
 # Internationalization
@@ -166,7 +161,6 @@ USE_TZ = True
 
 STATIC_URL = INTERPRO_CONFIG.get("static_url", "/static_files/")
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "static_files"))
-
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

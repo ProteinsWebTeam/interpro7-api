@@ -289,8 +289,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
         url = self.context["request"].build_absolute_uri()
         next_page = None
         previous = None
-        if obj["after_key"] is not None:
+        if "after_key" in obj and obj["after_key"] is not None:
             next_page = replace_query_param(url, "cursor", obj["after_key"])
-        if obj["before_key"] is not None:
+        if "before_key" in obj and obj["before_key"] is not None:
             previous = replace_query_param(url, "cursor", "-" + obj["before_key"])
         return {"next": next_page, "previous": previous, **payload}

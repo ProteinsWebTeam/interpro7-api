@@ -1,8 +1,10 @@
 hmmer_path: "/tmp/hmmer-3.1b2-macosx-intel/binaries/"
 tmp_path: "/tmp/"
 django_cors: true
-searcher_path: "http://hmmer-prod-db01:9200/current/relationship"
-searcher_test_path: "http://localhost:9200/test/relationship"
+searcher_path: "http://hmmer-prod-db01:9200"
+searcher_index: "current"
+searcher_ida_index: "ida"
+searcher_test_path: "http://localhost:9200"
 api_url: "http://localhost:8007/api/"
 url_path_prefix: ""
 use_test_db: false

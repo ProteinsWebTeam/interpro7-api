@@ -12,6 +12,7 @@ from interpro.settings import SEARCHER_TEST_URL
 
 
 @override_settings(SEARCHER_URL=SEARCHER_TEST_URL)
+@override_settings(SEARCHER_INDEX="test")
 class FunctionalTest(StaticLiveServerTestCase):
     fixtures = [
         "webfront/tests/fixtures_entry.json",

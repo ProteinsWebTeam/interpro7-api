@@ -371,14 +371,33 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]["ngroups"]["value"]
 
-    # TODO: Used only for the tests... Move it there?
-    def execute_query(self, query, fq=None, rows=0, start=0):
+    def ida_query(self, query, size, cursor, is_testing_page=False):
+        obj = {"sort": [{"id": "asc"}], "size": size}
+
+        if cursor is not None:
+            if cursor[0] == "-":
+                obj["sort"][0]["id"] = "desc"
+                obj["search_after"] = [cursor[1:]]
+            else:
+                obj["search_after"] = [cursor]
+
+        response = self.execute_query(query, None, None, obj, True)
+        if not is_testing_page and len(response["hits"]["hits"]) > 0:
+            after_key = response["hits"]["hits"][-1]["_id"]
+            before_key = "-" + response["hits"]["hits"][0]["_id"]
+            test_after = self.ida_query(query, size, after_key, True)
+            if len(test_after["hits"]["hits"]) > 0:
+                response["after_key"] = after_key
+            test_before = self.ida_query(query, size, before_key, True)
+            if len(test_before["hits"]["hits"]) > 0:
+                response["before_key"] = after_key
+        return response
+
+    def execute_query(self, query, fq=None, rows=0, query_obj=None, is_ida=False):
         logger = logging.getLogger("interpro.elastic")
-        q = query = (
-            self.queryset_manager.get_searcher_query()
-            if query is None
-            else query.lower()
-        )
+        if query is None:
+            query = self.queryset_manager.get_searcher_query()
+        q = query
         if fq is not None:
             q = query + " && " + fq.lower()
         q = (
@@ -386,20 +405,15 @@ class ElasticsearchController(SearchController):
             .replace(" || ", "%20OR%20")
             .replace(" to ", "%20TO%20")
         )
-        path = (
-            "/"
-            + self.index
-            + "/_search?request_cache=true&q="
-            + q
-            + "&size="
-            + str(rows)
-        )
+        index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
+        path = "/{}/_search?request_cache=true&q={}".format(index, q)
+        if rows is not None:
+            path += "&size={}".format(rows)
         logger.debug("URL:" + path)
-        self.connection.request("GET", path, None, self.headers)
+        self.connection.request("GET", path, json.dumps(query_obj), self.headers)
         response = self.connection.getresponse()
         data = response.read().decode()
-        obj = json.loads(data)
-        return [o["_source"] for o in obj["hits"]["hits"]]
+        return json.loads(data)
 
     def _elastic_json_query(self, q, query_obj=None, is_ida=False):
         logger = logging.getLogger("interpro.elastic")

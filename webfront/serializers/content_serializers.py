@@ -186,7 +186,6 @@ class ModelContentSerializer(serializers.ModelSerializer):
         base_query=None,
     ):
         if include_chains:
-            # search = searcher.execute_query(None, fq=searcher_query, rows=20)
             search = searcher.get_group_obj_of_field_by_query(
                 None, ["structure_chain", "entry_acc"], fq=searcher_query, rows=20
             )["groups"]

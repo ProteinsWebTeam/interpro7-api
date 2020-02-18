@@ -39,7 +39,8 @@ class ActionsOnTestDocumentTest(InterproRESTTestCase):
     def setUpClass(cls):
         super(ActionsOnTestDocumentTest, cls).setUpClass()
         search = ElasticsearchController()
-        cls.all_docs = search.execute_query("*:*", rows=50)
+        obj = search.execute_query("*:*", rows=50)
+        cls.all_docs = [o["_source"] for o in obj["hits"]["hits"]]
 
     def tests_all_docs_are_loaded(self):
         self.assertNotEqual(None, self.all_docs)
@@ -120,7 +121,8 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
     def setUpClass(cls):
         super(ThreeEndpointsTableTest, cls).setUpClass()
         search = ElasticsearchController()
-        cls.all_docs = search.execute_query("*:*", rows=50)
+        obj = search.execute_query("*:*", rows=50)
+        cls.all_docs = [o["_source"] for o in obj["hits"]["hits"]]
 
     def assert_response_equal_to_expectd(
         self, url, data, payload_type, endpoints, dbs, accs

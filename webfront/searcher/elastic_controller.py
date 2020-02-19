@@ -410,7 +410,9 @@ class ElasticsearchController(SearchController):
         if rows is not None:
             path += "&size={}".format(rows)
         logger.debug("URL:" + path)
-        self.connection.request("GET", path, json.dumps(query_obj), self.headers)
+        self.connection.request(
+            "GET", path, query_obj and json.dumps(query_obj), self.headers
+        )
         response = self.connection.getresponse()
         data = response.read().decode()
         return json.loads(data)

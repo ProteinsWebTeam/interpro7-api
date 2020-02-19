@@ -389,10 +389,11 @@ def get_domain_architectures(field, general_handler):
     cursor = general_handler.pagination["cursor"]
 
     if field is None or field.strip() == "":
-        # return searcher._elastic_json_query(None, None, True)
-        return searcher.get_group_obj_copy_of_field_by_query(
-            None, "ida_id", rows=size, cursor=cursor, inner_field_to_count="protein_acc"
-        )
+        # TODO: is there a better way to get this?
+        accession = general_handler.queryset_manager.filters["entry"][
+            "accession__iexact"
+        ]
+        return ida_search(accession, general_handler)
     else:
         query = (
             general_handler.queryset_manager.get_searcher_query()

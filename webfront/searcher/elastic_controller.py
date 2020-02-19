@@ -371,20 +371,31 @@ class ElasticsearchController(SearchController):
         response = self._elastic_json_query(qs, facet)
         return response["aggregations"]["ngroups"]["value"]
 
+    def _get_cursor_from_doc(self, doc):
+        return "{}|{}".format(doc["proteins"], doc["id"])
+
+    def _get_parts_from_cursor(self, cursor):
+        return cursor.split("|")
+
     def ida_query(self, query, size, cursor, is_testing_page=False):
-        obj = {"sort": [{"id": "asc"}], "size": size}
+        obj = {"sort": [{"proteins": "desc"}, {"id": "asc"}], "size": size}
 
         if cursor is not None:
             if cursor[0] == "-":
-                obj["sort"][0]["id"] = "desc"
-                obj["search_after"] = [cursor[1:]]
+                obj["sort"][0]["proteins"] = "asc"
+                obj["sort"][1]["id"] = "desc"
+                obj["search_after"] = self._get_parts_from_cursor(cursor[1:])
             else:
-                obj["search_after"] = [cursor]
+                obj["search_after"] = self._get_parts_from_cursor(cursor)
 
         response = self.execute_query(query, None, None, obj, True)
         if not is_testing_page and len(response["hits"]["hits"]) > 0:
-            after_key = response["hits"]["hits"][-1]["_id"]
-            before_key = "-" + response["hits"]["hits"][0]["_id"]
+            after_key = self._get_cursor_from_doc(
+                response["hits"]["hits"][-1]["_source"]
+            )
+            before_key = "-" + self._get_cursor_from_doc(
+                response["hits"]["hits"][0]["_source"]
+            )
             test_after = self.ida_query(query, size, after_key, True)
             if len(test_after["hits"]["hits"]) > 0:
                 response["after_key"] = after_key

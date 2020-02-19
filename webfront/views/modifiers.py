@@ -472,9 +472,6 @@ def ida_search(value, general_handler):
             )
 
     return searcher.ida_query(query, size, cursor)
-    # return searcher.get_group_obj_copy_of_field_by_query(
-    #     query, "ida_id", rows=size, cursor=cursor, inner_field_to_count="protein_acc"
-    # )
 
 
 def get_isoforms(value, general_handler):

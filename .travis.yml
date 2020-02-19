@@ -25,6 +25,7 @@ before_script:
   - sleep 10
   - "curl 'localhost:9200'"
   - "curl -XPUT 'localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json"
+  - "curl -XPUT 'localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json"
 script:
   - coverage run --source='.' manage.py test
 after_success:

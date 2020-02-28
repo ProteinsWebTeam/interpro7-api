@@ -390,18 +390,17 @@ class ElasticsearchController(SearchController):
 
         response = self.execute_query(query, None, None, obj, True)
         if not is_testing_page and len(response["hits"]["hits"]) > 0:
-            after_key = self._get_cursor_from_doc(
-                response["hits"]["hits"][-1]["_source"]
-            )
-            before_key = "-" + self._get_cursor_from_doc(
-                response["hits"]["hits"][0]["_source"]
-            )
+            hits = response["hits"]["hits"]
+            if cursor is not None and cursor[0] == "-":
+                response["hits"]["hits"] = hits = hits[::-1]
+            after_key = self._get_cursor_from_doc(hits[-1]["_source"])
+            before_key = "-" + self._get_cursor_from_doc(hits[0]["_source"])
             test_after = self.ida_query(query, size, after_key, True)
             if len(test_after["hits"]["hits"]) > 0:
                 response["after_key"] = after_key
             test_before = self.ida_query(query, size, before_key, True)
             if len(test_before["hits"]["hits"]) > 0:
-                response["before_key"] = after_key
+                response["before_key"] = before_key
         return response
 
     def execute_query(self, query, fq=None, rows=0, query_obj=None, is_ida=False):

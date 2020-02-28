@@ -330,10 +330,14 @@ class TaxonomySerializer(ModelContentSerializer):
 
     @staticmethod
     def get_counter_for_children_filtered_by_acc(instance):
-        qs = TaxonomyPerEntry.objects.filter(
-            taxonomy__in=instance.taxonomy.children
-        ).filter(entry_acc=instance.entry_acc)
-        return {match.taxonomy.accession: match.counts for match in qs}
+        qs = TaxonomyPerEntry.objects.filter(entry_acc=instance.entry_acc)
+        counts = {}
+        for child in instance.taxonomy.children:
+            hit = qs.filter(taxonomy__accession=child)
+            if len(hit) > 0:
+                counts[child] = hit.first().counts
+        # return {match.taxonomy.accession: match.counts for match in qs}
+        return counts
 
     @staticmethod
     def get_counter_for_children_filtered_by_db(instance):

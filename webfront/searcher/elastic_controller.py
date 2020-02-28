@@ -372,18 +372,18 @@ class ElasticsearchController(SearchController):
         return response["aggregations"]["ngroups"]["value"]
 
     def _get_cursor_from_doc(self, doc):
-        return "{}|{}".format(doc["proteins"], doc["id"])
+        return "{}|{}".format(doc["counts"], doc["ida_id"])
 
     def _get_parts_from_cursor(self, cursor):
         return cursor.split("|")
 
     def ida_query(self, query, size, cursor, is_testing_page=False):
-        obj = {"sort": [{"proteins": "desc"}, {"id": "asc"}], "size": size}
+        obj = {"sort": [{"counts": "desc"}, {"ida_id": "asc"}], "size": size}
 
         if cursor is not None:
             if cursor[0] == "-":
-                obj["sort"][0]["proteins"] = "asc"
-                obj["sort"][1]["id"] = "desc"
+                obj["sort"][0]["counts"] = "asc"
+                obj["sort"][1]["ida_id"] = "desc"
                 obj["search_after"] = self._get_parts_from_cursor(cursor[1:])
             else:
                 obj["search_after"] = self._get_parts_from_cursor(cursor)

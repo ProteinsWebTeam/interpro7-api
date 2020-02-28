@@ -45,9 +45,9 @@ class FixtureReader:
                             "id": ida_id,
                             "ida_id": ida_id,
                             "ida": fixture["fields"]["ida"],
-                            "proteins": 0,
+                            "counts": 0,
                         }
-                    self.ida_to_add[ida_id]["proteins"] += 1
+                    self.ida_to_add[ida_id]["counts"] += 1
 
             elif fixture["model"] == "webfront.Structure":
                 self.structures[fixture["fields"]["accession"].lower()] = fixture[

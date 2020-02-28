@@ -7,7 +7,7 @@
       "ida": {
         "type": "keyword"
       },
-      "counter": {
+      "counts": {
         "type": "long"
       }
     }

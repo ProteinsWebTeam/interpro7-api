@@ -45,7 +45,7 @@ This configuration ensures that all the API requests are first managed in a sing
 including all the common logic:
 * Defines the available endpoints
 * For the current request
-    * Initializes the QuerysetManager.
+    * Initializes the QuerysetManager [ReadMore](./QUERYSET_README.md).
     * Initializes the SearchController.
     * Initializes the ModifierManager.
     * Splits a given URL into blocks.

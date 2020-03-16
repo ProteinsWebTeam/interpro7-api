@@ -45,9 +45,9 @@ This configuration ensures that all the API requests are first managed in a sing
 including all the common logic:
 * Defines the available endpoints
 * For the current request
-    * Initializes the QuerysetManager [ReadMore](./QUERYSET_README.md).
-    * Initializes the SearchController.
-    * Initializes the ModifierManager.
+    * Initializes the QuerysetManager [(Read More)](./QUERYSET_README.md).
+    * Initializes the SearchController [(Read More)](../searcher/README.md).
+    * Initializes the ModifierManager [(Read More)](./MODIFIER_README.md).
     * Splits a given URL into blocks.
     * If there are not blocks generates the response for the root query i.e. `/api/`.
     * Tries to get the response from the redis cache.

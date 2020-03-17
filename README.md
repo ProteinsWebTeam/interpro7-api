@@ -58,6 +58,10 @@ An optional set of dependencies, not required to run the API, but useful for dev
 
 The procedure to install this project can be seen [HERE](deploy_tools/README.md).
 
+#### Developers Documentation
+
+Some details about decisions, compromises an d techniques used throughout the project can be found [HERE](./webfront/README.md)
+
 ---
 This project followed some of the recommendations and guidelines presented in the book:
 [Test-Driven Development with Python](http://www.obeythetestinggoat.com/)

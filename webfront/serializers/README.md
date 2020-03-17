@@ -16,17 +16,17 @@ When defining the view that is going to deal with an endpoint, there are 3 class
 
 These values get overwritten by the latest View when processing the URL. So for example, if the URL is `/api/entry/interpro/protein` this is how these values get changed:
 0. `/api`: This is the root pathe so we start with the defaults:
-  * `serializer_class = None`
-  * `serializer_detail = SerializerDetail.ALL`
-  * `serializer_detail_filter = SerializerDetail.ALL`
+   * `serializer_class = None`
+   * `serializer_detail = SerializerDetail.ALL`
+   * `serializer_detail_filter = SerializerDetail.ALL`
 1. `/entry`: Main endpoint redifines the values for the main endpoint
-  * `serializer_class = EntrySerializer`
-  * `serializer_detail = SerializerDetail.ENTRY_OVERVIEW`
+   * `serializer_class = EntrySerializer`
+   * `serializer_detail = SerializerDetail.ENTRY_OVERVIEW`
 2. `/interpro`: Still part of the main endpoint so it changes the detail values:
-  * `serializer_class = EntrySerializer`
-  * `serializer_detail = SerializerDetail.ENTRY_HEADERS`
+   * `serializer_class = EntrySerializer`
+   * `serializer_detail = SerializerDetail.ENTRY_HEADERS`
 3. `/protein` It is a different endpoint so this should be use to define the filter values
-  * `serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW`
+   * `serializer_detail_filter = SerializerDetail.PROTEIN_OVERVIEW`
   
 Actually [custom.py](../views/custom.py#L231) register multiple `serializer_detail_filter` in case there are several filter endpoints in the URL.
 

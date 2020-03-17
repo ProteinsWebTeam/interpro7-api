@@ -15,7 +15,8 @@ When defining the view that is going to deal with an endpoint, there are 3 class
 * `serializer_detail_filter` (Default: `SerializerDetail.ALL`): Indicates which serializer function use, if this view is in the filter endpoints.
 
 These values get overwritten by the latest View when processing the URL. So for example, if the URL is `/api/entry/interpro/protein` this is how these values get changed:
-0. `/api`: This is the root pathe so we start with the defaults:
+
+0. `/api`: This is the root path so we start with the defaults:
    * `serializer_class = None`
    * `serializer_detail = SerializerDetail.ALL`
    * `serializer_detail_filter = SerializerDetail.ALL`

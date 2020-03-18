@@ -460,7 +460,19 @@ def ida_search(value, general_handler):
 
     conserve_order = "ordered" in general_handler.request.query_params
     entries = value.upper().split(",")
-    if conserve_order:
+    exact_match = "exact" in general_handler.request.query_params
+    if exact_match:
+        query = "/{}/".format(
+            "\-".join(
+                [
+                    f"PF[0-9]{{5}}\:{e}"
+                    if e.startswith("IPR")
+                    else f"{e}(\:IPR[0-9]{{6}})?"
+                    for e in entries
+                ]
+            )
+        )
+    elif conserve_order:
         query = "ida:*{}*".format("*".join(entries))
     else:
         query = " && ".join(["ida:*{}*".format(e) for e in entries])

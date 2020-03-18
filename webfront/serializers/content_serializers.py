@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.utils.urls import replace_query_param, remove_query_param
 
+from pagination import replace_url_host
 from webfront.exceptions import EmptyQuerysetError
 from webfront.views.custom import SerializerDetail
 import webfront.serializers
@@ -286,6 +287,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
     def add_pagination(self, payload, obj):
         url = self.context["request"].build_absolute_uri()
+        url = replace_url_host(url)
         next_page = None
         previous = None
         if "after_key" in obj and obj["after_key"] is not None:

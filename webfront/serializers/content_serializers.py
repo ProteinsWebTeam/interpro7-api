@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.utils.urls import replace_query_param, remove_query_param
 
-from pagination import replace_url_host
+from webfront.pagination import replace_url_host
 from webfront.exceptions import EmptyQuerysetError
 from webfront.views.custom import SerializerDetail
 import webfront.serializers

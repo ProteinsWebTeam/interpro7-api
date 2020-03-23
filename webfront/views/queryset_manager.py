@@ -69,7 +69,7 @@ class QuerysetManager:
     def order_by(self, field):
         self.order_field = field
 
-    def get_searcher_query(self, include_search=False):
+    def get_searcher_query(self, include_search=False, use_lineage=False):
         blocks = []
         for ep in self.filters:
             for k, v in self.filters[ep].items():
@@ -111,9 +111,10 @@ class QuerysetManager:
                     and isinstance(v, list)
                     and len(v) > 0
                 ):
+                    template = "tax_lineage:{}" if use_lineage else "tax_id:{}"
                     blocks.append(
                         "({})".format(
-                            " || ".join(["tax_id:{}".format(value) for value in v])
+                            " || ".join([template.format(value) for value in v])
                         )
                     )
                 elif (

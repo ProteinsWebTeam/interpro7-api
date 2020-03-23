@@ -20,7 +20,9 @@ class TaxonomySerializer(ModelContentSerializer):
             def counter_function():
                 get_c = TaxonomySerializer.get_counters
                 return get_c(
-                    instance, self.searcher, self.queryset_manager.get_searcher_query()
+                    instance,
+                    self.searcher,
+                    self.queryset_manager.get_searcher_query(use_lineage=True),
                 )
 
             representation = self.add_other_fields(

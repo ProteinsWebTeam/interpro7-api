@@ -91,7 +91,7 @@ class ElasticsearchController(SearchController):
         return response["aggregations"]
 
     def get_counter_object(self, endpoint, query=None, extra_counters=[]):
-        qs = self.queryset_manager.get_searcher_query()
+        qs = self.queryset_manager.get_searcher_query(use_lineage=True)
         if qs == "":
             qs = "*:*"
         if query is not None:

@@ -123,24 +123,13 @@ class QuerysetManager:
                     or k == "integrated__iexact"
                     or k == "integrated__contains"
                 ):
-                    if ep == "set":
-                        if not v:
-                            blocks.append("!_exists_:set_integrated")
-                        else:
-                            blocks.append("set_integrated:{}".format(escape(v)))
-                    else:
-                        blocks.append("entry_integrated:{}".format(escape(v)))
+                    blocks.append("entry_integrated:{}".format(escape(v)))
                 elif k == "integrated__isnull":
-                    if ep == "set":
-                        blocks.append(
-                            "{}_exists_:set_integrated".format("!" if v else "")
+                    blocks.append(
+                        "{}_exists_:entry_integrated".format(
+                            "!entry_db:interpro && !" if v else ""
                         )
-                    else:
-                        blocks.append(
-                            "{}_exists_:entry_integrated".format(
-                                "!entry_db:interpro && !" if v else ""
-                            )
-                        )
+                    )
                 elif k == "type" or k == "type__iexact" or k == "type__exact":
                     blocks.append("{}_type:{}".format(ep, escape(v)))
                 elif k == "is_fragment":

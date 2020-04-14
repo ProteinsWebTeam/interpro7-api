@@ -140,9 +140,6 @@
       },
       "set_db": {
         "type": "keyword"
-      },
-      "set_integrated": {
-        "type": "keyword"
       }
     }
   }

@@ -178,7 +178,6 @@ class SetSerializer(ModelContentSerializer):
                 "name": {"name": instance.name},
                 "source_database": instance.source_database,
                 "description": instance.description,
-                "integrated": instance.integrated,
                 "relationships": instance.relationships,
                 "counters": counters,
             }
@@ -295,8 +294,6 @@ class SetSerializer(ModelContentSerializer):
     @staticmethod
     def get_set_from_search_object(obj, include_chain=False):
         header = {"accession": obj["set_acc"], "source_database": obj["set_db"]}
-        if "set_integrated" in obj:
-            header["integrated"] = obj["set_integrated"]
         if include_chain:
             header["chain"] = obj["structure_chain_acc"]
         return header

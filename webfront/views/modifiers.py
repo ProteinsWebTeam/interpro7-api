@@ -421,10 +421,9 @@ def get_entry_annotation(field, general_handler):
 
 
 def get_set_alignment(field, general_handler):
+    acc = general_handler.queryset_manager.get_queryset().first().accession
     qs = (
-        Alignment.objects.filter(
-            set_acc__in=general_handler.queryset_manager.get_queryset()
-        )
+        Alignment.objects.filter(set_acc=acc)
         .values_list("set_acc", "entry_acc")
         .annotate(count=Count("target_acc"))
     )

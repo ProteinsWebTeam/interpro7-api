@@ -29,9 +29,6 @@ class SearchController(metaclass=abc.ABCMeta):
         elif endpoint == "proteome":
             db = "proteome_acc"
             acc = "proteome_acc"
-            # accession = accession.lower()
-        if field == "set_acc":
-            fq = "!set_integrated:* && !set_db:kegg"
         ngroups = self.get_group_obj_of_field_by_query(
             "{} && {}:* && {}:{}".format(
                 query, db, acc, escape(str(accession).lower())

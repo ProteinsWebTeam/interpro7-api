@@ -178,11 +178,7 @@ class StructureSerializer(ModelContentSerializer):
     def to_metadata_representation(instance, searcher, base_query, counters=None):
         return {
             "accession": instance.accession,
-            "name": {
-                "name": instance.name,
-                "short": instance.short_name,
-                "other": instance.other_names,
-            },
+            "name": {"name": instance.name},
             "experiment_type": instance.experiment_type,
             "release_date": instance.release_date,
             "literature": instance.literature,

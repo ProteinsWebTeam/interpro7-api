@@ -242,8 +242,6 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
         "structure": [
             "accession",
             "name",
-            "short_name",
-            "other_names",
             "experiment_type",
             "release_date",
             "literature",
@@ -260,14 +258,7 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             "children",
         ],
         "proteome": ["accession", "strain", "is_reference", "assembly"],
-        "set": [
-            "accession",
-            "name",
-            "description",
-            "source_database",
-            "integrated",
-            "relationships",
-        ],
+        "set": ["accession", "name", "description", "source_database", "relationships"],
     }
     list_url = {
         "entry": "/entry/interpro",

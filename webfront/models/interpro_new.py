@@ -67,7 +67,7 @@ class Protein(models.Model):
     )
     residues = JSONField(null=True)
     extra_features = JSONField(null=True)
-    structure = JSONField(default={})
+    structure = JSONField(default={}, null=True)
     is_fragment = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
     ida_id = models.CharField(max_length=40, null=True)
@@ -78,8 +78,6 @@ class Protein(models.Model):
 class Structure(models.Model):
     accession = models.CharField(max_length=4, primary_key=True)
     name = models.CharField(max_length=512)
-    short_name = models.CharField(max_length=20, null=True)
-    other_names = JSONField(null=True)
     experiment_type = models.CharField(max_length=16)
     release_date = models.DateTimeField()
     literature = JSONField(null=True)
@@ -138,11 +136,7 @@ class Set(models.Model):
     name = models.CharField(max_length=512)
     description = models.TextField()
     source_database = models.CharField(max_length=20, db_index=True)
-    integrated = JSONField(null=True)
-    relationships = JSONField(
-        null=True
-    )  # {nodes: [{accession:"", type: ""}], links:[source:"", target: ""]}
-    is_set = models.BooleanField(default=True)
+    relationships = JSONField(null=True)
     counts = JSONField(null=True)
 
 

@@ -367,7 +367,6 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("name", obj, msg)
         self.assertIn("source_database", obj, msg)
         if is_complete:
-            self.assertIn("integrated", obj, msg)
             self.assertIn("relationships", obj, msg)
             self.assertIn("description", obj, msg)
 
@@ -379,4 +378,3 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_set_from_searcher(self, obj, msg=""):
         self.assertIn("accession", obj, msg)
         self.assertIn("source_database", obj, msg)
-        self.assertIn("integrated", obj, msg)

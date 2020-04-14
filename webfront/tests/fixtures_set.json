@@ -6,8 +6,6 @@
       "name": "The Clan",
       "description": "An example of a pfam clan",
       "source_database": "pfam",
-      "integrated": [],
-      "is_set": true,
       "relationships": {
         "nodes": [
           {
@@ -48,8 +46,6 @@
       "name": "A Clan",
       "description": "Another example of a pfam clan",
       "source_database": "pfam",
-      "integrated": [],
-      "is_set": true,
       "relationships": {
         "nodes": [
           {

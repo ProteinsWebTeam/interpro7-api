@@ -207,6 +207,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         for entry in response:
             if (
                 hasattr(instance, "residues")
+                and instance.residues is not None
                 and entry["accession"] in instance.residues
             ):
                 entry["residues"] = instance.residues

@@ -113,8 +113,6 @@ def filter_by_db_field(subset, db_field, db):
     if db_field is not None:
         if db_field != "protein_db" or db != "uniprot":
             subset = filter_by_value(subset, db_field, db)
-        if db_field == "set_db":
-            subset = filter_by_value(subset, "set_integrated", [])
     return subset
 
 
@@ -248,8 +246,7 @@ def extend_proteome_counter(counter, data, ep, db):
 
 
 def get_set_counter(data):
-    without_nodes = filter_by_value(data, "set_integrated", [])
-    without_nodes = group_by_field_and_count(without_nodes, "set_db", "set_acc", True)
+    without_nodes = group_by_field_and_count(data, "set_db", "set_acc", True)
     without_nodes["all"] = sum(without_nodes.values())
     return without_nodes
 

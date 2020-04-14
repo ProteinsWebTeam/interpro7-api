@@ -4,7 +4,6 @@
     "fields": {
       "accession": "1jm7",
       "name": "Solution structure of the BRCA1/BARD1 RING-domain heterodimer",
-      "other_names": [],
       "experiment_type": "nmr",
       "release_date": "2009-02-24T00:00:00Z",
       "resolution": 2.5,
@@ -104,7 +103,6 @@
       "accession": "1t2V",
       "resolution": 2.9,
       "name": "Structural basis of phospho-peptide recognition by the brct domain of brca1, structure with phosphopeptide",
-      "other_names": [],
       "experiment_type": "x-ray",
       "release_date": "2011-07-13T00:00:00Z",
       "literature": {},
@@ -134,7 +132,6 @@
       "accession": "2bkm",
       "resolution": 9.2,
       "name": "Crystal structure of the truncated hemoglobin from geobacillus stearothermophilus",
-      "other_names": [],
       "experiment_type": "x-ray",
       "release_date": "2009-02-24T00:00:00Z",
       "literature": {
@@ -181,7 +178,6 @@
       "accession": "1jZ8",
       "resolution": 59.2,
       "name": "E. COLI (lacZ) BETA-GALACTOSIDASE (E537Q) IN COMPLEX WITH ALLOLACTOSE",
-      "other_names": [],
       "experiment_type": "X-ray diffraction, resolution 1.50",
       "release_date": "2009-02-24T00:00:00Z",
       "literature": {

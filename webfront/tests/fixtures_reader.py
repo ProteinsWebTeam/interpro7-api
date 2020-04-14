@@ -83,29 +83,13 @@ class FixtureReader:
             for n in self.sets[s]["relationships"]["nodes"]:
                 if n["type"] == "entry":
                     db = self.sets[s]["source_database"]
-                    integrated = self.sets[s]["integrated"]
-                    if integrated is not None:
-                        integrated = [x.lower() for x in integrated]
                     # if db == "node":
                     #     db = "kegg"
                     if n["accession"].lower() not in e2s:
                         e2s[n["accession"].lower()] = []
                     e2s[n["accession"].lower()].append(
-                        {
-                            "accession": s,
-                            "source_database": db,
-                            "integrated": integrated,
-                        }
+                        {"accession": s, "source_database": db}
                     )
-                    if self.sets[s]["integrated"] is not None:
-                        for i in self.sets[s]["integrated"]:
-                            e2s[n["accession"]].append(
-                                {
-                                    "accession": i,
-                                    "source_database": db,
-                                    "integrated": [],
-                                }
-                            )
         return e2s
 
     def get_fixtures(self):
@@ -178,7 +162,6 @@ class FixtureReader:
                             c2 = copy.copy(c)
                             c2["set_acc"] = e2s["accession"]
                             c2["set_db"] = e2s["source_database"]
-                            c2["set_integrated"] = e2s["integrated"]
                             c2["text_set"] = c2["set_acc"] + " " + c2["set_db"]
                             c2["id"] = get_id(
                                 e, p, sp["structure"], sp["chain"], e2s["accession"]
@@ -194,7 +177,6 @@ class FixtureReader:
                         c2["id"] = get_id(e, p, e2s["accession"])
                         c2["set_acc"] = e2s["accession"]
                         c2["set_db"] = e2s["source_database"]
-                        c2["set_integrated"] = e2s["integrated"]
                         c2["text_set"] = c2["set_acc"] + " " + c2["set_db"]
                         to_add.append(c2)
                 else:

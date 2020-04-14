@@ -72,6 +72,13 @@ class CustomView(GenericAPIView):
             if has_payload or general_handler.modifiers.serializer is not None:
                 self.serializer_detail = general_handler.modifiers.serializer
             if has_payload:
+                if general_handler.modifiers.payload is None:
+                    raise EmptyQuerysetError(
+                        "There is no data associated with the requested URL+modifier.\nList of endpoints: {}".format(
+                            endpoint_levels
+                        )
+                    )
+
                 self.queryset = general_handler.modifiers.payload
                 if self.serializer_detail == SerializerDetail.ANNOTATION_BLOB:
                     # assuming queryset contains a list of one annotation object

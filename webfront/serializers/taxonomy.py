@@ -194,7 +194,8 @@ class TaxonomySerializer(ModelContentSerializer):
         filter_children = lambda x: True
         if len(self.detail_filters) > 0:
             filter_children = self.isChildInQuery()
-        return [str(c) for c in instance.children if filter_children(c)]
+        children = instance.children or []
+        return [str(c) for c in children if filter_children(c)]
 
     @staticmethod
     def to_headers_representation(instance):
@@ -324,7 +325,7 @@ class TaxonomySerializer(ModelContentSerializer):
     @staticmethod
     def get_names_map(instance):
         qs = Taxonomy.objects.filter(
-            accession__in=instance.lineage.strip().split() + instance.children
+            accession__in=instance.lineage.strip().split() + (instance.children or [])
         )
         return {
             t.accession: {"name": t.scientific_name, "short": t.full_name} for t in qs
@@ -334,7 +335,8 @@ class TaxonomySerializer(ModelContentSerializer):
     def get_counter_for_children_filtered_by_acc(instance):
         qs = TaxonomyPerEntry.objects.filter(entry_acc=instance.entry_acc)
         counts = {}
-        for child in instance.taxonomy.children:
+        children = instance.taxonomy.children or []
+        for child in children:
             hit = qs.filter(taxonomy__accession=child)
             if len(hit) > 0:
                 counts[child] = hit.first().counts
@@ -344,6 +346,6 @@ class TaxonomySerializer(ModelContentSerializer):
     @staticmethod
     def get_counter_for_children_filtered_by_db(instance):
         qs = TaxonomyPerEntryDB.objects.filter(
-            taxonomy__in=instance.taxonomy.children
+            taxonomy__in=(instance.taxonomy.children or [])
         ).filter(source_database=instance.source_database)
         return {match.taxonomy.accession: match.counts for match in qs}

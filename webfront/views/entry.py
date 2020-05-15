@@ -119,10 +119,10 @@ class MemberHandler(CustomView):
                 Entry,
                 {
                     "type": "entry_type",
-                    "integrated": "integrated",
                     "source_database": "entry_db",
-                    "member_databases": "",
+                    "go_categories": "go_categories",
                     "go_terms": "go_terms",
+                    "tax_id": "tax_id",
                 },
             ),
             use_model_as_payload=True,
@@ -364,10 +364,11 @@ class InterproHandler(CustomView):
                 Entry,
                 {
                     "type": "entry_type",
-                    "integrated": "integrated",
+                    "tax_id": "tax_id",
                     "source_database": "entry_db",
                     "member_databases": "",
                     "go_categories": "go_categories",
+                    "go_terms": "text",
                 },
             ),
             use_model_as_payload=True,
@@ -508,7 +509,6 @@ class EntryHandler(CustomView):
                 Entry,
                 {
                     "type": "entry_type",
-                    "integrated": "integrated",
                     "source_database": "entry_db",
                     "tax_id": "tax_id",
                     "go_terms": "text",

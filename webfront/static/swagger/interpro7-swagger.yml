@@ -27,13 +27,28 @@ paths:
         - Entry
       parameters:
         - $ref: '#/components/parameters/entryGroupBy'
+        - $ref: '#/components/parameters/entryIntegrated'
+        - $ref: '#/components/parameters/entryType'
+        - $ref: '#/components/parameters/entryGoCategory'
+        - $ref: '#/components/parameters/entryGoTerm'
+        - $ref: '#/components/parameters/entryIdaSearch'
+        - $ref: '#/components/parameters/entryIdaIgnore'
+        - $ref: '#/components/parameters/entryIdaOrdered'
+        - $ref: '#/components/parameters/entryIdaExact'
       responses:
-        '200':    # status code
-          description: A JSON object with the number of entries per database
-          content:
-            application/json:
-              schema:
-                type: object
+        '200':
+          $ref: '#/components/responses/Aggregations'
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '410':
+          $ref: '#/components/responses/Gone'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /entry/{sourceDB}:
     get:
       summary: Returns a list of the entries in the selected DB.
@@ -43,70 +58,33 @@ paths:
         - name: sourceDB
           in: path
           required: true
-          description: Either a member database, interpro or one of the wildcards (e.g. all)
+          description: Either a member database, interpro or one of the wildcards- all, integrated, unintegrated
           schema:
             $ref: '#/components/schemas/EntryDB'
-        - name: integrated
-          in: query
-          description: Filters the entries that are integrated with the given interPro accession
-          schema:
-            type: string
-        - name: go_category
-          in: query
-          description: Filter the entries tha belong to one of the high level GO categories. Use P for Biological Process, F for Molecular Function, and C for Cellular Component.
-          schema:
-            type: string
-            enum: ["P", "F", "C"]
-
-        - name: go_term
-          in: query
-          description: Filters the entries that have been annotated with the given GO term.
-          schema:
-            type: string
-        - name: annotation
-          in: query
-          description: Filters the entries matching the given type
-          schema:
-            type: string
-        - name: interpro_status
-          in: query
-          description: |
-            counts how many entries in the selection are integrated and how many are not.
-
-            **Note:** This only works if the sourceDB selected is a member Database.
-          schema:
-            type: boolean
-          allowEmptyValue: true
-        - name: extra_fields
-          in: query
-          description: Filters the entries matching the given type
-          schema:
-            type: string
-            style: form
-            explode: false
-            enum:
-            - counters
-            - entry_id
-            - short_name
-            - description
-            - wikipedia
-            - literature
-            - hierarchy
-            - cross_references
-            - entry_date
-            - is_featured
-            - overlaps_with
-        - $ref: '#/components/parameters/entrySortBy'
         - $ref: '#/components/parameters/entryGroupBy'
+        - $ref: '#/components/parameters/entrySortBy'
+        - $ref: '#/components/parameters/entryIntegrated'
+        - $ref: '#/components/parameters/entryAnnotation'
+        - $ref: '#/components/parameters/entryType'
+        - $ref: '#/components/parameters/entryGoCategory'
+        - $ref: '#/components/parameters/entryGoTerm'
+        - $ref: '#/components/parameters/entryInterproStatus'
+        - $ref: '#/components/parameters/entryInterproLatest'
+        - $ref: '#/components/parameters/entrySignatureIn'
+        - $ref: '#/components/parameters/entryExtraFields'
       responses:
         '200':    # status code
-          description: A JSON array with the overview objects of the entries of the selected DB
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
+          $ref: '#/components/responses/List'
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '410':
+          $ref: '#/components/responses/Gone'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /entry/{sourceDB}/{accession}:
     get:
       summary: Returns and object of the selected Entry
@@ -126,13 +104,10 @@ paths:
           schema:
             type: string
           example: "IPR000001"
-        - name: ida
-          in: query
-          description:
-          schema:
-            type: string
-            enum: ["", " "]
-          required: false
+        - $ref: '#/components/parameters/entryIDA'
+        - $ref: '#/components/parameters/entryInteractions'
+        - $ref: '#/components/parameters/entryPathways'
+        - $ref: '#/components/parameters/entryAnnotationMemberDB'
       responses:
         '200':    # status code
           description: A JSON array with the overview objects of the entries of the selected DB
@@ -571,6 +546,23 @@ paths:
 
 components:
   schemas:
+    MemberDB:
+      type: string
+      enum:
+        - cathgene3d
+        - hamap
+        - panther
+        - pirsf
+        - prints
+        - prosite
+        - profile
+        - pfam
+        - prodom
+        - smart
+        - ssf
+        - tigrfams
+        - cdd
+        - sfld
     EntryDB:
       type: string
       enum:
@@ -591,8 +583,18 @@ components:
         - ssf
         - tigrfams
         - cdd
-        - mobidblt
         - sfld
+    EntryType:
+      type: string
+      enum:
+        - homologous_superfamily
+        - family
+        - domain
+        - repeat
+        - conserved_site
+        - binding_site
+        - active_site
+        - ptm
     ProteinDB:
       type: string
       enum:
@@ -606,17 +608,29 @@ components:
         description: |
           Groups the current selection of entries by the given parameter, and counts the unique entries for each group.
 
+          **Note:** The valid values for the parameter to group by changes depending of the context:
+            * `/entry`:
+            * `/entry/all`:
+            * `/entry/integrated`:
+            * `/entry/unintegrated`:
+              * `type`, `source_database`, `tax_id`, `go_terms`
+            * `/entry/interpro`:
+              * `type`, `tax_id`, `source_database`, `member_databases`, `go_terms`, `go_categories`
+            * `/entry/{sourceDB}`:
+              * `type`, `tax_id`, `source_database`, `go_terms`, `go_categories`
+
           **Note:** This parameter changes the output's format.
 
-          **Note:** This parameter might not play along with other parameters (e.g. sort_by)
+          **Note:** This parameter might not play along with other parameters.
         schema:
           type: string
           enum:
             - type
-            - integrated
             - source_database
             - tax_id
+            - member_databases
             - go_terms
+            - go_categories
     entrySortBy:
         name: sort_by
         in: query
@@ -627,6 +641,200 @@ components:
             - accession
             - integrated
             - name
+    entryIntegrated:
+        name: integrated
+        in: query
+        description: Filters the entries that are integrated with the given interPro accession
+        schema:
+          type: string
+          pattern: '^[Ii][Pp][Rr]\d{6}$'
+    entryType:
+        name: type
+        in: query
+        description: Filter entries by its entry type
+        schema:
+          $ref: '#/components/schemas/EntryType'
+    entryGoCategory:
+        name: go_category
+        in: query
+        description: Filter the entries tha belong to one of the high level GO categories. Use P for Biological Process, F for Molecular Function, and C for Cellular Component.
+        schema:
+          type: string
+          enum: ["P", "F", "C"]
+    entryGoTerm:
+        name: go_term
+        in: query
+        description: Filters the entries that have been annotated with the given GO term.
+        schema:
+          type: string
+          pattern: '^[Gg][Oo]:\d{7}$'
+    entryAnnotation:
+        name: annotation
+        in: query
+        description: Filters the entries to those which have an annotation of the given type
+        schema:
+          type: string
+          enum:
+            - logo
+            - alignment
+            - hmm
+    entryIdaSearch:
+        name: ida_search
+        in: query
+        description: |
+          Search by InterPro Domain Architecture (IDA).
+
+          Include a comma separated list of the domains accessions(InterPro or Pfam) to be included in the IDA.
+
+          **Note:**  When using this parameter, the response won't include the aggregated counts of `/entry` and parameters not related with IDA search will be ignored.
+        schema:
+          type: string
+    entryIdaIgnore:
+        name: ida_ignore
+        in: query
+        description: |
+          Ignore domains When doing a Search by InterPro Domain Architecture (IDA).
+
+          Comma separated list of PFam or interprodomains to ignore.
+
+          **Note:** This parameter only works when `ida_search` is also present.
+        schema:
+          type: string
+    entryIdaOrdered:
+        name: ordered
+        in: query
+        description: |
+          Establish that the domains to search using `ida_search` should be in order
+
+          **Note:** This parameter only works when `ida_search` is also present.
+        schema:
+          type: string
+          enum:
+            - ordered
+    entryIdaExact:
+        name: exact
+        in: query
+        description: |
+          Establish that the domains to search using `ida_search` should be exact.
+
+          Only the domains included in `ida_search` will be included and they will be  in the exact order.
+          Only the domains included in `ida_search` will be included and they will be  in the exact order.
+
+          **Note:** This parameter only works when `ida_search` and `ordered` are also present.
+        schema:
+          type: string
+          enum:
+            - exact
+    entryInterproStatus:
+        name: interpro_status
+        in: query
+        description: |
+          counts how many entries in the selection are integrated and how many are not.
+
+          **Note:** This only works if the sourceDB selected is a member Database.
+        schema:
+          type: string
+          enum:
+            - interpro_status
+    entrySignatureIn:
+        name: signature_in
+        in: query
+        description: |
+          Filters InterPro entries to those that have a match with the given memberDB
+
+          **Note:** This only works if the sourceDB selected is InterPro.
+        schema:
+          $ref: '#/components/schemas/MemberDB'
+    entryInterproLatest:
+        name: latest_entries
+        in: query
+        description: |
+          List of the latest entries registered in Interpro. Based in the Release Notes.
+
+          **Note:** This modifier doesn't operates in combination with other parameters.
+
+          **Note:** This only works if the sourceDB selected is InterPro.
+        schema:
+          type: string
+          enum:
+            - latest_entries
+    entryExtraFields:
+        name: extra_fields
+        in: query
+        description: Includes the value of the selected fields
+        schema:
+          type: string
+          style: form
+          allowReserved: true
+          explode: false
+          enum:
+          - counters
+          - entry_id
+          - short_name
+          - description
+          - wikipedia
+          - literature
+          - hierarchy
+          - cross_references
+          - entry_date
+          - is_featured
+          - overlaps_with
+    entryIDA:
+      name: ida
+      in: query
+      description: |
+        Returns a list of the domain architectures that contain this entry.
+
+        **Note:** This only works if the sourceDB selected is InterPro.
+
+        **Note:** This modifier doesn't operates in combination with other parameters.
+      schema:
+          type: string
+          enum:
+            - ida
+    entryInteractions:
+      name: interactions
+      in: query
+      description: |
+        Returns a list of interactions reported for the selected entry.
+
+        **Note:** This only works if the sourceDB selected is InterPro.
+
+        **Note:** This modifier doesn't operates in combination with other parameters.
+      schema:
+          type: string
+          enum:
+            - interactions
+    entryPathways:
+      name: pathways
+      in: query
+      description: |
+        Returns a list of pathways reported for the selected entry.
+
+        **Note:** This only works if the sourceDB selected is InterPro.
+
+        **Note:** This modifier doesn't operates in combination with other parameters.
+      schema:
+          type: string
+          enum:
+            - pathways
+    entryAnnotationMemberDB:
+      name: annotation
+      in: query
+      description: |
+        Extra annotations provided by the member database about this entry
+
+        **Note:** This only works if the sourceDB selected is a member DB.
+
+        **Note:** This modifier doesn't operates in combination with other parameters.
+      schema:
+          type: string
+          enum:
+            - logo
+            - hmm
+            - alignment
+
+
     proteinGroupBy:
         name: group_by
         in: query
@@ -675,3 +883,40 @@ components:
             - accession
             - experiment_type
             - name
+  responses:
+    Aggregations:
+      description: A JSON object with aggregating the entities in this endpoint by database
+      content:
+        application/json:
+          schema:
+            type: object
+    List:
+      description: |
+        A JSON object that includes a key `results`, which is an list of the filtered values.
+
+        This type of response can be paginated using the `cursor`, `page_size` parameters.
+      content:
+        application/json:
+          schema:
+            type: object
+    NoContent:
+      description: Empty response. The request is correct but produced an empty dataset.
+    NotFound:
+      description: Error. The request is incorrect.
+    Gone:
+      description: Error. The requested entity has been removed from InterPro.
+      content:
+        application/json:
+          schema:
+            type: object
+    ServerError:
+      description: Error. There was an issue in our servers.
+    Timeout:
+      description: |
+        Timeout. The server took too long to process this request. Please notice that:
+        * The request is moved to run in the background.
+        * If you try again this query you should expect:
+          * An almost instant 408, meaning the previous query is still running.
+          * The response of the query, if the API has finished the background process.
+
+

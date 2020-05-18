@@ -36,18 +36,7 @@ paths:
         - $ref: '#/components/parameters/entryIdaOrdered'
         - $ref: '#/components/parameters/entryIdaExact'
       responses:
-        '200':
-          $ref: '#/components/responses/Aggregations'
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '410':
-          $ref: '#/components/responses/Gone'
-        '500':
-          $ref: '#/components/responses/ServerError'
+        $ref: '#/components/responses/AggregationsAndErrors'
 
   /entry/{sourceDB}:
     get:
@@ -62,7 +51,6 @@ paths:
           schema:
             $ref: '#/components/schemas/EntryDB'
         - $ref: '#/components/parameters/entryGroupBy'
-        - $ref: '#/components/parameters/entrySortBy'
         - $ref: '#/components/parameters/entryIntegrated'
         - $ref: '#/components/parameters/entryAnnotation'
         - $ref: '#/components/parameters/entryType'
@@ -73,18 +61,7 @@ paths:
         - $ref: '#/components/parameters/entrySignatureIn'
         - $ref: '#/components/parameters/entryExtraFields'
       responses:
-        '200':    # status code
-          $ref: '#/components/responses/List'
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '410':
-          $ref: '#/components/responses/Gone'
-        '500':
-          $ref: '#/components/responses/ServerError'
+        $ref: '#/components/responses/ListAndErrors'
   /entry/{sourceDB}/{accession}:
     get:
       summary: Returns and object of the selected Entry
@@ -109,12 +86,7 @@ paths:
         - $ref: '#/components/parameters/entryPathways'
         - $ref: '#/components/parameters/entryAnnotationMemberDB'
       responses:
-        '200':    # status code
-          description: A JSON array with the overview objects of the entries of the selected DB
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/MetadataAndErrors'
 
   /protein:
     get:
@@ -123,13 +95,12 @@ paths:
         - Protein
       parameters:
         - $ref: '#/components/parameters/proteinGroupBy'
+        - $ref: '#/components/parameters/proteinTaxID'
+        - $ref: '#/components/parameters/proteinMatchPresence'
+        - $ref: '#/components/parameters/proteinIsFragment'
+#        - $ref: '#/components/parameters/proteinEvidence'
       responses:
-        '200':    # status code
-          description: A JSON object with the number of proteins per database
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/AggregationsAndErrors'
   /protein/{sourceDB}:
     get:
       summary: Returns a list of the proteins in the selected DB.
@@ -142,66 +113,14 @@ paths:
           description: The wild card 'uniprot' shows all the proteins, or it can be filtered by reviewed or unreviewed.
           schema:
             $ref: '#/components/schemas/ProteinDB'
-        - name: size
-          in: query
-          description: Filter the proteins that belong to one of the size categories - i.e. small, medium, large.
-          schema:
-            type: string
-            enum: ["small", "medium", "large"]
-        - name: id
-          in: query
-          description: Filters the proteins by its ID. e.g. CYC_HUMAN
-          schema:
-            type: string
-        - name: tax_id
-          in: query
-          description: Filters the proteins by its taxonomy ID. e.g. 9606
-          schema:
-            type: integer
-        - name: protein_evidence
-          in: query
-          description: Filters the proteins by its evidence code - 1 to 6
-          schema:
-            type: integer
-        - name: go_term
-          in: query
-          description: Filters the proteins that have been annotated with the given GO term. e.g. GO:0006122
-          schema:
-            type: string
-        - name: ida
-          in: query
-          description: Filters the proteins that follow the domain architecture of a given ida e.g. 44d74765435ca3c68b3d87ebbb680e5498d1a24a
-          schema:
-            type: string
-        - name: extra_fields
-          in: query
-          description: Include the extra fields in the  payload
-          schema:
-            type: string
-            style: form
-            explode: false
-            enum:
-            - counters
-            - identifier
-            - description
-            - sequence
-            - gene
-            - go_terms
-            - evidence_code
-            - residues
-            - fragment
-            - tax_id
+        - $ref: '#/components/parameters/proteinGOTerm'
+        - $ref: '#/components/parameters/proteinListIDA'
+        - $ref: '#/components/parameters/proteinID'
+        - $ref: '#/components/parameters/proteinTaxID'
+        - $ref: '#/components/parameters/proteinExtraFields'
         - $ref: '#/components/parameters/proteinGroupBy'
-        - $ref: '#/components/parameters/proteinSortBy'
       responses:
-        '200':    # status code
-          description: A JSON array with the overview objects of the proteins of the selected DB
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
+        $ref: '#/components/responses/ListAndErrors'
   /protein/{sourceDB}/{accession}:
     get:
       summary: Returns and object of the selected protein
@@ -221,13 +140,15 @@ paths:
           schema:
             type: string
           example: "P99999"
+        - $ref: '#/components/parameters/proteinIDA'
+        - $ref: '#/components/parameters/proteinResidues'
+        - $ref: '#/components/parameters/proteinStructureinfo'
+        - $ref: '#/components/parameters/proteinExtraFeatures'
+        - $ref: '#/components/parameters/proteinIsoforms'
+        - $ref: '#/components/parameters/proteinConservation'
+        - $ref: '#/components/parameters/proteinExtraFields'
       responses:
-        '200':    # status code
-          description: A JSON array with the overview objects of the entries of the selected DB
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/MetadataAndErrors'
 
   /structure:
     get:
@@ -285,7 +206,6 @@ paths:
             - literature
             - chains
         - $ref: '#/components/parameters/structureGroupBy'
-        - $ref: '#/components/parameters/structureSortBy'
       responses:
         '200':    # status code
           description: A JSON object with the number of entries per database
@@ -631,16 +551,6 @@ components:
             - member_databases
             - go_terms
             - go_categories
-    entrySortBy:
-        name: sort_by
-        in: query
-        description: Sorts te list by the given value
-        schema:
-          type: string
-          enum:
-            - accession
-            - integrated
-            - name
     entryIntegrated:
         name: integrated
         in: query
@@ -843,23 +753,138 @@ components:
 
           **Note:** This parameter changes the output's format.
 
-          **Note:** This parameter might not play along with other parameters (e.g. sort_by)
+          **Note:** This parameter might not play along with other parameters
         schema:
           type: string
           enum:
             - tax_id
             - source_database
             - go_terms
-            - size
-    proteinSortBy:
-        name: sort_by
+            - match_presence
+            - is_fragment
+    proteinTaxID:
+      name: tax_id
+      in: query
+      description: Filters the proteins that belong to this taxonomy id. It doesn't search in its lineage.
+      schema:
+        type: number
+    proteinEvidence:
+      name: protein_evidence
+      in: query
+      description: Filters the proteins that have an evidence code equal to the one in the parameter.
+      schema:
+        type: number
+    proteinMatchPresence:
+      name: match_presence
+      in: query
+      description: Filters the proteins that have matches with any entry
+      schema:
+        type: boolean
+    proteinIsFragment:
+      name: is_fragment
+      in: query
+      description: Filters the proteins that are fragments(`true`) or not(`false`)
+      schema:
+        type: boolean
+    proteinIDA:
+      name: ida
+      in: query
+      description: Gets the IDA of the selected protein.
+      schema:
+        type: string
+        enum:
+          - ida
+    proteinListIDA:
+      name: ida
+      in: query
+      description: |
+        Filters the proteins that follow the domain architecture of a given IDA accession e.g. 44d74765435ca3c68b3d87ebbb680e5498d1a24a
+      schema:
+        type: string
+    proteinID:
+      name: id
+      in: query
+      description: Filters the proteins by its ID. e.g. CYC_HUMAN
+      schema:
+        type: string
+    proteinGOTerm:
+      name: go_term
+      in: query
+      description: Filters the proteins that have been annotated with the given GO term. e.g. GO:0006122
+      schema:
+        type: string
+        pattern: '^[Gg][Oo]:\d{7}$'
+    proteinResidues:
+      name: residues
+      in: query
+      description: Gets a JSON with the residues of the selected protein.
+      schema:
+        type: string
+        enum:
+          - residues
+    proteinStructureinfo:
+      name: structureinfo
+      in: query
+      description: Gets a JSON with the structure information (e.g. Predicted domains) of the selected protein.
+      schema:
+        type: string
+        enum:
+          - structureinfo
+    proteinExtraFeatures:
+      name: extra_features
+      in: query
+      description: Gets a JSON containing additional features(e.g. mobidb, coil, etc.) of the selected protein.
+      schema:
+        type: string
+        enum:
+          - extra_features
+    proteinIsoforms:
+      name: isoforms
+      in: query
+      description: Gets a JSON containing the information of existing isoforms.
+      schema:
+        type: string
+        enum:
+          - isoforms
+    proteinConservation:
+      name: conservation
+      in: query
+      description: Calculates the conservation per residue of the current protein.
+      schema:
+        type: string
+        enum:
+          - conservation
+
+    proteinExtraFields:
+        name: extra_fields
         in: query
-        description: Sorts te list by the given value
+        description: Includes the value of the selected fields
         schema:
           type: string
+          style: form
+          allowReserved: true
+          explode: false
           enum:
-            - accession
-            - length
+          - counters
+          - identifier
+          - description
+          - sequence
+          - gene
+          - go_terms
+          - evidence_code
+          - residues
+          - tax_id
+          - accession
+          - organism
+          - name
+          - length
+          - proteome
+          - source_database
+          - extra_features
+          - structure
+          - is_fragment
+          - ida_id
+          - ida
     structureGroupBy:
         name: group_by
         in: query
@@ -868,21 +893,11 @@ components:
 
           **Note:** This parameter changes the output's format.
 
-          **Note:** This parameter might not play along with other parameters (e.g. sort_by)
+          **Note:** This parameter might not play along with other parameters
         schema:
           type: string
           enum:
             - experiment_type
-    structureSortBy:
-        name: sort_by
-        in: query
-        description: Sorts te list by the given value
-        schema:
-          type: string
-          enum:
-            - accession
-            - experiment_type
-            - name
   responses:
     Aggregations:
       description: A JSON object with aggregating the entities in this endpoint by database
@@ -899,6 +914,52 @@ components:
         application/json:
           schema:
             type: object
+    Metadata:
+      description: A JSON object that includes a key `metadata`, which is an object with the data related to the selected entity.
+      content:
+        application/json:
+          schema:
+            type: object
+    ListAndErrors:
+      '200':
+        $ref: '#/components/responses/Metadata'
+      '204':
+        $ref: '#/components/responses/NoContent'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '408':
+        $ref: '#/components/responses/Timeout'
+      '410':
+        $ref: '#/components/responses/Gone'
+      '500':
+        $ref: '#/components/responses/ServerError'
+    AggregationsAndErrors:
+      '200':
+        $ref: '#/components/responses/Metadata'
+      '204':
+        $ref: '#/components/responses/NoContent'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '408':
+        $ref: '#/components/responses/Timeout'
+      '410':
+        $ref: '#/components/responses/Gone'
+      '500':
+        $ref: '#/components/responses/ServerError'
+    MetadataAndErrors:
+      '200':
+        $ref: '#/components/responses/Metadata'
+      '204':
+        $ref: '#/components/responses/NoContent'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '408':
+        $ref: '#/components/responses/Timeout'
+      '410':
+        $ref: '#/components/responses/Gone'
+      '500':
+        $ref: '#/components/responses/ServerError'
+
     NoContent:
       description: Empty response. The request is correct but produced an empty dataset.
     NotFound:

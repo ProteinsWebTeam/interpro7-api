@@ -210,12 +210,7 @@ paths:
       tags:
         - Taxonomy
       responses:
-        '200':    # status code
-          description: A JSON object with the number of taxa per database
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/AggregationsAndErrors'
   /taxonomy/{sourceDB}:
     get:
       summary: Returns a list of the taxa in the selected DB.
@@ -229,28 +224,10 @@ paths:
           schema:
             type: string
             enum: ["uniprot"]
-        - name: extra_fields
-          in: query
-          description: Include the extra fields in the  payload
-          schema:
-            type: string
-            style: form
-            explode: false
-            enum:
-            - counters
-            - scientific_name
-            - full_name
-            - lineage
-            - rank
+        - $ref: '#/components/parameters/taxonomyKeySpecies'
+        - $ref: '#/components/parameters/taxonomyExtraFields'
       responses:
-        '200':    # status code
-          description: A JSON list with the basic dtails of the taxa corresponding to th current selection.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
+        $ref: '#/components/responses/ListAndErrors'
   /taxonomy/{sourceDB}/{accession}:
     get:
       summary: Returns an object with the details of the selected Taxon
@@ -271,26 +248,22 @@ paths:
           schema:
             type: integer
           example: 9606
+        - $ref: '#/components/parameters/taxonomyWithNames'
+        - $ref: '#/components/parameters/taxonomyFilterByEntry'
+        - $ref: '#/components/parameters/taxonomyFilterByEntryDB'
       responses:
-        '200':    # status code
-          description: An object with the details of the selected taxon.
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/MetadataAndErrors'
 
   /proteome:
     get:
       summary: Returns the overview counters of the Proteome in the database.
       tags:
         - Proteome
+#      parameters: Removed as all proteomes included in InterPro are reference.
+#        - $ref: '#/components/parameters/proteomeGroupBy'
+#        - $ref: '#/components/parameters/proteomeIsReference'
       responses:
-        '200':    # status code
-          description: A JSON object with the number of Proteomes per database
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/AggregationsAndErrors'
   /proteome/{sourceDB}:
     get:
       summary: Returns a list of the Proteomes in the selected DB.
@@ -304,26 +277,9 @@ paths:
           schema:
             type: string
             enum: ["uniprot"]
-        - name: extra_fields
-          in: query
-          description: Include the extra fields in the  payload
-          schema:
-            type: string
-            style: form
-            explode: false
-            enum:
-            - counters
-            - strain
-            - assembly
+        - $ref: '#/components/parameters/proteomeExtraFields'
       responses:
-        '200':    # status code
-          description: A JSON list with the basic dtails of the Proteome corresponding to th current selection.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
+        $ref: '#/components/responses/ListAndErrors'
   /proteome/{sourceDB}/{accession}:
     get:
       summary: Returns an object with the details of the selected Proteome
@@ -345,12 +301,7 @@ paths:
             type: string
           example: "up000000211"
       responses:
-        '200':    # status code
-          description: An object with the details of the selected Proteome.
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/MetadataAndErrors'
 
   /set:
     get:
@@ -358,12 +309,7 @@ paths:
       tags:
         - Sets
       responses:
-        '200':    # status code
-          description: A JSON object with the number of sets per database
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/AggregationsAndErrors'
   /set/{sourceDB}:
     get:
       summary: Returns a list of the sets in the selected DB.
@@ -377,26 +323,9 @@ paths:
           schema:
             type: string
             enum: ["all", "cdd", "pfam"]
-        - name: extra_fields
-          in: query
-          description: Include the extra fields in the  payload
-          schema:
-            type: string
-            style: form
-            explode: false
-            enum:
-            - counters
-            - description
-            - relationships
+        - $ref: '#/components/parameters/setExtraFields'
       responses:
-        '200':    # status code
-          description: A JSON list with the basic dtails of the set corresponding to the current selection.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
+        $ref: '#/components/responses/ListAndErrors'
   /set/{sourceDB}/{accession}:
     get:
       summary: Returns an object with the details of the selected set.
@@ -417,13 +346,9 @@ paths:
           schema:
             type: string
           example: "cl0001"
+        - $ref: '#/components/parameters/setAlignments'
       responses:
-        '200':    # status code
-          description: An object with the details of the selected Set.
-          content:
-            application/json:
-              schema:
-                type: object
+        $ref: '#/components/responses/MetadataAndErrors'
 
 components:
   schemas:
@@ -834,12 +759,7 @@ components:
           - evidence_code
           - residues
           - tax_id
-          - accession
-          - organism
-          - name
-          - length
           - proteome
-          - source_database
           - extra_features
           - structure
           - is_fragment
@@ -889,17 +809,136 @@ components:
         style: form
         explode: false
         enum:
-          - accession
-          - name
-          - experiment_type
           - release_date
           - literature
           - chains
-          - source_database
-          - resolution
-          - counts
           - secondary_structures
           - counters
+
+    taxonomyExtraFields:
+      name: extra_fields
+      in: query
+      description: Include the extra fields in the payload
+      schema:
+        type: string
+        style: form
+        explode: false
+        enum:
+          - counters
+          - scientific_name
+          - full_name
+          - lineage
+          - rank
+    taxonomyKeySpecies:
+      name: key_species
+      in: query
+      description: |
+        Filter tha only includes the selected key species:
+        * `39947`: 'Oryza sativa subsp. japonica'
+        * `3702`: 'Arabidopsis thaliana'
+        * `9606`: 'Homo sapiens'
+        * `7955`: 'Danio rerio'
+        * `10090`: 'Mus musculus'
+        * `7227`: 'Drosophila melanogaster'
+        * `6239`: 'Caenorhabditis elegans'
+        * `559292`: 'Saccharomyces cerevisiae'
+        * `284812`: 'Schizosaccharomyces pombe'
+        * `83333`: 'Escherichia coli'
+        * `10665`: 'Escherichia virus T4'
+        * `2242`: 'Halobacterium salinarum'
+      schema:
+        type: string
+        enum:
+          - key_species
+    taxonomyWithNames:
+      name: with_names
+      in: query
+      description: |
+        Includes an object to the payload where the key is a `tax_id` and the value is its name.
+
+        The names object includes all the taxa mentioned in the payload (i.e. lineage, children and parent).
+      schema:
+        type: string
+        enum:
+          - with_names
+    taxonomyFilterByEntry:
+      name: filter_by_entry
+      in: query
+      description: |
+        A quick access method to get the counters of the selected taxon filtered by the ones which have a match with the given entry.
+
+        e.g. You can find out how many human proteins have a match with IPR000001: `/api/taxonomy/uniprot/9606?filter_by_entry=IPR000001`
+
+        **Note:** The payload already includes the names. It will error if use together with `with_names` or `filter_by_entry_db`
+      schema:
+        type: string
+    taxonomyFilterByEntryDB:
+      name: filter_by_entry_db
+      in: query
+      description: |
+        A quick access method to get the counters of the selected taxon filtered by the ones which have a match with the given database.
+
+        e.g. You can find out how many human proteins have a match with a pfam entry  `/api/taxonomy/uniprot/9606?filter_by_entry_db=pfam`
+
+        **Note:** The payload already includes the names. It will error if use together with `with_names` or `filter_by_entry`
+      schema:
+        type: string
+
+    proteomeGroupBy:
+      name: group_by
+      in: query
+      description: |
+        Groups the current selection of proteomes by the given parameter, and counts the unique proteins for each group.
+
+        **Note:** This parameter changes the output's format.
+
+        **Note:** This parameter might not play along with other parameters
+      schema:
+        type: string
+        enum:
+          - proteome_is_reference
+    proteomeIsReference:
+      name: is_reference
+      in: query
+      description: Filters the list of proteomes by those which are tagged as a reference proteome.
+      schema:
+        type: string
+        enum:
+          - is_reference
+    proteomeExtraFields:
+      name: extra_fields
+      in: query
+      description: Include the extra fields in the  payload
+      schema:
+        type: string
+        style: form
+        explode: false
+        enum:
+          - counters
+          - strain
+          - assembly
+
+    setExtraFields:
+      name: extra_fields
+      in: query
+      description: Include the extra fields in the  payload
+      schema:
+        type: string
+        style: form
+        explode: false
+        enum:
+          - counters
+          - description
+          - relationships
+    setAlignments:
+      name: alignments
+      in: query
+      description: |
+        Gets a JSON containing the information of the alignments for the current set, for a particular entry (e.g. cd00113)
+
+        If not entry is given it will recover all the alignments. E.g. https://www.ebi.ac.uk/interpro/api/set/cdd/cl00011?alignments
+      schema:
+        type: string
 
   responses:
     Aggregations:

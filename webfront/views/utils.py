@@ -3,6 +3,9 @@ from webfront.models.interpro_new import Release_Note, Protein
 from webfront.response import Response
 from rest_framework import status
 
+from django.conf import settings
+from django.http import HttpResponse
+
 from webfront.views.custom import CustomView
 from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
@@ -270,6 +273,13 @@ class ReleaseEndpointHandler(CustomView):
         )
 
 
+class OpenAPiHandler(CustomView):
+    def get(self, request, *args):
+        short_report = open(settings.STATIC_ROOT + "/interpro7-swagger.yml", "r")
+        response = HttpResponse(short_report, content_type="application/x-yaml")
+        return response
+
+
 class UtilsHandler(CustomView):
     level_description = "Utils level"
     from_model = False
@@ -277,6 +287,7 @@ class UtilsHandler(CustomView):
         ("accession", AccessionEndpointHandler),
         ("release", ReleaseEndpointHandler),
         ("test", TestEndpointHandler),
+        ("openapi", OpenAPiHandler),
     ]
     many = False
     serializer_class = ModelContentSerializer

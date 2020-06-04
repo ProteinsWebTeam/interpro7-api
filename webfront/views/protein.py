@@ -1,6 +1,5 @@
 from django.db.models import Count
 from django.shortcuts import redirect
-import re
 
 from webfront.serializers.uniprot import ProteinSerializer
 from webfront.views.custom import CustomView, SerializerDetail
@@ -18,7 +17,6 @@ from webfront.views.modifiers import (
     calculate_residue_conservation,
 )
 from webfront.models import Protein
-from webfront.exceptions import EmptyQuerysetError
 from django.conf import settings
 
 entry_db_members = "|".join(settings.DB_MEMBERS)
@@ -172,6 +170,13 @@ class UniprotHandler(CustomView):
             many=True,
         )
         general_handler.modifiers.register(
+            "id", filter_by_field("protein", "identifier")
+        )
+        general_handler.modifiers.register(
+            "go_term",
+            filter_by_contains_field("protein", "go_terms", '"identifier": "{}"'),
+        )
+        general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Protein, "counters")
         )
         return super(UniprotHandler, self).get(
@@ -246,7 +251,6 @@ class ProteinHandler(CustomView):
                 Protein,
                 {
                     "tax_id": "tax_id",
-                    "protein_evidence": None,
                     "source_database": "protein_db",
                     "go_terms": "text",
                     "match_presence": "match_presence",
@@ -256,29 +260,15 @@ class ProteinHandler(CustomView):
             use_model_as_payload=True,
             serializer=SerializerDetail.GROUP_BY,
         )
-        general_handler.modifiers.register(
-            "ida",
-            get_domain_architectures,
-            use_model_as_payload=True,
-            serializer=SerializerDetail.PROTEIN_OVERVIEW,
-        )
 
         general_handler.modifiers.register(
             "sort_by", sort_by({"accession": "protein_acc", "length": "length"})
-        )
-        general_handler.modifiers.register("size", filter_by_field("protein", "size"))
-        general_handler.modifiers.register(
-            "id", filter_by_field("protein", "identifier")
         )
         general_handler.modifiers.register(
             "tax_id", filter_by_field("protein", "tax_id")
         )
         general_handler.modifiers.register(
             "protein_evidence", filter_by_field("protein", "evidence_code")
-        )
-        general_handler.modifiers.register(
-            "go_term",
-            filter_by_contains_field("protein", "go_terms", '"identifier": "{}"'),
         )
         general_handler.modifiers.register("match_presence", filter_by_match_presence)
         general_handler.modifiers.register(

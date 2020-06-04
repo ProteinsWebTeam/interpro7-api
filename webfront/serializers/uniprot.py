@@ -181,7 +181,7 @@ class ProteinSerializer(ModelContentSerializer):
             "proteome": instance.proteome,
             "gene": instance.gene,
             "go_terms": instance.go_terms,
-            "protein_evidence": 4,  # TODO
+            "protein_evidence": instance.evidence_code,
             "source_database": instance.source_database,
             "is_fragment": instance.is_fragment,
             "ida_accession": instance.ida_id,

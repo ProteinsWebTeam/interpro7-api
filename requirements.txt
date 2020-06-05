@@ -1,4 +1,4 @@
-Django==3.0.3
+Django==3.0.7
 djangorestframework==3.11.0
 PyYAML==5.3
 jsonfield2==3.1.0

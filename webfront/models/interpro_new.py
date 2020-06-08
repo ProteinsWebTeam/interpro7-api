@@ -50,7 +50,7 @@ class EntryAnnotation(models.Model):
     type = models.CharField(max_length=32)
     value = models.BinaryField()
     mime_type = models.CharField(max_length=32)
-    num_sequnces = models.FloatField(null=True)
+    num_sequences = models.FloatField(null=True)
 
 
 class Protein(models.Model):

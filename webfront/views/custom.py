@@ -86,7 +86,10 @@ class CustomView(GenericAPIView):
                         annotation = self.queryset[0]
                         mime_type = annotation.mime_type
                         value = annotation.value
-                        return HttpResponse(value, content_type=mime_type)
+                        response = HttpResponse(value, content_type=mime_type)
+                        if annotation.type.startswith("alignment:"):
+                            response["Content-Encoding"] = "gzip"
+                        return response
                 general_handler.filter_serializers = []
                 self.many = general_handler.modifiers.many
                 self.search_size = general_handler.modifiers.search_size

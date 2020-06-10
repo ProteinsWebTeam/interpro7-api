@@ -12,6 +12,7 @@ from webfront.views.modifiers import (
     filter_by_contains_field,
     get_domain_architectures,
     get_entry_annotation,
+    get_entry_annotation_info,
     add_extra_fields,
     ida_search,
     filter_by_latest_entries,
@@ -53,6 +54,9 @@ class MemberAccessionHandler(CustomView):
             get_entry_annotation,
             use_model_as_payload=True,
             serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+        general_handler.modifiers.register(
+            "annotation:info", get_entry_annotation_info, use_model_as_payload=True
         )
         return super(MemberAccessionHandler, self).get(
             request._request,

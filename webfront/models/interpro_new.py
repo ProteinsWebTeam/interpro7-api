@@ -44,10 +44,13 @@ class Entry(models.Model):
 
 class EntryAnnotation(models.Model):
     annotation_id = models.CharField(max_length=40, primary_key=True)
-    accession = models.ForeignKey(Entry, on_delete=models.SET_NULL, null=True)
+    accession = models.ForeignKey(
+        Entry, db_column="accession", on_delete=models.SET_NULL, null=True
+    )
     type = models.CharField(max_length=32)
     value = models.BinaryField()
     mime_type = models.CharField(max_length=32)
+    num_sequences = models.FloatField(null=True)
 
 
 class Protein(models.Model):

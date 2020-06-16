@@ -420,6 +420,22 @@ def get_entry_annotation(field, general_handler):
     return annotation
 
 
+def get_entry_annotation_info(field, general_handler):
+    queryset = general_handler.queryset_manager.get_queryset()
+    for entry in queryset:
+        data = entry.entryannotation_set.filter(type=field).values(
+            "accession", "type", "mime_type", "num_sequences"
+        )
+        annotation = data[0]
+        return {
+            "accession": annotation["accession"],
+            "type": annotation["type"],
+            "mime_type": annotation["mime_type"],
+            "num_sequences": annotation["num_sequences"],
+        }
+    return {}
+
+
 def get_set_alignment(field, general_handler):
     acc = general_handler.queryset_manager.get_queryset().first().accession
     qs = (

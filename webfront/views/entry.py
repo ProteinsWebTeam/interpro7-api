@@ -12,6 +12,7 @@ from webfront.views.modifiers import (
     filter_by_contains_field,
     get_domain_architectures,
     get_entry_annotation,
+    get_entry_annotation_info,
     add_extra_fields,
     ida_search,
     filter_by_latest_entries,
@@ -53,6 +54,9 @@ class MemberAccessionHandler(CustomView):
             get_entry_annotation,
             use_model_as_payload=True,
             serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+        general_handler.modifiers.register(
+            "annotation:info", get_entry_annotation_info, use_model_as_payload=True
         )
         return super(MemberAccessionHandler, self).get(
             request._request,
@@ -119,10 +123,10 @@ class MemberHandler(CustomView):
                 Entry,
                 {
                     "type": "entry_type",
-                    "integrated": "integrated",
                     "source_database": "entry_db",
-                    "member_databases": "",
+                    "go_categories": "go_categories",
                     "go_terms": "go_terms",
+                    "tax_id": "tax_id",
                 },
             ),
             use_model_as_payload=True,
@@ -364,10 +368,11 @@ class InterproHandler(CustomView):
                 Entry,
                 {
                     "type": "entry_type",
-                    "integrated": "integrated",
+                    "tax_id": "tax_id",
                     "source_database": "entry_db",
                     "member_databases": "",
                     "go_categories": "go_categories",
+                    "go_terms": "text",
                 },
             ),
             use_model_as_payload=True,
@@ -508,7 +513,6 @@ class EntryHandler(CustomView):
                 Entry,
                 {
                     "type": "entry_type",
-                    "integrated": "integrated",
                     "source_database": "entry_db",
                     "tax_id": "tax_id",
                     "go_terms": "text",

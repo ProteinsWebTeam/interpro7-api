@@ -183,6 +183,33 @@ class EntrySetTest(InterproRESTTestCase):
             for s in response.data["sets"]:
                 self._check_set_from_searcher(s)
 
+    def test_can_get_the_authors_and_literature(self):
+        url = "/api/set/pfam/CL0001"
+        response = self.client.get(url)
+        self.assertEqual(
+            response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+        )
+        metadata = response.data["metadata"]
+        self._check_set_details(metadata)
+        self.assertIn("authors", metadata)
+        self.assertEqual(2, len(metadata["authors"]))
+        self.assertEqual(str, type(metadata["authors"][0]))
+        self.assertEqual(2, len(metadata["literature"]))
+        self.assertEqual(dict, type(metadata["literature"][0]))
+        self.assertIn("PMID", metadata["literature"][0])
+
+    def test_can_authors_and_literature_be_null(self):
+        url = "/api/set/pfam/CL0002"
+        response = self.client.get(url)
+        self.assertEqual(
+            response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+        )
+        metadata = response.data["metadata"]
+        self._check_set_details(metadata)
+        self.assertIn("authors", metadata)
+        self.assertEqual(None, metadata["authors"])
+        self.assertEqual(None, metadata["literature"])
+
 
 class ProteinSetTest(InterproRESTTestCase):
     def test_can_get_the_set_count(self):

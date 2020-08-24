@@ -334,6 +334,29 @@
         "proteomes": 1,
         "sets": 2,
         "domain_architectures": 0
+      },
+      "details": {
+        "curation": {
+          "sequence_ontology": "SO:0100021",
+          "authors": [
+            {
+              "author": "Sonnhammer ELL",
+              "orcid": "0000-0002-9015-5588"
+            }
+          ]
+        },
+        "hmm": {
+          "commands": {
+            "build": "hmmbuild  -o /dev/null --hand HMM SEED",
+            "search": "hmmsearch -Z 47079205 -E 1000 --cpu 4 HMM pfamseq"
+          },
+          "cutoffs": {
+            "gathering": {
+              "sequence": 30.5,
+              "domain": 30.5
+            }
+          }
+        }
       }
     }
   },

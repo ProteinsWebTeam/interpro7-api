@@ -40,6 +40,7 @@ class Entry(models.Model):
     interactions = JSONField(null=True)
     pathways = JSONField(null=True)
     history = JSONField(null=True)
+    details = JSONField(null=True)
 
 
 class EntryAnnotation(models.Model):
@@ -141,6 +142,8 @@ class Set(models.Model):
     source_database = models.CharField(max_length=20, db_index=True)
     relationships = JSONField(null=True)
     counts = JSONField(null=True)
+    authors = JSONField(null=True)
+    literature = JSONField(null=True)
 
 
 class Release_Note(models.Model):

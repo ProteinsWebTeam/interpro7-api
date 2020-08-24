@@ -180,6 +180,8 @@ class SetSerializer(ModelContentSerializer):
                 "description": instance.description,
                 "relationships": instance.relationships,
                 "counters": counters,
+                "authors": instance.authors,
+                "literature": instance.literature,
             }
         }
         return obj

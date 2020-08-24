@@ -4,7 +4,7 @@
     "fields": {
       "accession": "CL0001",
       "name": "The Clan",
-      "description": "An example of a pfam clan",
+      "description": "An example of a pfam clan.",
       "source_database": "pfam",
       "relationships": {
         "nodes": [
@@ -36,7 +36,32 @@
         "proteins": 2,
         "taxa": 2,
         "proteomes": 2
-      }
+      },
+      "authors": [
+        "Finn RD",
+        "Bateman A"
+      ],
+      "literature": [
+        {
+          "PMID": 3282918,
+          "title": "Structure and function of epidermal growth factor-like regions in proteins.",
+          "authors": [
+            "Appella E",
+            "Weber IT",
+            "Blasi F"
+          ],
+          "journal": "FEBS Lett 1988;231:1-4."
+        },
+        {
+          "PMID": 11852228,
+          "title": "Domain structure and organisation in extracellular matrix proteins.",
+          "authors": [
+            "Hohenester E",
+            "Engel J"
+          ],
+          "journal": "Matrix Biol 2002;21:115-128."
+        }
+      ]
     }
   },
   {

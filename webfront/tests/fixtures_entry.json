@@ -77,7 +77,7 @@
       "description": [
         "The piwi domain [PUB00020128] is a protein domain found in piwi proteins and a large number of related nucleic acid-binding proteins, especially those that bind and cleave RNA. The function of the domain is double stranded-RNA-guided hydrolysis of single stranded-RNA, as has been determined in the argonaute family of related proteins [PUB00018283]."
       ],
-      "wikipedia": "",
+      "wikipedia": {},
       "literature": {
         "PUB00020128": {
           "PMID": 15284453,
@@ -206,7 +206,7 @@
       "description": [
         "The qiwi domain "
       ],
-      "wikipedia": "",
+      "wikipedia": {},
       "literature": {},
       "cross_references": {},
       "counts": {
@@ -277,7 +277,7 @@
       "description": [
         "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."
       ],
-      "wikipedia": "Piwi",
+      "wikipedia": {"title": "Piwi"},
       "literature": {
         "PUB00020128": {
           "PMID": 15284453,
@@ -387,7 +387,7 @@
       "description": [
         "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [PUB00020128]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."
       ],
-      "wikipedia": "Piwi",
+      "wikipedia": {"title": "Piwi"},
       "literature": {},
       "cross_references": {},
       "counts": {
@@ -418,7 +418,7 @@
       "description": [
         "The Piwi box (or Sting domain) is an about 40 to 80 amino-acid conserved region, which was first identified in the C-terminal part of Drosophila Piwi and Sting proteins, and of related proteins from human, Caenorhabditis elegans, Arabidopsis thaliana, fission yeast and Dictyostelium discoideum."
       ],
-      "wikipedia": "Piwi",
+      "wikipedia": {"title": "Piwi"},
       "literature": {},
       "cross_references": {},
       "counts": {
@@ -447,7 +447,7 @@
       "name": "Zinc-binding domain",
       "short_name": "zf-3CxxC_2",
       "description": [],
-      "wikipedia": "",
+      "wikipedia": {},
       "literature": {},
       "cross_references": {},
       "counts": {
@@ -476,7 +476,7 @@
       "name": "tRNA-binding domain",
       "short_name": "tRNA_bind_3",
       "description": [],
-      "wikipedia": "",
+      "wikipedia": {},
       "literature": {},
       "cross_references": {},
       "counts": {

@@ -4,7 +4,7 @@
     "fields": {
       "accession": "CL0001",
       "name": "The Clan",
-      "description": "An example of a pfam clan.",
+      "description": "An example of a pfam clan. And it has a reference [2].",
       "source_database": "pfam",
       "relationships": {
         "nodes": [

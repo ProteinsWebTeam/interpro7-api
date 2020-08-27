@@ -57,7 +57,7 @@ class RESTRequestsTest(FunctionalTest):
 
     def test_request_protein_endpoint(self):
         self.browser.get(self.server_url + "/api/protein/?format=json")
-        time.sleep(10)
+        time.sleep(3)
         content = self.browser.find_element_by_tag_name("body").text
 
         jsonp = json.loads(content)

@@ -1,0 +1,21 @@
+
+div.region {
+    text-align: right;
+}
+div.region form div.btn-group a{
+    min-width: 10rem;
+}
+
+div.open ul.dropdown-menu {
+    display: block;
+}
+ul.dropdown-menu li {
+    text-align: right;
+    padding-right: 1em;
+}
+ul.dropdown-menu li:hover {
+    background-color: rgb(20,160,206);
+}
+ul.dropdown-menu li a.format-option{
+    color: rgb(231, 231, 231);;
+}

@@ -50,6 +50,7 @@ class CustomView(GenericAPIView):
     serializer_detail_filter = SerializerDetail.ALL
     after_key = None
     before_key = None
+    http_method_names = ['get', 'head']
 
     def get(
         self,

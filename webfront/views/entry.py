@@ -58,6 +58,13 @@ class MemberAccessionHandler(CustomView):
         general_handler.modifiers.register(
             "annotation:info", get_entry_annotation_info, use_model_as_payload=True
         )
+        general_handler.modifiers.register(
+            "ida",
+            get_domain_architectures,
+            use_model_as_payload=True,
+            serializer=SerializerDetail.IDA_LIST,
+        )
+
         return super(MemberAccessionHandler, self).get(
             request._request,
             endpoint_levels,

@@ -4,6 +4,7 @@ __pycache__
 unifam/mysql.conf
 *.pyc
 .DS_Store
+.vscode
 unifam/settings-private.py
 .coverage
 config/~oracle.yml

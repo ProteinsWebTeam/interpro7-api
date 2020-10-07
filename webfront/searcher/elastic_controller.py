@@ -1,7 +1,9 @@
 import http.client
 import json
 import urllib.parse
+import re
 
+from webfront.views.queryset_manager import escape
 from webfront.searcher.search_controller import SearchController
 
 from django.conf import settings
@@ -353,11 +355,12 @@ class ElasticsearchController(SearchController):
         return [ch["_source"] for ch in response["hits"]["hits"]]
 
     def get_document_by_any_accession(self, accession):
+        acc = escape(accession)
         q = "entry_acc:{} or protein_acc:{} or structure_acc:{} or proteome_acc:{} or set_acc:{}".format(
-            accession, accession, accession, accession, accession
+            acc, acc, acc, acc, acc
         )
-        if accession.isnumeric():
-            q += " or tax_id:{}".format(accession)
+        if acc.isnumeric():
+            q += " or tax_id:{}".format(acc)
         return self._elastic_json_query(q, {"size": 1})
 
     def count_unique(self, query, field_to_count):

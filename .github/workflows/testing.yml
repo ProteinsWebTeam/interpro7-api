@@ -39,8 +39,7 @@ jobs:
         export BROWSER_TEST=chrome
         coverage run --source='.' manage.py test
     - name: 🧥‍ - Coveralls
-      uses: AndreMiras/coveralls-python-action@develop
-      continue-on-error: true
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        export COVERALLS_REPO_TOKEN=0NCZQkRT7k27xoKabeCH3UzAEUIDk5BAw
+        coveralls
 

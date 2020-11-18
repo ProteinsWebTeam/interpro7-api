@@ -1,0 +1,22 @@
+name: Unit and Funtional Testing
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: 🐍 Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.6'
+    - name: 🔧 Install Dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r dev_requirements.txt
+        pip install tblib
+        pip freeze
+

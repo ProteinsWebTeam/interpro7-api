@@ -34,12 +34,12 @@ jobs:
         pip install -r dev_requirements.txt
         pip install tblib
         pip freeze
-    - name: 🧪 - Functional Tests
+    - name: 🧪 - Testing
       run: |
         export BROWSER_TEST=chrome
-        python manage.py test functional_tests
-    - name: 🧪 - Unit Tests and coverage
-      run: |
-        coverage run --source='.' manage.py test webfront.tests
-        coveralls
+        coverage run --source='.' manage.py test
+    - name: 🧥‍ - Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 

@@ -34,8 +34,12 @@ jobs:
         pip install -r dev_requirements.txt
         pip install tblib
         pip freeze
-    - name: 🧪 - Test and coverage
+    - name: 🧪 - Functional Tests
       run: |
-        coverage run --source='.' manage.py test
+        export BROWSER_TEST=chrome
+        python manage.py test functional_tests
+    - name: 🧪 - Unit Tests and coverage
+      run: |
+        coverage run --source='.' manage.py test webfront.tests
         coveralls
 

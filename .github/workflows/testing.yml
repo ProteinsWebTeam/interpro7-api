@@ -39,6 +39,7 @@ jobs:
         export BROWSER_TEST=chrome
         coverage run --source='.' manage.py test
     - name: 🧥‍ - Coveralls
+      continue-on-error: true
       run: |
         export COVERALLS_REPO_TOKEN=0NCZQkRT7k27xoKabeCH3UzAEUIDk5BAw
         coveralls

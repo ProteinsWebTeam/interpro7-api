@@ -43,4 +43,14 @@ jobs:
       run: |
         export COVERALLS_REPO_TOKEN=0NCZQkRT7k27xoKabeCH3UzAEUIDk5BAw
         coveralls
-
+    - name: 📮 - Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      continue-on-error: true
+      env:
+        SLACK_COLOR: "${{ job.status == 'success' && 'good' || 'danger' }}"
+        SLACK_USERNAME: "Github Actions API"
+        SLACK_ICON_EMOJI: ":octocat:"
+        SLACK_TITLE: "CI API results in GitHub Actions"
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: "#interpro7"
+        MSG_MINIMAL: Actions URL

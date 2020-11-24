@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/ProteinsWebTeam/interpro7-api.svg?branch=master)](https://travis-ci.org/ProteinsWebTeam/interpro7-api)
+[![Unit and Funtional Testing](https://github.com/ProteinsWebTeam/interpro7-api/workflows/Unit%20and%20Funtional%20Testing/badge.svg)](https://github.com/ProteinsWebTeam/interpro7-api/actions?query=workflow%3A%22Unit+and+Funtional+Testing%22)
 [![Coverage Status](https://coveralls.io/repos/github/ProteinsWebTeam/interpro7-api/badge.svg?branch=master)](https://coveralls.io/github/ProteinsWebTeam/interpro7-api?branch=master)
 [![GitHub license](https://img.shields.io/badge/license-apache-blue.svg)](https://github.com/ProteinsWebTeam/interpro7-api/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)

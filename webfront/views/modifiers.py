@@ -384,31 +384,32 @@ def filter_by_latest_entries(value, general_handler):
 
 
 def get_domain_architectures(field, general_handler):
-    searcher = general_handler.searcher
-    size = general_handler.pagination["size"]
-    cursor = general_handler.pagination["cursor"]
-
     if field is None or field.strip() == "":
         # TODO: is there a better way to get this?
         accession = general_handler.queryset_manager.filters["entry"][
             "accession__iexact"
         ]
         return ida_search(accession, general_handler)
-    else:
-        query = (
-            general_handler.queryset_manager.get_searcher_query()
-            + " && ida_id:"
-            + field
-        )
-        res, length, after_key, before_key = searcher.get_list_of_endpoint(
-            "protein", rows=size, query=query, cursor=cursor
-        )
-        general_handler.modifiers.search_size = length
-        general_handler.modifiers.after_key = after_key
-        general_handler.modifiers.before_key = before_key
-        return filter_queryset_accession_in(
-            general_handler.queryset_manager.get_base_queryset("protein"), res
-        )
+
+
+def filter_by_domain_architectures(field, general_handler):
+    searcher = general_handler.searcher
+    size = general_handler.pagination["size"]
+    cursor = general_handler.pagination["cursor"]
+
+    query = (
+        general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
+    )
+    endpoint = general_handler.queryset_manager.main_endpoint
+    res, length, after_key, before_key = searcher.get_list_of_endpoint(
+        endpoint, rows=size, query=query, cursor=cursor
+    )
+    general_handler.modifiers.search_size = length
+    general_handler.modifiers.after_key = after_key
+    general_handler.modifiers.before_key = before_key
+    return filter_queryset_accession_in(
+        general_handler.queryset_manager.get_base_queryset(endpoint), res
+    )
 
 
 def get_entry_annotation(field, general_handler):

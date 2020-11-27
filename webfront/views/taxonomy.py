@@ -7,6 +7,7 @@ from webfront.views.modifiers import (
     filter_by_key_species,
     filter_by_entry,
     filter_by_entry_db,
+    filter_by_domain_architectures,
 )
 
 
@@ -94,6 +95,14 @@ class UniprotHandler(CustomView):
             "extra_fields", add_extra_fields(Taxonomy, "counters")
         )
         general_handler.modifiers.register("key_species", filter_by_key_species)
+        general_handler.modifiers.register(
+            "ida",
+            filter_by_domain_architectures,
+            use_model_as_payload=True,
+            serializer=SerializerDetail.TAXONOMY_HEADERS,
+            many=True,
+        )
+
         return super(UniprotHandler, self).get(
             request._request,
             endpoint_levels,

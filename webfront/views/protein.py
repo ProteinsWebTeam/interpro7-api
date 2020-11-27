@@ -9,7 +9,7 @@ from webfront.views.modifiers import (
     filter_by_field,
     filter_by_boolean_field,
     get_single_value,
-    get_domain_architectures,
+    filter_by_domain_architectures,
     filter_by_contains_field,
     filter_by_match_presence,
     add_extra_fields,
@@ -164,7 +164,7 @@ class UniprotHandler(CustomView):
             general_handler.queryset_manager.add_filter("protein", source_database=ds)
         general_handler.modifiers.register(
             "ida",
-            get_domain_architectures,
+            filter_by_domain_architectures,
             use_model_as_payload=True,
             serializer=SerializerDetail.PROTEIN_HEADERS,
             many=True,

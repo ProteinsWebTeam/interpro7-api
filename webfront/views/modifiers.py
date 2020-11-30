@@ -10,6 +10,7 @@ from webfront.models import (
     Release_Note,
     TaxonomyPerEntry,
     TaxonomyPerEntryDB,
+    Taxonomy,
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError, HmmerWebError
@@ -707,6 +708,29 @@ def get_value_for_field(field):
         return {field: queryset.__getattribute__(field)}
 
     return x
+
+
+def add_taxonomy_names(value, current_payload):
+    names = {}
+    to_query = set()
+    for taxon in current_payload:
+        names[taxon["metadata"]["accession"]] = taxon["metadata"]["name"]
+        if "parent" in taxon["metadata"] and taxon["metadata"]["parent"] is not None:
+            to_query.add(taxon["metadata"]["parent"])
+        if (
+            "children" in taxon["metadata"]
+            and taxon["metadata"]["children"] is not None
+        ):
+            for child in taxon["metadata"]["children"]:
+                to_query.add(child)
+        if "extra_fields" in taxon and "lineage" in taxon["extra_fields"]:
+            for tax in taxon["extra_fields"]["lineage"].split():
+                to_query.add(tax)
+
+    qs = Taxonomy.objects.filter(accession__in=[q for q in to_query if q not in names])
+    for t in qs:
+        names[t.accession] = t.scientific_name
+    return names
 
 
 def passing(x, y):

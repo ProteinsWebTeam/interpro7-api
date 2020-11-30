@@ -12,7 +12,10 @@ This are the parameters of the method to register a modifier:
 * `action`: The modifier function. It should returns a queryset or None. And its parameters are:
   * `value`: The value given as a URL parameter.
   * `general_handler`: The handler that is in charge of the current request.
-* `use_model_as_payload`: (default: `False`) If the modifier needs to replace the queryset to be serialized.
+* `type`: (default: `ModifierType.EXTEND_PAYLOAD`) There are 3 types of modifiers:
+  * `ModifierType.FILTER` It add new filters into the queryset before it gets executed or serialized.
+  * `ModifierType.REPLACE_PAYLOAD` Creates a new payload that replaces the one that would normally been used by the `custom view`
+  * `ModifierType.EXTEND_PAYLOAD` Extend an already calculated payload. The data extending the payload is added as a new key at the level of `"metadata"` or `"results"`.
 * `serializer`: (default: `None`) In case the modification requires to be serialized in an specific way.
 * `many`: (default: `False`) This is to explicitely indicate when the modifier queryset has *many* results and needs to be iterated. This is useful to indicate the pagination logic needs to be included. Note that this only makes sense if `use_model_as_payload == True`. 
 * `works_in_single_endpoint`: (default: `True`) It indicates that a given modifier works for single endpoints URLs. If is false it will raise an exception when a single endpoint URL has this modifier

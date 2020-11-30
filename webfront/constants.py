@@ -64,3 +64,9 @@ class QuerysetType(Enum):
     ENTRY_PROTEIN = 150
     ENTRY_STRUCTURE = 160
     STRUCTURE_PROTEIN = 250
+
+
+class ModifierType(Enum):
+    FILTER = 1
+    REPLACE_PAYLOAD = 2
+    EXTEND_PAYLOAD = 3

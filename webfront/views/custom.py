@@ -50,7 +50,7 @@ class CustomView(GenericAPIView):
     serializer_detail_filter = SerializerDetail.ALL
     after_key = None
     before_key = None
-    http_method_names = ['get', 'head']
+    http_method_names = ["get", "head"]
 
     def get(
         self,
@@ -157,8 +157,15 @@ class CustomView(GenericAPIView):
                 queryset_manager=general_handler.queryset_manager,
             )
 
+            payload = {"data": serialized.data}
+            extensions = general_handler.modifiers.execute_extenders(
+                drf_request, serialized.data
+            )
+            if extensions != {}:
+                payload["extensions"] = extensions
+
             if self.many:
-                return self.get_paginated_response(serialized.data)
+                return self.get_paginated_response(payload)
             else:
                 return Response(serialized.data)
 

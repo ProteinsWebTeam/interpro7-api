@@ -9,6 +9,7 @@ from webfront.views.modifiers import (
     filter_by_field_or_field_range,
     add_extra_fields,
 )
+from webfront.constants import ModifierType
 
 
 class ChainPDBAccessionHandler(CustomView):
@@ -185,7 +186,7 @@ class StructureHandler(CustomView):
         general_handler.modifiers.register(
             "group_by",
             group_by(Structure, {"experiment_type": "structure_evidence"}),
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.GROUP_BY,
         )
         general_handler.modifiers.register(

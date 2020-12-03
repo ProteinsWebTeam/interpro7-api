@@ -10,6 +10,7 @@ from webfront.models import (
     Release_Note,
     TaxonomyPerEntry,
     TaxonomyPerEntryDB,
+    Taxonomy,
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError, HmmerWebError
@@ -706,6 +707,9 @@ def get_value_for_field(field):
         return {field: queryset.__getattribute__(field)}
 
     return x
+
+def get_organism_by_scientific_name(scientific_name, general_handler):
+    pass
 
 
 def passing(x, y):

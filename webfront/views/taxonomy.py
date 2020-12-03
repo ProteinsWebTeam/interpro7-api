@@ -7,6 +7,7 @@ from webfront.views.modifiers import (
     filter_by_key_species,
     filter_by_entry,
     filter_by_entry_db,
+    get_organism_by_scientific_name,
 )
 
 
@@ -139,6 +140,12 @@ class TaxonomyHandler(CustomView):
         **kwargs
     ):
         general_handler.queryset_manager.reset_filters("taxonomy", endpoint_levels)
+
+        general_handler.modifiers.register(
+            "name",
+            get_organism_by_scientific_name,
+            use_model_as_payload=False,
+        )
 
         return super(TaxonomyHandler, self).get(
             request._request,

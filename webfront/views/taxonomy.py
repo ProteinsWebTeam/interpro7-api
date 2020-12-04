@@ -7,7 +7,7 @@ from webfront.views.modifiers import (
     filter_by_key_species,
     filter_by_entry,
     filter_by_entry_db,
-    get_organism_by_scientific_name,
+    get_taxonomy_by_scientific_name,
 )
 
 
@@ -142,9 +142,10 @@ class TaxonomyHandler(CustomView):
         general_handler.queryset_manager.reset_filters("taxonomy", endpoint_levels)
 
         general_handler.modifiers.register(
-            "name",
-            get_organism_by_scientific_name,
-            use_model_as_payload=False,
+            "scientific_name",
+            get_taxonomy_by_scientific_name,
+            serializer=TaxonomySerializer,
+            use_model_as_payload=True,
         )
 
         return super(TaxonomyHandler, self).get(

@@ -144,8 +144,8 @@ class TaxonomyHandler(CustomView):
         general_handler.modifiers.register(
             "scientific_name",
             get_taxonomy_by_scientific_name,
-            serializer=TaxonomySerializer,
-            use_model_as_payload=True,
+            serializer=SerializerDetail.ALL,
+            many=False,
         )
 
         return super(TaxonomyHandler, self).get(

@@ -137,6 +137,7 @@ class MemberHandler(CustomView):
                 },
             ),
             use_model_as_payload=True,
+            many=False,
             # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
         general_handler.modifiers.register(
@@ -144,7 +145,10 @@ class MemberHandler(CustomView):
         )
 
         general_handler.modifiers.register(
-            "interpro_status", get_interpro_status_counter, use_model_as_payload=True
+            "interpro_status",
+            get_interpro_status_counter,
+            use_model_as_payload=True,
+            many=False,
         )
 
         return super(MemberHandler, self).get(
@@ -383,6 +387,7 @@ class InterproHandler(CustomView):
                 },
             ),
             use_model_as_payload=True,
+            many=False,
             # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
         general_handler.modifiers.register(

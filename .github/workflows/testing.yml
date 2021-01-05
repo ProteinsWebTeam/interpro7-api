@@ -1,0 +1,57 @@
+name: Unit and Funtional Testing
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: 🐍 - Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.6'
+    - name: ⚙️ - Configure sysctl limits
+      run: |
+        sudo swapoff -a
+        sudo sysctl -w vm.swappiness=1
+        sudo sysctl -w fs.file-max=262144
+        sudo sysctl -w vm.max_map_count=262144
+    - name: 🔎 - Runs Elasticsearch
+      uses: elastic/elastic-github-actions/elasticsearch@master
+      with:
+        stack-version: 7.3.0
+    - name: ⚙️🔎 - Setup elastic search
+      run: |
+        curl 'localhost:9200'
+        curl -XPUT 'localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json
+        curl -XPUT 'localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json
+    - name: 🔧 - Install Dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r dev_requirements.txt
+        pip install tblib
+        pip freeze
+    - name: 🧪 - Testing
+      run: |
+        export BROWSER_TEST=chrome
+        coverage run --source='.' manage.py test
+    - name: 🧥‍ - Coveralls
+      continue-on-error: true
+      run: |
+        export COVERALLS_REPO_TOKEN=0NCZQkRT7k27xoKabeCH3UzAEUIDk5BAw
+        coveralls
+    - name: 📮 - Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      continue-on-error: true
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev'
+      env:
+        SLACK_COLOR: "${{ job.status == 'success' && 'good' || 'danger' }}"
+        SLACK_USERNAME: "Github Actions API"
+        SLACK_ICON_EMOJI: ":octocat:"
+        SLACK_TITLE: "CI API results in GitHub Actions"
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: "#interpro7"
+        MSG_MINIMAL: Actions URL

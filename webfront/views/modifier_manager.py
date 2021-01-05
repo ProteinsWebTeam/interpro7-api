@@ -8,7 +8,7 @@ class ModifierManager:
         self.modifiers = {}
         self.payload = None
         self.serializer = None
-        self.many = False
+        self.many = None
         self.search_size = None
         self.after_key = None
         self.before_key = None
@@ -19,7 +19,7 @@ class ModifierManager:
         action,
         type=ModifierType.FILTER,
         serializer=None,
-        many=False,
+        many=None,
         works_in_single_endpoint=True,
         works_in_multiple_endpoint=True,
     ):
@@ -69,7 +69,10 @@ class ModifierManager:
                     param, self.general_handler
                 )
                 self.serializer = self.modifiers[modifier]["serializer"]
-                self.many = self.many or self.modifiers[modifier]["many"]
+                if self.modifiers[modifier]["many"] is not None:
+                    self.many = (self.many is not None and self.many) or self.modifiers[
+                        modifier
+                    ]["many"]
         use_model_as_payload = False
         for modifier in payload_modifiers:
             param = request.query_params.get(modifier)
@@ -78,7 +81,10 @@ class ModifierManager:
                 self.payload = self.modifiers[modifier]["action"](
                     param, self.general_handler
                 )
-                self.many = self.many or self.modifiers[modifier]["many"]
+                if self.modifiers[modifier]["many"] is not None:
+                    self.many = (self.many is not None and self.many) or self.modifiers[
+                        modifier
+                    ]["many"]
                 if self.serializer is None:
                     self.serializer = self.modifiers[modifier]["serializer"]
                 else:

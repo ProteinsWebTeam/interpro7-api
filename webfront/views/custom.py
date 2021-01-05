@@ -72,6 +72,9 @@ class CustomView(GenericAPIView):
             logger.debug(request.get_full_path())
             if has_payload or general_handler.modifiers.serializer is not None:
                 self.serializer_detail = general_handler.modifiers.serializer
+                # self.many = general_handler.modifiers.many
+            if general_handler.modifiers.many is not None:
+                self.many = general_handler.modifiers.many
             if has_payload:
                 if general_handler.modifiers.payload is None:
                     raise EmptyQuerysetError(
@@ -94,7 +97,6 @@ class CustomView(GenericAPIView):
                                 response["Content-Type"] = "text/plain"
                         return response
                 general_handler.filter_serializers = []
-                self.many = general_handler.modifiers.many
                 self.search_size = general_handler.modifiers.search_size
                 if self.many:
                     self.queryset = self.paginator.paginate_queryset(

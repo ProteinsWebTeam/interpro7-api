@@ -123,6 +123,7 @@ class ProteomeHandler(CustomView):
             "group_by",
             group_by(Proteome, {"proteome_is_reference": "proteome_acc"}),
             type=ModifierType.REPLACE_PAYLOAD,
+            many=False,
             serializer=SerializerDetail.GROUP_BY,
         )
         general_handler.modifiers.register(

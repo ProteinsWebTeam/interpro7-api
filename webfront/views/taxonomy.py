@@ -9,6 +9,7 @@ from webfront.views.modifiers import (
     filter_by_entry_db,
     filter_by_domain_architectures,
     add_taxonomy_names,
+    get_taxonomy_by_scientific_name,
 )
 from webfront.constants import ModifierType
 
@@ -153,6 +154,13 @@ class TaxonomyHandler(CustomView):
         **kwargs
     ):
         general_handler.queryset_manager.reset_filters("taxonomy", endpoint_levels)
+
+        general_handler.modifiers.register(
+            "scientific_name",
+            get_taxonomy_by_scientific_name,
+            serializer=SerializerDetail.ALL,
+            many=False,
+        )
 
         return super(TaxonomyHandler, self).get(
             request._request,

@@ -139,7 +139,7 @@ class MemberHandler(CustomView):
                 },
             ),
             type=ModifierType.REPLACE_PAYLOAD,
-            # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
+            many=False,
         )
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Entry, "counters")
@@ -149,6 +149,7 @@ class MemberHandler(CustomView):
             "interpro_status",
             get_interpro_status_counter,
             type=ModifierType.REPLACE_PAYLOAD,
+            many=False,
         )
 
         return super(MemberHandler, self).get(
@@ -389,7 +390,7 @@ class InterproHandler(CustomView):
                 },
             ),
             type=ModifierType.REPLACE_PAYLOAD,
-            # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
+            many=False,
         )
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Entry, "counters")

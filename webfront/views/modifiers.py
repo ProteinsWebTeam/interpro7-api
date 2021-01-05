@@ -10,9 +10,10 @@ from webfront.models import (
     Release_Note,
     TaxonomyPerEntry,
     TaxonomyPerEntryDB,
+    Taxonomy,
 )
 from webfront.views.custom import filter_queryset_accession_in
-from webfront.exceptions import EmptyQuerysetError, HmmerWebError
+from webfront.exceptions import EmptyQuerysetError, HmmerWebError, ExpectedUniqueError
 from django.conf import settings
 
 from requests import Session
@@ -706,6 +707,17 @@ def get_value_for_field(field):
         return {field: queryset.__getattribute__(field)}
 
     return x
+
+def get_taxonomy_by_scientific_name(scientific_name, general_handler):
+    general_handler.queryset_manager.filters["taxonomy"] = {"scientific_name": scientific_name}
+      
+    queryset = general_handler.queryset_manager.get_queryset()
+    if (queryset.count() == 1):
+        return queryset
+    elif (queryset.count() == 0):
+        raise EmptyQuerysetError(f"Failed to find Taxonomy node with scientific name '{scientific_name}'")
+    elif (queryset.count() > 1):
+        raise ExpectedUniqueError(f"Found more than one Taxonomy node with scientific name '{scientific_name}'")
 
 
 def passing(x, y):

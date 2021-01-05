@@ -416,3 +416,13 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
     def test_no_pathways_modifier(self):
         response = self.client.get("/api/entry/interpro/IPR003165?pathways")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
+    def test_scientific_name_modifier(self):
+        response = self.client.get("/api/taxonomy/uniprot/?scientific_name=Penicillium+italicum")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("metadata", response.data)
+        self.assertIn("accession", response.data["metadata"])
+        self.assertIn("counters", response.data["metadata"])
+        self.assertEqual("40296", response.data["metadata"]["accession"])
+        self.assertEqual(2, response.data["metadata"]["counters"]["entries"])

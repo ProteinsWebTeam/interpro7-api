@@ -122,6 +122,7 @@ class ProteomeHandler(CustomView):
             "group_by",
             group_by(Proteome, {"proteome_is_reference": "proteome_acc"}),
             use_model_as_payload=True,
+            many=False,
             serializer=SerializerDetail.GROUP_BY,
         )
         general_handler.modifiers.register(

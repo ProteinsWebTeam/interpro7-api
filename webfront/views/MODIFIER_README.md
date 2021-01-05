@@ -12,7 +12,7 @@ This are the parameters of the method to register a modifier:
 * `action`: The modifier function. It should returns a queryset or None. And its parameters are:
   * `value`: The value given as a URL parameter.
   * `general_handler`: The handler that is in charge of the current request.
-* `type`: (default: `ModifierType.EXTEND_PAYLOAD`) There are 3 types of modifiers:
+* `type`: (default: `ModifierType.FILTER`) There are 3 types of modifiers:
   * `ModifierType.FILTER` It add new filters into the queryset before it gets executed or serialized.
   * `ModifierType.REPLACE_PAYLOAD` Creates a new payload that replaces the one that would normally been used by the `custom view`
   * `ModifierType.EXTEND_PAYLOAD` Extend an already calculated payload. The data extending the payload is added as a new key at the level of `"metadata"` or `"results"`.

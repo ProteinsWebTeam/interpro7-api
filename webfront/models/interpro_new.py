@@ -1,3 +1,5 @@
+import gzip
+
 from django.db import models
 from jsonfield import JSONField
 
@@ -60,7 +62,7 @@ class Protein(models.Model):
     organism = JSONField(null=True)
     name = models.CharField(max_length=20)
     description = JSONField(null=True)
-    sequence = models.TextField(null=False)
+    sequence_bin = models.BinaryField(db_column="sequence", null=True)
     length = models.IntegerField(null=False)
     proteome = models.CharField(max_length=20, null=True)
     gene = models.CharField(max_length=70, null=True)
@@ -69,14 +71,21 @@ class Protein(models.Model):
     source_database = models.CharField(
         max_length=20, default="unreviewed", db_index=True
     )
-    residues = JSONField(null=True)
-    extra_features = JSONField(null=True)
+    # residues = JSONField(null=True)
+    # extra_features = JSONField(null=True)
     structure = JSONField(default={}, null=True)
     is_fragment = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
     ida_id = models.CharField(max_length=40, null=True)
     ida = models.TextField(null=True)
     counts = JSONField(null=True)
+
+    @property
+    def sequence(self):
+        if self.sequence_bin is not None:
+            return gzip.decompress(self.sequence_bin)
+        else:
+            return None
 
 
 class Structure(models.Model):

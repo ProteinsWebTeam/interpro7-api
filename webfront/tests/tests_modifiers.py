@@ -234,7 +234,7 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             "go_terms",
             "evidence_code",
             "source_database",
-            "residues",
+            # "residues",
             "structure",
             "is_fragment",
             "tax_id",
@@ -417,9 +417,12 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/interpro/IPR003165?pathways")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+
 class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
     def test_scientific_name_modifier(self):
-        response = self.client.get("/api/taxonomy/uniprot/?scientific_name=Penicillium+italicum")
+        response = self.client.get(
+            "/api/taxonomy/uniprot/?scientific_name=Penicillium+italicum"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self.assertIn("accession", response.data["metadata"])

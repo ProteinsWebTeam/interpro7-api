@@ -182,7 +182,7 @@ class UniprotHandler(CustomView):
             filter_by_contains_field("protein", "go_terms", '"identifier": "{}"'),
         )
         general_handler.modifiers.register(
-            "extra_fields", add_extra_fields(Protein, "counters")
+            "extra_fields", add_extra_fields(Protein, "counters", "sequence")
         )
         return super(UniprotHandler, self).get(
             request._request,

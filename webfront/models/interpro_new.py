@@ -88,6 +88,32 @@ class Protein(models.Model):
             return None
 
 
+class ProteinExtraFeatures(models.Model):
+    feature_id = models.IntegerField(primary_key=True)
+    protein_acc = models.CharField(max_length=15)
+    entry_acc = models.CharField(max_length=25)
+    source_database = models.CharField(max_length=10)
+    location_start = models.IntegerField()
+    location_end = models.IntegerField()
+    sequence_feature = models.CharField(max_length=35)
+
+    class Meta:
+        db_table = "webfront_proteinfeature"
+
+
+class ProteinResidues(models.Model):
+    residue_id = models.IntegerField(primary_key=True)
+    protein_acc = models.CharField(max_length=15)
+    entry_acc = models.CharField(max_length=25)
+    entry_name = models.CharField(max_length=100)
+    source_database = models.CharField(max_length=10)
+    description = models.CharField(max_length=255)
+    fragments = JSONField(null=True)
+
+    class Meta:
+        db_table = "webfront_proteinresidue"
+
+
 class Structure(models.Model):
     accession = models.CharField(max_length=4, primary_key=True)
     name = models.CharField(max_length=512)

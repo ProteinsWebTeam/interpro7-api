@@ -229,7 +229,7 @@
       "ida_id": 590134
     }
   },
-    {
+  {
     "model": "webfront.Isoforms",
     "fields": {
       "accession": "A1CUJ5-2",
@@ -268,6 +268,30 @@
           "integrated": "ipr001165"
         }
       }
+    }
+  },
+  {
+    "model": "webfront.ProteinExtraFeatures",
+    "fields": {
+      "feature_id": 1,
+      "protein_acc": "A1CUJ5",
+      "entry_acc": "TMhelix",
+      "source_database": "tmhmm",
+      "sequence_feature": "TMhelix",
+      "location_start": 265,
+      "location_end": 287
+    }
+  },
+  {
+    "model": "webfront.ProteinResidues",
+    "fields": {
+      "residue_id": 1,
+      "entry_name": "the residue",
+      "description": "a single residue",
+      "fragments": [["X",5,5]],
+      "protein_acc": "A1CUJ5",
+      "entry_acc": "residue",
+      "source_database": "cddd"
     }
   }
 ]

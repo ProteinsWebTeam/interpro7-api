@@ -11,6 +11,8 @@ from webfront.models import (
     TaxonomyPerEntry,
     TaxonomyPerEntryDB,
     Taxonomy,
+    ProteinExtraFeatures,
+    ProteinResidues,
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError, HmmerWebError, ExpectedUniqueError
@@ -749,6 +751,57 @@ def add_taxonomy_names(value, current_payload):
     for t in qs:
         names[t.accession] = t.scientific_name
     return names
+
+
+def extra_features(value, general_handler):
+    features = ProteinExtraFeatures.objects.filter(
+        protein_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    payload = {}
+    for feature in features:
+        if feature.entry_acc not in payload:
+            payload[feature.entry_acc] = {
+                "accession": feature.entry_acc,
+                "source_database": feature.source_database,
+                "locations": [],
+            }
+        payload[feature.entry_acc]["locations"].append(
+            {
+                "fragments": [
+                    {
+                        "start": feature.location_start,
+                        "end": feature.location_end,
+                        "seq_feature": feature.sequence_feature,
+                    }
+                ]
+            }
+        )
+    return payload
+
+
+def residues(value, general_handler):
+    residues = ProteinResidues.objects.filter(
+        protein_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    payload = {}
+    for residue in residues:
+        if residue.entry_acc not in payload:
+            payload[residue.entry_acc] = {
+                "accession": residue.entry_acc,
+                "source_database": residue.source_database,
+                "name": residue.entry_name,
+                "locations": [],
+            }
+        payload[residue.entry_acc]["locations"].append(
+            {
+                "description": residue.description,
+                "fragments": [
+                    {"residues": f[0], "start": f[1], "end": f[2]}
+                    for f in residue.fragments
+                ],
+            }
+        )
+    return payload
 
 
 def passing(x, y):

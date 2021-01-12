@@ -264,6 +264,7 @@ class ProteinHandler(CustomView):
             ),
             type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.GROUP_BY,
+            many=False,
         )
 
         general_handler.modifiers.register(

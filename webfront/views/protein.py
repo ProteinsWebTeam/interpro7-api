@@ -15,6 +15,8 @@ from webfront.views.modifiers import (
     add_extra_fields,
     get_isoforms,
     calculate_residue_conservation,
+    extra_features,
+    residues,
 )
 from webfront.models import Protein
 from webfront.constants import ModifierType
@@ -48,7 +50,7 @@ class UniprotAccessionHandler(CustomView):
             "protein", accession__iexact=endpoint_levels[level - 1]
         )
         general_handler.modifiers.register(
-            "residues", get_single_value("residues"), type=ModifierType.REPLACE_PAYLOAD
+            "residues", residues, type=ModifierType.REPLACE_PAYLOAD
         )
         general_handler.modifiers.register(
             "structureinfo",
@@ -59,9 +61,7 @@ class UniprotAccessionHandler(CustomView):
             "ida", get_single_value("ida", True), type=ModifierType.REPLACE_PAYLOAD
         )
         general_handler.modifiers.register(
-            "extra_features",
-            get_single_value("extra_features"),
-            type=ModifierType.REPLACE_PAYLOAD,
+            "extra_features", extra_features, type=ModifierType.REPLACE_PAYLOAD
         )
         general_handler.modifiers.register(
             "isoforms", get_isoforms, type=ModifierType.REPLACE_PAYLOAD
@@ -182,7 +182,7 @@ class UniprotHandler(CustomView):
             filter_by_contains_field("protein", "go_terms", '"identifier": "{}"'),
         )
         general_handler.modifiers.register(
-            "extra_fields", add_extra_fields(Protein, "counters")
+            "extra_fields", add_extra_fields(Protein, "counters", "sequence")
         )
         return super(UniprotHandler, self).get(
             request._request,

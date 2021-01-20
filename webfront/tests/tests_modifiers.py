@@ -234,7 +234,6 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             "go_terms",
             "evidence_code",
             "source_database",
-            "residues",
             "structure",
             "is_fragment",
             "tax_id",
@@ -417,12 +416,30 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/interpro/IPR003165?pathways")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+
 class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
     def test_scientific_name_modifier(self):
-        response = self.client.get("/api/taxonomy/uniprot/?scientific_name=Penicillium+italicum")
+        response = self.client.get(
+            "/api/taxonomy/uniprot/?scientific_name=Penicillium+italicum"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self.assertIn("accession", response.data["metadata"])
         self.assertIn("counters", response.data["metadata"])
         self.assertEqual("40296", response.data["metadata"]["accession"])
         self.assertEqual(2, response.data["metadata"]["counters"]["entries"])
+
+
+class ResidueModifierTest(InterproRESTTestCase):
+    def test_residue_modifier_is_different_than_acc_protein(self):
+        response1 = self.client.get("/api/protein/uniprot/a1cuj5")
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        response2 = self.client.get("/api/protein/uniprot/a1cuj5?residues")
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertNotEquals(response1.data, response2.data)
+
+    def test_residue_modifier(self):
+        response2 = self.client.get("/api/protein/uniprot/a1cuj5?residues")
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertIn("residue", response2.data)
+        self.assertIn("locations", response2.data["residue"])

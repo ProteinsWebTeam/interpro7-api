@@ -7,8 +7,11 @@ from webfront.views.modifiers import (
     filter_by_key_species,
     filter_by_entry,
     filter_by_entry_db,
+    filter_by_domain_architectures,
+    add_taxonomy_names,
     get_taxonomy_by_scientific_name,
 )
+from webfront.constants import ModifierType
 
 
 class TaxonomyAccessionHandler(CustomView):
@@ -40,13 +43,13 @@ class TaxonomyAccessionHandler(CustomView):
             "filter_by_entry",
             filter_by_entry,
             serializer=SerializerDetail.TAXONOMY_PER_ENTRY,
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
         )
         general_handler.modifiers.register(
             "filter_by_entry_db",
             filter_by_entry_db,
             serializer=SerializerDetail.TAXONOMY_PER_ENTRY_DB,
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
         )
 
         return super(TaxonomyAccessionHandler, self).get(
@@ -95,6 +98,17 @@ class UniprotHandler(CustomView):
             "extra_fields", add_extra_fields(Taxonomy, "counters")
         )
         general_handler.modifiers.register("key_species", filter_by_key_species)
+        general_handler.modifiers.register(
+            "ida",
+            filter_by_domain_architectures,
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.TAXONOMY_HEADERS,
+            many=True,
+        )
+        general_handler.modifiers.register(
+            "with_names", add_taxonomy_names, type=ModifierType.EXTEND_PAYLOAD
+        )
+
         return super(UniprotHandler, self).get(
             request._request,
             endpoint_levels,

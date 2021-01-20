@@ -9,7 +9,7 @@ from webfront.views.modifiers import (
     filter_by_field,
     filter_by_boolean_field,
     get_single_value,
-    get_domain_architectures,
+    filter_by_domain_architectures,
     filter_by_contains_field,
     filter_by_match_presence,
     add_extra_fields,
@@ -17,6 +17,7 @@ from webfront.views.modifiers import (
     calculate_residue_conservation,
 )
 from webfront.models import Protein
+from webfront.constants import ModifierType
 from django.conf import settings
 
 entry_db_members = "|".join(settings.DB_MEMBERS)
@@ -47,24 +48,28 @@ class UniprotAccessionHandler(CustomView):
             "protein", accession__iexact=endpoint_levels[level - 1]
         )
         general_handler.modifiers.register(
-            "residues", get_single_value("residues"), use_model_as_payload=True
+            "residues", get_single_value("residues"), type=ModifierType.REPLACE_PAYLOAD
         )
         general_handler.modifiers.register(
-            "structureinfo", get_single_value("structure"), use_model_as_payload=True
+            "structureinfo",
+            get_single_value("structure"),
+            type=ModifierType.REPLACE_PAYLOAD,
         )
         general_handler.modifiers.register(
-            "ida", get_single_value("ida", True), use_model_as_payload=True
+            "ida", get_single_value("ida", True), type=ModifierType.REPLACE_PAYLOAD
         )
         general_handler.modifiers.register(
             "extra_features",
             get_single_value("extra_features"),
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
         )
         general_handler.modifiers.register(
-            "isoforms", get_isoforms, use_model_as_payload=True
+            "isoforms", get_isoforms, type=ModifierType.REPLACE_PAYLOAD
         )
         general_handler.modifiers.register(
-            "conservation", calculate_residue_conservation, use_model_as_payload=True
+            "conservation",
+            calculate_residue_conservation,
+            type=ModifierType.REPLACE_PAYLOAD,
         )
         return super(UniprotAccessionHandler, self).get(
             request._request,
@@ -164,8 +169,8 @@ class UniprotHandler(CustomView):
             general_handler.queryset_manager.add_filter("protein", source_database=ds)
         general_handler.modifiers.register(
             "ida",
-            get_domain_architectures,
-            use_model_as_payload=True,
+            filter_by_domain_architectures,
+            type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.PROTEIN_HEADERS,
             many=True,
         )
@@ -257,8 +262,9 @@ class ProteinHandler(CustomView):
                     "is_fragment": "protein_is_fragment",
                 },
             ),
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.GROUP_BY,
+            many=False,
         )
 
         general_handler.modifiers.register(

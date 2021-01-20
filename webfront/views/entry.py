@@ -1,5 +1,5 @@
 from django.db.models import Count
-from webfront.models.interpro_new import Release_Note
+from webfront.constants import ModifierType
 
 from webfront.exceptions import DeletedEntryError
 from webfront.models import Entry
@@ -52,16 +52,18 @@ class MemberAccessionHandler(CustomView):
         general_handler.modifiers.register(
             "annotation",
             get_entry_annotation,
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.ANNOTATION_BLOB,
         )
         general_handler.modifiers.register(
-            "annotation:info", get_entry_annotation_info, use_model_as_payload=True
+            "annotation:info",
+            get_entry_annotation_info,
+            type=ModifierType.REPLACE_PAYLOAD,
         )
         general_handler.modifiers.register(
             "ida",
             get_domain_architectures,
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.IDA_LIST,
         )
 
@@ -136,9 +138,8 @@ class MemberHandler(CustomView):
                     "tax_id": "tax_id",
                 },
             ),
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             many=False,
-            # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Entry, "counters")
@@ -147,7 +148,7 @@ class MemberHandler(CustomView):
         general_handler.modifiers.register(
             "interpro_status",
             get_interpro_status_counter,
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             many=False,
         )
 
@@ -215,16 +216,18 @@ class AccessionHandler(CustomView):
         general_handler.modifiers.register(
             "ida",
             get_domain_architectures,
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.IDA_LIST,
         )
         general_handler.modifiers.register(
             "interactions",
             get_value_for_field("interactions"),
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
         )
         general_handler.modifiers.register(
-            "pathways", get_value_for_field("pathways"), use_model_as_payload=True
+            "pathways",
+            get_value_for_field("pathways"),
+            type=ModifierType.REPLACE_PAYLOAD,
         )
 
         return super(AccessionHandler, self).get(
@@ -386,9 +389,8 @@ class InterproHandler(CustomView):
                     "go_terms": "text",
                 },
             ),
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             many=False,
-            # serializer=SerializerDetail.GROUP_BY_MEMBER_DATABASES
         )
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Entry, "counters")
@@ -530,8 +532,9 @@ class EntryHandler(CustomView):
                     "go_terms": "text",
                 },
             ),
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.GROUP_BY,
+            many=False,
         )
         general_handler.modifiers.register(
             "sort_by",
@@ -551,14 +554,12 @@ class EntryHandler(CustomView):
             filter_by_contains_field("entry", "go_terms", '"identifier": "{}"'),
         )
         general_handler.modifiers.register(
-            "annotation",
-            filter_by_contains_field("entry", "entryannotation__type"),
-            use_model_as_payload=False,
+            "annotation", filter_by_contains_field("entry", "entryannotation__type")
         )
         general_handler.modifiers.register(
             "ida_search",
             ida_search,
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.IDA_LIST,
         )
         response = super(EntryHandler, self).get(

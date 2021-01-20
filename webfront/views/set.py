@@ -4,6 +4,7 @@ from webfront.models import Set, Alignment
 from webfront.serializers.collection import SetSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from django.conf import settings
+from webfront.constants import ModifierType
 
 from webfront.views.modifiers import add_extra_fields, get_set_alignment
 
@@ -57,7 +58,7 @@ class SetAccessionHandler(CustomView):
         general_handler.modifiers.register(
             "alignments",
             get_set_alignment,
-            use_model_as_payload=True,
+            type=ModifierType.REPLACE_PAYLOAD,
             many=True,
             serializer=SerializerDetail.SET_ALIGNMENT,
         )

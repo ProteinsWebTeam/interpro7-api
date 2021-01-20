@@ -385,31 +385,32 @@ def filter_by_latest_entries(value, general_handler):
 
 
 def get_domain_architectures(field, general_handler):
-    searcher = general_handler.searcher
-    size = general_handler.pagination["size"]
-    cursor = general_handler.pagination["cursor"]
-
     if field is None or field.strip() == "":
         # TODO: is there a better way to get this?
         accession = general_handler.queryset_manager.filters["entry"][
             "accession__iexact"
         ]
         return ida_search(accession, general_handler)
-    else:
-        query = (
-            general_handler.queryset_manager.get_searcher_query()
-            + " && ida_id:"
-            + field
-        )
-        res, length, after_key, before_key = searcher.get_list_of_endpoint(
-            "protein", rows=size, query=query, cursor=cursor
-        )
-        general_handler.modifiers.search_size = length
-        general_handler.modifiers.after_key = after_key
-        general_handler.modifiers.before_key = before_key
-        return filter_queryset_accession_in(
-            general_handler.queryset_manager.get_base_queryset("protein"), res
-        )
+
+
+def filter_by_domain_architectures(field, general_handler):
+    searcher = general_handler.searcher
+    size = general_handler.pagination["size"]
+    cursor = general_handler.pagination["cursor"]
+
+    query = (
+        general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
+    )
+    endpoint = general_handler.queryset_manager.main_endpoint
+    res, length, after_key, before_key = searcher.get_list_of_endpoint(
+        endpoint, rows=size, query=query, cursor=cursor
+    )
+    general_handler.modifiers.search_size = length
+    general_handler.modifiers.after_key = after_key
+    general_handler.modifiers.before_key = before_key
+    return filter_queryset_accession_in(
+        general_handler.queryset_manager.get_base_queryset(endpoint), res
+    )
 
 
 def get_entry_annotation(field, general_handler):
@@ -708,16 +709,46 @@ def get_value_for_field(field):
 
     return x
 
+
 def get_taxonomy_by_scientific_name(scientific_name, general_handler):
-    general_handler.queryset_manager.filters["taxonomy"] = {"scientific_name": scientific_name}
-      
+    general_handler.queryset_manager.filters["taxonomy"] = {
+        "scientific_name": scientific_name
+    }
+
     queryset = general_handler.queryset_manager.get_queryset()
-    if (queryset.count() == 1):
+    if queryset.count() == 1:
         return queryset
-    elif (queryset.count() == 0):
-        raise EmptyQuerysetError(f"Failed to find Taxonomy node with scientific name '{scientific_name}'")
-    elif (queryset.count() > 1):
-        raise ExpectedUniqueError(f"Found more than one Taxonomy node with scientific name '{scientific_name}'")
+    elif queryset.count() == 0:
+        raise EmptyQuerysetError(
+            f"Failed to find Taxonomy node with scientific name '{scientific_name}'"
+        )
+    elif queryset.count() > 1:
+        raise ExpectedUniqueError(
+            f"Found more than one Taxonomy node with scientific name '{scientific_name}'"
+        )
+
+
+def add_taxonomy_names(value, current_payload):
+    names = {}
+    to_query = set()
+    for taxon in current_payload:
+        names[taxon["metadata"]["accession"]] = taxon["metadata"]["name"]
+        if "parent" in taxon["metadata"] and taxon["metadata"]["parent"] is not None:
+            to_query.add(taxon["metadata"]["parent"])
+        if (
+            "children" in taxon["metadata"]
+            and taxon["metadata"]["children"] is not None
+        ):
+            for child in taxon["metadata"]["children"]:
+                to_query.add(child)
+        if "extra_fields" in taxon and "lineage" in taxon["extra_fields"]:
+            for tax in taxon["extra_fields"]["lineage"].split():
+                to_query.add(tax)
+
+    qs = Taxonomy.objects.filter(accession__in=[q for q in to_query if q not in names])
+    for t in qs:
+        names[t.accession] = t.scientific_name
+    return names
 
 
 def passing(x, y):

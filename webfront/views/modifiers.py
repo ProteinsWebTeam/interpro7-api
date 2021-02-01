@@ -11,6 +11,8 @@ from webfront.models import (
     TaxonomyPerEntry,
     TaxonomyPerEntryDB,
     Taxonomy,
+    ProteinExtraFeatures,
+    ProteinResidues,
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError, HmmerWebError, ExpectedUniqueError
@@ -385,31 +387,32 @@ def filter_by_latest_entries(value, general_handler):
 
 
 def get_domain_architectures(field, general_handler):
-    searcher = general_handler.searcher
-    size = general_handler.pagination["size"]
-    cursor = general_handler.pagination["cursor"]
-
     if field is None or field.strip() == "":
         # TODO: is there a better way to get this?
         accession = general_handler.queryset_manager.filters["entry"][
             "accession__iexact"
         ]
         return ida_search(accession, general_handler)
-    else:
-        query = (
-            general_handler.queryset_manager.get_searcher_query()
-            + " && ida_id:"
-            + field
-        )
-        res, length, after_key, before_key = searcher.get_list_of_endpoint(
-            "protein", rows=size, query=query, cursor=cursor
-        )
-        general_handler.modifiers.search_size = length
-        general_handler.modifiers.after_key = after_key
-        general_handler.modifiers.before_key = before_key
-        return filter_queryset_accession_in(
-            general_handler.queryset_manager.get_base_queryset("protein"), res
-        )
+
+
+def filter_by_domain_architectures(field, general_handler):
+    searcher = general_handler.searcher
+    size = general_handler.pagination["size"]
+    cursor = general_handler.pagination["cursor"]
+
+    query = (
+        general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
+    )
+    endpoint = general_handler.queryset_manager.main_endpoint
+    res, length, after_key, before_key = searcher.get_list_of_endpoint(
+        endpoint, rows=size, query=query, cursor=cursor
+    )
+    general_handler.modifiers.search_size = length
+    general_handler.modifiers.after_key = after_key
+    general_handler.modifiers.before_key = before_key
+    return filter_queryset_accession_in(
+        general_handler.queryset_manager.get_base_queryset(endpoint), res
+    )
 
 
 def get_entry_annotation(field, general_handler):
@@ -708,6 +711,7 @@ def get_value_for_field(field):
 
     return x
 
+
 def get_taxonomy_by_scientific_name(scientific_name, general_handler):
     filters = general_handler.queryset_manager.filters
     filters["taxonomy"] = {
@@ -747,7 +751,6 @@ def get_taxonomy_by_scientific_name(scientific_name, general_handler):
             )
         return filtered_queryset
 
-
 def add_taxonomy_names(value, current_payload):
     names = {}
     to_query = set()
@@ -764,6 +767,62 @@ def add_taxonomy_names(value, current_payload):
         if "extra_fields" in taxon and "lineage" in taxon["extra_fields"]:
             for tax in taxon["extra_fields"]["lineage"].split():
                 to_query.add(tax)
+
+    qs = Taxonomy.objects.filter(accession__in=[q for q in to_query if q not in names])
+    for t in qs:
+        names[t.accession] = t.scientific_name
+    return names
+
+
+def extra_features(value, general_handler):
+    features = ProteinExtraFeatures.objects.filter(
+        protein_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    payload = {}
+    for feature in features:
+        if feature.entry_acc not in payload:
+            payload[feature.entry_acc] = {
+                "accession": feature.entry_acc,
+                "source_database": feature.source_database,
+                "locations": [],
+            }
+        payload[feature.entry_acc]["locations"].append(
+            {
+                "fragments": [
+                    {
+                        "start": feature.location_start,
+                        "end": feature.location_end,
+                        "seq_feature": feature.sequence_feature,
+                    }
+                ]
+            }
+        )
+    return payload
+
+
+def residues(value, general_handler):
+    residues = ProteinResidues.objects.filter(
+        protein_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    payload = {}
+    for residue in residues:
+        if residue.entry_acc not in payload:
+            payload[residue.entry_acc] = {
+                "accession": residue.entry_acc,
+                "source_database": residue.source_database,
+                "name": residue.entry_name,
+                "locations": [],
+            }
+        payload[residue.entry_acc]["locations"].append(
+            {
+                "description": residue.description,
+                "fragments": [
+                    {"residues": f[0], "start": f[1], "end": f[2]}
+                    for f in residue.fragments
+                ],
+            }
+        )
+    return payload
 
     qs = Taxonomy.objects.filter(accession__in=[q for q in to_query if q not in names])
     for t in qs:

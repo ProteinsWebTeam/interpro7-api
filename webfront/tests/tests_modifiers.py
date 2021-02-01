@@ -234,7 +234,6 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             "go_terms",
             "evidence_code",
             "source_database",
-            "residues",
             "structure",
             "is_fragment",
             "tax_id",
@@ -416,6 +415,7 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
     def test_no_pathways_modifier(self):
         response = self.client.get("/api/entry/interpro/IPR003165?pathways")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 
 class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
     def test_scientific_name_modifier(self):

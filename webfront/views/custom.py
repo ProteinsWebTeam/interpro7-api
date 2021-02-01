@@ -159,8 +159,15 @@ class CustomView(GenericAPIView):
                 queryset_manager=general_handler.queryset_manager,
             )
 
+            payload = {"data": serialized.data}
+            extensions = general_handler.modifiers.execute_extenders(
+                drf_request, serialized.data
+            )
+            if extensions != {}:
+                payload["extensions"] = extensions
+
             if self.many:
-                return self.get_paginated_response(serialized.data)
+                return self.get_paginated_response(payload)
             else:
                 return Response(serialized.data)
 

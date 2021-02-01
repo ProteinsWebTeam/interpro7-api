@@ -33,16 +33,16 @@ class CustomPagination(CursorPagination):
     before_key = None
 
     def get_paginated_response(self, data):
-        return Response(
-            OrderedDict(
-                [
-                    ("count", self.current_size),
-                    ("next", self.get_next_link()),
-                    ("previous", self.get_previous_link()),
-                    ("results", data),
-                ]
-            )
-        )
+        base = [
+            ("count", self.current_size),
+            ("next", self.get_next_link()),
+            ("previous", self.get_previous_link()),
+            ("results", data["data"]),
+        ]
+        if "extensions" in data and len(data["extensions"]) > 0:
+            for ext in data["extensions"]:
+                base.append((ext, data["extensions"][ext]))
+        return Response(OrderedDict(base))
 
     def _get_position_from_instance(self, instance, ordering):
         if type(instance) == tuple:

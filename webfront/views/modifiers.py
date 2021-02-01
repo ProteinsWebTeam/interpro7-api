@@ -750,6 +750,8 @@ def get_taxonomy_by_scientific_name(scientific_name, general_handler):
                 f"Found more than one Taxonomy count with scientific name '{scientific_name}' and filters"
             )
         return filtered_queryset
+    else:
+        raise URLError('scientific_name modifier currently only works with taxonomy endpoint and entry filter')
 
 def add_taxonomy_names(value, current_payload):
     names = {}

@@ -826,11 +826,6 @@ def residues(value, general_handler):
         )
     return payload
 
-    qs = Taxonomy.objects.filter(accession__in=[q for q in to_query if q not in names])
-    for t in qs:
-        names[t.accession] = t.scientific_name
-    return names
-
 
 def extra_features(value, general_handler):
     features = ProteinExtraFeatures.objects.filter(

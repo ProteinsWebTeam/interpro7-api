@@ -17,6 +17,7 @@ from webfront.views.modifiers import (
     ida_search,
     filter_by_latest_entries,
     get_value_for_field,
+    get_model,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -49,6 +50,18 @@ class MemberAccessionHandler(CustomView):
             "entry", accession__iexact=endpoint_levels[level - 1].lower()
         )
 
+        general_handler.modifiers.register(
+            "model:structure",
+            get_model("structure"),
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+        general_handler.modifiers.register(
+            "model:contacts",
+            get_model("contacts"),
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
         general_handler.modifiers.register(
             "annotation",
             get_entry_annotation,

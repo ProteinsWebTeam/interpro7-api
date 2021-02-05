@@ -1,4 +1,6 @@
 import unittest
+import gzip
+import json
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from rest_framework import status
 import ssl
@@ -443,3 +445,23 @@ class ResidueModifierTest(InterproRESTTestCase):
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertIn("residue", response2.data)
         self.assertIn("locations", response2.data["residue"])
+
+
+class StructuralModelTest(InterproRESTTestCase):
+    def test_model_structure_modifier(self):
+        response = self.client.get("/api/entry/pfam/PF17176?model:structure")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.charset, "utf-8")
+        self.assertEqual(response["content-type"], "chemical/x-pdb")
+        content = gzip.decompress(response.content)
+        self.assertIn("ATOM", str(content))
+
+    def test_model_contacts_modifier(self):
+        response = self.client.get("/api/entry/pfam/PF17176?model:contacts")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.charset, "utf-8")
+        self.assertEqual(response["content-type"], "application/json")
+        content = gzip.decompress(response.content)
+        data = json.loads(content)
+        self.assertEqual(3, len(data))
+        self.assertEqual(3, len(data[0]))

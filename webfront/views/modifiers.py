@@ -714,9 +714,7 @@ def get_value_for_field(field):
 
 def get_taxonomy_by_scientific_name(scientific_name, general_handler):
     filters = general_handler.queryset_manager.filters
-    filters["taxonomy"] = {
-        "scientific_name": scientific_name
-    }
+    filters["taxonomy"] = {"scientific_name": scientific_name}
 
     # Taxonomy has to be fetched before any further filters are applied
     queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True)
@@ -728,18 +726,18 @@ def get_taxonomy_by_scientific_name(scientific_name, general_handler):
         raise ExpectedUniqueError(
             f"Found more than one Taxonomy node with scientific name '{scientific_name}'"
         )
-    
+
     # The queryset contains the taxonomy object matching the scientific_name
-    # the counters apply to the full dataset so we only return this data if 
+    # the counters apply to the full dataset so we only return this data if
     # there are no other endpoints in the request
     if general_handler.queryset_manager.is_single_endpoint():
         return queryset
-    
+
     # The counts for a member database can be fetched from TaxonomyPerEntryDB
-    if 'entry' in filters and bool(filters.get('entry')):
-        filtered_queryset= TaxonomyPerEntryDB.objects.filter(
+    if "entry" in filters and bool(filters.get("entry")):
+        filtered_queryset = TaxonomyPerEntryDB.objects.filter(
             taxonomy=queryset.first().accession,
-            source_database=filters.get('entry')["source_database"]
+            source_database=filters.get("entry")["source_database"],
         )
         if len(filtered_queryset) == 0:
             raise EmptyQuerysetError(
@@ -751,7 +749,10 @@ def get_taxonomy_by_scientific_name(scientific_name, general_handler):
             )
         return filtered_queryset
     else:
-        raise URLError('scientific_name modifier currently only works with taxonomy endpoint and entry filter')
+        raise URLError(
+            "scientific_name modifier currently only works with taxonomy endpoint and entry filter"
+        )
+
 
 def add_taxonomy_names(value, current_payload):
     names = {}
@@ -803,11 +804,11 @@ def extra_features(value, general_handler):
 
 
 def residues(value, general_handler):
-    residues = ProteinResidues.objects.filter(
+    residues_qs = ProteinResidues.objects.filter(
         protein_acc__in=general_handler.queryset_manager.get_queryset()
     )
     payload = {}
-    for residue in residues:
+    for residue in residues_qs:
         if residue.entry_acc not in payload:
             payload[residue.entry_acc] = {
                 "accession": residue.entry_acc,
@@ -826,56 +827,6 @@ def residues(value, general_handler):
         )
     return payload
 
-
-def extra_features(value, general_handler):
-    features = ProteinExtraFeatures.objects.filter(
-        protein_acc__in=general_handler.queryset_manager.get_queryset()
-    )
-    payload = {}
-    for feature in features:
-        if feature.entry_acc not in payload:
-            payload[feature.entry_acc] = {
-                "accession": feature.entry_acc,
-                "source_database": feature.source_database,
-                "locations": [],
-            }
-        payload[feature.entry_acc]["locations"].append(
-            {
-                "fragments": [
-                    {
-                        "start": feature.location_start,
-                        "end": feature.location_end,
-                        "seq_feature": feature.sequence_feature,
-                    }
-                ]
-            }
-        )
-    return payload
-
-
-def residues(value, general_handler):
-    residues = ProteinResidues.objects.filter(
-        protein_acc__in=general_handler.queryset_manager.get_queryset()
-    )
-    payload = {}
-    for residue in residues:
-        if residue.entry_acc not in payload:
-            payload[residue.entry_acc] = {
-                "accession": residue.entry_acc,
-                "source_database": residue.source_database,
-                "name": residue.entry_name,
-                "locations": [],
-            }
-        payload[residue.entry_acc]["locations"].append(
-            {
-                "description": residue.description,
-                "fragments": [
-                    {"residues": f[0], "start": f[1], "end": f[2]}
-                    for f in residue.fragments
-                ],
-            }
-        )
-    return payload
 
 def passing(x, y):
     pass

@@ -33,7 +33,7 @@ class CustomView(GenericAPIView):
     # description of the level of the endpoint, for debug purposes
     level_description = "level"
     # List of tuples for the handlers for lower levels of the endpoint
-    # the firt item of each tuple will be regex or string to which the endpoint will be matched
+    # the first item of each tuple will be regex or string to which the endpoint will be matched
     # and the second item is the view handler that should proccess it.
     child_handlers = []
     # Default queryset of this view

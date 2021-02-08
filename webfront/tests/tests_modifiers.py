@@ -420,14 +420,28 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
 class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
     def test_scientific_name_modifier(self):
         response = self.client.get(
-            "/api/taxonomy/uniprot/?scientific_name=Penicillium+italicum"
+            "/api/taxonomy/uniprot/?scientific_name=Bacteria"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self.assertIn("accession", response.data["metadata"])
         self.assertIn("counters", response.data["metadata"])
-        self.assertEqual("40296", response.data["metadata"]["accession"])
+        self.assertEqual("2", response.data["metadata"]["accession"])
         self.assertEqual(2, response.data["metadata"]["counters"]["entries"])
+        self.assertEqual(2, response.data["metadata"]["counters"]["proteins"])
+    
+    def test_scientific_name_modifier_member_database_filter(self):
+        response = self.client.get(
+            "/api/taxonomy/uniprot/entry/interpro?scientific_name=Bacteria"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("metadata", response.data)
+        self.assertIn("accession", response.data["metadata"])
+        self.assertIn("counters", response.data["metadata"])
+        self.assertEqual("2", response.data["metadata"]["accession"])
+        self.assertEqual(1, response.data["metadata"]["counters"]["entries"])
+        self.assertEqual(1, response.data["metadata"]["counters"]["proteins"])
+
 
 
 class ResidueModifierTest(InterproRESTTestCase):

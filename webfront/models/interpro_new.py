@@ -225,3 +225,13 @@ class Isoforms(models.Model):
 
     class Meta:
         db_table = "webfront_varsplic"
+
+
+class StructuralModel(models.Model):
+    model_id = models.IntegerField(primary_key=True)
+    accession = models.CharField(max_length=25, null=False)
+    contacts = models.BinaryField()
+    structure = models.BinaryField()
+
+    class Meta:
+        db_table = "webfront_structuralmodel"

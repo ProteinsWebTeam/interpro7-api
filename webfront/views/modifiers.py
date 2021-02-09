@@ -856,9 +856,5 @@ def get_model(type):
     return get_model_structure
 
 
-def get_model_contacts(value, general_handler):
-    return payload
-
-
 def passing(x, y):
     pass

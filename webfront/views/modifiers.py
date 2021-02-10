@@ -11,6 +11,9 @@ from webfront.models import (
     TaxonomyPerEntry,
     TaxonomyPerEntryDB,
     Taxonomy,
+    ProteinExtraFeatures,
+    ProteinResidues,
+    StructuralModel,
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError, HmmerWebError, ExpectedUniqueError
@@ -385,31 +388,32 @@ def filter_by_latest_entries(value, general_handler):
 
 
 def get_domain_architectures(field, general_handler):
-    searcher = general_handler.searcher
-    size = general_handler.pagination["size"]
-    cursor = general_handler.pagination["cursor"]
-
     if field is None or field.strip() == "":
         # TODO: is there a better way to get this?
         accession = general_handler.queryset_manager.filters["entry"][
             "accession__iexact"
         ]
         return ida_search(accession, general_handler)
-    else:
-        query = (
-            general_handler.queryset_manager.get_searcher_query()
-            + " && ida_id:"
-            + field
-        )
-        res, length, after_key, before_key = searcher.get_list_of_endpoint(
-            "protein", rows=size, query=query, cursor=cursor
-        )
-        general_handler.modifiers.search_size = length
-        general_handler.modifiers.after_key = after_key
-        general_handler.modifiers.before_key = before_key
-        return filter_queryset_accession_in(
-            general_handler.queryset_manager.get_base_queryset("protein"), res
-        )
+
+
+def filter_by_domain_architectures(field, general_handler):
+    searcher = general_handler.searcher
+    size = general_handler.pagination["size"]
+    cursor = general_handler.pagination["cursor"]
+
+    query = (
+        general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
+    )
+    endpoint = general_handler.queryset_manager.main_endpoint
+    res, length, after_key, before_key = searcher.get_list_of_endpoint(
+        endpoint, rows=size, query=query, cursor=cursor
+    )
+    general_handler.modifiers.search_size = length
+    general_handler.modifiers.after_key = after_key
+    general_handler.modifiers.before_key = before_key
+    return filter_queryset_accession_in(
+        general_handler.queryset_manager.get_base_queryset(endpoint), res
+    )
 
 
 def get_entry_annotation(field, general_handler):
@@ -708,16 +712,148 @@ def get_value_for_field(field):
 
     return x
 
+
 def get_taxonomy_by_scientific_name(scientific_name, general_handler):
-    general_handler.queryset_manager.filters["taxonomy"] = {"scientific_name": scientific_name}
-      
-    queryset = general_handler.queryset_manager.get_queryset()
-    if (queryset.count() == 1):
+    filters = general_handler.queryset_manager.filters
+    filters["taxonomy"] = {"scientific_name": scientific_name}
+
+    # Taxonomy has to be fetched before any further filters are applied
+    queryset = general_handler.queryset_manager.get_queryset(only_main_endpoint=True)
+    if queryset.count() == 0:
+        raise EmptyQuerysetError(
+            f"Failed to find Taxonomy node with scientific name '{scientific_name}'"
+        )
+    if queryset.count() > 1:
+        raise ExpectedUniqueError(
+            f"Found more than one Taxonomy node with scientific name '{scientific_name}'"
+        )
+
+    # The queryset contains the taxonomy object matching the scientific_name
+    # the counters apply to the full dataset so we only return this data if
+    # there are no other endpoints in the request
+    if general_handler.queryset_manager.is_single_endpoint():
         return queryset
-    elif (queryset.count() == 0):
-        raise EmptyQuerysetError(f"Failed to find Taxonomy node with scientific name '{scientific_name}'")
-    elif (queryset.count() > 1):
-        raise ExpectedUniqueError(f"Found more than one Taxonomy node with scientific name '{scientific_name}'")
+
+    # The counts for a member database can be fetched from TaxonomyPerEntryDB
+    if "entry" in filters and bool(filters.get("entry")):
+        filtered_queryset = TaxonomyPerEntryDB.objects.filter(
+            taxonomy=queryset.first().accession,
+            source_database=filters.get("entry")["source_database"],
+        )
+        if len(filtered_queryset) == 0:
+            raise EmptyQuerysetError(
+                f"Failed to find Taxonomy count associated with scientific name '{scientific_name}' and filters"
+            )
+        elif len(filtered_queryset) > 1:
+            raise ExpectedUniqueError(
+                f"Found more than one Taxonomy count with scientific name '{scientific_name}' and filters"
+            )
+        return filtered_queryset
+    else:
+        raise URLError(
+            "scientific_name modifier currently only works with taxonomy endpoint and entry filter"
+        )
+
+
+def add_taxonomy_names(value, current_payload):
+    names = {}
+    to_query = set()
+    for taxon in current_payload:
+        names[taxon["metadata"]["accession"]] = taxon["metadata"]["name"]
+        if "parent" in taxon["metadata"] and taxon["metadata"]["parent"] is not None:
+            to_query.add(taxon["metadata"]["parent"])
+        if (
+            "children" in taxon["metadata"]
+            and taxon["metadata"]["children"] is not None
+        ):
+            for child in taxon["metadata"]["children"]:
+                to_query.add(child)
+        if "extra_fields" in taxon and "lineage" in taxon["extra_fields"]:
+            for tax in taxon["extra_fields"]["lineage"].split():
+                to_query.add(tax)
+
+    qs = Taxonomy.objects.filter(accession__in=[q for q in to_query if q not in names])
+    for t in qs:
+        names[t.accession] = t.scientific_name
+    return names
+
+
+def extra_features(value, general_handler):
+    features = ProteinExtraFeatures.objects.filter(
+        protein_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    payload = {}
+    for feature in features:
+        if feature.entry_acc not in payload:
+            payload[feature.entry_acc] = {
+                "accession": feature.entry_acc,
+                "source_database": feature.source_database,
+                "locations": [],
+            }
+        payload[feature.entry_acc]["locations"].append(
+            {
+                "fragments": [
+                    {
+                        "start": feature.location_start,
+                        "end": feature.location_end,
+                        "seq_feature": feature.sequence_feature,
+                    }
+                ]
+            }
+        )
+    return payload
+
+
+def residues(value, general_handler):
+    residues_qs = ProteinResidues.objects.filter(
+        protein_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    payload = {}
+    for residue in residues_qs:
+        if residue.entry_acc not in payload:
+            payload[residue.entry_acc] = {
+                "accession": residue.entry_acc,
+                "source_database": residue.source_database,
+                "name": residue.entry_name,
+                "locations": [],
+            }
+        payload[residue.entry_acc]["locations"].append(
+            {
+                "description": residue.description,
+                "fragments": [
+                    {"residues": f[0], "start": f[1], "end": f[2]}
+                    for f in residue.fragments
+                ],
+            }
+        )
+    return payload
+
+
+def get_model(type):
+    def get_model_structure(value, general_handler):
+        entry = general_handler.queryset_manager.get_queryset()
+        if len(entry) == 0:
+            raise EmptyQuerysetError(
+                "There is are not entries with the given accession"
+            )
+        queryset = StructuralModel.objects.filter(accession=entry.first().accession)
+        if len(queryset) == 0:
+            raise EmptyQuerysetError("The selected entry doesn't have a linked model")
+
+        annotation = queryset.first()
+
+        payload = lambda: None
+        payload.accession = annotation.accession
+        payload.type = "model:pdb"
+        if type == "structure":
+            payload.mime_type = "chemical/x-pdb"
+            payload.value = annotation.structure
+        elif type == "contacts":
+            payload.mime_type = "application/json"
+            payload.value = annotation.contacts
+        return [payload]
+
+    return get_model_structure
 
 
 def passing(x, y):

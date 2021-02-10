@@ -1,4 +1,5 @@
 from webfront.views.custom import is_single_endpoint
+from webfront.constants import ModifierType
 
 
 class ModifierManager:
@@ -16,7 +17,7 @@ class ModifierManager:
         self,
         parameter,
         action,
-        use_model_as_payload=False,
+        type=ModifierType.FILTER,
         serializer=None,
         many=None,
         works_in_single_endpoint=True,
@@ -24,7 +25,7 @@ class ModifierManager:
     ):
         self.modifiers[parameter] = {
             "action": action,
-            "use_model_as_payload": use_model_as_payload,
+            "type": type,
             "serializer": serializer,
             "many": many,
             "works_in_single_endpoint": works_in_single_endpoint,
@@ -39,13 +40,13 @@ class ModifierManager:
         single = is_single_endpoint(self.general_handler)
         if single and not self.modifiers[modifier]["works_in_single_endpoint"]:
             raise Exception(
-                "The modifier '{}' doen't work on URLs of a single endpoint".format(
+                "The modifier '{}' doesn't work on URLs of a single endpoint".format(
                     modifier
                 )
             )
         if not single and not self.modifiers[modifier]["works_in_multiple_endpoint"]:
             raise Exception(
-                "The modifier '{}' doen't work on URLs of multiple endpoints".format(
+                "The modifier '{}' doesn't work on URLs of multiple endpoints".format(
                     modifier
                 )
             )
@@ -53,12 +54,13 @@ class ModifierManager:
     def execute(self, request):
         payload_modifiers = {}
         queryset_modifiers = {}
-        for p, m in self.modifiers.items():
 
-            if m["use_model_as_payload"]:
+        for p, m in self.modifiers.items():
+            if m["type"] == ModifierType.REPLACE_PAYLOAD:
                 payload_modifiers[p] = m
-            else:
+            elif m["type"] == ModifierType.FILTER:
                 queryset_modifiers[p] = m
+
         for modifier in queryset_modifiers:
             param = request.query_params.get(modifier)
             if param is not None:
@@ -92,3 +94,17 @@ class ModifierManager:
                     )
                 use_model_as_payload = True
         return use_model_as_payload
+
+    def execute_extenders(self, request, current_payload):
+        extenders = {}
+        for p, m in self.modifiers.items():
+            if m["type"] == ModifierType.EXTEND_PAYLOAD:
+                extenders[p] = m
+        extensions = {}
+        for extender in extenders:
+            param = request.query_params.get(extender)
+            if param is not None:
+                extensions[extender] = self.modifiers[extender]["action"](
+                    param, current_payload
+                )
+        return extensions

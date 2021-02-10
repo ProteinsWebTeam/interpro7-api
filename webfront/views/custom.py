@@ -33,7 +33,7 @@ class CustomView(GenericAPIView):
     # description of the level of the endpoint, for debug purposes
     level_description = "level"
     # List of tuples for the handlers for lower levels of the endpoint
-    # the firt item of each tuple will be regex or string to which the endpoint will be matched
+    # the first item of each tuple will be regex or string to which the endpoint will be matched
     # and the second item is the view handler that should proccess it.
     child_handlers = []
     # Default queryset of this view
@@ -91,10 +91,15 @@ class CustomView(GenericAPIView):
                         mime_type = annotation.mime_type
                         value = annotation.value
                         response = HttpResponse(value, content_type=mime_type)
-                        if annotation.type.startswith("alignment:"):
-                            response["Content-Encoding"] = "gzip"
-                            if "download" not in request.GET:
-                                response["Content-Type"] = "text/plain"
+                        if annotation.type.startswith(
+                            "alignment:"
+                        ) or annotation.type.startswith("model:"):
+                            if "download" in request.GET:
+                                response["Content-Type"] = "application/gzip"
+                            else:
+                                response["Content-Encoding"] = "gzip"
+                                if "gzip" in mime_type:
+                                    response["Content-Type"] = "text/plain"
                         return response
                 general_handler.filter_serializers = []
                 self.search_size = general_handler.modifiers.search_size
@@ -159,8 +164,15 @@ class CustomView(GenericAPIView):
                 queryset_manager=general_handler.queryset_manager,
             )
 
+            payload = {"data": serialized.data}
+            extensions = general_handler.modifiers.execute_extenders(
+                drf_request, serialized.data
+            )
+            if extensions != {}:
+                payload["extensions"] = extensions
+
             if self.many:
-                return self.get_paginated_response(serialized.data)
+                return self.get_paginated_response(payload)
             else:
                 return Response(serialized.data)
 

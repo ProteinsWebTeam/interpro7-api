@@ -30,7 +30,7 @@ from json import loads
 
 go_terms = settings.INTERPRO_CONFIG.get("key_go_terms", {})
 organisms = settings.INTERPRO_CONFIG.get("key_organisms", {})
-
+encoding = 'utf-8'
 
 class SmartRedirectHandler(request.HTTPRedirectHandler):
     def http_error_302(self, req, fp, code, msg, headers):
@@ -674,7 +674,7 @@ def calculate_residue_conservation(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
     # will always have one protein in queryset
     protein = queryset[0]
-    sequence = protein.sequence
+    sequence = protein.sequence.decode(encoding)
     opener = request.build_opener(SmartRedirectHandler())
     request.install_opener(opener)
     hits = run_hmmscan(sequence)

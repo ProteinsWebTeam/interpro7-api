@@ -3,6 +3,8 @@ import gzip
 from django.db import models
 from jsonfield import JSONField
 
+encoding = 'utf-8'
+
 
 class Database(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
@@ -83,7 +85,7 @@ class Protein(models.Model):
     @property
     def sequence(self):
         if self.sequence_bin is not None:
-            return gzip.decompress(self.sequence_bin)
+            return gzip.decompress(self.sequence_bin).decode(encoding)
         else:
             return None
 

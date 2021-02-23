@@ -3,7 +3,7 @@ import gzip
 from django.db import models
 from jsonfield import JSONField
 
-encoding = 'utf-8'
+encoding = "utf-8"
 
 
 class Database(models.Model):
@@ -234,6 +234,7 @@ class StructuralModel(models.Model):
     accession = models.CharField(max_length=25, null=False)
     contacts = models.BinaryField()
     structure = models.BinaryField()
+    lddt = models.FloatField()
 
     class Meta:
         db_table = "webfront_structuralmodel"

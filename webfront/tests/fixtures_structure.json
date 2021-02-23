@@ -223,6 +223,7 @@
     "pk": 1,
     "fields": {
         "accession": "PF17176",
+        "lddt": 0.5,
         "contacts": "H4sIAOAnHWAC/4uONtQxNNQx0DON1VGINtIxNgCyLUBsYxg7FgCIHLXIJAAAAA==",
         "structure": "H4sIAOcnHWAC/42QMQ7DMAhF95yCCxRhOy54RFnbZIly/6MEcBWpSi2V5X9s/Qe27tsbohLAanLoC7S3Xg9CJvcJmSm0tOxC1s3o/irLT3oB7WbRGxAIn819Rqq5g5MMgMsXsMTBDWgbyRxAEeoDCv8FtNQGvzZsnw2FW3xBLaMnW346Aa6DA5lEAQAA"
     }

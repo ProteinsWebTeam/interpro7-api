@@ -421,9 +421,7 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
 
 class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
     def test_scientific_name_modifier(self):
-        response = self.client.get(
-            "/api/taxonomy/uniprot/?scientific_name=Bacteria"
-        )
+        response = self.client.get("/api/taxonomy/uniprot/?scientific_name=Bacteria")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self.assertIn("accession", response.data["metadata"])
@@ -431,7 +429,7 @@ class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
         self.assertEqual("2", response.data["metadata"]["accession"])
         self.assertEqual(2, response.data["metadata"]["counters"]["entries"])
         self.assertEqual(2, response.data["metadata"]["counters"]["proteins"])
-    
+
     def test_scientific_name_modifier_member_database_filter(self):
         response = self.client.get(
             "/api/taxonomy/uniprot/entry/interpro?scientific_name=Bacteria"
@@ -443,7 +441,6 @@ class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
         self.assertEqual("2", response.data["metadata"]["accession"])
         self.assertEqual(1, response.data["metadata"]["counters"]["entries"])
         self.assertEqual(1, response.data["metadata"]["counters"]["proteins"])
-
 
 
 class ResidueModifierTest(InterproRESTTestCase):
@@ -462,6 +459,13 @@ class ResidueModifierTest(InterproRESTTestCase):
 
 
 class StructuralModelTest(InterproRESTTestCase):
+    def test_model_info_modifier(self):
+        response = self.client.get("/api/entry/pfam/PF17176?model:info")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("accession", response.data)
+        self.assertIn("lddt", response.data)
+        self.assertEqual(0.5, response.data["lddt"])
+
     def test_model_structure_modifier(self):
         response = self.client.get("/api/entry/pfam/PF17176?model:structure")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

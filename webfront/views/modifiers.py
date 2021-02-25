@@ -841,7 +841,8 @@ def get_model(type):
             raise EmptyQuerysetError("The selected entry doesn't have a linked model")
 
         annotation = queryset.first()
-
+        if type == "info":
+            return {"lddt": annotation.lddt, "accession": annotation.accession}
         payload = lambda: None
         payload.accession = annotation.accession
         payload.type = "model:pdb"

@@ -51,6 +51,9 @@ class MemberAccessionHandler(CustomView):
         )
 
         general_handler.modifiers.register(
+            "model:info", get_model("info"), type=ModifierType.REPLACE_PAYLOAD
+        )
+        general_handler.modifiers.register(
             "model:structure",
             get_model("structure"),
             type=ModifierType.REPLACE_PAYLOAD,

@@ -22,7 +22,7 @@ from django.conf import settings
 from requests import Session
 from urllib import request, parse
 from json import loads
-
+import gzip
 # import ssl
 
 # MAQ bypassing SSL errors
@@ -527,6 +527,22 @@ def get_isoforms(value, general_handler):
 
     return {"results": [iso.accession for iso in isoforms], "count": len(isoforms)}
 
+def run_hmmsearch(model):
+    """
+        run hmmsearch using hmm model against reviewed uniprot proteins
+    """
+    parameters = {
+        "seq": model, 
+        "seqdb": "swissprot", 
+    }
+    
+    enc_params = parse.urlencode(parameters).encode()
+    url = "https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch"
+    req = request.Request(url=url, data=enc_params, headers={"Accept": "application/json"})
+    with request.urlopen(req) as response:
+        raw_results = response.read().decode("utf-8")
+        results = loads(raw_results)
+        return results['results']['hits']
 
 def run_hmmscan(sequence):
     """
@@ -573,13 +589,13 @@ def filter_entries(hits):
     return filtered_hits
 
 
-def calculate_conservation_scores(pfam_acc):
+def calculate_conservation_scores(entry_acc):
     """
     Get HMM Logo and convert it to conservation score
     :param pfam_acc:
     :return: list of scores
     """
-    logo_data = EntryAnnotation.objects.filter(accession_id=pfam_acc, type="logo")[0]
+    logo_data = EntryAnnotation.objects.filter(accession_id=entry_acc, type="logo")[0]
     logo_string = logo_data.value.decode("utf8")
     logo = loads(logo_string)
     max_height = logo["max_height_theory"]
@@ -664,17 +680,53 @@ def format_logo(matrix):
     return output
 
 
-def calculate_residue_conservation(value, general_handler):
+def calculate_residue_conservation(entry_db, general_handler):
     """
     Calculate the conservancy score of each Pfam entry matching the protein sequence
-    :param value:
+    :param entry_db: name of database to calculate entry conservation scores from
     :param general_handler:
     :return: An object with an array of hits and conservancy scores
     """
     queryset = general_handler.queryset_manager.get_queryset()
     # will always have one protein in queryset
     protein = queryset[0]
-    sequence = protein.sequence
+
+    # get entries matching the sequence from the selected database
+    q = "protein_acc:{} && entry_db:{}".format(protein.accession.lower(), entry_db.lower())
+    searcher = general_handler.searcher
+    results = searcher.execute_query(q, None, None)
+    # process each hit
+    sequence = protein.sequence.decode('utf-8')
+    alignments = {"sequence": sequence, entry_db: {"entries": {}}}
+
+    if "hits" in results.keys() and "hits" in results["hits"] and len(results["hits"]["hits"]) > 0 :
+        entries = results["hits"]["hits"]
+        for entry in entries:
+            entry_annotation = EntryAnnotation.objects.filter(accession_id=entry["_source"]["entry_acc"], type="hmm")[0]
+            model = gzip.decompress(entry_annotation.value).decode("utf-8")
+            hits = run_hmmsearch(model)
+            protein_hits = list(filter(lambda x: x['acc'] == protein.identifier, hits))
+            if len(protein_hits) == 0:
+                raise HmmerWebError(
+                    f"Failed to match {protein.identifier} with model {entry_annotation.accession_id}"
+                )
+            alignments[entry_db]["entries"][entry_annotation.accession_id] = []
+            logo_score = calculate_conservation_scores(entry_annotation.accession_id)
+            domains = [hit['domains'] for hit in protein_hits][0]
+            for hit in domains:
+                # calculate scores for each domain hit for each entry
+                mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(
+                    hit, sequence
+                )
+                matrixseq = get_hmm_matrix(
+                    logo_score, alisqfrom, alisqto, hmmfrom, hmmto, mappedseq, modelseq
+                )
+                formatted_matrix = format_logo(matrixseq)
+                alignments[entry_db]["entries"][entry_annotation.accession_id].append(formatted_matrix)
+        pass
+    return alignments
+    
+    sequence = protein.sequence.decode('utf-8')
     opener = request.build_opener(SmartRedirectHandler())
     request.install_opener(opener)
     hits = run_hmmscan(sequence)
@@ -687,7 +739,6 @@ def calculate_residue_conservation(value, general_handler):
         (pfam_acc, _version) = pfam_hit_acc.split(".")
         if pfam_acc not in alignments["pfam"]["entries"]:
             alignments["pfam"]["entries"][pfam_acc] = []
-
         logo_score = calculate_conservation_scores(pfam_acc)
         for hit in entry["domains"]:
             # calculate scores for each domain hit for each entry

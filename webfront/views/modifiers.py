@@ -661,24 +661,24 @@ def calculate_residue_conservation(entry_db, general_handler):
             model = gzip.decompress(entry_annotation.value).decode("utf-8")
             hits = run_hmmsearch(model)
             protein_hits = list(filter(lambda x: x['acc'] == protein.identifier, hits))
-            if len(protein_hits) == 0:
-                raise HmmerWebError(
-                    f"Failed to match {protein.identifier} with model {entry_annotation.accession_id}"
-                )
-            alignments[entry_db]["entries"][entry_annotation.accession_id] = []
-            logo_score = calculate_conservation_scores(entry_annotation.accession_id)
-            domains = [hit['domains'] for hit in protein_hits][0]
-            for hit in domains:
-                # calculate scores for each domain hit for each entry
-                mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(
-                    hit, sequence
-                )
-                matrixseq = get_hmm_matrix(
-                    logo_score, alisqfrom, alisqto, hmmfrom, hmmto, mappedseq, modelseq
-                )
-                formatted_matrix = format_logo(matrixseq)
-                alignments[entry_db]["entries"][entry_annotation.accession_id].append(formatted_matrix)
-        pass
+            if len(protein_hits) > 0:
+                alignments[entry_db]["entries"][entry_annotation.accession_id] = []
+                logo_score = calculate_conservation_scores(entry_annotation.accession_id)
+                domains = [hit['domains'] for hit in protein_hits][0]
+                for hit in domains:
+                    # calculate scores for each domain hit for each entry
+                    mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(
+                        hit, sequence
+                    )
+                    matrixseq = get_hmm_matrix(
+                        logo_score, alisqfrom, alisqto, hmmfrom, hmmto, mappedseq, modelseq
+                    )
+                    formatted_matrix = format_logo(matrixseq)
+                    alignments[entry_db]["entries"][entry_annotation.accession_id].append(formatted_matrix)
+                else:
+                    raise HmmerWebError(
+                    f"Failed to match {protein.identifier} with model {entry_annotation.accession_id}. Is protein Uniprot reviewed?"
+                    )
     return alignments
 
 

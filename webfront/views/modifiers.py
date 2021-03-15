@@ -16,7 +16,7 @@ from webfront.models import (
     StructuralModel,
 )
 from webfront.views.custom import filter_queryset_accession_in
-from webfront.exceptions import EmptyQuerysetError, HmmerWebError, ExpectedUniqueError
+from webfront.exceptions import EmptyQuerysetError, HmmerWebError, ExpectedUniqueError, InvalidOperationRequest
 from django.conf import settings
 
 from requests import Session
@@ -646,6 +646,11 @@ def calculate_residue_conservation(entry_db, general_handler):
     # will always have one protein in queryset
     protein = queryset[0]
 
+    if protein.source_database != 'reviewed':
+        raise InvalidOperationRequest(
+                f"Conservation data can only be calculated for proteins in UniProt reviewed."
+            )
+
     # get entries matching the sequence from the selected database
     q = "protein_acc:{} && entry_db:{}".format(protein.accession.lower(), entry_db.lower())
     searcher = general_handler.searcher
@@ -677,7 +682,7 @@ def calculate_residue_conservation(entry_db, general_handler):
                     alignments[entry_db]["entries"][entry_annotation.accession_id].append(formatted_matrix)
                 else:
                     raise HmmerWebError(
-                    f"Failed to match {protein.identifier} with model {entry_annotation.accession_id}. Is protein Uniprot reviewed?"
+                        f"Failed to match {protein.identifier} with model {entry_annotation.accession_id}."
                     )
     return alignments
 

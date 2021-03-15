@@ -681,9 +681,9 @@ def calculate_residue_conservation(entry_db, general_handler):
                     formatted_matrix = format_logo(matrixseq)
                     alignments[entry_db]["entries"][entry_annotation.accession_id].append(formatted_matrix)
                 else:
-                    raise HmmerWebError(
-                        f"Failed to match {protein.identifier} with model {entry_annotation.accession_id}."
-                    )
+                    # could raise an exception here as hmmer should find everything 
+                    # interproscan does. However it seems that they occasionally differ.
+                    continue
     return alignments
 
 

@@ -656,7 +656,7 @@ def calculate_residue_conservation(entry_db, general_handler):
     searcher = general_handler.searcher
     results = searcher.execute_query(q, None, None)
     # process each hit
-    sequence = protein.sequence.decode('utf-8')
+    sequence = protein.sequence
     alignments = {"sequence": sequence, entry_db: {"entries": {}}}
 
     if "hits" in results.keys() and "hits" in results["hits"] and len(results["hits"]["hits"]) > 0 :

@@ -637,7 +637,7 @@ def format_logo(matrix):
 
 def calculate_residue_conservation(entry_db, general_handler):
     """
-    Calculate the conservancy score of each Pfam entry matching the protein sequence
+    Calculate the conservancy score of each entry from entry_db matching the protein sequence
     :param entry_db: name of database to calculate entry conservation scores from
     :param general_handler:
     :return: An object with an array of hits and conservancy scores
@@ -665,6 +665,7 @@ def calculate_residue_conservation(entry_db, general_handler):
             entry_annotation = EntryAnnotation.objects.filter(accession_id=entry["_source"]["entry_acc"], type="hmm")[0]
             model = gzip.decompress(entry_annotation.value).decode("utf-8")
             hits = run_hmmsearch(model)
+            protein_dict = {x['acc']: x for x in hits}
             protein_hits = list(filter(lambda x: x['acc'] == protein.identifier, hits))
             if len(protein_hits) > 0:
                 alignments[entry_db]["entries"][entry_annotation.accession_id] = []
@@ -680,10 +681,10 @@ def calculate_residue_conservation(entry_db, general_handler):
                     )
                     formatted_matrix = format_logo(matrixseq)
                     alignments[entry_db]["entries"][entry_annotation.accession_id].append(formatted_matrix)
-                else:
-                    # could raise an exception here as hmmer should find everything 
-                    # interproscan does. However it seems that they occasionally differ.
-                    continue
+            else:
+                if 'warnings' not in alignments[entry_db]:
+                    alignments[entry_db]['warnings'] = []
+                alignments[entry_db]['warnings'].append(f"Hmmer did not match Entry {entry_annotation.accession_id} with Protein {protein.identifier}.")
     return alignments
 
 

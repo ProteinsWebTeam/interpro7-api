@@ -51,9 +51,6 @@ class MemberAccessionHandler(CustomView):
         )
 
         general_handler.modifiers.register(
-            "model:info", get_model("info"), type=ModifierType.REPLACE_PAYLOAD
-        )
-        general_handler.modifiers.register(
             "model:structure",
             get_model("structure"),
             type=ModifierType.REPLACE_PAYLOAD,
@@ -62,6 +59,12 @@ class MemberAccessionHandler(CustomView):
         general_handler.modifiers.register(
             "model:contacts",
             get_model("contacts"),
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+        general_handler.modifiers.register(
+            "model:lddt",
+            get_model("lddt"),
             type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.ANNOTATION_BLOB,
         )

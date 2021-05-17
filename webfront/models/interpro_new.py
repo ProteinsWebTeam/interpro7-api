@@ -234,7 +234,7 @@ class StructuralModel(models.Model):
     accession = models.CharField(max_length=25, null=False)
     contacts = models.BinaryField()
     structure = models.BinaryField()
-    lddt = models.FloatField()
+    lddt = models.BinaryField()
 
     class Meta:
         db_table = "webfront_structuralmodel"

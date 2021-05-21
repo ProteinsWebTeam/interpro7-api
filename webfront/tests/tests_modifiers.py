@@ -459,13 +459,6 @@ class ResidueModifierTest(InterproRESTTestCase):
 
 
 class StructuralModelTest(InterproRESTTestCase):
-    def test_model_info_modifier(self):
-        response = self.client.get("/api/entry/pfam/PF17176?model:info")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("accession", response.data)
-        self.assertIn("lddt", response.data)
-        self.assertEqual(0.5, response.data["lddt"])
-
     def test_model_structure_modifier(self):
         response = self.client.get("/api/entry/pfam/PF17176?model:structure")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -483,3 +476,13 @@ class StructuralModelTest(InterproRESTTestCase):
         data = json.loads(content)
         self.assertEqual(3, len(data))
         self.assertEqual(3, len(data[0]))
+
+    def test_model_lddt_modifier(self):
+        response = self.client.get("/api/entry/pfam/PF17176?model:lddt")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.charset, "utf-8")
+        self.assertEqual(response["content-type"], "application/json")
+        content = gzip.decompress(response.content)
+        data = json.loads(content)
+        self.assertEqual(3, len(data))
+        self.assertTrue(all([0 <= item <= 1 for item in data]))

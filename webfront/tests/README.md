@@ -23,7 +23,9 @@ This in an example of how to generate the fixtures file for `StructuralModel`. T
     ATOM      4  O   VAL A   1       0.991   2.879  -0.532  1.00  4.92           O   
     """  
     structure_gz = gzip.compress(bytes(structure,'utf-8'))
-    model = StructuralModel(model_id=1,accession='PF17176',contacts=contacts_gz,structure=structure_gz)
+    lddt = '[0.07427680118058666, 0.016404920747420615, 0.5094414232300765]'
+    lddt_gz = gzip.compress(bytes(lddt,'utf-8'))
+    model = StructuralModel(model_id=1,accession='PF17176',contacts=contacts_gz,structure=structure_gz,lddt=lddt_gz)
    
     model.save()
     ```

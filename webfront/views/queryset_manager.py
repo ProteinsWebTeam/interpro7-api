@@ -132,8 +132,8 @@ class QuerysetManager:
                     )
                 elif k == "type" or k == "type__iexact" or k == "type__exact":
                     blocks.append("{}_type:{}".format(ep, escape(v)))
-                elif k == "is_fragment":
-                    blocks.append("{}_is_fragment:{}".format(ep, escape(v)))
+                elif k in ("is_fragment", "has_model"):
+                    blocks.append("{}_{}:{}".format(ep, k, escape(v)))
                 elif k == "tax_id" or k == "tax_id__iexact" or k == "tax_id__contains":
                     blocks.append("tax_id:{}".format(escape(v)))
                 elif "tax_lineage__contains" in k:

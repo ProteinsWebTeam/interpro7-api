@@ -19,7 +19,6 @@ every path starting with `/api` to the common view: `GeneralHandler`.
 urlpatterns = [url(r"^api/(?P<url>.*)$", common.GeneralHandler.as_view())]
 ```
 
-
 ## URL structure
 
 As seen above a valid URL on the InterPro7 API should start with `/api`.
@@ -35,8 +34,8 @@ The first *endpoint-block* will be called *main-endpoint-block*. Any following
 *endpoint-block* are considered filters. 
 In this way, the *main-endpoint-block* defines the set to return, and the rest of the endpoints
 filter the set. For example `/api/protein/reviewed/entry/interpro` is a list of reviewed proteins
-that have matches with interpro entries; in contrast of `/api/entry/interpro/protein/reviewed`, 
-which is a list of interproentris that can match reviwed proteins.
+that have matches with InterPro entries; in contrast of `/api/entry/interpro/protein/reviewed`, 
+which is a list of InterPro entries that can match reviewed proteins.
 
 
 ## GeneralHandler
@@ -55,15 +54,16 @@ including all the common logic:
     and recursively finding a handler for each block.
 
 ### Cache Strategy
-Besides using the cache for fast responses we  use it to avoid duplication of expensive queries.
+
+Besides using the cache for fast responses, we use it to avoid duplication of expensive queries.
 When a query is executed it has 90 seconds (by default) to get a response. 
 Otherwise the response will be a time put HTTP code `408`, which will be temporarily saved in the 
 cache. 
 This however won't interrupt the query, which will keep its execution in parallel.
-if a duplicate request arrives before the original request finishes, it will automaticaly get the
+if a duplicate request arrives before the original request finishes, it will automatically get the
 `408` from the cache.
 When the original request completes, it saves the response in the cache, replacing the `408` one. 
-This way, any future duplicate request will get the value from the cache alomos instantly.  
+This way, any future duplicate request will get the value from the cache almost instantly.  
 
 
 ## CustomView
@@ -73,7 +73,7 @@ All *block* handlers inherit from `CustomView` and have to implement their `get(
 
 #### main-endpoint-block
  
-Basically the task of the `get()` method in `CustomView` is to find what is the most apropiate 
+Basically the task of the `get()` method in `CustomView` is to find what is the most appropriate 
 handler for the current block, and once it founds it invokes the `get()` method of such handler.
 The usual tasks of a handler and in particular of the `get()` method are:
 
@@ -89,11 +89,12 @@ The usual tasks of a handler and in particular of the `get()` method are:
 Once all the *blocks* of the main endpoint have been exhausted, is is time to process the filters:
  
  #### filter-endpoint-blocks
- The logic is very similar, but now the method to call in all the handlers is `filter()`.
- The `filter()` method should be defined as _static_ and should return the filtered queryset.
- This is then repeated for the rest of the *endpoint-blocks*
+ 
+The logic is very similar, but now the method to call in all the handlers is `filter()`.
+The `filter()` method should be defined as _static_ and should return the filtered queryset.
+This is then repeated for the rest of the *endpoint-blocks*
  
 After processing the filters the last call of the recursion occurs, and because there are not more blocks, 
-we should finish the response, which implies the excution of any available modifiers, setting up 
+we should finish the response, which implies the execution of any available modifiers, setting up 
 the pagination in case of responses with many items, and finally serializing the built queryset.
  

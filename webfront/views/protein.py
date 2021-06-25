@@ -280,6 +280,9 @@ class ProteinHandler(CustomView):
         general_handler.modifiers.register(
             "is_fragment", filter_by_boolean_field("protein", "is_fragment")
         )
+        general_handler.modifiers.register(
+            "has_model", filter_by_boolean_field("protein", "has_model")
+        )
 
         return super(ProteinHandler, self).get(
             request._request,

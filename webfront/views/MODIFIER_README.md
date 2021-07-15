@@ -1,11 +1,11 @@
 Modifier Manager
 ===
 
-Modifiers are the technique defined to extend the functionality of the API. Modifiers are exposed to the user as URL parameters, so they can modify the current queryset by filtering it further, aggregated or change the serializer of it.
+Modifiers are the technique defined to extend the functionality of the API. Modifiers are exposed to the user as URL parameters, so they can modify the current queryset by filtering, aggregating or change the serializer of the queryset.
 
-As is described [here](./README.md), the API executes a view for each level in the URL. The main purpose of the view execution is to filter the queryset. But additionally, modifiers are registered in during this process. For example, the modifier `with_names` was registered at the level of the [TaxonomyAccessionHandler](./taxonomy.py#L39). This modifier is used by users wanting to include in the response, the names of children and parents of a given taxon id.
+As is described [here](./README.md), the API executes a view for each level in the URL. The main purpose of the view execution is to filter the queryset. Additionally, modifiers are registered in during this process. For example, the modifier `with_names` is registered at the level of the [TaxonomyAccessionHandler](./taxonomy.py#L39). This modifier is used by users wanting to include the names of children and parents of a given taxon id in the response.
 
-After all the levels of the URL have been processed by the views, the custom manager checks if there are any modifier registered, and if the associated URL parameter is present, and executes the modifier if that's the case.
+After all the levels of the URL have been processed by the views, the custom manager checks if there are any modifiers registered, and if the associated URL parameter is present, executes the modifier.
 
 This are the parameters of the method to register a modifier:
 * `parameter`: the associated URL parameter of the modifier.

@@ -17,16 +17,19 @@ This in an example of how to generate the fixtures file for `StructuralModel`. T
     
     contacts = "[[1,11,0.5], [2,30,0.8], [3,30,0.8]]"  
     contacts_gz = gzip.compress(bytes(contacts,'utf-8'))
+   
+    plddt = '[0.07427680118058666, 0.016404920747420615, 0.5094414232300765]'
+    plddt_gz = gzip.compress(bytes(plddt,'utf-8'))
+   
     structure = """ATOM      1  N   VAL A   1      -0.701   1.770   1.392  1.00  4.92           N   
     ATOM      2  CA  VAL A   1       0.691   2.052   1.718  1.00  4.92           C   
     ATOM      3  C   VAL A   1       1.384   2.880   0.637  1.00  4.92           C   
     ATOM      4  O   VAL A   1       0.991   2.879  -0.532  1.00  4.92           O   
     """  
     structure_gz = gzip.compress(bytes(structure,'utf-8'))
-    lddt = '[0.07427680118058666, 0.016404920747420615, 0.5094414232300765]'
-    lddt_gz = gzip.compress(bytes(lddt,'utf-8'))
-    model = StructuralModel(model_id=1,accession='PF17176',contacts=contacts_gz,structure=structure_gz,lddt=lddt_gz)
-   
+
+    model = StructuralModel(model_id=1, accession='PF17176', algorithm='RoseTTAFold', contacts=contacts_gz,
+                            plddt=plddt_gz, structure=structure_gz)
     model.save()
     ```
 
@@ -41,8 +44,10 @@ This in an example of how to generate the fixtures file for `StructuralModel`. T
             "pk": 1,
             "fields": {
                 "accession": "PF17176",
-                "contacts": "H4sIAOAnHWAC/4uONtQxNNQx0DON1VGINtIxNgCyLUBsYxg7FgCIHLXIJAAAAA==",
-                "structure": "H4sIAOcnHWAC/42QMQ7DMAhF95yCCxRhOy54RFnbZIly/6MEcBWpSi2V5X9s/Qe27tsbohLAanLoC7S3Xg9CJvcJmSm0tOxC1s3o/irLT3oB7WbRGxAIn819Rqq5g5MMgMsXsMTBDWgbyRxAEeoDCv8FtNQGvzZsnw2FW3xBLaMnW346Aa6DA5lEAQAA"
+                "algorithm": "RoseTTAFold",
+                "contacts": "H4sIABYRKmEC/4uONtQxNNQx0DON1VGINtIxNgCyLUBsYxg7FgCIHLXIJAAAAA==",
+                "plddt": "H4sIABYRKmEC/xXJwQ2AMAwDwFUYACE7dZx0FsT+azR87148KEW5QTaybd/XIC1ox+Q0zPw1sSUqViygnN8BxhV43z8AAAA=",
+                "structure": "H4sIABYRKmEC/42QQQ6EIAxF956iF5imgNiybNyqbIz3P4otTExmHJPp5v9C/mtB97pCqwCwmRy6gPbW60XI5D4gMzVNJbqQdSO6v8rzg15Eu5r1RgTCqbiPSDl2cpAH4vxJTP3km2g7ydiIItQnJP6PaLEKv3Ys7x2FS/uFnJ5e7fnhBOGGnjRIAQAA"
             }
         }
     ]

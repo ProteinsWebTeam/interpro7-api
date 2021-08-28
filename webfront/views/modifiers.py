@@ -839,7 +839,7 @@ def get_model(field):
             payload.value = annotation.contacts
         elif field == "lddt":
             payload.mime_type = "application/json"
-            payload.value = annotation.lddt
+            payload.value = annotation.plddt
 
         return [payload]
 

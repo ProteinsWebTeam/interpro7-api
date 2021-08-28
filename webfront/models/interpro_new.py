@@ -234,8 +234,8 @@ class StructuralModel(models.Model):
     accession = models.CharField(max_length=25, null=False)
     algorithm = models.CharField(max_length=20, null=False)
     contacts = models.BinaryField(null=False)
+    plddt = models.BinaryField(null=False)
     structure = models.BinaryField(null=False)
-    lddt = models.BinaryField(null=False)
 
     class Meta:
         db_table = "webfront_structuralmodel"

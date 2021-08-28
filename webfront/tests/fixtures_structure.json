@@ -223,10 +223,10 @@
     "pk": 1,
     "fields": {
       "accession": "PF17176",
-      "algorithm": "trRosetta",
-      "contacts": "H4sIAB6Io2AC/4uONtQxNNQx0DON1VGINtIxNgCyLUBsYxg7FgCIHLXIJAAAAA==",
-      "structure": "H4sIAB6Io2AC/42QQQ6EIAxF956iF5imgNiybNyqbIz3P4otTExmHJPp5v9C/mtB97pCqwCwmRy6gPbW60XI5D4gMzVNJbqQdSO6v8rzg15Eu5r1RgTCqbiPSDl2cpAH4vxJTP3km2g7ydiIItQnJP6PaLEKv3Ys7x2FS/uFnJ5e7fnhBOGGnjRIAQAA",
-      "lddt": "H4sIAB6Io2AC/xXJwQ2AMAwDwFUYACE7dZx0FsT+azR87148KEW5QTaybd/XIC1ox+Q0zPw1sSUqViygnN8BxhV43z8AAAA="
+      "algorithm": "RoseTTAFold",
+      "contacts": "H4sIABYRKmEC/4uONtQxNNQx0DON1VGINtIxNgCyLUBsYxg7FgCIHLXIJAAAAA==",
+      "plddt": "H4sIABYRKmEC/xXJwQ2AMAwDwFUYACE7dZx0FsT+azR87148KEW5QTaybd/XIC1ox+Q0zPw1sSUqViygnN8BxhV43z8AAAA=",
+      "structure": "H4sIABYRKmEC/42QQQ6EIAxF956iF5imgNiybNyqbIz3P4otTExmHJPp5v9C/mtB97pCqwCwmRy6gPbW60XI5D4gMzVNJbqQdSO6v8rzg15Eu5r1RgTCqbiPSDl2cpAH4vxJTP3km2g7ydiIItQnJP6PaLEKv3Ys7x2FS/uFnJ5e7fnhBOGGnjRIAQAA"
     }
   }
 ]

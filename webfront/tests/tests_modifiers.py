@@ -460,7 +460,7 @@ class ResidueModifierTest(InterproRESTTestCase):
 
 class StructuralModelTest(InterproRESTTestCase):
     def test_model_structure_modifier(self):
-        response = self.client.get("/api/entry/pfam/PF17176?model:structure")
+        response = self.client.get("/api/entry/pfam/PF18859?model:structure")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.charset, "utf-8")
         self.assertEqual(response["content-type"], "chemical/x-pdb")
@@ -468,7 +468,7 @@ class StructuralModelTest(InterproRESTTestCase):
         self.assertIn("ATOM", str(content))
 
     def test_model_contacts_modifier(self):
-        response = self.client.get("/api/entry/pfam/PF17176?model:contacts")
+        response = self.client.get("/api/entry/pfam/PF18859?model:contacts")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.charset, "utf-8")
         self.assertEqual(response["content-type"], "application/json")
@@ -478,7 +478,7 @@ class StructuralModelTest(InterproRESTTestCase):
         self.assertEqual(5, len(data[0]))
 
     def test_model_lddt_modifier(self):
-        response = self.client.get("/api/entry/pfam/PF17176?model:lddt")
+        response = self.client.get("/api/entry/pfam/PF18859?model:lddt")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.charset, "utf-8")
         self.assertEqual(response["content-type"], "application/json")

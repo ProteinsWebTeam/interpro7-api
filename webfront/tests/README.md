@@ -34,7 +34,7 @@ This in an example of how to generate the fixtures file for `StructuralModel`. T
     """  
     structure_gz = gzip.compress(bytes(structure,'utf-8'))
 
-    model = StructuralModel(model_id=1, accession='PF18859', algorithm='RoseTTAFold', contacts=contacts_gz,
+    model = StructuralModel(model_id=1, accession='PF17176', algorithm='RoseTTAFold', contacts=contacts_gz,
                             plddt=plddt_gz, structure=structure_gz)
     model.save()
     ```
@@ -50,7 +50,7 @@ This in an example of how to generate the fixtures file for `StructuralModel`. T
             "model": "webfront.structuralmodel",
             "pk": 1,
             "fields": {
-                "accession": "PF18859",
+                "accession": "PF17176",
                 "algorithm": "RoseTTAFold",
                 "contacts": "H4sIAKMfQmEC/4uONtSBQj2DWB0FINdIB4SNDXQM9EwhIsZAERMg1wLENdKBQKh6oEogByRrCeIaA7kmQAiSjQUAU15YL10AAAA=",
                 "plddt": "H4sIAKMfQmEC/x3IwQ3AIAwDwFU6AEIm2NiZBXX/NSr1nncxHThbm2B3nPFgJizllNNLhP477EhRrTKs9wMKEasjPAAAAA==",

@@ -135,7 +135,24 @@
         "sets": 0,
         "domain_architectures": 2
       },
-      "interactions": null
+      "interactions": null,
+      "taxa": {
+        "id": "1",
+        "rank": null,
+        "name": "root",
+        "proteins": 10,
+        "species": 2,
+        "children": [
+          {
+            "id": "2759",
+            "rank": "superkingdom",
+            "name": "Eukaryota",
+            "proteins": 10,
+            "species": 2,
+            "children": []
+          }
+        ]
+      }
     }
   },
   {

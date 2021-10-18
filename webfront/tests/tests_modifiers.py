@@ -418,6 +418,18 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/interpro/IPR003165?pathways")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_taxa_modifier(self):
+        response = self.client.get("/api/entry/interpro/IPR003165?taxa")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("taxa", response.data)
+        self.assertIsInstance(response.data["taxa"], object)
+        self.assertIn("children", response.data["taxa"])
+        self.assertEqual(1, len(response.data["taxa"]["children"]))
+
+    def test_no_taxa_modifier(self):
+        response = self.client.get("/api/entry/interpro/IPR001165?taxa")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 
 class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
     def test_scientific_name_modifier(self):

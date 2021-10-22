@@ -1,4 +1,4 @@
-selenium==4.0.0
+selenium==3.141.0
 django-debug-toolbar==3.2.2
 ipdb==0.13.9
 coveralls==3.2.0

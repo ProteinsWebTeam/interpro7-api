@@ -9,6 +9,10 @@
       },
       "counts": {
         "type": "long"
+      },
+      "representative": {
+        "type": "object",
+        "enabled": false
       }
     }
   }

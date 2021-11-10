@@ -814,7 +814,7 @@ def residues(value, general_handler):
     return payload
 
 
-def get_model(type):
+def get_model(field):
     def get_model_structure(value, general_handler):
         entry = general_handler.queryset_manager.get_queryset()
         if len(entry) == 0:
@@ -831,15 +831,15 @@ def get_model(type):
         payload.accession = annotation.accession
         payload.type = "model:pdb"
 
-        if type == "structure":
+        if field == "structure":
             payload.mime_type = "chemical/x-pdb"
             payload.value = annotation.structure
-        elif type == "contacts":
+        elif field == "contacts":
             payload.mime_type = "application/json"
             payload.value = annotation.contacts
-        elif type == "lddt":
+        elif field == "lddt":
             payload.mime_type = "application/json"
-            payload.value = annotation.lddt
+            payload.value = annotation.plddt
 
         return [payload]
 

@@ -486,8 +486,8 @@ class StructuralModelTest(InterproRESTTestCase):
         self.assertEqual(response["content-type"], "application/json")
         content = gzip.decompress(response.content)
         data = json.loads(content)
-        self.assertEqual(3, len(data))
-        self.assertEqual(3, len(data[0]))
+        self.assertEqual(6, len(data))
+        self.assertEqual(5, len(data[0]))
 
     def test_model_lddt_modifier(self):
         response = self.client.get("/api/entry/pfam/PF17176?model:lddt")

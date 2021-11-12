@@ -42,7 +42,7 @@ Currently there are six main types of data available through the API.
 
 |Type| Description|Source|
 |----|----|----|
-|Entry| Predicted functional and structural domains on proteins| InterPro, CATH-Gene3D, CDD, HAMAP, PANTHER, Pfam, PIRSF, PRINTS, ProDom, PROSITE Patterns, PROSITE Profiles, SMART, SFLD, SUPERFAMILY, TIGRFAMs|
+|Entry| Predicted functional and structural domains on proteins| InterPro, CATH-Gene3D, CDD, HAMAP, PANTHER, Pfam, PIRSF, PRINTS, PROSITE Patterns, PROSITE Profiles, SMART, SFLD, SUPERFAMILY, TIGRFAMs|
 |Protein| Protein sequence| UniProtKB (reviewed and unreviewed)|
 |Structure| Macromolecular structures involving proteins| PDB|
 |Set| Sets describing relationships between entries|Pfam, CDD|

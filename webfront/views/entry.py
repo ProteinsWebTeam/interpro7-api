@@ -85,9 +85,6 @@ class MemberAccessionHandler(CustomView):
             type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.IDA_LIST,
         )
-        general_handler.modifiers.register(
-            "taxa", get_value_for_field("taxa"), type=ModifierType.REPLACE_PAYLOAD
-        )
 
         return super(MemberAccessionHandler, self).get(
             request._request,
@@ -250,9 +247,6 @@ class AccessionHandler(CustomView):
             "pathways",
             get_value_for_field("pathways"),
             type=ModifierType.REPLACE_PAYLOAD,
-        )
-        general_handler.modifiers.register(
-            "taxa", get_value_for_field("taxa"), type=ModifierType.REPLACE_PAYLOAD
         )
 
         return super(AccessionHandler, self).get(

@@ -396,6 +396,25 @@ class InterproHandler(CustomView):
         )
 
         general_handler.modifiers.register(
+            "model:structure",
+            get_model("structure"),
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+        general_handler.modifiers.register(
+            "model:contacts",
+            get_model("contacts"),
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+        general_handler.modifiers.register(
+            "model:lddt",
+            get_model("lddt"),
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+
+        general_handler.modifiers.register(
             "group_by",
             group_by(
                 Entry,

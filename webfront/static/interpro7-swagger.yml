@@ -26,17 +26,17 @@ paths:
       tags:
         - Entry
       parameters:
-        - $ref: '#/components/parameters/entryGroupBy'
-        - $ref: '#/components/parameters/entryIntegrated'
-        - $ref: '#/components/parameters/entryType'
-        - $ref: '#/components/parameters/entryGoCategory'
-        - $ref: '#/components/parameters/entryGoTerm'
-        - $ref: '#/components/parameters/entryIdaSearch'
-        - $ref: '#/components/parameters/entryIdaIgnore'
-        - $ref: '#/components/parameters/entryIdaOrdered'
-        - $ref: '#/components/parameters/entryIdaExact'
+        - $ref: "#/components/parameters/entryGroupBy"
+        - $ref: "#/components/parameters/entryIntegrated"
+        - $ref: "#/components/parameters/entryType"
+        - $ref: "#/components/parameters/entryGoCategory"
+        - $ref: "#/components/parameters/entryGoTerm"
+        - $ref: "#/components/parameters/entryIdaSearch"
+        - $ref: "#/components/parameters/entryIdaIgnore"
+        - $ref: "#/components/parameters/entryIdaOrdered"
+        - $ref: "#/components/parameters/entryIdaExact"
       responses:
-        $ref: '#/components/responses/AggregationsAndErrors'
+        $ref: "#/components/responses/AggregationsAndErrors"
 
   /entry/{sourceDB}:
     get:
@@ -49,19 +49,20 @@ paths:
           required: true
           description: Either a member database, interpro or one of the wildcards- all, integrated, unintegrated
           schema:
-            $ref: '#/components/schemas/EntryDB'
-        - $ref: '#/components/parameters/entryGroupBy'
-        - $ref: '#/components/parameters/entryIntegrated'
-        - $ref: '#/components/parameters/entryAnnotation'
-        - $ref: '#/components/parameters/entryType'
-        - $ref: '#/components/parameters/entryGoCategory'
-        - $ref: '#/components/parameters/entryGoTerm'
-        - $ref: '#/components/parameters/entryInterproStatus'
-        - $ref: '#/components/parameters/entryInterproLatest'
-        - $ref: '#/components/parameters/entrySignatureIn'
-        - $ref: '#/components/parameters/entryExtraFields'
+            $ref: "#/components/schemas/EntryDB"
+        - $ref: "#/components/parameters/entryGroupBy"
+        - $ref: "#/components/parameters/entrySortBy"
+        - $ref: "#/components/parameters/entryIntegrated"
+        - $ref: "#/components/parameters/entryAnnotation"
+        - $ref: "#/components/parameters/entryType"
+        - $ref: "#/components/parameters/entryGoCategory"
+        - $ref: "#/components/parameters/entryGoTerm"
+        - $ref: "#/components/parameters/entryInterproStatus"
+        - $ref: "#/components/parameters/entryInterproLatest"
+        - $ref: "#/components/parameters/entrySignatureIn"
+        - $ref: "#/components/parameters/entryExtraFields"
       responses:
-        $ref: '#/components/responses/ListAndErrors'
+        $ref: "#/components/responses/ListAndErrors"
   /entry/{sourceDB}/{accession}:
     get:
       summary: Returns and object of the selected Entry
@@ -73,7 +74,7 @@ paths:
           required: true
           description: Either a member database, interpro or one of the wildcards (e.g. all)
           schema:
-            $ref: '#/components/schemas/EntryDB'
+            $ref: "#/components/schemas/EntryDB"
         - name: accession
           in: path
           required: true
@@ -81,12 +82,13 @@ paths:
           schema:
             type: string
           example: "IPR000001"
-        - $ref: '#/components/parameters/entryIDA'
-        - $ref: '#/components/parameters/entryInteractions'
-        - $ref: '#/components/parameters/entryPathways'
-        - $ref: '#/components/parameters/entryAnnotationMemberDB'
+        - $ref: "#/components/parameters/entryIDA"
+        - $ref: "#/components/parameters/entryInteractions"
+        - $ref: "#/components/parameters/entryPathways"
+        - $ref: "#/components/parameters/entryAnnotationMemberDB"
+        #- $ref: "#/components/parameters/entryModelMemberDB" needs to change from ':' to '='
       responses:
-        $ref: '#/components/responses/MetadataAndErrors'
+        $ref: "#/components/responses/MetadataAndErrors"
 
   /protein:
     get:
@@ -94,13 +96,13 @@ paths:
       tags:
         - Protein
       parameters:
-        - $ref: '#/components/parameters/proteinGroupBy'
-        - $ref: '#/components/parameters/proteinTaxID'
-        - $ref: '#/components/parameters/proteinMatchPresence'
-        - $ref: '#/components/parameters/proteinIsFragment'
-#        - $ref: '#/components/parameters/proteinEvidence'
+        - $ref: "#/components/parameters/proteinGroupBy"
+        - $ref: "#/components/parameters/proteinTaxID"
+        - $ref: "#/components/parameters/proteinMatchPresence"
+        - $ref: "#/components/parameters/proteinIsFragment"
+      #        - $ref: '#/components/parameters/proteinEvidence'
       responses:
-        $ref: '#/components/responses/AggregationsAndErrors'
+        $ref: "#/components/responses/AggregationsAndErrors"
   /protein/{sourceDB}:
     get:
       summary: Returns a list of the proteins in the selected DB.
@@ -112,15 +114,18 @@ paths:
           required: true
           description: The wild card 'uniprot' shows all the proteins, or it can be filtered by reviewed or unreviewed.
           schema:
-            $ref: '#/components/schemas/ProteinDB'
-        - $ref: '#/components/parameters/proteinGOTerm'
-        - $ref: '#/components/parameters/proteinListIDA'
-        - $ref: '#/components/parameters/proteinID'
-        - $ref: '#/components/parameters/proteinTaxID'
-        - $ref: '#/components/parameters/proteinExtraFields'
-        - $ref: '#/components/parameters/proteinGroupBy'
+            $ref: "#/components/schemas/ProteinDB"
+        - $ref: "#/components/parameters/proteinGOTerm"
+        - $ref: "#/components/parameters/proteinListIDA"
+        - $ref: "#/components/parameters/proteinID"
+        - $ref: "#/components/parameters/proteinTaxID"
+        - $ref: "#/components/parameters/proteinMatchPresence"
+        - $ref: "#/components/parameters/proteinIsFragment"
+        - $ref: "#/components/parameters/proteinExtraFields"
+        - $ref: "#/components/parameters/proteinGroupBy"
+
       responses:
-        $ref: '#/components/responses/ListAndErrors'
+        $ref: "#/components/responses/ListAndErrors"
   /protein/{sourceDB}/{accession}:
     get:
       summary: Returns and object of the selected protein
@@ -132,7 +137,7 @@ paths:
           required: true
           description: The wild card 'uniprot' shows all the proteins, or it can be filtered by reviewed or unreviewed.
           schema:
-            $ref: '#/components/schemas/ProteinDB'
+            $ref: "#/components/schemas/ProteinDB"
         - name: accession
           in: path
           required: true
@@ -140,15 +145,15 @@ paths:
           schema:
             type: string
           example: "P99999"
-        - $ref: '#/components/parameters/proteinIDA'
-        - $ref: '#/components/parameters/proteinResidues'
-        - $ref: '#/components/parameters/proteinStructureinfo'
-        - $ref: '#/components/parameters/proteinExtraFeatures'
-        - $ref: '#/components/parameters/proteinIsoforms'
-        - $ref: '#/components/parameters/proteinConservation'
-        - $ref: '#/components/parameters/proteinExtraFields'
+        - $ref: "#/components/parameters/proteinIDA"
+        - $ref: "#/components/parameters/proteinResidues"
+        - $ref: "#/components/parameters/proteinStructureinfo"
+        - $ref: "#/components/parameters/proteinExtraFeatures"
+        - $ref: "#/components/parameters/proteinIsoforms"
+        - $ref: "#/components/parameters/proteinConservation"
+        - $ref: "#/components/parameters/proteinExtraFields"
       responses:
-        $ref: '#/components/responses/MetadataAndErrors'
+        $ref: "#/components/responses/MetadataAndErrors"
 
   /structure:
     get:
@@ -156,11 +161,11 @@ paths:
       tags:
         - Structure
       parameters:
-        - $ref: '#/components/parameters/structureGroupBy'
-#        - $ref: '#/components/parameters/structureResolution'
-        - $ref: '#/components/parameters/structureExperimentType'
+        - $ref: "#/components/parameters/structureGroupBy"
+        #        - $ref: '#/components/parameters/structureResolution'
+        - $ref: "#/components/parameters/structureExperimentType"
       responses:
-        $ref: '#/components/responses/AggregationsAndErrors'
+        $ref: "#/components/responses/AggregationsAndErrors"
   /structure/{sourceDB}:
     get:
       summary: Returns a list of the structure in the selected DB.
@@ -174,12 +179,12 @@ paths:
           schema:
             type: string
             enum: ["pdb"]
-        - $ref: '#/components/parameters/structureResolution'
-        - $ref: '#/components/parameters/structureExperimentType'
-        - $ref: '#/components/parameters/structureGroupBy'
-        - $ref: '#/components/parameters/structureExtraFields'
+        - $ref: "#/components/parameters/structureResolution"
+        - $ref: "#/components/parameters/structureExperimentType"
+        - $ref: "#/components/parameters/structureGroupBy"
+        - $ref: "#/components/parameters/structureExtraFields"
       responses:
-        $ref: '#/components/responses/ListAndErrors'
+        $ref: "#/components/responses/ListAndErrors"
   /structure/{sourceDB}/{accession}:
     get:
       summary: Returns an object with the detail of the selected Structure
@@ -200,9 +205,9 @@ paths:
           schema:
             type: string
           example: "101m"
-        - $ref: '#/components/parameters/structureExtraFields'
+        - $ref: "#/components/parameters/structureExtraFields"
       responses:
-        $ref: '#/components/responses/MetadataAndErrors'
+        $ref: "#/components/responses/MetadataAndErrors"
 
   /taxonomy:
     get:
@@ -210,7 +215,7 @@ paths:
       tags:
         - Taxonomy
       responses:
-        $ref: '#/components/responses/AggregationsAndErrors'
+        $ref: "#/components/responses/AggregationsAndErrors"
   /taxonomy/{sourceDB}:
     get:
       summary: Returns a list of the taxa in the selected DB.
@@ -224,10 +229,10 @@ paths:
           schema:
             type: string
             enum: ["uniprot"]
-        - $ref: '#/components/parameters/taxonomyKeySpecies'
-        - $ref: '#/components/parameters/taxonomyExtraFields'
+        - $ref: "#/components/parameters/taxonomyKeySpecies"
+        - $ref: "#/components/parameters/taxonomyExtraFields"
       responses:
-        $ref: '#/components/responses/ListAndErrors'
+        $ref: "#/components/responses/ListAndErrors"
   /taxonomy/{sourceDB}/{accession}:
     get:
       summary: Returns an object with the details of the selected Taxon
@@ -248,22 +253,22 @@ paths:
           schema:
             type: integer
           example: 9606
-        - $ref: '#/components/parameters/taxonomyWithNames'
-        - $ref: '#/components/parameters/taxonomyFilterByEntry'
-        - $ref: '#/components/parameters/taxonomyFilterByEntryDB'
+        - $ref: "#/components/parameters/taxonomyWithNames"
+        - $ref: "#/components/parameters/taxonomyFilterByEntry"
+        - $ref: "#/components/parameters/taxonomyFilterByEntryDB"
       responses:
-        $ref: '#/components/responses/MetadataAndErrors'
+        $ref: "#/components/responses/MetadataAndErrors"
 
   /proteome:
     get:
       summary: Returns the overview counters of the Proteome in the database.
       tags:
         - Proteome
-#      parameters: Removed as all proteomes included in InterPro are reference.
-#        - $ref: '#/components/parameters/proteomeGroupBy'
-#        - $ref: '#/components/parameters/proteomeIsReference'
+      #      parameters: Removed as all proteomes included in InterPro are reference.
+      #        - $ref: '#/components/parameters/proteomeGroupBy'
+      #        - $ref: '#/components/parameters/proteomeIsReference'
       responses:
-        $ref: '#/components/responses/AggregationsAndErrors'
+        $ref: "#/components/responses/AggregationsAndErrors"
   /proteome/{sourceDB}:
     get:
       summary: Returns a list of the Proteomes in the selected DB.
@@ -277,9 +282,9 @@ paths:
           schema:
             type: string
             enum: ["uniprot"]
-        - $ref: '#/components/parameters/proteomeExtraFields'
+        - $ref: "#/components/parameters/proteomeExtraFields"
       responses:
-        $ref: '#/components/responses/ListAndErrors'
+        $ref: "#/components/responses/ListAndErrors"
   /proteome/{sourceDB}/{accession}:
     get:
       summary: Returns an object with the details of the selected Proteome
@@ -301,7 +306,7 @@ paths:
             type: string
           example: "up000000211"
       responses:
-        $ref: '#/components/responses/MetadataAndErrors'
+        $ref: "#/components/responses/MetadataAndErrors"
 
   /set:
     get:
@@ -309,7 +314,7 @@ paths:
       tags:
         - Sets
       responses:
-        $ref: '#/components/responses/AggregationsAndErrors'
+        $ref: "#/components/responses/AggregationsAndErrors"
   /set/{sourceDB}:
     get:
       summary: Returns a list of the sets in the selected DB.
@@ -323,9 +328,9 @@ paths:
           schema:
             type: string
             enum: ["all", "cdd", "pfam"]
-        - $ref: '#/components/parameters/setExtraFields'
+        - $ref: "#/components/parameters/setExtraFields"
       responses:
-        $ref: '#/components/responses/ListAndErrors'
+        $ref: "#/components/responses/ListAndErrors"
   /set/{sourceDB}/{accession}:
     get:
       summary: Returns an object with the details of the selected set.
@@ -346,9 +351,9 @@ paths:
           schema:
             type: string
           example: "cl0001"
-        - $ref: '#/components/parameters/setAlignments'
+        - $ref: "#/components/parameters/setAlignments"
       responses:
-        $ref: '#/components/responses/MetadataAndErrors'
+        $ref: "#/components/responses/MetadataAndErrors"
 
 components:
   schemas:
@@ -409,161 +414,173 @@ components:
         - uniprot
   parameters:
     entryGroupBy:
-        name: group_by
-        in: query
-        description: |
-          Groups the current selection of entries by the given parameter, and counts the unique entries for each group.
+      name: group_by
+      in: query
+      description: |
+        Groups the current selection of entries by the given parameter, and counts the unique entries for each group.
 
-          **Note:** The valid values for the parameter to group by changes depending of the context:
-            * `/entry`:
-            * `/entry/all`:
-            * `/entry/integrated`:
-            * `/entry/unintegrated`:
-              * `type`, `source_database`, `tax_id`, `go_terms`
-            * `/entry/interpro`:
-              * `type`, `tax_id`, `source_database`, `member_databases`, `go_terms`, `go_categories`
-            * `/entry/{sourceDB}`:
-              * `type`, `tax_id`, `source_database`, `go_terms`, `go_categories`
+        **Note:** The valid values for the parameter to group by changes depending of the context:
+          * `/entry`:
+            * `type`, `source_database`, `tax_id`, `go_terms`
+          * `/entry/all`:
+            * `type`, `source_database`, `tax_id`, `go_terms`
+          * `/entry/integrated`:
+            * `type`, `source_database`, `tax_id`, `go_terms`
+          * `/entry/unintegrated`:
+            * `type`, `source_database`, `tax_id`, `go_terms`
+          * `/entry/interpro`:
+            * `type`, `tax_id`, `source_database`, `member_databases`, `go_terms`, `go_categories`
+          * `/entry/{sourceDB}`:
+            * `type`, `tax_id`, `source_database`, `go_terms`, `go_categories`
 
-          **Note:** This parameter changes the output's format.
+        **Note:** This parameter changes the output's format.
 
-          **Note:** This parameter might not play along with other parameters.
-        schema:
-          type: string
-          enum:
-            - type
-            - source_database
-            - tax_id
-            - member_databases
-            - go_terms
-            - go_categories
+        **Note:** This parameter might not play along with other parameters.
+      schema:
+        type: string
+        enum:
+          - type
+          - source_database
+          - tax_id
+          - member_databases
+          - go_terms
+          - go_categories
+    entrySortBy:
+      name: sort_by
+      in: query
+      description: Order the entries using the option selected
+      schema:
+        type: string
+        enum:
+          - accession
+          - integrated
     entryIntegrated:
-        name: integrated
-        in: query
-        description: Filters the entries that are integrated with the given interPro accession
-        schema:
-          type: string
-          pattern: '^[Ii][Pp][Rr]\d{6}$'
+      name: integrated
+      in: query
+      description: Filters the entries that are integrated with the given interPro accession
+      schema:
+        type: string
+        pattern: '^[Ii][Pp][Rr]\d{6}$'
     entryType:
-        name: type
-        in: query
-        description: Filter entries by its entry type
-        schema:
-          $ref: '#/components/schemas/EntryType'
+      name: type
+      in: query
+      description: Filter entries by its entry type
+      schema:
+        $ref: "#/components/schemas/EntryType"
     entryGoCategory:
-        name: go_category
-        in: query
-        description: Filter the entries tha belong to one of the high level GO categories. Use P for Biological Process, F for Molecular Function, and C for Cellular Component.
-        schema:
-          type: string
-          enum: ["P", "F", "C"]
+      name: go_category
+      in: query
+      description: Filter the entries tha belong to one of the high level GO categories. Use P for Biological Process, F for Molecular Function, and C for Cellular Component.
+      schema:
+        type: string
+        enum: ["P", "F", "C"]
     entryGoTerm:
-        name: go_term
-        in: query
-        description: Filters the entries that have been annotated with the given GO term.
-        schema:
-          type: string
-          pattern: '^[Gg][Oo]:\d{7}$'
+      name: go_term
+      in: query
+      description: Filters the entries that have been annotated with the given GO term.
+      schema:
+        type: string
+        pattern: '^[Gg][Oo]:\d{7}$'
     entryAnnotation:
-        name: annotation
-        in: query
-        description: Filters the entries to those which have an annotation of the given type
-        schema:
-          type: string
-          enum:
-            - logo
-            - alignment
-            - hmm
+      name: annotation
+      in: query
+      description: Filters the entries to those which have an annotation of the given type
+      schema:
+        type: string
+        enum:
+          - logo
+          - alignment
+          - hmm
     entryIdaSearch:
-        name: ida_search
-        in: query
-        description: |
-          Search by InterPro Domain Architecture (IDA).
+      name: ida_search
+      in: query
+      description: |
+        Search by InterPro Domain Architecture (IDA).
 
-          Include a comma separated list of the domains accessions(InterPro or Pfam) to be included in the IDA.
+        Include a comma separated list of the domains accessions(InterPro or Pfam) to be included in the IDA.
 
-          **Note:**  When using this parameter, the response won't include the aggregated counts of `/entry` and parameters not related with IDA search will be ignored.
-        schema:
-          type: string
+        **Note:**  When using this parameter, the response won't include the aggregated counts of `/entry` and parameters not related with IDA search will be ignored.
+      schema:
+        type: string
     entryIdaIgnore:
-        name: ida_ignore
-        in: query
-        description: |
-          Ignore domains When doing a Search by InterPro Domain Architecture (IDA).
+      name: ida_ignore
+      in: query
+      description: |
+        Ignore domains When doing a Search by InterPro Domain Architecture (IDA).
 
-          Comma separated list of PFam or interprodomains to ignore.
+        Comma separated list of PFam or interprodomains to ignore.
 
-          **Note:** This parameter only works when `ida_search` is also present.
-        schema:
-          type: string
+        **Note:** This parameter only works when `ida_search` is also present.
+      schema:
+        type: string
     entryIdaOrdered:
-        name: ordered
-        in: query
-        description: |
-          Establish that the domains to search using `ida_search` should be in order
+      name: ordered
+      in: query
+      description: |
+        Establish that the domains to search using `ida_search` should be in order
 
-          **Note:** This parameter only works when `ida_search` is also present.
-        schema:
-          type: string
-          enum:
-            - ordered
+        **Note:** This parameter only works when `ida_search` is also present.
+      schema:
+        type: string
+        enum:
+          - ordered
     entryIdaExact:
-        name: exact
-        in: query
-        description: |
-          Establish that the domains to search using `ida_search` should be exact.
+      name: exact
+      in: query
+      description: |
+        Establish that the domains to search using `ida_search` should be exact.
 
-          Only the domains included in `ida_search` will be included and they will be  in the exact order.
-          Only the domains included in `ida_search` will be included and they will be  in the exact order.
+        Only the domains included in `ida_search` will be included and they will be  in the exact order.
+        Only the domains included in `ida_search` will be included and they will be  in the exact order.
 
-          **Note:** This parameter only works when `ida_search` and `ordered` are also present.
-        schema:
-          type: string
-          enum:
-            - exact
+        **Note:** This parameter only works when `ida_search` and `ordered` are also present.
+      schema:
+        type: string
+        enum:
+          - exact
     entryInterproStatus:
-        name: interpro_status
-        in: query
-        description: |
-          counts how many entries in the selection are integrated and how many are not.
+      name: interpro_status
+      in: query
+      description: |
+        counts how many entries in the selection are integrated and how many are not.
 
-          **Note:** This only works if the sourceDB selected is a member Database.
-        schema:
-          type: string
-          enum:
-            - interpro_status
+        **Note:** This only works if the sourceDB selected is a member Database.
+      schema:
+        type: string
+        enum:
+          - interpro_status
     entrySignatureIn:
-        name: signature_in
-        in: query
-        description: |
-          Filters InterPro entries to those that have a match with the given memberDB
+      name: signature_in
+      in: query
+      description: |
+        Filters InterPro entries to those that have a match with the given memberDB
 
-          **Note:** This only works if the sourceDB selected is InterPro.
-        schema:
-          $ref: '#/components/schemas/MemberDB'
+        **Note:** This only works if the sourceDB selected is InterPro.
+      schema:
+        $ref: "#/components/schemas/MemberDB"
     entryInterproLatest:
-        name: latest_entries
-        in: query
-        description: |
-          List of the latest entries registered in Interpro. Based in the Release Notes.
+      name: latest_entries
+      in: query
+      description: |
+        List of the latest entries registered in Interpro. Based in the Release Notes.
 
-          **Note:** This modifier doesn't operates in combination with other parameters.
+        **Note:** This modifier doesn't operates in combination with other parameters.
 
-          **Note:** This only works if the sourceDB selected is InterPro.
-        schema:
-          type: string
-          enum:
-            - latest_entries
+        **Note:** This only works if the sourceDB selected is InterPro.
+      schema:
+        type: string
+        enum:
+          - latest_entries
     entryExtraFields:
-        name: extra_fields
-        in: query
-        description: Includes the value of the selected fields
-        schema:
-          type: string
-          style: form
-          allowReserved: true
-          explode: false
-          enum:
+      name: extra_fields
+      in: query
+      description: Includes the value of the selected fields
+      schema:
+        type: string
+        style: form
+        allowReserved: true
+        explode: false
+        enum:
           - counters
           - entry_id
           - short_name
@@ -585,9 +602,9 @@ components:
 
         **Note:** This modifier doesn't operates in combination with other parameters.
       schema:
-          type: string
-          enum:
-            - ida
+        type: string
+        enum:
+          - ida
     entryInteractions:
       name: interactions
       in: query
@@ -598,9 +615,9 @@ components:
 
         **Note:** This modifier doesn't operates in combination with other parameters.
       schema:
-          type: string
-          enum:
-            - interactions
+        type: string
+        enum:
+          - interactions
     entryPathways:
       name: pathways
       in: query
@@ -611,9 +628,9 @@ components:
 
         **Note:** This modifier doesn't operates in combination with other parameters.
       schema:
-          type: string
-          enum:
-            - pathways
+        type: string
+        enum:
+          - pathways
     entryAnnotationMemberDB:
       name: annotation
       in: query
@@ -624,30 +641,44 @@ components:
 
         **Note:** This modifier doesn't operates in combination with other parameters.
       schema:
-          type: string
-          enum:
-            - logo
-            - hmm
-            - alignment
+        type: string
+        enum:
+          - logo
+          - hmm
+          - alignment
+    entryModelMemberDB:
+      name: model
+      in: query
+      description: |
+        Structural model information from RoseTTAFold.
 
+        **Note:** This parameter only works when the sourceDB selected is InterPro or Pfam.
+
+        **Note:** This modifier doesn't operates in combination with other parameters.
+      schema:
+        type: string
+        enum:
+          - structure
+          - contacts
+          - lddt
 
     proteinGroupBy:
-        name: group_by
-        in: query
-        description: |
-          Groups the current selection of proteins by the given parameter, and counts the unique proteins for each group.
+      name: group_by
+      in: query
+      description: |
+        Groups the current selection of proteins by the given parameter, and counts the unique proteins for each group.
 
-          **Note:** This parameter changes the output's format.
+        **Note:** This parameter changes the output's format.
 
-          **Note:** This parameter might not play along with other parameters
-        schema:
-          type: string
-          enum:
-            - tax_id
-            - source_database
-            - go_terms
-            - match_presence
-            - is_fragment
+        **Note:** This parameter might not play along with other parameters
+      schema:
+        type: string
+        enum:
+          - tax_id
+          - source_database
+          - go_terms
+          - match_presence
+          - is_fragment
     proteinTaxID:
       name: tax_id
       in: query
@@ -663,13 +694,13 @@ components:
     proteinMatchPresence:
       name: match_presence
       in: query
-      description: Filters the proteins that have matches with any entry
+      description: Filters the proteins that have (`true`) or don't have (`false`) matches to an InterPro entry
       schema:
         type: boolean
     proteinIsFragment:
       name: is_fragment
       in: query
-      description: Filters the proteins that are fragments(`true`) or not(`false`)
+      description: Filters the proteins that are (`true`) or are not (`false`) fragments
       schema:
         type: boolean
     proteinIDA:
@@ -727,29 +758,42 @@ components:
     proteinIsoforms:
       name: isoforms
       in: query
-      description: Gets a JSON containing the information of existing isoforms.
+      description: Gets a JSON containing the information of existing isoforms (`isoforms`) or data for the specified isoform (e.g. `Q6ZNL6-1`).
       schema:
-        type: string
-        enum:
-          - isoforms
+        type: ["null", string]
+        # enum:
+        #   - isoforms
     proteinConservation:
       name: conservation
       in: query
-      description: Calculates the conservation per residue of the current protein.
+      description: Calculates the conservation per residue of the selected protein using the member database specified.
       schema:
         type: string
         enum:
-          - conservation
+          - cathgene3d
+          - hamap
+          - panther
+          - pirsf
+          - prints
+          - prosite
+          - profile
+          - pfam
+          - prodom
+          - smart
+          - ssf
+          - tigrfams
+          - cdd
+          - sfld
     proteinExtraFields:
-        name: extra_fields
-        in: query
-        description: Includes the value of the selected fields
-        schema:
-          type: string
-          style: form
-          allowReserved: true
-          explode: false
-          enum:
+      name: extra_fields
+      in: query
+      description: Includes the value of the selected fields
+      schema:
+        type: string
+        style: form
+        allowReserved: true
+        explode: false
+        enum:
           - counters
           - identifier
           - description
@@ -767,18 +811,18 @@ components:
           - ida
 
     structureGroupBy:
-        name: group_by
-        in: query
-        description: |
-          Groups the current selection of structures by the given parameter, and counts the unique structures for each group.
+      name: group_by
+      in: query
+      description: |
+        Groups the current selection of structures by the given parameter, and counts the unique structures for each group.
 
-          **Note:** This parameter changes the output's format.
+        **Note:** This parameter changes the output's format.
 
-          **Note:** This parameter might not play along with other parameters
-        schema:
-          type: string
-          enum:
-            - experiment_type
+        **Note:** This parameter might not play along with other parameters
+      schema:
+        type: string
+        enum:
+          - experiment_type
     structureResolution:
       name: resolution
       in: query
@@ -963,44 +1007,44 @@ components:
           schema:
             type: object
     ListAndErrors:
-      '200':
-        $ref: '#/components/responses/Metadata'
-      '204':
-        $ref: '#/components/responses/NoContent'
-      '404':
-        $ref: '#/components/responses/NotFound'
-      '408':
-        $ref: '#/components/responses/Timeout'
-      '410':
-        $ref: '#/components/responses/Gone'
-      '500':
-        $ref: '#/components/responses/ServerError'
+      "200":
+        $ref: "#/components/responses/Metadata"
+      "204":
+        $ref: "#/components/responses/NoContent"
+      "404":
+        $ref: "#/components/responses/NotFound"
+      "408":
+        $ref: "#/components/responses/Timeout"
+      "410":
+        $ref: "#/components/responses/Gone"
+      "500":
+        $ref: "#/components/responses/ServerError"
     AggregationsAndErrors:
-      '200':
-        $ref: '#/components/responses/Metadata'
-      '204':
-        $ref: '#/components/responses/NoContent'
-      '404':
-        $ref: '#/components/responses/NotFound'
-      '408':
-        $ref: '#/components/responses/Timeout'
-      '410':
-        $ref: '#/components/responses/Gone'
-      '500':
-        $ref: '#/components/responses/ServerError'
+      "200":
+        $ref: "#/components/responses/Metadata"
+      "204":
+        $ref: "#/components/responses/NoContent"
+      "404":
+        $ref: "#/components/responses/NotFound"
+      "408":
+        $ref: "#/components/responses/Timeout"
+      "410":
+        $ref: "#/components/responses/Gone"
+      "500":
+        $ref: "#/components/responses/ServerError"
     MetadataAndErrors:
-      '200':
-        $ref: '#/components/responses/Metadata'
-      '204':
-        $ref: '#/components/responses/NoContent'
-      '404':
-        $ref: '#/components/responses/NotFound'
-      '408':
-        $ref: '#/components/responses/Timeout'
-      '410':
-        $ref: '#/components/responses/Gone'
-      '500':
-        $ref: '#/components/responses/ServerError'
+      "200":
+        $ref: "#/components/responses/Metadata"
+      "204":
+        $ref: "#/components/responses/NoContent"
+      "404":
+        $ref: "#/components/responses/NotFound"
+      "408":
+        $ref: "#/components/responses/Timeout"
+      "410":
+        $ref: "#/components/responses/Gone"
+      "500":
+        $ref: "#/components/responses/ServerError"
 
     NoContent:
       description: Empty response. The request is correct but produced an empty dataset.
@@ -1021,5 +1065,3 @@ components:
         * If you try again this query you should expect:
           * An almost instant 408, meaning the previous query is still running.
           * The response of the query, if the API has finished the background process.
-
-

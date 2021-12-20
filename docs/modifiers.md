@@ -181,7 +181,7 @@ Information on RoseTTAFold models available for InterPro and Pfam entries
 | group_by=experiment type                                                        | Number of PDB structures for each experiment type            | https://www.ebi.ac.uk:443/interpro/api/structure/pdb?group_by=experiment_type                            |
 | extra_fields=[release_date, literature, chains, secondary_structures, counters] | Includes the value of the selected fields in the results     | https://www.ebi.ac.uk:443/interpro/api/structure/pdb?resolution=1.0-2.5&extra_field=secondary_structures |
 
-## /api/structure/pdb/<_ pdb accession_ >
+## /api/structure/pdb/< _pdb accession_ >
 
 | Modifier                                                                        | Data returned                                            | Example                                                                            |
 | ------------------------------------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------- |

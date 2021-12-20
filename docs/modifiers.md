@@ -7,7 +7,7 @@ This document aims to provide some guidance on how to use the InterPro API modif
 | Modifier                     | Data returned                                     | Example                                                               |
 | ---------------------------- | ------------------------------------------------- | --------------------------------------------------------------------- |
 | page_size=<number up to 200> | Number of results returned at a time (default=20) | https://www.ebi.ac.uk:443/interpro/api/protein/reviewed?page_size=100 |
-| search=<text>                | Entries matching the text search                  | https://www.ebi.ac.uk:443/interpro/api/taxonomy/uniprot/?search=9606  |
+| search=< text >                | Entries matching the text search                  | https://www.ebi.ac.uk:443/interpro/api/taxonomy/uniprot/?search=9606  |
 
 ## /api/entry
 
@@ -17,7 +17,7 @@ This document aims to provide some guidance on how to use the InterPro API modif
 | group_by=source_database                         | Number of entries for each member database (e.g. pfam, CDD...)                                                                 | https://www.ebi.ac.uk:443/interpro/api/entry?group_by=source_database                          |
 | group_by=tax_id                                  | Number of entries (InterPro+member database) for key species                                                                   | https://www.ebi.ac.uk:443/interpro/api/entry?group_by=tax_id                                   |
 | group_by=go_terms                                | Number of entries (InterPro+member database) for each GO term                                                                  | https://www.ebi.ac.uk:443/interpro/api/entry?group_by=go_terms                                 |
-| type=<entry_type>                                | List of signatures with the entry type specified                                                                               | https://www.ebi.ac.uk:443/interpro/api/entry?type=family                                       |
+| type=<entry type>                                | List of signatures with the entry type specified                                                                               | https://www.ebi.ac.uk:443/interpro/api/entry?type=family                                       |
 | go_category=[F, C, P]                            | List of GO terms for the category specified (P for Biological Process, F for Molecular Function, and C for Cellular Component) | https://www.ebi.ac.uk:443/interpro/api/entry?go_category=F                                     |
 | go_term=<GO identifier>                          | Count entries that have been annotated with the given GO term, group by member database                                        | http://www.ebi.ac.uk:443/interpro/api/entry?go_term=GO:0004298                                 |
 | ida_search                                       | List of InterPro domain architectures with protein count                                                                       | https://www.ebi.ac.uk:443/interpro/api/entry?ida_search                                        |

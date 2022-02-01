@@ -11,6 +11,33 @@ from django.conf import settings
 multiple_slashes = re.compile("/+")
 
 
+FIVE_DAYS = 5*24*60*60
+
+
+def get_timeout_from_path(path):
+    parsed = urlparse(path)
+    # process query
+    query = parse_qs(parsed.query, keep_blank_values=True)
+    # order querystring, lowercase keys
+    query = OrderedDict(
+        sorted(((key.lower(), sorted(value)) for key, value in query.items()))
+    )
+    page = query.get("page")
+    if page is not None and len(page) > 0:
+        try:
+            page = int(page[0])
+            if page > 1:
+                return FIVE_DAYS
+        except Exception:
+            return 0
+    short_life_parameters = ["cursor", "size", "go_terms", "ida_ignore", "ida_search", "format"]
+    for parameter in short_life_parameters:
+        value = query.get(parameter)
+        if value is not None:
+            return FIVE_DAYS
+    return None
+
+
 def canonical(url, remove_all_page_size=False):
     parsed = urlparse(url)
     # process query

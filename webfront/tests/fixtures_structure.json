@@ -222,11 +222,11 @@
     "model": "webfront.structuralmodel",
     "pk": 1,
     "fields": {
-      "accession": "PF17176",
-      "algorithm": "trRosetta",
-      "contacts": "H4sIAB6Io2AC/4uONtQxNNQx0DON1VGINtIxNgCyLUBsYxg7FgCIHLXIJAAAAA==",
-      "structure": "H4sIAB6Io2AC/42QQQ6EIAxF956iF5imgNiybNyqbIz3P4otTExmHJPp5v9C/mtB97pCqwCwmRy6gPbW60XI5D4gMzVNJbqQdSO6v8rzg15Eu5r1RgTCqbiPSDl2cpAH4vxJTP3km2g7ydiIItQnJP6PaLEKv3Ys7x2FS/uFnJ5e7fnhBOGGnjRIAQAA",
-      "lddt": "H4sIAB6Io2AC/xXJwQ2AMAwDwFUYACE7dZx0FsT+azR87148KEW5QTaybd/XIC1ox+Q0zPw1sSUqViygnN8BxhV43z8AAAA="
+        "accession": "PF17176",
+        "algorithm": "RoseTTAFold",
+        "contacts": "H4sIAKMfQmEC/4uONtSBQj2DWB0FINdIB4SNDXQM9EwhIsZAERMg1wLENdKBQKh6oEogByRrCeIaA7kmQAiSjQUAU15YL10AAAA=",
+        "plddt": "H4sIAKMfQmEC/x3IwQ3AIAwDwFU6AEIm2NiZBXX/NSr1nncxHThbm2B3nPFgJizllNNLhP477EhRrTKs9wMKEasjPAAAAA==",
+        "structure": "H4sIAKMfQmEC/43SS27EIAwG4P2cggvEssE8sqR0NJvpRKqqLnr/g9Q2VZUZEgkW4aHw8Zukfm0fzho595Duu95d7VNtC0JGHRPkjNaH1WuHMmPQ8X/T/Zf6KtbP24uI6yoDhMTF5jsR7bkXd6C81eoAaqTQQS4djEwnYHsCgy0MoAc0kKBw7GBIUyA7t7mjhJm8wZnlzEUThxNwewLl+PZ2BKaULJlnNrCEuZJlV7uNYABi7KWSwn9XMAFmWXg/ApnQktGqYJCS5xLKJ3xcR5Ch+F4qR29gxLnfRupoPyMYgX00MLMUsbDcaTlLePkFk6MiNykDAAA="
     }
   }
 ]

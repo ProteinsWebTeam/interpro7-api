@@ -86,6 +86,7 @@ paths:
         - $ref: "#/components/parameters/entryInteractions"
         - $ref: "#/components/parameters/entryPathways"
         - $ref: "#/components/parameters/entryAnnotationMemberDB"
+        - $ref: "#/components/parameters/entryExtraFields"
         #- $ref: "#/components/parameters/entryModelMemberDB" needs to change from ':' to '='
       responses:
         $ref: "#/components/responses/MetadataAndErrors"
@@ -598,13 +599,14 @@ components:
       description: |
         Returns a list of the domain architectures that contain this entry.
 
-        **Note:** This only works if the sourceDB selected is InterPro.
-
         **Note:** This modifier doesn't operates in combination with other parameters.
+
+        **Note:** This only works if the sourceDB selected is InterPro or pfam.
+
+        **Note:** This modifier doesn't require parameters, check `Send empty value` to use it.
       schema:
         type: string
-        enum:
-          - ida
+      allowEmptyValue: true
     entryInteractions:
       name: interactions
       in: query
@@ -982,6 +984,7 @@ components:
         If not entry is given it will recover all the alignments. E.g. https://www.ebi.ac.uk/interpro/api/set/cdd/cl00011?alignments
       schema:
         type: string
+      allowEmptyValue: true
 
   responses:
     Aggregations:

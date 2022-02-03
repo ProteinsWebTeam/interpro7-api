@@ -87,6 +87,7 @@ paths:
         - $ref: "#/components/parameters/entryPathways"
         - $ref: "#/components/parameters/entryAnnotationMemberDB"
         - $ref: "#/components/parameters/entryExtraFields"
+        - $ref: "#/components/parameters/entryAFmodel"
         #- $ref: "#/components/parameters/entryModelMemberDB" needs to change from ':' to '='
       responses:
         $ref: "#/components/responses/MetadataAndErrors"
@@ -501,8 +502,11 @@ components:
         Include a comma separated list of the domains accessions(InterPro or Pfam) to be included in the IDA.
 
         **Note:**  When using this parameter, the response won't include the aggregated counts of `/entry` and parameters not related with IDA search will be ignored.
+
+        **Note:**  To get the full list of IDA check the `Send empty value` option.
       schema:
         type: string
+      allowEmptyValue: true
     entryIdaIgnore:
       name: ida_ignore
       in: query
@@ -648,6 +652,18 @@ components:
           - logo
           - hmm
           - alignment
+    entryAFmodel:
+      name: has_model
+      in: query
+      description: |
+        Returns a list of proteins with/without an AlphaFold prediction for the InterPro entry selected
+
+        **Note:** This parameter only works when the sourceDB selected is InterPro.
+
+         **Note: ** This modifier doesn't operates in combination with other parameters.
+
+      schema:
+        type: boolean
     entryModelMemberDB:
       name: model
       in: query

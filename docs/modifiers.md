@@ -26,7 +26,7 @@ This document aims to provide some guidance on how to use the InterPro API modif
 | ida_search=< _ipr1,pf2,ipr3_ >&exact                     | Protein count for proteins containing specified domain accessions only                                                         | https://www.ebi.ac.uk:443/interpro/api/entry?ida_search=IPR003100,IPR003165&exact              |
 | ida_search=< _ipr1,pf2,ipr3_ >&ida-ignore=< _ipr4,pf6_ > | List of ida and protein count for the specified domain accessions where the last accessions specified shouldn't be in the ida  | https://www.ebi.ac.uk:443/interpro/api/entry?ida_search=IPR003100,IPR003165&ida_ignore=PF08699 |
 
-## /api/entry/<database name>
+## /api/entry/< _database name_ >
 
 database name can be: interpro, pfam, cdd, panther, sfld, cathgene3d, ssf, hamap, pirsf, prints, prosite, profile, smart, tigrfams
 | Modifier | Data returned | Example |
@@ -64,7 +64,7 @@ Information on member database signatures integrated/unintegrated in InterPro en
 | go_category=[F, C, P]       | List of GO terms for the category specified (P for Biological Process, F for Molecular Function, and C for Cellular Component)        | https://www.ebi.ac.uk:443/interpro/api/entry/interpro?go_category=F             |
 | go_term=< _GO identifier_ > | List of InterPro entries that have been annotated with the given GO term                                                              | https://www.ebi.ac.uk:443/interpro/api/entry/interpro?go_term=GO:0004298        |
 
-## /api/entry/interpro/accession
+## /api/entry/interpro/< _InterPro entry accession_ >
 
 | Modifier                                                                                                                                               | Data returned                                                                                               | Example                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |

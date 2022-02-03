@@ -758,11 +758,10 @@ components:
     proteinIsoforms:
       name: isoforms
       in: query
-      description: Gets a JSON containing the information of existing isoforms (`isoforms`) or data for the specified isoform (e.g. `Q6ZNL6-1`).
+      description: Gets a JSON containing the information of existing isoforms (check `Send empty value` option) or data for the specified isoform (e.g. `Q6ZNL6-1`).
       schema:
-        type: ["null", string]
-        # enum:
-        #   - isoforms
+        type: string
+      allowEmptyValue: true
     proteinConservation:
       name: conservation
       in: query

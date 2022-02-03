@@ -157,13 +157,18 @@ Information on RoseTTAFold models available for InterPro and Pfam entries
 | Modifier                                  | Data returned                                                                   | Example                                                                                |
 | ----------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | group_by=proteome_is_reference            | Number of UniProt proteomes that are/aren't from the UniProt reference proteome | https://www.ebi.ac.uk:443/interpro/api/proteome/uniprot?group_by=proteome_is_reference |
-| extra_fields=[counters, strain, assembly] | Includes the value of the selected fields in the results                        | https://www.ebi.ac.uk:443/interpro/api/proteome/uniprot?extra_field=counters           |
+| extra_fields=[counters, strain, assembly] | Includes the value of the selected fields in the results                        | https://www.ebi.ac.uk:443/interpro/api/proteome/uniprot?extra_fields=counters           |
 
 ## /api/set/< _all, cdd, pfam_ >
 
 | Modifier                                            | Data returned                                            | Example                                                             |
 | --------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------- |
-| extra_fields=[counters, description, relationships] | Includes the value of the selected fields in the results | https://www.ebi.ac.uk:443/interpro/api/set/cdd?extra_field=counters |
+| extra_fields=[counters, description, relationships] | Includes the value of the selected fields in the results | https://www.ebi.ac.uk:443/interpro/api/set/cdd?extra_fields=counters |
+## /api/set/< _all, cdd, pfam_ >/< _accession_ >
+
+| Modifier                                            | Data returned                                            | Example                                                             |
+| --------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------- |
+| alignments | Alignment information for the database and set specified | https://www.ebi.ac.uk:443/interpro/api/set/cdd/cl00014/?alignments= |
 
 ## /api/structure
 

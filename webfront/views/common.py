@@ -20,7 +20,7 @@ from webfront.views.taxonomy import TaxonomyHandler
 from webfront.views.proteome import ProteomeHandler
 from webfront.views.set import SetHandler
 from webfront.views.utils import UtilsHandler
-from webfront.views.cache import InterProCache, get_timeout_from_path
+from webfront.views.cache import InterProCache, get_timeout_from_path, SHOULD_NO_CACHE
 
 from webfront.models import Database
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
@@ -191,9 +191,9 @@ class GeneralHandler(CustomView):
                     drf_request=drf_request,
                 )
                 # Got a good response, then save it in cache
-                timeout = get_timeout_from_path(full_path)
-                print('timeout', timeout)
-                self._set_in_cache(caching_allowed, full_path, response, timeout)
+                timeout = get_timeout_from_path(full_path, endpoint_levels)
+                if timeout != SHOULD_NO_CACHE:
+                    self._set_in_cache(caching_allowed, full_path, response, timeout)
                 # Forcing to close the connection because django is not closing it when this query is ran as future
                 connection.close()
             except DeletedEntryError as e:

@@ -6,7 +6,8 @@ from django.core.cache import cache
 
 from rest_framework import status
 from webfront.response import Response
-from views.utils import endpoints
+from webfront.views.utils import endpoints
+
 from django.conf import settings
 
 multiple_slashes = re.compile("/+")

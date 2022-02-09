@@ -535,8 +535,7 @@ components:
       description: |
         Establish that the domains to search using `ida_search` should be exact.
 
-        Only the domains included in `ida_search` will be included and they will be  in the exact order.
-        Only the domains included in `ida_search` will be included and they will be  in the exact order.
+        Only the domains included in `ida_search` will be included and they will be in the exact order.
 
         **Note:** This parameter only works when `ida_search` and `ordered` are also present.
       schema:

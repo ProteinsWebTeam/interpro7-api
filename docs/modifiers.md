@@ -4,10 +4,10 @@ This document aims to provide some guidance on how to use the InterPro API modif
 
 ## Apply to any API call
 
-| Modifier                         | Data returned                                     | Example                                                               |
-| -------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------- |
-| `page_size=< number up to 200 >` | Number of results returned at a time (default=20) | https://www.ebi.ac.uk:443/interpro/api/protein/reviewed?page_size=100 |
-| `search=< text >`                | Entries matching the text search                  | https://www.ebi.ac.uk:443/interpro/api/taxonomy/uniprot/?search=9606  |
+| Modifier                         | Compatible with  other modifiers | Data returned                                     | Example                                                               |
+|----------------------------------|---------------------------------|---------------------------------------------------|-----------------------------------------------------------------------|
+| `page_size=< number up to 200 >` |           &check;               | Number of results returned at a time (default=20) | https://www.ebi.ac.uk:443/interpro/api/protein/reviewed?page_size=100 |
+| `search=< text >`                |           &check;               | Entries matching the text search                  | https://www.ebi.ac.uk:443/interpro/api/taxonomy/uniprot/?search=9606  |
 
 ## /api/entry
 

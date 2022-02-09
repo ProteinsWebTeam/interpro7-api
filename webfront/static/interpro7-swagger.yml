@@ -472,7 +472,10 @@ components:
     entryGoCategory:
       name: go_category
       in: query
-      description: Filter the entries tha belong to one of the high level GO categories. Use P for Biological Process, F for Molecular Function, and C for Cellular Component.
+      description: 
+        Filter the entries tha belong to one of the high level GO categories. Use P for Biological Process, F for Molecular Function, and C for Cellular Component.
+       
+        **Note:** This only works if the sourceDB selected is InterPro.
       schema:
         type: string
         enum: ["P", "F", "C"]

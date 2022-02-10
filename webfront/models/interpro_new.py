@@ -45,6 +45,7 @@ class Entry(models.Model):
     pathways = JSONField(null=True)
     history = JSONField(null=True)
     details = JSONField(null=True)
+    taxa = JSONField(null=True)
 
 
 class EntryAnnotation(models.Model):

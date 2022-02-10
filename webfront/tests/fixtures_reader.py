@@ -45,6 +45,11 @@ class FixtureReader:
                             "id": ida_id,
                             "ida_id": ida_id,
                             "ida": fixture["fields"]["ida"],
+                            "representative": {
+                                "accession": fixture["fields"]["accession"].lower(),
+                                "length": fixture["fields"]["length"],
+                                "domains": [],
+                            },
                             "counts": 0,
                         }
                     self.ida_to_add[ida_id]["counts"] += 1
@@ -55,6 +60,8 @@ class FixtureReader:
                 ]
             elif fixture["model"] == "webfront.ProteinEntryFeature":
                 self.entry_protein_list.append(fixture["fields"])
+                # complete representative info
+
             elif fixture["model"] == "webfront.ProteinStructureFeature":
                 self.protein_structure_list[
                     fixture["fields"]["protein"].lower()
@@ -229,6 +236,16 @@ class FixtureReader:
                             "protein_structure": sp["mapping"],
                         }
                     )
+
+        for ep in self.entry_protein_list:
+            e = ep["entry"]
+            p = ep["protein"]
+            if e.startswith("pf") or e.startswith("ipr"):
+                for ida in self.ida_to_add.values():
+                    if p == ida["representative"]["accession"]:
+                        ida["representative"]["domains"].append(
+                            {"entry": e, "coordinates": ep["coordinates"]}
+                        )
         lower = []
         for doc in to_add:
             lower.append(

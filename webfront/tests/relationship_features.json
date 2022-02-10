@@ -25,12 +25,12 @@
         {
           "fragments": [
             {
-              "start": 17,
-              "end": 70
+              "start": 27,
+              "end": 40
             },
             {
-              "start": 92,
-              "end": 110
+              "start": 50,
+              "end": 80
             }
           ]
         }
@@ -47,7 +47,7 @@
           "fragments": [
             {
               "start": 37,
-              "end": 90
+              "end": 80
             }
           ]
         }
@@ -81,12 +81,12 @@
           "fragments": [
             {
               "start": 48,
-              "end": 91,
+              "end": 71,
               "bounds": "e"
             },
             {
-              "start": 95,
-              "end": 99,
+              "start": 75,
+              "end": 79,
               "bounds": "se"
             }
           ]
@@ -94,13 +94,13 @@
         {
           "fragments": [
             {
-              "start": 148,
-              "end": 191,
+              "start": 88,
+              "end": 91,
               "bounds": "e"
             },
             {
-              "start": 195,
-              "end": 199,
+              "start": 95,
+              "end": 99,
               "bounds": "s"
             }
           ]
@@ -117,8 +117,8 @@
         {
           "fragments": [
             {
-              "start": 48,
-              "end": 10
+              "start": 10,
+              "end": 48
             }
           ]
         }

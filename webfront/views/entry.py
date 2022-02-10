@@ -56,6 +56,8 @@ class MemberAccessionHandler(CustomView):
             type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.ANNOTATION_BLOB,
         )
+
+        # get-model:[structure,contacts,lddt]
         general_handler.modifiers.register(
             "model:contacts",
             get_model("contacts"),

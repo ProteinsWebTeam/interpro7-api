@@ -546,6 +546,7 @@ class EntrySerializer(ModelContentSerializer):
                     {
                         "ida": o["_source"]["ida"],
                         "ida_id": o["_source"]["ida_id"],
+                        "representative": o["_source"]["representative"],
                         "unique_proteins": o["_source"]["counts"],
                     }
                     for o in obj["hits"]["hits"]

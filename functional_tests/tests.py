@@ -1,7 +1,6 @@
 from functional_tests.base import FunctionalTest
 import json
 import re
-import time
 
 
 class RESTRequestsTest(FunctionalTest):
@@ -57,7 +56,6 @@ class RESTRequestsTest(FunctionalTest):
 
     def test_request_protein_endpoint(self):
         self.browser.get(self.server_url + "/api/protein/?format=json")
-        time.sleep(3)
         content = self.browser.find_element_by_tag_name("body").text
 
         jsonp = json.loads(content)
@@ -119,7 +117,6 @@ class RESTRequestsTest(FunctionalTest):
     def test_request_to_api_frontend(self):
         url = "/api/entry/"
         self.browser.get(self.server_url + url)
-        time.sleep(10)
 
         req_info = self.browser.find_element_by_css_selector(".request-info").text
 

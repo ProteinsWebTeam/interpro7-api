@@ -26,7 +26,7 @@ def get_timeout_from_path(path, endpoint_levels):
 
     if (  # is requesting by accession
         len(endpoint_levels) == 3
-        and len([ep for ep in endpoint_levels if ep in names]) < 2
+        and len([ep for ep in endpoint_levels if ep in names]) == 1
     ):
         # it doesn't have modifiers
         if len(query.keys()) == 0:
@@ -50,7 +50,7 @@ def get_timeout_from_path(path, endpoint_levels):
             if page > 1:
                 return FIVE_DAYS
         except Exception:
-            return 0
+            return SHOULD_NO_CACHE
     short_life_parameters = [
         "cursor",
         "size",

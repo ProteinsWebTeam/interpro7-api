@@ -195,7 +195,6 @@ class GeneralHandler(CustomView):
                 if timeout != SHOULD_NO_CACHE:
                     self._set_in_cache(caching_allowed, full_path, response, timeout)
                 # Forcing to close the connection because django is not closing it when this query is ran as future
-                connection.close()
             except DeletedEntryError as e:
                 # DeletedEntryError is still a valid response so a response object is created and saved in cache
                 if settings.DEBUG:
@@ -207,7 +206,6 @@ class GeneralHandler(CustomView):
                 }
                 if len(e.args) > 3 and e.args[3] is not None:
                     content["history"] = e.args[3]
-                connection.close()
                 response = Response(content, status=status.HTTP_410_GONE)
                 self._set_in_cache(caching_allowed, full_path, response)
             except EmptyQuerysetError as e:
@@ -215,7 +213,6 @@ class GeneralHandler(CustomView):
                 if settings.DEBUG:
                     raise
                 content = {"detail": e.args[0]}
-                connection.close()
                 response = Response(content, status=status.HTTP_204_NO_CONTENT)
                 self._set_in_cache(caching_allowed, full_path, response)
             except Exception as e:
@@ -223,8 +220,9 @@ class GeneralHandler(CustomView):
                 if settings.DEBUG:
                     raise
                 content = {"Error": e.args[0]}
-                connection.close()
                 response = Response(content, status=status.HTTP_404_NOT_FOUND)
+            finally:
+                connection.close()
             return response
 
         def timer(caching_allowed):

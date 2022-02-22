@@ -56,6 +56,8 @@ class MemberAccessionHandler(CustomView):
             type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.ANNOTATION_BLOB,
         )
+
+        # get-model:[structure,contacts,lddt]
         general_handler.modifiers.register(
             "model:contacts",
             get_model("contacts"),
@@ -84,6 +86,9 @@ class MemberAccessionHandler(CustomView):
             get_domain_architectures,
             type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.IDA_LIST,
+        )
+        general_handler.modifiers.register(
+            "taxa", get_value_for_field("taxa"), type=ModifierType.REPLACE_PAYLOAD
         )
 
         return super(MemberAccessionHandler, self).get(
@@ -247,6 +252,9 @@ class AccessionHandler(CustomView):
             "pathways",
             get_value_for_field("pathways"),
             type=ModifierType.REPLACE_PAYLOAD,
+        )
+        general_handler.modifiers.register(
+            "taxa", get_value_for_field("taxa"), type=ModifierType.REPLACE_PAYLOAD
         )
 
         return super(AccessionHandler, self).get(

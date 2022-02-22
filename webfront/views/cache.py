@@ -26,7 +26,7 @@ def get_timeout_from_path(path, endpoint_levels):
 
     if (  # is requesting by accession
         len(endpoint_levels) == 3
-        and len([ep for ep in endpoint_levels if ep in names]) == 1
+        and len([ep for ep in endpoint_levels if ep.lower() in names]) == 1
     ):
         # it doesn't have modifiers
         if len(query.keys()) == 0:

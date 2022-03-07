@@ -6,9 +6,64 @@ from django.core.cache import cache
 
 from rest_framework import status
 from webfront.response import Response
+from webfront.views.utils import endpoints
+
 from django.conf import settings
 
 multiple_slashes = re.compile("/+")
+
+
+FIVE_DAYS = 5 * 24 * 60 * 60
+SHOULD_NO_CACHE = -1
+
+names = [ep["name"].lower() for ep in endpoints]
+
+
+def get_timeout_from_path(path, endpoint_levels):
+    parsed = urlparse(path)
+    # process query
+    query = parse_qs(parsed.query, keep_blank_values=True)
+
+    if (  # is requesting by accession
+        len(endpoint_levels) == 3
+        and len([ep for ep in endpoint_levels if ep.lower() in names]) == 1
+    ):
+        # it doesn't have modifiers
+        if len(query.keys()) == 0:
+            return SHOULD_NO_CACHE
+        if (  # The only modifier is page_size=20 or default
+            len(query.keys()) == 1
+            and "page_size" in query
+            and query["page_size"]
+            == settings.INTERPRO_CONFIG.get("default_page_size", 20)
+        ):
+            return SHOULD_NO_CACHE
+
+    # order querystring, lowercase keys
+    query = OrderedDict(
+        sorted(((key.lower(), sorted(value)) for key, value in query.items()))
+    )
+    page = query.get("page")
+    if page is not None and len(page) > 0:
+        try:
+            page = int(page[0])
+            if page > 1:
+                return FIVE_DAYS
+        except Exception:
+            return SHOULD_NO_CACHE
+    short_life_parameters = [
+        "cursor",
+        "size",
+        "go_terms",
+        "ida_ignore",
+        "ida_search",
+        "format",
+    ]
+    for parameter in short_life_parameters:
+        value = query.get(parameter)
+        if value is not None:
+            return FIVE_DAYS
+    return None
 
 
 def canonical(url, remove_all_page_size=False):

@@ -40,6 +40,8 @@ The user can freely combine the endpoint blocks (e.g. `/entry/interpro/ipr000001
 
 The google doc here contains more information about the URL design of this API: [Document](https://docs.google.com/document/d/1JkZAkGI6KjZdqwJFXYlTFPna82p68vom_CojYYaTAR0/edit?usp=sharing)
 
+The `interpro7-api/docs/modifiers.md` document contains an exhaustive list of modifiers that can be used with example links. 
+
 
 #### Dependencies
 

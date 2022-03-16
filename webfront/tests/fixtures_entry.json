@@ -135,7 +135,13 @@
         "sets": 0,
         "domain_architectures": 2
       },
-      "interactions": null,
+      "interactions": null
+    }
+  },
+  {
+    "model": "webfront.EntryTaxa",
+    "fields": {
+      "accession": "IPR003165",
       "taxa": {
         "id": "1",
         "rank": null,

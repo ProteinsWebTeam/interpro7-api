@@ -5,6 +5,7 @@ from django.db.models import Count
 from webfront.models import (
     Entry,
     EntryAnnotation,
+    EntryTaxa,
     Alignment,
     Isoforms,
     Release_Note,
@@ -762,6 +763,14 @@ def add_taxonomy_names(value, current_payload):
         names[t.accession] = t.scientific_name
     return names
 
+
+def get_sunburst_taxa(value, general_handler):
+    taxa = EntryTaxa.objects.filter(
+        accession__in=general_handler.queryset_manager.get_queryset()
+    )
+    if taxa.count()==0:
+        raise EmptyQuerysetError("This entry doesn't have taxa")
+    return {"taxa": taxa.first().taxa}
 
 def extra_features(value, general_handler):
     features = ProteinExtraFeatures.objects.filter(

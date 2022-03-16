@@ -18,6 +18,7 @@ from webfront.views.modifiers import (
     filter_by_latest_entries,
     get_value_for_field,
     get_model,
+    get_sunburst_taxa,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -88,7 +89,7 @@ class MemberAccessionHandler(CustomView):
             serializer=SerializerDetail.IDA_LIST,
         )
         general_handler.modifiers.register(
-            "taxa", get_value_for_field("taxa"), type=ModifierType.REPLACE_PAYLOAD
+            "taxa", get_sunburst_taxa, type=ModifierType.REPLACE_PAYLOAD
         )
 
         return super(MemberAccessionHandler, self).get(
@@ -254,7 +255,7 @@ class AccessionHandler(CustomView):
             type=ModifierType.REPLACE_PAYLOAD,
         )
         general_handler.modifiers.register(
-            "taxa", get_value_for_field("taxa"), type=ModifierType.REPLACE_PAYLOAD
+            "taxa", get_sunburst_taxa, type=ModifierType.REPLACE_PAYLOAD
         )
 
         return super(AccessionHandler, self).get(

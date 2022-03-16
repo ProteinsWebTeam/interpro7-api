@@ -45,7 +45,16 @@ class Entry(models.Model):
     pathways = JSONField(null=True)
     history = JSONField(null=True)
     details = JSONField(null=True)
+
+
+class EntryTaxa(models.Model):
+    accession = models.OneToOneField(
+        Entry, db_column="accession", on_delete=models.SET_NULL, null=True
+    )
     taxa = JSONField(null=True)
+
+    class Meta:
+        db_table = "webfront_entrytaxa"
 
 
 class EntryAnnotation(models.Model):

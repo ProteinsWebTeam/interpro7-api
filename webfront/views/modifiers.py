@@ -770,7 +770,7 @@ def get_sunburst_taxa(value, general_handler):
     )
     if taxa.count()==0:
         raise EmptyQuerysetError("This entry doesn't have taxa")
-    return {"taxa": taxa.first().taxa}
+    return {"taxa": taxa.first().tree}
 
 def extra_features(value, general_handler):
     features = ProteinExtraFeatures.objects.filter(

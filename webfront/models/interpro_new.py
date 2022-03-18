@@ -49,9 +49,9 @@ class Entry(models.Model):
 
 class EntryTaxa(models.Model):
     accession = models.OneToOneField(
-        Entry, db_column="accession", on_delete=models.SET_NULL, null=True
+        Entry, db_column="accession", primary_key=True, on_delete=models.CASCADE
     )
-    taxa = JSONField(null=True)
+    tree = JSONField(null=True)
 
     class Meta:
         db_table = "webfront_entrytaxa"

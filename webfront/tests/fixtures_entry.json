@@ -142,7 +142,7 @@
     "model": "webfront.EntryTaxa",
     "fields": {
       "accession": "IPR003165",
-      "taxa": {
+      "tree": {
         "id": "1",
         "rank": null,
         "name": "root",

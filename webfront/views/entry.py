@@ -239,6 +239,12 @@ class AccessionHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry", is_alive=True)
 
         general_handler.modifiers.register(
+            "annotation",
+            get_entry_annotation,
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+        general_handler.modifiers.register(
             "ida",
             get_domain_architectures,
             type=ModifierType.REPLACE_PAYLOAD,

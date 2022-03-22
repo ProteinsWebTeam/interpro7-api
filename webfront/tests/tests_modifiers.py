@@ -375,18 +375,25 @@ class EntryAnnotationModifiersTest(InterproRESTTestCase):
     def test_annotation_modifier_hmm(self):
         response = self.client.get("/api/entry/pfam/pf02171?annotation=hmm")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response["content-type"], "application/octet-stream")
+        self.assertEqual(response["content-type"], "application/gzip")
 
-    def test_annotation_modifier_alignment(self):
-        response = self.client.get("/api/entry/pfam/pf02171?annotation=alignment")
+    def test_annotation_modifier_logo(self):
+        response = self.client.get("/api/entry/pfam/pf02171?annotation=logo")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response["content-type"], "application/octet-stream")
+        self.assertEqual(response['content-type'], "application/json")
+        data = json.loads(response.content)
+        self.assertIn("ali_map", data)
+        self.assertEqual(302, len(data["ali_map"]))
 
-    # TODO Problem encoding logo as byte-coded json
-    # def test_annotation_modifier_logo(self):
-    #     response = self.client.get("/api/entry/pfam/pf02171?annotation=logo")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(response['content-type'], "application/json")
+    def test_annotation_modifier_pfam_alignment(self):
+        response = self.client.get("/api/entry/pfam/pf02171?annotation=alignment:seed")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["content-type"], "text/plain")
+
+    def test_annotation_modifier_interpro_alignment(self):
+        response = self.client.get("/api/entry/interpro/ipr003165?annotation=alignment:seed")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["content-type"], "text/plain")
 
     # TODO This test should fail but doesn't
     # def test_annotation_wrong_acc_modifier(self):

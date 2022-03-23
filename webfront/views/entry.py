@@ -245,6 +245,11 @@ class AccessionHandler(CustomView):
             serializer=SerializerDetail.ANNOTATION_BLOB,
         )
         general_handler.modifiers.register(
+            "annotation:info",
+            get_entry_annotation_info,
+            type=ModifierType.REPLACE_PAYLOAD,
+        )
+        general_handler.modifiers.register(
             "ida",
             get_domain_architectures,
             type=ModifierType.REPLACE_PAYLOAD,

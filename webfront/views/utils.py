@@ -10,6 +10,8 @@ from webfront.views.custom import CustomView
 from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
 
+organisms = settings.INTERPRO_CONFIG.get("key_organisms", {})
+
 endpoints = [
     {"name": "entry", "db": "entry_db", "accession": "entry_acc"},
     {"name": "protein", "db": "protein_db", "accession": "protein_acc"},
@@ -105,6 +107,7 @@ class AccessionHandler(CustomView):
 
         self.queryset = {}
         if len(docs["hits"]["hits"]) == 0:
+            # Checking protein identifiers AKA Uniprot entry names
             qs = Protein.objects.filter(identifier__iexact=acc)
             if qs.count() > 0:
                 first = qs.first()
@@ -113,6 +116,20 @@ class AccessionHandler(CustomView):
                     "source_database": first.source_database,
                     "accession": first.accession,
                 }
+            else:
+                qs2 = Protein.objects.filter(tax_id__in=list(organisms.keys())).filter(gene__iexact=acc)
+
+                if qs2.count() > 0:
+                    first = qs2.first()
+                    self.queryset = {
+                        "endpoint": "protein",
+                        "source_database": first.source_database,
+                        "proteins": [
+                            {"accession": item.accession,
+                             "organism": item.organism["scientificName"],
+                             "tax_id":item.tax_id
+                             } for item in qs2[:20]],
+                    }
         else:
             hit = docs["hits"]["hits"][0]["_source"]
 

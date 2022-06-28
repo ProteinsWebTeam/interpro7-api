@@ -62,6 +62,15 @@ class UtilsAccessionTest(InterproRESTTestCase):
         self.assertEqual(response.data["source_database"], "reviewed")
         self.assertEqual(response.data["accession"], "A1CUJ5")
 
+    def test_accession_endpoint_with_gene_name(self):
+        response = self.client.get("/api/utils/accession/FOLH1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["endpoint"], "protein")
+        self.assertEqual(response.data["source_database"], "unreviewed")
+        self.assertIn("proteins", response.data)
+        self.assertGreater( len(response.data["proteins"]), 0)
+        self.assertEqual(response.data["proteins"][0]['accession'], "Q0VDM6")
+
 
 class UtilsReleaseTest(InterproRESTTestCase):
     def test_can_read_structure_overview(self):

@@ -19,9 +19,9 @@ api_test_map = {
         "unintegrated/profile": ["PS01031"],
     },
     "protein": {
-        "uniprot": ["A1CUJ5", "M5ADK6", "A0A0A2L2G2", "P16582"],
+        "uniprot": ["A1CUJ5", "M5ADK6", "A0A0A2L2G2", "P16582", "Q0VDM6"],
         "reviewed": ["A1CUJ5", "M5ADK6"],
-        "unreviewed": ["A0A0A2L2G2", "P16582"],
+        "unreviewed": ["A0A0A2L2G2", "P16582", "Q0VDM6"],
     },
     "structure": {"pdb": ["1JM7", "1T2V", "2BKM", "1JZ8"]},
     "taxonomy": {"uniprot": ["1", "2", "2579", "40296", "344612", "1001583"]},

@@ -128,7 +128,7 @@ class AccessionHandler(CustomView):
                             {"accession": item.accession,
                              "organism": item.organism["scientificName"],
                              "tax_id":item.tax_id
-                             } for item in qs2[:20]],
+                             } for item in qs2],
                     }
         else:
             hit = docs["hits"]["hits"][0]["_source"]

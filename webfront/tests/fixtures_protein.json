@@ -236,6 +236,7 @@
       "accession": "Q0VDM6",
       "tax_id": "10090",
       "organism": {
+        "name": "Mus musculus",
         "scientificName": "Mus musculus",
         "taxId": "10090"
       },

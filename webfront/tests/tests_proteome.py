@@ -7,7 +7,7 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 class ProteomeFixturesTest(InterproRESTTestCase):
     def test_the_fixtures_are_loaded(self):
         proteomes = Proteome.objects.all()
-        self.assertEqual(proteomes.count(), 3)
+        self.assertEqual(proteomes.count(), 4)
         names = [t.name for t in proteomes]
         self.assertIn("Lactobacillus brevis KB290", names)
         self.assertNotIn("unicorn", names)
@@ -22,7 +22,7 @@ class ProteomeFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/proteome/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self.assertEqual(len(response.data["results"]), 3)
+        self.assertEqual(len(response.data["results"]), 4)
 
     def test_can_read_proteome_id(self):
         response = self.client.get("/api/proteome/uniprot/UP000012042")

@@ -346,7 +346,7 @@ class ProteinSerializer(ModelContentSerializer):
             "source_database": obj["protein_db"],
             "organism": obj["tax_id"],
         }
-        if not for_entry:
+        if not for_entry and "structure_chain_acc" in obj:
             header["chain"] = obj["structure_chain_acc"]
         if include_coordinates:
             key_coord = (

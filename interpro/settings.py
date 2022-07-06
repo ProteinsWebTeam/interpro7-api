@@ -142,6 +142,7 @@ SEARCHER_IDA_INDEX = INTERPRO_CONFIG.get("searcher_ida_index", "ida")
 if INTERPRO_CONFIG.get("use_test_db", True):
     SEARCHER_URL = SEARCHER_TEST_URL
     SEARCHER_INDEX = "test"
+    SEARCHER_IDA_INDEX = "ida"
 TEST_RUNNER = "webfront.tests.managed_model_test_runner.UnManagedModelTestRunner"
 
 # Internationalization

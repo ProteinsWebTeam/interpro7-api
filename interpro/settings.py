@@ -86,6 +86,7 @@ if INTERPRO_CONFIG.get("django_cors", False):
     MIDDLEWARE = ("corsheaders.middleware.CorsMiddleware",) + MIDDLEWARE
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = False
+    CORS_EXPOSE_HEADERS = ["InterPro-Version"]
 
 ROOT_URLCONF = "interpro.urls"
 

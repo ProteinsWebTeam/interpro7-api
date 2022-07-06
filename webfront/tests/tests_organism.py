@@ -7,7 +7,7 @@ from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 class TaxonomyFixturesTest(InterproRESTTestCase):
     def test_the_fixtures_are_loaded(self):
         taxa = Taxonomy.objects.all()
-        self.assertEqual(taxa.count(), 6)
+        self.assertEqual(taxa.count(), 7)
         names = [t.scientific_name for t in taxa]
         self.assertIn("ROOT", names)
         self.assertNotIn("unicorn", names)
@@ -23,7 +23,7 @@ class TaxonomyFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/taxonomy/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self.assertEqual(len(response.data["results"]), 6)
+        self.assertEqual(len(response.data["results"]), 7)
 
     def test_can_read_taxonomy_id(self):
         response = self.client.get("/api/taxonomy/uniprot/2")
@@ -37,7 +37,7 @@ class TaxonomyProteomeFixturesTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
         self._check_is_list_of_objects_with_key(response.data["results"], "proteomes")
-        self.assertEqual(len(response.data["results"]), 3)
+        self.assertEqual(len(response.data["results"]), 4)
 
     def test_can_read_taxonomy_leaf_id_with_proteome_count(self):
         response = self.client.get("/api/taxonomy/uniprot/40296/proteome")
@@ -59,7 +59,7 @@ class TaxonomyProteomeFixturesTest(InterproRESTTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
         self.assertIn("proteome_subset", response.data)
-        self.assertEqual(len(response.data["proteome_subset"]), 2)
+        self.assertEqual(len(response.data["proteome_subset"]), 3)
 
     def test_can_read_proteome_id_including_tax_id(self):
         lineage = [1, 2, 40296]

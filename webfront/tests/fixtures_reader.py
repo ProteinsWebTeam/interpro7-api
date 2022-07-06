@@ -102,6 +102,8 @@ class FixtureReader:
     def get_fixtures(self):
         to_add = []
         entry2set = self.get_entry2set()
+
+        # Creating obj to add for proteins with entries
         for ep in self.entry_protein_list:
             e = ep["entry"]
             p = ep["protein"]
@@ -113,17 +115,17 @@ class FixtureReader:
                 "entry_integrated": self.entries[e]["integrated"],
                 "entry_date": self.entries[e]["entry_date"],
                 "text_entry": e
-                + " "
-                + self.entries[e]["type"]
-                + " "
-                + (" ".join(self.entries[e]["description"])),
+                              + " "
+                              + self.entries[e]["type"]
+                              + " "
+                              + (" ".join(self.entries[e]["description"])),
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
                 "text_protein": p
-                + " "
-                + self.proteins[p]["source_database"]
-                + " "
-                + (" ".join(self.proteins[p]["description"])),
+                                + " "
+                                + self.proteins[p]["source_database"]
+                                + " "
+                                + (" ".join(self.proteins[p]["description"])),
                 "ida_id": self.proteins[p]["ida_id"],
                 "ida": self.proteins[p]["ida"],
                 "tax_id": self.proteins[p]["organism"]["taxId"],
@@ -141,10 +143,7 @@ class FixtureReader:
             }
             obj["text_taxonomy"] = obj["tax_id"] + " " + (" ".join(obj["tax_lineage"]))
 
-            # if "ida" in ep:
-            #     obj["ida"] = ep["ida"]
-            #     obj["ida_id"] = ep["ida_id"]
-
+            # In case that protein also has a structure
             if p in self.protein_structure_list:
                 for sp in self.protein_structure_list[p]:
                     c = copy.copy(obj)
@@ -189,6 +188,7 @@ class FixtureReader:
                 else:
                     to_add.append(obj)
 
+        # Creating obj to add for proteins without entries but with structures
         proteins = [p["protein"] for p in self.entry_protein_list]
         for p, chains in self.protein_structure_list.items():
             if p not in proteins:
@@ -237,6 +237,7 @@ class FixtureReader:
                         }
                     )
 
+        # getting representative coordinates for IDA
         for ep in self.entry_protein_list:
             e = ep["entry"]
             p = ep["protein"]
@@ -246,6 +247,37 @@ class FixtureReader:
                         ida["representative"]["domains"].append(
                             {"entry": e, "coordinates": ep["coordinates"]}
                         )
+
+        # Creating obj to add for proteins without entry or structure
+        for p in self.proteins:
+            p_ocurrences = len([t for t in to_add if t['protein_acc']==p ])
+            if p_ocurrences == 0:
+                to_add.append(
+                    {
+                        "text": p,
+                        "protein_acc": p,
+                        "protein_db": self.proteins[p]["source_database"],
+                        "text_protein": p
+                                        + " "
+                                        + self.proteins[p]["source_database"],
+                        "tax_id": self.proteins[p]["organism"]["taxId"],
+                        "tax_name": self.proteins[p]["organism"]["name"],
+                        "tax_rank": self.tax2rank[
+                            self.proteins[p]["organism"]["taxId"]
+                        ],
+                        "tax_lineage": self.tax2lineage[
+                            self.proteins[p]["organism"]["taxId"]
+                        ],
+                        "proteome_acc": self.proteomes[proteome]["accession"],
+                        "proteome_name": self.proteomes[proteome]["name"],
+                        "proteome_is_reference": self.proteomes[proteome][
+                            "is_reference"
+                        ],
+                        "protein_length": self.proteins[p]["length"],
+                        "id": get_id(None, p),
+                    }
+                )
+
         lower = []
         for doc in to_add:
             lower.append(

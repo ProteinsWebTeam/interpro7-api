@@ -148,6 +148,27 @@
     }
   },
   {
+    "model": "webfront.Taxonomy",
+    "fields": {
+      "accession": "10090",
+      "scientific_name": "Mus musculus",
+      "full_name": "Mus musculus",
+      "lineage": " 1 2579 10090 ",
+      "parent": "2579",
+      "rank": "SPECIES",
+      "children": [],
+      "counts": {
+        "entries": {
+          "total": 0
+        },
+        "structures": 0,
+        "proteins": 1,
+        "sets": 0,
+        "proteomes": 1
+      }
+    }
+  },
+  {
     "model": "webfront.Proteome",
     "fields": {
       "accession": "UP000006701",
@@ -210,6 +231,26 @@
         "proteins": 1,
         "taxa": 1,
         "sets": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.Proteome",
+    "fields": {
+      "accession": "UP000000589",
+      "name": "Mus musculus",
+      "is_reference": true,
+      "strain": "C57BL",
+      "assembly": "GCA_000001635.8 from Ensembl",
+      "taxonomy": "10090",
+      "counts": {
+        "entries": {
+          "total": 0
+        },
+        "structures": 0,
+        "proteins": 1,
+        "taxa": 1,
+        "sets": 0
       }
     }
   },

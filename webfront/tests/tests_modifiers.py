@@ -504,3 +504,17 @@ class StructuralModelTest(InterproRESTTestCase):
         data = json.loads(content)
         self.assertEqual(3, len(data))
         self.assertTrue(all([0 <= item <= 1 for item in data]))
+
+class PantherSubfamilyTest(InterproRESTTestCase):
+    def test_subfamilies_counter(self):
+        response = self.client.get("/api/entry/panther/PTHR43214")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("counters", response.data["metadata"])
+        self.assertEqual(response.data["metadata"]["counters"]["subfamilies"], 1)
+        # self.assertEqual(len(response.data["results"]), 1)
+    def test_panther_subfamilies(self):
+        response = self.client.get("/api/entry/panther/PTHR43214?subfamilies")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["metadata"]["accession"], "PTHR43214:sf24")
+        self.assertEqual(response.data["results"][0]["metadata"]["integrated"], "PTHR43214")

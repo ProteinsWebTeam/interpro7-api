@@ -855,5 +855,14 @@ def get_model(field):
     return get_model_structure
 
 
+def get_subfamilies(value, general_handler):
+    queryset = general_handler.queryset_manager.get_queryset().first()
+    entries = Entry.objects.filter(integrated=queryset.accession, source_database='panther', is_alive=False)
+    if len(entries) == 0:
+        raise EmptyQuerysetError(
+            "There is are not subfamilies for this entry"
+        )
+    return entries
+
 def passing(x, y):
     pass

@@ -66,7 +66,7 @@ class RESTRequestsTest(FunctionalTest):
 
         num_uniprot = jsonp["proteins"]["uniprot"]
         self.assertEqual(
-            num_uniprot, 4, "the TEST dataset only includes 4 uniprot entries"
+            num_uniprot, 5, "the TEST dataset only includes 5 uniprot entries"
         )
 
         self.browser.get(self.server_url + "/api/protein/uniprot?format=json")

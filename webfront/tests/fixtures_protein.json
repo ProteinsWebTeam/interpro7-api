@@ -230,6 +230,37 @@
     }
   },
   {
+    "model": "webfront.Protein",
+    "fields": {
+      "identifier": "Q0VDM6_MOUSE",
+      "accession": "Q0VDM6",
+      "tax_id": "10090",
+      "organism": {
+        "name": "Mus musculus",
+        "scientificName": "Mus musculus",
+        "taxId": "10090"
+      },
+      "name": "Folh1 protein",
+      "description": null,
+      "sequence_bin": "H4sIAE1d/F8C/xWRUQ4EIQhDz0ZUHEKHoBA33v8iy/ihhoD2te/eO0DYQO213B2+EpjkzYe3aNv7rI7m0zdNxEYgL1z0iMci3hM2zlEZEit6YNSVjLgbYIghkGWphnNl+CROg2/oRUiznLIV3k+qcMRgY8GQVtOPZB7/nlrzNRshCcWdNnkMWfEQ28yE1J/QYfRA9X2sf6JoTw9Bl4hULILHnag3Ck8oI25Ud1X30E8ROmWBeTyt1XxJTB3LODiEtU5dbUTS3l5SEjdImEYMRP/12+/kFq6J1aicKw3mbXR55+2MfSA/iAmoKnbygA+Q8VxFQW7G28osps7tnbgVhlCcTit1rnvtIem/lQXf4tBkzsP0/X5u6T5lzdi/JyUvyUJfWqnuGnJ5MecPHB/3C8eZp+hfPWU//O1nlIexKh1kZQU7h1hEGrUrKpfpLPOBl9K0V0xULlMBcXbO9pJLMJMEEfQ4JE9aaOEV5PVj0cicUcI4tbzdnbn4QmO2ps+igbu3dg66TSvdnGFaycSXd36Wrht53q7Zrvb2B5BjI824AgAA",
+      "length": 696,
+      "proteome": "UP000000589",
+      "gene": "FOLH1",
+      "go_terms": null,
+      "evidence_code": 1,
+      "source_database": "unreviewed",
+      "is_fragment": false,
+      "counts": {
+        "entries": {
+          "total": 0
+        },
+        "structures": 0,
+        "sets": 0
+      }
+
+    }
+  },
+  {
     "model": "webfront.Isoforms",
     "fields": {
       "accession": "A1CUJ5-2",

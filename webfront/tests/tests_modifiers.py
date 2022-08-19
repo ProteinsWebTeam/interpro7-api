@@ -24,7 +24,8 @@ class GroupByModifierTest(InterproRESTTestCase):
     def test_can_get_the_entry_type_groups_proteins_by_tax_id(self):
         response = self.client.get("/api/protein?group_by=tax_id")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual({}, response.data)
+        # Only Mus musculus is a key species
+        self.assertEqual({'10090': {'value': 1, 'title': 'Mus musculus'}}, response.data)
 
     def test_can_group_interpro_entries_with_member_databases(self):
         response = self.client.get("/api/entry/interpro?group_by=member_databases")
@@ -45,7 +46,7 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertIn("true", response.data["match_presence"])
         self.assertIn("false", response.data["match_presence"])
         self.assertEqual(response.data["match_presence"]["true"], 3)
-        self.assertEqual(response.data["match_presence"]["false"], 1)
+        self.assertEqual(response.data["match_presence"]["false"], 2)
 
     def test_can_get_the_fragment_groups(self):
         response = self.client.get("/api/protein?group_by=is_fragment")

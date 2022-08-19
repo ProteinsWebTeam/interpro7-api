@@ -12,7 +12,7 @@ class ProteinRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/protein/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self.assertEqual(len(response.data["results"]), 4)
+        self.assertEqual(len(response.data["results"]), 5)
 
     def test_can_read_protein_uniprot_accession(self):
         response = self.client.get("/api/protein/uniprot/P16582")

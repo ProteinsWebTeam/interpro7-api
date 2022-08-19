@@ -20,11 +20,9 @@ from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import EmptyQuerysetError, HmmerWebError, ExpectedUniqueError, InvalidOperationRequest
 from django.conf import settings
 
-from requests import Session
 from urllib import request, parse
 from json import loads
 import gzip
-# import ssl
 
 # MAQ bypassing SSL errors
 # ssl._create_default_https_context = ssl._create_unverified_context

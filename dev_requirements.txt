@@ -1,5 +1,6 @@
-selenium~=4.0
-django-debug-toolbar==3.6.0
+# remember to check the version is compatible with python 3.6
+selenium~=3.141
+django-debug-toolbar~=3.2
 ipdb==0.13.9
 coveralls==3.3.1
 tqdm==4.64.0

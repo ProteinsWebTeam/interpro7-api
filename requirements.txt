@@ -1,3 +1,4 @@
+# remember to check the version is compatible with python 3.6
 Django==3.2.15
 djangorestframework==3.13.1
 PyYAML==6.0

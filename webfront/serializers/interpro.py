@@ -204,9 +204,10 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_metadata_representation(instance, searcher, sq, counters=None):
         results = EntryAnnotation.objects.filter(accession=instance.accession).only(
-            "type"
+            "type",
+            "num_sequences"
         )
-        annotation_types = [x.type for x in results]
+        annotation_types = {x.type: x.num_sequences or 0 for x in results}
         if counters is None:
             counters = EntrySerializer.get_counters(instance, searcher, sq)
 

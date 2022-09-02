@@ -145,6 +145,12 @@ class EntryRESTTest(InterproRESTTestCase):
         self.assertIn("metadata", response.data.keys())
         self.assertIn("counters", response.data["metadata"].keys())
         self.assertIn("proteins", response.data["metadata"]["counters"].keys())
+        self.assertIn("entry_annotations", response.data["metadata"].keys())
+        self.assertIsInstance(response.data["metadata"]["entry_annotations"],
+                              dict)
+        for k, v in response.data["metadata"]["entry_annotations"].items():
+            self.assertIsInstance(k, str)
+            self.assertIsInstance(v, int)
         self._check_entry_details(response.data["metadata"])
 
     def test_can_read_entry_unintegrated_pfam_id(self):

@@ -860,6 +860,7 @@ def get_subfamilies(value, general_handler):
         raise EmptyQuerysetError(
             "There is are not subfamilies for this entry"
         )
+    general_handler.modifiers.search_size = len(entries)
     return entries
 
 def passing(x, y):

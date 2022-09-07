@@ -855,7 +855,7 @@ def get_model(field):
 
 def get_subfamilies(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset().first()
-    entries = Entry.objects.filter(integrated=queryset.accession, source_database='panther', is_alive=False)
+    entries = Entry.objects.filter(integrated=queryset.accession, is_alive=False)
     if len(entries) == 0:
         raise EmptyQuerysetError(
             "There is are not subfamilies for this entry"

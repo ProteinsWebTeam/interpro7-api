@@ -138,7 +138,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/protein/uniprot/"
             + sp_2
             + "/entry/interpro": ["IPR003165", "IPR001165"],
-            "/api/protein/uniprot/" + sp_1 + "/entry/unintegrated": ["PF17180"],
+            "/api/protein/uniprot/" + sp_1 + "/entry/unintegrated": ["PF17180", "PTHR43214"],
             "/api/protein/uniprot/" + sp_2 + "/entry/pfam": ["PF17176", "PF02171"],
             "/api/protein/uniprot/" + sp_2 + "/entry/interpro/pfam": ["PF02171"],
             "/api/protein/uniprot/" + sp_2 + "/entry/interpro/smart": ["SM00950"],

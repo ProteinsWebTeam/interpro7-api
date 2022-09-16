@@ -1,6 +1,7 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 import sys
 import time
 import os
@@ -70,7 +71,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         def link_has_gone_stale():
             try:
                 # poll the link with an arbitrary call
-                link.find_elements_by_id("doesnt-matter")
+                link.find_elements(By.ID, "doesnt-matter")
                 return False
             except StaleElementReferenceException:
                 return True

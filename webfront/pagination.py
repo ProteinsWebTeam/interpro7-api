@@ -31,18 +31,38 @@ class CustomPagination(CursorPagination):
     current_size = None
     after_key = None
     before_key = None
+    elastic_result = None
 
     def get_paginated_response(self, data):
         base = [
             ("count", self.current_size),
             ("next", self.get_next_link()),
             ("previous", self.get_previous_link()),
-            ("results", data["data"]),
+            ("results", self._sortBasedOnElastic(data["data"])),
         ]
         if "extensions" in data and len(data["extensions"]) > 0:
             for ext in data["extensions"]:
                 base.append((ext, data["extensions"][ext]))
         return Response(OrderedDict(base))
+
+    # If there is data in elastic_result, implies that the wueryset was created by querying elastic first.
+    # This method uses the list of accession retrieved via elastic to order the results.
+    def _sortBasedOnElastic(self, data):
+        if self.elastic_result is None:
+            return data
+        ordered_data = []
+        for acc in self.elastic_result:
+            obj = next(
+                filter(
+                    lambda item: item.get("metadata", {}).get("accession", "").lower()
+                    == acc.lower(),
+                    data,
+                ),
+                None,
+            )
+            if obj is not None:
+                ordered_data.append(obj)
+        return ordered_data
 
     def _get_position_from_instance(self, instance, ordering):
         if type(instance) == tuple:
@@ -51,9 +71,11 @@ class CustomPagination(CursorPagination):
             instance, ordering
         )
 
+    # Extract some values passed as kwargs before invoking the implementation in the super class
     def paginate_queryset(self, queryset, request, **kwargs):
         self.current_size = None
         self.after_key = None
+        self.elastic_result = None
         if (
             hasattr(queryset, "model")
             and queryset.model._meta.ordering != []
@@ -69,6 +91,8 @@ class CustomPagination(CursorPagination):
             self.after_key = kwargs["after_key"]
         if "before_key" in kwargs and kwargs["before_key"] is not None:
             self.before_key = kwargs["before_key"]
+        if "elastic_result" in kwargs and kwargs["elastic_result"] is not None:
+            self.elastic_result = kwargs["elastic_result"]
         return super(CustomPagination, self).paginate_queryset(
             queryset, request, kwargs["view"]
         )

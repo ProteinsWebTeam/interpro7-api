@@ -69,6 +69,8 @@ class QuerysetManager:
     def order_by(self, field):
         self.order_field = field
 
+    # Generates a query string for elasticsearch from the registered queryset filters.
+    # It explicitely goes through all the filters and create the query string case by case.
     def get_searcher_query(self, include_search=False, use_lineage=False):
         blocks = []
         for ep in self.filters:
@@ -162,9 +164,11 @@ class QuerysetManager:
                     if k == "source_database" or k == "source_database__iexact":
                         blocks.append("{}_db:{}".format(ep, escape(v)))
 
+        # Normalizes the blocks(sorts and lower) and joins them with ' && '.
         blocks = list(set(blocks))
         blocks.sort()
         q = " && ".join(blocks).lower()
+
         if self.order_field is not None:
             q += "&sort=" + self.order_field
         return q

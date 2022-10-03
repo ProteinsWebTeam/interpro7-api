@@ -399,7 +399,7 @@ class ElasticsearchController(SearchController):
             self.reverseOrderDirection(facet["aggs"]["groups"]["composite"])
         after_key = self.getAfterKey(response, facet, before, qs)
         before_key = self.getBeforeKey(response, facet, before, qs)
-        return accessions, count, after_key, before_key,should_keep_elastic_order
+        return accessions, count, after_key, before_key, should_keep_elastic_order
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()

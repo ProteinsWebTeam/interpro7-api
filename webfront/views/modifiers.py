@@ -420,7 +420,7 @@ def filter_by_domain_architectures(field, general_handler):
         general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
     )
     endpoint = general_handler.queryset_manager.main_endpoint
-    res, length, after_key, before_key = searcher.get_list_of_endpoint(
+    res, length, after_key, before_key, _ = searcher.get_list_of_endpoint(
         endpoint, rows=size, query=query, cursor=cursor
     )
     general_handler.modifiers.search_size = length

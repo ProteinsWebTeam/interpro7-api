@@ -630,5 +630,126 @@
         ]
       }
     }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id": null,
+      "accession": "PTHR43214",
+      "type": "D",
+      "name": "TWO-COMPONENT RESPONSE REGULATOR",
+      "short_name": "PTHR43214",
+      "go_terms": [],
+      "entry_date": "2014-03-02T00:00:00Z",
+      "is_featured": true,
+      "is_alive": true,
+      "source_database": "panther",
+      "member_databases": null,
+      "integrated": null,
+      "description": [
+        "two-component response regulator."
+      ],
+      "wikipedia": null,
+      "literature": {},
+      "cross_references": {},
+      "counts": {
+        "proteins": 1,
+        "structures": 2,
+        "taxa": 0,
+        "proteomes": 0,
+        "sets": 0,
+        "domain_architectures": 0,
+        "subfamilies": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id": null,
+      "accession": "PTHR43214:sf24",
+      "type": "D",
+      "name": "NITRATE/NITRITE RESPONSE REGULATOR PROTEIN NARL",
+      "short_name": "PTHR43214:sf24",
+      "go_terms": [],
+      "entry_date": "2014-03-02T00:00:00Z",
+      "is_featured": true,
+      "is_alive": false,
+      "source_database": "panther",
+      "member_databases": null,
+      "integrated": "PTHR43214",
+      "description": [
+        "nitrate/nitrite response regulator protein narl."
+      ],
+      "wikipedia": null,
+      "literature": {},
+      "cross_references": {},
+      "counts": {
+        "proteins": 0,
+        "structures": 0,
+        "taxa": 0,
+        "proteomes": 0,
+        "sets": 0,
+        "domain_architectures": 0
+      }
+    }  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id": null,
+      "accession": "G3DSA:1.10.10.10",
+      "type": "homologous_superfamily",
+      "name": "Winged helix-like DNA-binding domain superfamily/Winged helix DNA-binding domain",
+      "short_name": "G3DSA:1.10.10.10",
+      "go_terms": [],
+      "entry_date": "2004-03-02T00:00:00Z",
+      "is_featured": true,
+      "is_alive": true,
+      "source_database": "cathgene3d",
+      "member_databases": null,
+      "integrated": null,
+      "description": [],
+      "wikipedia": null,
+      "literature": {},
+      "cross_references": {},
+      "counts": {
+        "proteins": 1,
+        "structures": 2,
+        "taxa": 0,
+        "proteomes": 0,
+        "sets": 0,
+        "domain_architectures": 0,
+        "subfamilies": 1
+      }
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id": null,
+      "accession": "G3DSA:1.10.10.10:1",
+      "type": "funfam",
+      "name": "LysR family transcriptional regulator",
+      "short_name": "G3DSA:1.10.10.10:1",
+      "go_terms": [],
+      "entry_date": "2004-03-02T00:00:00Z",
+      "is_featured": true,
+      "is_alive": false,
+      "source_database": "cathgene3d",
+      "member_databases": null,
+      "integrated": "G3DSA:1.10.10.10",
+      "description": [],
+      "wikipedia": null,
+      "literature": {},
+      "cross_references": {},
+      "counts": {
+        "proteins": 0,
+        "structures": 0,
+        "taxa": 0,
+        "proteomes": 0,
+        "sets": 0,
+        "domain_architectures": 0
+      }
+    }
   }
 ]

@@ -160,6 +160,27 @@
     }
   },
   {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
+      "entry": "pthr43214",
+      "protein": "m5adk6",
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 12,
+              "end": 46
+            }
+          ],
+          "subfamily": {
+            "name": "NITRATE/NITRITE RESPONSE REGULATOR PROTEIN NARL",
+            "accession":"PTHR43214:sf24"
+          }
+        }
+      ]
+    }
+  },
+  {
     "model": "webfront.ProteinStructureFeature",
     "fields": {
       "protein": "a1cuj5",

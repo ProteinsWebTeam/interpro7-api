@@ -505,3 +505,33 @@ class StructuralModelTest(InterproRESTTestCase):
         data = json.loads(content)
         self.assertEqual(3, len(data))
         self.assertTrue(all([0 <= item <= 1 for item in data]))
+
+
+class SubfamiliesTest(InterproRESTTestCase):
+    entries = [
+        {"db": "panther", "acc": "PTHR43214", "sf": "PTHR43214:sf24"},
+        {"db": "cathgene3d", "acc": "G3DSA:1.10.10.10", "sf": "G3DSA:1.10.10.10:1"},
+    ]
+
+    def test_subfamilies_counter(self):
+        for entry in self.entries:
+            response = self.client.get(f"/api/entry/{entry['db']}/{entry['acc']}")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("counters", response.data["metadata"])
+            self.assertEqual(response.data["metadata"]["counters"]["subfamilies"], 1)
+
+    def test_panther_subfamilies(self):
+        for entry in self.entries:
+            response = self.client.get(f"/api/entry/{entry['db']}/{entry['acc']}?subfamilies")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data["results"]), 1)
+            self.assertEqual(response.data["results"][0]["metadata"]["accession"], entry['sf'])
+            self.assertEqual(response.data["results"][0]["metadata"]["integrated"], entry['acc'])
+
+    def test_no_subfamilies_in_pfam(self):
+        response = self.client.get(f"/api/entry/pfam/PF02171")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("counters", response.data["metadata"])
+        self.assertNotIn("subfamilies", response.data["metadata"]["counters"])
+        response2 = self.client.get(f"/api/entry/pfam/PF02171?subfamilies")
+        self.assertEqual(response2.status_code, status.HTTP_204_NO_CONTENT)

@@ -14,6 +14,7 @@ api_test_map = {
         "pfam": ["PF02171", "PF17180", "PF17176"],
         "smart": ["SM00950", "SM00002"],
         "profile": ["PS50822", "PS01031"],
+        "panther": ["PTHR43214"],
     },
     "protein": {
         "uniprot": ["A1CUJ5", "M5ADK6", "A0A0A2L2G2", "P16582", "Q0VDM6"],

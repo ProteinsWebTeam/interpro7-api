@@ -335,7 +335,7 @@ class CustomView(GenericAPIView):
         cursor = general_handler.pagination["cursor"]
 
         qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
-        elastic_result, length, after_key, before_key = searcher.get_list_of_endpoint(
+        elastic_result, length, after_key, before_key, should_keep_elastic_order = searcher.get_list_of_endpoint(
             ep, rows=s, query=qs, cursor=cursor
         )
 
@@ -346,7 +346,7 @@ class CustomView(GenericAPIView):
         self.search_size = length
         self.after_key = after_key
         self.before_key = before_key
-        self.elastic_result = elastic_result
+        self.elastic_result = elastic_result if should_keep_elastic_order else None
 
 
 def filter_queryset_accession_in(queryset, list):

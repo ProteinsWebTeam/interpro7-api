@@ -340,6 +340,7 @@ class ElasticsearchController(SearchController):
         return output
 
     def get_list_of_endpoint(self, endpoint, query=None, rows=10, start=0, cursor=None):
+        should_keep_elastic_order = False
         qs = self.queryset_manager.get_searcher_query() if query is None else query
         if qs == "":
             qs = "*:*"
@@ -372,6 +373,7 @@ class ElasticsearchController(SearchController):
                         }
                     }
                 })
+                should_keep_elastic_order = True
 
         after, before = getAfterBeforeFromCursor(cursor)
         reset_direction = self.addAfterKeyToQueryComposite(
@@ -397,7 +399,7 @@ class ElasticsearchController(SearchController):
             self.reverseOrderDirection(facet["aggs"]["groups"]["composite"])
         after_key = self.getAfterKey(response, facet, before, qs)
         before_key = self.getBeforeKey(response, facet, before, qs)
-        return accessions, count, after_key, before_key
+        return accessions, count, after_key, before_key,should_keep_elastic_order
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()

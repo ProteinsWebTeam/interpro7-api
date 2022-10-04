@@ -31,11 +31,9 @@ def get_timeout_from_path(path, endpoint_levels):
         # it doesn't have modifiers
         if len(query.keys()) == 0:
             return SHOULD_NO_CACHE
-        if (  # The only modifier is page_size=20 or default
+        if (  # The only modifier is page_size
             len(query.keys()) == 1
             and "page_size" in query
-            and query["page_size"]
-            == settings.INTERPRO_CONFIG.get("default_page_size", 20)
         ):
             return SHOULD_NO_CACHE
 

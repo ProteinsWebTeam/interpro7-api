@@ -117,7 +117,9 @@ class AccessionHandler(CustomView):
                     "accession": first.accession,
                 }
             else:
-                qs2 = Protein.objects.filter(tax_id__in=list(organisms.keys())).filter(gene__iexact=acc)
+                qs2 = Protein.objects.filter(tax_id__in=list(organisms.keys())).filter(
+                    gene__iexact=acc
+                )
 
                 if qs2.count() > 0:
                     first = qs2.first()
@@ -125,10 +127,13 @@ class AccessionHandler(CustomView):
                         "endpoint": "protein",
                         "source_database": first.source_database,
                         "proteins": [
-                            {"accession": item.accession,
-                             "organism": item.organism["scientificName"],
-                             "tax_id":item.tax_id
-                             } for item in qs2],
+                            {
+                                "accession": item.accession,
+                                "organism": item.organism["scientificName"],
+                                "tax_id": item.tax_id,
+                            }
+                            for item in qs2
+                        ],
                     }
         else:
             hit = docs["hits"]["hits"][0]["_source"]

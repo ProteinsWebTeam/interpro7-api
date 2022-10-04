@@ -121,7 +121,9 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         pdb_2 = "2BKM"
         acc = "IPR003165"
         urls = {
-            "/api/structure/pdb/" + pdb_2 + "/entry/unintegrated": ["PF17180", "PTHR43214"],
+            "/api/structure/pdb/"
+            + pdb_2
+            + "/entry/unintegrated": ["PF17180", "PTHR43214"],
             "/api/structure/pdb/"
             + pdb_1
             + "/entry/unintegrated": ["PF17180", "PF17176", "PTHR43214"],
@@ -165,9 +167,13 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         pdb_2 = "2BKM"
         acc = "IPR003165"
         urls = {
-            "/api/structure/pdb/" + pdb_2 + "/B/entry/unintegrated": ["PF17180", "PTHR43214"],
+            "/api/structure/pdb/"
+            + pdb_2
+            + "/B/entry/unintegrated": ["PF17180", "PTHR43214"],
             "/api/structure/pdb/" + pdb_1 + "/A/entry/unintegrated": ["PF17176"],
-            "/api/structure/pdb/" + pdb_1 + "/B/entry/unintegrated": ["PF17180", "PTHR43214"],
+            "/api/structure/pdb/"
+            + pdb_1
+            + "/B/entry/unintegrated": ["PF17180", "PTHR43214"],
             "/api/structure/pdb/"
             + pdb_1
             + "/A/entry/interpro": ["IPR003165", "IPR001165"],

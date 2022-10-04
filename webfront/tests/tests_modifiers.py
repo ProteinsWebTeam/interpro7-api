@@ -25,7 +25,9 @@ class GroupByModifierTest(InterproRESTTestCase):
         response = self.client.get("/api/protein?group_by=tax_id")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Only Mus musculus is a key species
-        self.assertEqual({'10090': {'value': 1, 'title': 'Mus musculus'}}, response.data)
+        self.assertEqual(
+            {"10090": {"value": 1, "title": "Mus musculus"}}, response.data
+        )
 
     def test_can_group_interpro_entries_with_member_databases(self):
         response = self.client.get("/api/entry/interpro?group_by=member_databases")
@@ -381,7 +383,7 @@ class EntryAnnotationModifiersTest(InterproRESTTestCase):
     def test_annotation_modifier_logo(self):
         response = self.client.get("/api/entry/pfam/pf02171?annotation=logo")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response['content-type'], "application/json")
+        self.assertEqual(response["content-type"], "application/json")
         data = json.loads(response.content)
         self.assertIn("ali_map", data)
         self.assertEqual(302, len(data["ali_map"]))
@@ -392,7 +394,9 @@ class EntryAnnotationModifiersTest(InterproRESTTestCase):
         self.assertEqual(response["content-type"], "text/plain")
 
     def test_annotation_modifier_interpro_alignment(self):
-        response = self.client.get("/api/entry/interpro/ipr003165?annotation=alignment:seed")
+        response = self.client.get(
+            "/api/entry/interpro/ipr003165?annotation=alignment:seed"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["content-type"], "text/plain")
 
@@ -437,7 +441,8 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
     def test_no_taxa_modifier(self):
         response = self.client.get("/api/entry/interpro/IPR001165?taxa")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        
+
+
 class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
     def test_scientific_name_modifier(self):
         response = self.client.get("/api/taxonomy/uniprot/?scientific_name=Bacteria")
@@ -522,11 +527,17 @@ class SubfamiliesTest(InterproRESTTestCase):
 
     def test_panther_subfamilies(self):
         for entry in self.entries:
-            response = self.client.get(f"/api/entry/{entry['db']}/{entry['acc']}?subfamilies")
+            response = self.client.get(
+                f"/api/entry/{entry['db']}/{entry['acc']}?subfamilies"
+            )
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data["results"]), 1)
-            self.assertEqual(response.data["results"][0]["metadata"]["accession"], entry['sf'])
-            self.assertEqual(response.data["results"][0]["metadata"]["integrated"], entry['acc'])
+            self.assertEqual(
+                response.data["results"][0]["metadata"]["accession"], entry["sf"]
+            )
+            self.assertEqual(
+                response.data["results"][0]["metadata"]["integrated"], entry["acc"]
+            )
 
     def test_no_subfamilies_in_pfam(self):
         response = self.client.get(f"/api/entry/pfam/PF02171")

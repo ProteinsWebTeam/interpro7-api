@@ -6,14 +6,10 @@ import jsonfield.fields
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('webfront', '0017_structural_model_plddt'),
-    ]
+    dependencies = [("webfront", "0017_structural_model_plddt")]
 
     operations = [
         migrations.AddField(
-            model_name='entry',
-            name='taxa',
-            field=jsonfield.fields.JSONField(null=True),
-        ),
+            model_name="entry", name="taxa", field=jsonfield.fields.JSONField(null=True)
+        )
     ]

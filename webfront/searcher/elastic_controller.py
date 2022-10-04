@@ -287,58 +287,6 @@ class ElasticsearchController(SearchController):
 
         return output
 
-    def get_group_obj_copy_of_field_by_query(
-        self, query, field, fq=None, rows=1, cursor=None, inner_field_to_count=None
-    ):
-        # TODO: change to new pagination
-        query = self.queryset_manager.get_searcher_query() if query is None else query
-        facet = {
-            "aggs": {
-                "ngroups": {"cardinality": {"field": field}},
-                "groups": {
-                    "composite": {
-                        "size": rows,
-                        "sources": [{"source": {"terms": {"field": field}}}],
-                    },
-                    "aggs": {"tops": {"top_hits": {"size": 1}}},
-                },
-            },
-            "size": 0,
-        }
-        after, before = getAfterBeforeFromCursor(cursor)
-        reset_direction = self.addAfterKeyToQueryComposite(
-            facet["aggs"]["groups"]["composite"], after, before
-        )
-        if inner_field_to_count is not None:
-            facet["aggs"]["groups"]["aggs"]["unique"] = {
-                "cardinality": {"field": inner_field_to_count}
-            }
-        if fq is not None:
-            query += " && " + fq
-        response = self._elastic_json_query(query, facet)
-        if reset_direction:
-            self.reverseOrderDirection(facet["aggs"]["groups"]["composite"])
-        after_key = self.getAfterKey(response, facet, before, query)
-        before_key = self.getBeforeKey(response, facet, before, query)
-        buckets = response["aggregations"]["groups"]["buckets"]
-        if len(buckets) > 0 and "tops" not in buckets[0]:
-            buckets = [b for sb in buckets for b in sb["subgroups"]["buckets"]]
-        output = {
-            "groups": [
-                bucket["tops"]["hits"]["hits"][0]["_source"] for bucket in buckets
-            ],
-            "ngroups": response["aggregations"]["ngroups"],
-            "after_key": after_key,
-            "before_key": before_key,
-        }
-        if inner_field_to_count is not None:
-            i = 0
-            for bucket in response["aggregations"]["groups"]["buckets"]:
-                output["groups"][i]["unique"] = bucket["unique"]
-                i += 1
-
-        return output
-
     def get_list_of_endpoint(self, endpoint, query=None, rows=10, start=0, cursor=None):
         should_keep_elastic_order = False
         qs = self.queryset_manager.get_searcher_query() if query is None else query
@@ -365,14 +313,9 @@ class ElasticsearchController(SearchController):
             field, direction = match.groups()
             if field != facet["aggs"]["ngroups"]["cardinality"]["field"]:
                 # Custom field takes priority over default one ('source')
-                facet["aggs"]["groups"]["composite"]["sources"].insert(0, {
-                    field: {
-                        "terms": {
-                            "field": field,
-                            "order": direction
-                        }
-                    }
-                })
+                facet["aggs"]["groups"]["composite"]["sources"].insert(
+                    0, {field: {"terms": {"field": field, "order": direction}}}
+                )
                 should_keep_elastic_order = True
 
         after, before = getAfterBeforeFromCursor(cursor)

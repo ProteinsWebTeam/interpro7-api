@@ -146,8 +146,7 @@ class EntryRESTTest(InterproRESTTestCase):
         self.assertIn("counters", response.data["metadata"].keys())
         self.assertIn("proteins", response.data["metadata"]["counters"].keys())
         self.assertIn("entry_annotations", response.data["metadata"].keys())
-        self.assertIsInstance(response.data["metadata"]["entry_annotations"],
-                              dict)
+        self.assertIsInstance(response.data["metadata"]["entry_annotations"], dict)
         for k, v in response.data["metadata"]["entry_annotations"].items():
             self.assertIsInstance(k, str)
             self.assertIsInstance(v, int)

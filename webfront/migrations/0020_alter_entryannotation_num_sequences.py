@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('webfront', '0019_entrytaxa_table'),
-    ]
+    dependencies = [("webfront", "0019_entrytaxa_table")]
 
     operations = [
         migrations.AlterField(
-            model_name='entryannotation',
-            name='num_sequences',
+            model_name="entryannotation",
+            name="num_sequences",
             field=models.IntegerField(null=True),
-        ),
+        )
     ]

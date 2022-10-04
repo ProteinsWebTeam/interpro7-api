@@ -7,23 +7,25 @@ import jsonfield.fields
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('webfront', '0018_taxa_modifier'),
-    ]
+    dependencies = [("webfront", "0018_taxa_modifier")]
 
     operations = [
         migrations.CreateModel(
-            name='EntryTaxa',
+            name="EntryTaxa",
             fields=[
-                ('accession', models.OneToOneField(db_column='accession', on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='webfront.entry')),
-                ('tree', jsonfield.fields.JSONField(null=True)),
+                (
+                    "accession",
+                    models.OneToOneField(
+                        db_column="accession",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to="webfront.entry",
+                    ),
+                ),
+                ("tree", jsonfield.fields.JSONField(null=True)),
             ],
-            options={
-                'db_table': 'webfront_entrytaxa',
-            },
+            options={"db_table": "webfront_entrytaxa"},
         ),
-        migrations.RemoveField(
-            model_name='entry',
-            name='taxa',
-        ),
+        migrations.RemoveField(model_name="entry", name="taxa"),
     ]

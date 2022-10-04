@@ -12,14 +12,44 @@ import logging
 es_results = list()
 
 
+def parseCursor(cursor):
+    fields = {}
+    for item in cursor.split(","):
+        k, t, v = item.split(":")
+        if t == "f":
+            fields[k] = float(v)
+        elif t == "i":
+            fields[k] = int(v)
+        else:
+            fields[k] = v.lower()
+
+    return fields
+
+
+def encodeCursor(keys):
+    if not keys:
+        return None
+    output = []
+    for k, v in keys.items():
+        if isinstance(v, float):
+            t = "f"
+        elif isinstance(v, int):
+            t = "i"
+        else:
+            t = "s"
+        output.append("{}:{}:{}".format(k, t, v))
+
+    return ",".join(output)
+
+
 def getAfterBeforeFromCursor(cursor):
-    after = None
-    before = None
+    after = {}
+    before = {}
     if cursor is not None:
         if cursor[0] == "-":
-            before = cursor[1:]
+            before = parseCursor(cursor[1:])
         else:
-            after = cursor
+            after = parseCursor(cursor)
     return after, before
 
 
@@ -257,57 +287,8 @@ class ElasticsearchController(SearchController):
 
         return output
 
-    def get_group_obj_copy_of_field_by_query(
-        self, query, field, fq=None, rows=1, cursor=None, inner_field_to_count=None
-    ):
-        # TODO: change to new pagination
-        query = self.queryset_manager.get_searcher_query() if query is None else query
-        facet = {
-            "aggs": {
-                "ngroups": {"cardinality": {"field": field}},
-                "groups": {
-                    "composite": {
-                        "size": rows,
-                        "sources": [{"source": {"terms": {"field": field}}}],
-                    },
-                    "aggs": {"tops": {"top_hits": {"size": 1}}},
-                },
-            },
-            "size": 0,
-        }
-        after, before = getAfterBeforeFromCursor(cursor)
-        self.addAfterKeyToQueryComposite(
-            facet["aggs"]["groups"]["composite"], after, before
-        )
-        if inner_field_to_count is not None:
-            facet["aggs"]["groups"]["aggs"]["unique"] = {
-                "cardinality": {"field": inner_field_to_count}
-            }
-        if fq is not None:
-            query += " && " + fq
-        response = self._elastic_json_query(query, facet)
-        after_key = self.getAfterKey(response, facet, before, query)
-        before_key = self.getBeforeKey(response, facet, before, query)
-        buckets = response["aggregations"]["groups"]["buckets"]
-        if len(buckets) > 0 and "tops" not in buckets[0]:
-            buckets = [b for sb in buckets for b in sb["subgroups"]["buckets"]]
-        output = {
-            "groups": [
-                bucket["tops"]["hits"]["hits"][0]["_source"] for bucket in buckets
-            ],
-            "ngroups": response["aggregations"]["ngroups"],
-            "after_key": after_key,
-            "before_key": before_key,
-        }
-        if inner_field_to_count is not None:
-            i = 0
-            for bucket in response["aggregations"]["groups"]["buckets"]:
-                output["groups"][i]["unique"] = bucket["unique"]
-                i += 1
-
-        return output
-
     def get_list_of_endpoint(self, endpoint, query=None, rows=10, start=0, cursor=None):
+        should_keep_elastic_order = False
         qs = self.queryset_manager.get_searcher_query() if query is None else query
         if qs == "":
             qs = "*:*"
@@ -325,8 +306,20 @@ class ElasticsearchController(SearchController):
             },
             "size": 0,
         }
+
+        # Sort buckets by custom field
+        match = re.search(r"&?sort=(\w+):(\w+)", qs)
+        if match:
+            field, direction = match.groups()
+            if field != facet["aggs"]["ngroups"]["cardinality"]["field"]:
+                # Custom field takes priority over default one ('source')
+                facet["aggs"]["groups"]["composite"]["sources"].insert(
+                    0, {field: {"terms": {"field": field, "order": direction}}}
+                )
+                should_keep_elastic_order = True
+
         after, before = getAfterBeforeFromCursor(cursor)
-        self.addAfterKeyToQueryComposite(
+        reset_direction = self.addAfterKeyToQueryComposite(
             facet["aggs"]["groups"]["composite"], after, before
         )
         if endpoint == "organism" or endpoint == "taxonomy":
@@ -345,9 +338,11 @@ class ElasticsearchController(SearchController):
             str(x["key"]["source"]).lower()
             for x in response["aggregations"]["groups"]["buckets"]
         ]
+        if reset_direction:
+            self.reverseOrderDirection(facet["aggs"]["groups"]["composite"])
         after_key = self.getAfterKey(response, facet, before, qs)
         before_key = self.getBeforeKey(response, facet, before, qs)
-        return accessions, count, after_key, before_key
+        return accessions, count, after_key, before_key, should_keep_elastic_order
 
     def get_chain(self):
         qs = self.queryset_manager.get_searcher_query()
@@ -452,53 +447,52 @@ class ElasticsearchController(SearchController):
         return obj
 
     def addAfterKeyToQueryComposite(self, composite, after, before):
-        if after is not None:
-            composite["after"] = {"source": after.lower()}
-        elif before is not None:
-            composite["after"] = {"source": before.lower()}
-            composite["sources"][0]["source"]["terms"]["order"] = "desc"
+        if after:
+            composite["after"] = after
+            return False
+        elif before:
+            composite["after"] = before
+            self.reverseOrderDirection(composite)
+            return True
 
     def getAfterKey(self, response, facet, before, qs):
         after_key = None
-        if before is not None:
+        if before:
             try:
-                after_key = response["aggregations"]["groups"]["buckets"][0]["key"][
-                    "source"
-                ]
+                after_key = response["aggregations"]["groups"]["buckets"][0]["key"]
             except:
                 pass
         elif "after_key" in response["aggregations"]["groups"]:
-            after_key = response["aggregations"]["groups"]["after_key"]["source"]
+            after_key = response["aggregations"]["groups"]["after_key"]
 
         if after_key is not None:
-            facet["aggs"]["groups"]["composite"]["after"] = {"source": after_key}
-            facet["aggs"]["groups"]["composite"]["sources"][0]["source"]["terms"][
-                "order"
-            ] = "asc"
+            facet["aggs"]["groups"]["composite"]["after"] = after_key
             next_response = self._elastic_json_query(qs, facet)
             if len(next_response["aggregations"]["groups"]["buckets"]) == 0:
                 after_key = None
-        return after_key
+        return encodeCursor(after_key)
 
     def getBeforeKey(self, response, facet, before, qs):
         before_key = None
         try:
-            if before is not None:
-                before_key = response["aggregations"]["groups"]["buckets"][-1]["key"][
-                    "source"
-                ]
+            if before:
+                before_key = response["aggregations"]["groups"]["buckets"][-1]["key"]
             else:
-                before_key = response["aggregations"]["groups"]["buckets"][0]["key"][
-                    "source"
-                ]
+                before_key = response["aggregations"]["groups"]["buckets"][0]["key"]
         except:
             pass
-        if before_key is not None:
-            facet["aggs"]["groups"]["composite"]["after"] = {"source": before_key}
-            facet["aggs"]["groups"]["composite"]["sources"][0]["source"]["terms"][
-                "order"
-            ] = "desc"
+        if before_key:
+            facet["aggs"]["groups"]["composite"]["after"] = before_key
+            self.reverseOrderDirection(facet["aggs"]["groups"]["composite"])
             prev_response = self._elastic_json_query(qs, facet)
             if len(prev_response["aggregations"]["groups"]["buckets"]) == 0:
                 before_key = None
-        return before_key
+        return encodeCursor(before_key)
+
+    def reverseOrderDirection(self, composite):
+        for field in composite["sources"]:
+            for k, v in field.items():
+                if v["terms"].get("order", "asc") == "asc":
+                    v["terms"]["order"] = "desc"
+                else:
+                    v["terms"]["order"] = "asc"

@@ -25,7 +25,9 @@ api_test_map = {
     },
     "structure": {"pdb": ["1JM7", "1T2V", "2BKM", "1JZ8"]},
     "taxonomy": {"uniprot": ["1", "2", "2579", "40296", "344612", "1001583", "10090"]},
-    "proteome": {"uniprot": ["UP000006701", "UP000012042", "UP000030104", "UP000000589"]},
+    "proteome": {
+        "uniprot": ["UP000006701", "UP000012042", "UP000030104", "UP000000589"]
+    },
 }
 plurals = ModelContentSerializer.plurals
 
@@ -252,7 +254,9 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
 
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(
-                                response.status_code, status.HTTP_204_NO_CONTENT, "URL : [{}]".format(current),
+                                response.status_code,
+                                status.HTTP_204_NO_CONTENT,
+                                "URL : [{}]".format(current),
                             )
 
     def test_db_acc(self):

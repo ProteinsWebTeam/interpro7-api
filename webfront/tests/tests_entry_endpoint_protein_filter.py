@@ -196,6 +196,7 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
             "/api/entry/interpro/" + acc + "/pfam//protein/uniprot/" + prot: ["A1CUJ5"],
             "/api/entry/pfam/protein/uniprot/" + prot: ["A1CUJ5"],
             "/api/entry/unintegrated/pfam/protein/uniprot/" + prot_u: ["M5ADK6"],
+            "/api/entry/panther/protein/uniprot/" + prot_u: ["M5ADK6"],
         }
         for url in tests:
             response = self.client.get(url)

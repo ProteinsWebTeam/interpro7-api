@@ -12,6 +12,7 @@ from webfront.views.modifiers import (
     filter_by_domain_architectures,
     filter_by_contains_field,
     filter_by_match_presence,
+    filter_by_min_value,
     add_extra_fields,
     get_isoforms,
     calculate_residue_conservation,
@@ -281,7 +282,7 @@ class ProteinHandler(CustomView):
             "is_fragment", filter_by_boolean_field("protein", "is_fragment")
         )
         general_handler.modifiers.register(
-            "has_model", filter_by_boolean_field("protein", "has_model")
+            "has_model", filter_by_min_value("protein", "protein_af_score", 0, "desc")
         )
 
         return super(ProteinHandler, self).get(

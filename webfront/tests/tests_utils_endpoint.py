@@ -68,8 +68,8 @@ class UtilsAccessionTest(InterproRESTTestCase):
         self.assertEqual(response.data["endpoint"], "protein")
         self.assertEqual(response.data["source_database"], "unreviewed")
         self.assertIn("proteins", response.data)
-        self.assertGreater( len(response.data["proteins"]), 0)
-        self.assertEqual(response.data["proteins"][0]['accession'], "Q0VDM6")
+        self.assertGreater(len(response.data["proteins"]), 0)
+        self.assertEqual(response.data["proteins"][0]["accession"], "Q0VDM6")
 
 
 class UtilsReleaseTest(InterproRESTTestCase):

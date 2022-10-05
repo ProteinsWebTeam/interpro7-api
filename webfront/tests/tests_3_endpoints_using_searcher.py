@@ -14,6 +14,7 @@ api_test_map = {
         "pfam": ["PF02171", "PF17180", "PF17176"],
         "smart": ["SM00950", "SM00002"],
         "profile": ["PS50822", "PS01031"],
+        "panther": ["PTHR43214"],
     },
     "protein": {
         "uniprot": ["A1CUJ5", "M5ADK6", "A0A0A2L2G2", "P16582", "Q0VDM6"],
@@ -22,7 +23,9 @@ api_test_map = {
     },
     "structure": {"pdb": ["1JM7", "1T2V", "2BKM", "1JZ8"]},
     "taxonomy": {"uniprot": ["1", "2", "2579", "40296", "344612", "1001583", "10090"]},
-    "proteome": {"uniprot": ["UP000006701", "UP000012042", "UP000030104", "UP000000589"]},
+    "proteome": {
+        "uniprot": ["UP000006701", "UP000012042", "UP000030104", "UP000000589"]
+    },
     "set": {"pfam": ["CL0001", "CL0002"]},
 }
 

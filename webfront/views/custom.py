@@ -50,6 +50,7 @@ class CustomView(GenericAPIView):
     serializer_detail_filter = SerializerDetail.ALL
     after_key = None
     before_key = None
+    elastic_result = None
     http_method_names = ["get", "head"]
 
     def get(
@@ -68,13 +69,15 @@ class CustomView(GenericAPIView):
         # if this is the last level
         if len(endpoint_levels) == level:
             searcher = general_handler.searcher
+            # Executes all the modifiers, some add filters to the query set but others might replace it.
             has_payload = general_handler.modifiers.execute(drf_request)
             logger.debug(request.get_full_path())
+            # If there is a payload from the modifiers, it has its own serializer
             if has_payload or general_handler.modifiers.serializer is not None:
                 self.serializer_detail = general_handler.modifiers.serializer
-                # self.many = general_handler.modifiers.many
             if general_handler.modifiers.many is not None:
                 self.many = general_handler.modifiers.many
+            # When there is a payload from the modifiers. It should build the response with it
             if has_payload:
                 if general_handler.modifiers.payload is None:
                     raise EmptyQuerysetError(
@@ -91,8 +94,9 @@ class CustomView(GenericAPIView):
                         mime_type = annotation.mime_type
                         anno_type = annotation.type
                         anno_value = annotation.value
-                        response = HttpResponse(content=anno_value,
-                                                content_type=mime_type)
+                        response = HttpResponse(
+                            content=anno_value, content_type=mime_type
+                        )
 
                         if anno_type.startswith(("alignment:", "model:")):
                             if "download" in request.GET:
@@ -117,6 +121,8 @@ class CustomView(GenericAPIView):
                     )
 
             elif self.from_model:
+                # Single endpoints don't require Elasticsearch, so they can be resolved
+                # by normal Django means(i.e. just the MySQL model)
                 if (
                     is_single_endpoint(general_handler)
                     or not self.expected_response_is_list()
@@ -126,13 +132,10 @@ class CustomView(GenericAPIView):
                     )
                     self.search_size = self.queryset.count()
                 else:
+                    # It uses multiple endpoints, so we need to use the elastic index
                     self.update_queryset_from_search(searcher, general_handler)
 
                 if self.queryset.count() == 0:
-                    # if 0 == general_handler.queryset_manager.get_queryset(only_main_endpoint=True).count():
-                    #     raise Exception("The URL requested didn't have any data related.\nList of endpoints: {}"
-                    #                     .format(endpoint_levels))
-
                     raise EmptyQuerysetError(
                         "There is no data associated with the requested URL.\nList of endpoints: {}".format(
                             endpoint_levels
@@ -143,15 +146,17 @@ class CustomView(GenericAPIView):
                         self.get_queryset(),
                         drf_request,
                         view=self,
+                        # passing data of the elastic result to the pagination instance
                         search_size=self.search_size,
                         after_key=self.after_key,
                         before_key=self.before_key,
+                        elastic_result=self.elastic_result,
                     )
                 else:
                     self.queryset = self.get_queryset().first()
             else:
                 if endpoint_levels[0] != "utils":
-                    # if it gets here it is a endpoint request checking for database contributions.
+                    # if it gets here it is an endpoint request checking for database contributions.
                     self.queryset = self.get_counter_response(general_handler, searcher)
 
             serialized = self.serializer_class(
@@ -321,22 +326,27 @@ class CustomView(GenericAPIView):
 
     search_size = None
 
+    # Queries the elastic searcher core to get a list of accessions of the main endpoint,
+    # then builds a queryset matching those accessions.
+    # This is the main connection point between elastic and MySQL
     def update_queryset_from_search(self, searcher, general_handler):
         ep = general_handler.queryset_manager.main_endpoint
         s = general_handler.pagination["size"]
         cursor = general_handler.pagination["cursor"]
 
         qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
-        res, length, after_key, before_key = searcher.get_list_of_endpoint(
+        elastic_result, length, after_key, before_key, should_keep_elastic_order = searcher.get_list_of_endpoint(
             ep, rows=s, query=qs, cursor=cursor
         )
+
         self.queryset = general_handler.queryset_manager.get_base_queryset(ep)
+        self.queryset = filter_queryset_accession_in(self.queryset, elastic_result)
 
-        self.queryset = filter_queryset_accession_in(self.queryset, res)
-
+        # This values get store in the instance attributes, so they can be recovered on the pagination stage.
         self.search_size = length
         self.after_key = after_key
         self.before_key = before_key
+        self.elastic_result = elastic_result if should_keep_elastic_order else None
 
 
 def filter_queryset_accession_in(queryset, list):

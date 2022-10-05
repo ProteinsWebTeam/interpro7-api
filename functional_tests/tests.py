@@ -1,4 +1,5 @@
 from functional_tests.base import FunctionalTest
+from selenium.webdriver.common.by import By
 import json
 import re
 
@@ -6,7 +7,7 @@ import re
 class RESTRequestsTest(FunctionalTest):
     def test_request_entry_endpoint(self):
         self.browser.get(self.server_url + "/api/entry/?format=json")
-        content = self.browser.find_element_by_tag_name("body").text
+        content = self.browser.find_element(By.TAG_NAME, "body").text
         jsonp = json.loads(content)
 
         self.assertEqual(len(jsonp["entries"]), 5, "the output has exactly 5 keys")
@@ -20,7 +21,7 @@ class RESTRequestsTest(FunctionalTest):
         )
 
         self.browser.get(self.server_url + "/api/entry/interpro?format=json")
-        content = self.browser.find_element_by_tag_name("body").text
+        content = self.browser.find_element(By.TAG_NAME, "body").text
 
         jsonp = json.loads(content)
 
@@ -35,7 +36,7 @@ class RESTRequestsTest(FunctionalTest):
         self.browser.get(
             self.server_url + "/api/entry/interpro/" + acc + "?format=json"
         )
-        content = self.browser.find_element_by_tag_name("body").text
+        content = self.browser.find_element(By.TAG_NAME, "body").text
 
         jsonp = json.loads(content)
         self.assertEqual(
@@ -56,7 +57,7 @@ class RESTRequestsTest(FunctionalTest):
 
     def test_request_protein_endpoint(self):
         self.browser.get(self.server_url + "/api/protein/?format=json")
-        content = self.browser.find_element_by_tag_name("body").text
+        content = self.browser.find_element(By.TAG_NAME, "body").text
 
         jsonp = json.loads(content)
 
@@ -70,7 +71,7 @@ class RESTRequestsTest(FunctionalTest):
         )
 
         self.browser.get(self.server_url + "/api/protein/uniprot?format=json")
-        content = self.browser.find_element_by_tag_name("body").text
+        content = self.browser.find_element(By.TAG_NAME, "body").text
 
         jsonp = json.loads(content)
 
@@ -84,7 +85,7 @@ class RESTRequestsTest(FunctionalTest):
         self.browser.get(
             self.server_url + "/api/protein/uniprot/" + acc + "?format=json"
         )
-        content = self.browser.find_element_by_tag_name("body").text
+        content = self.browser.find_element(By.TAG_NAME, "body").text
 
         jsonp = json.loads(content)
         self.assertEqual(
@@ -104,7 +105,7 @@ class RESTRequestsTest(FunctionalTest):
             + jsonp["metadata"]["id"]
             + "?format=json"
         )
-        content2 = self.browser.find_element_by_tag_name("body").text
+        content2 = self.browser.find_element(By.TAG_NAME, "body").text
 
         jsonp2 = json.loads(content2)
         self.assertEqual(
@@ -118,21 +119,21 @@ class RESTRequestsTest(FunctionalTest):
         url = "/api/entry/"
         self.browser.get(self.server_url + url)
 
-        req_info = self.browser.find_element_by_css_selector(".request-info").text
+        req_info = self.browser.find_element(By.CSS_SELECTOR, ".request-info").text
 
         self.assertIn("GET", req_info)
         self.assertIn(url, req_info)
 
-        response = self.browser.find_element_by_css_selector(".response-info").text
+        response = self.browser.find_element(By.CSS_SELECTOR, ".response-info").text
         match = re.search("[\{\[]", response)
         json_frontend = json.loads(response[match.start() :])
 
-        self.browser.find_element_by_css_selector(".format-selection button").click()
+        self.browser.find_element(By.CSS_SELECTOR, ".format-selection button").click()
         self.click_link_and_wait(
-            self.browser.find_element_by_css_selector(".js-tooltip.format-option")
+            self.browser.find_element(By.CSS_SELECTOR, ".js-tooltip.format-option")
         )
 
-        content = self.browser.find_element_by_tag_name("body").text
+        content = self.browser.find_element(By.TAG_NAME, "body").text
 
         jsonp = json.loads(content)
 

@@ -307,16 +307,20 @@ class ElasticsearchController(SearchController):
             "size": 0,
         }
 
-        # Sort buckets by custom field
+        # Sort buckets by custom fields
+
         match = re.search(r"&?sort=(\w+):(\w+)", qs)
         if match:
-            field, direction = match.groups()
-            if field != facet["aggs"]["ngroups"]["cardinality"]["field"]:
-                # Custom field takes priority over default one ('source')
-                facet["aggs"]["groups"]["composite"]["sources"].insert(
-                    0, {field: {"terms": {"field": field, "order": direction}}}
-                )
-                should_keep_elastic_order = True
+            fields = self.queryset_manager.order_field.split(',')
+            fields.reverse()
+            for order_field in fields:
+                [field, direction] = order_field.split(":")
+                if field != facet["aggs"]["ngroups"]["cardinality"]["field"]:
+                    # Custom field takes priority over default one ('source')
+                    facet["aggs"]["groups"]["composite"]["sources"].insert(
+                        0, {field: {"terms": {"field": field, "order": direction}}}
+                    )
+                    should_keep_elastic_order = True
 
         after, before = getAfterBeforeFromCursor(cursor)
         reset_direction = self.addAfterKeyToQueryComposite(

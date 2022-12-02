@@ -88,6 +88,8 @@ paths:
         - $ref: "#/components/parameters/entryAnnotationMemberDB"
         - $ref: "#/components/parameters/entryExtraFields"
         - $ref: "#/components/parameters/entryAFmodel"
+        - $ref: "#/components/parameters/entrySubfamilies"
+        - $ref: "#/components/parameters/entrySubfamily"
         #- $ref: "#/components/parameters/entryModelMemberDB" needs to change from ':' to '='
       responses:
         $ref: "#/components/responses/MetadataAndErrors"
@@ -666,6 +668,33 @@ components:
 
       schema:
         type: boolean
+    entrySubfamilies:
+      name: subfamilies
+      in: query
+      description: |
+        Panther families have subfamilies associated with each match. This modifier lists the subfamilies 
+        linked to the current entry.
+        If the attribute has a value (e.g. `subfamilies=PTHR10015:SF361`) the list will be filtered by that ID.
+
+        **Note:** This parameter only works when the sourceDB selected is panther.
+
+         **Note: ** This modifier doesn't operates in combination with other parameters.
+
+      schema:
+        type: string
+    entrySubfamily:
+      name: subfamily
+      in: query
+      description: |
+        Panther families have subfamilies associated with each match. This modifier indicates that the given 
+        accession belongs to a subfamily intead of an entry. For example `/entry/panther/PTHR10015:SF361?subfamily`
+        
+        **Note:** This parameter only works when the sourceDB selected is panther.
+
+         **Note: ** This modifier doesn't operates in combination with other parameters.
+
+      schema:
+        type: string
     entryModelMemberDB:
       name: model
       in: query

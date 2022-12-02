@@ -20,6 +20,7 @@ from webfront.views.modifiers import (
     get_model,
     get_sunburst_taxa,
     get_subfamilies,
+mark_as_subfamily,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -98,6 +99,10 @@ class MemberAccessionHandler(CustomView):
             type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.ENTRY_HEADERS,
             many=True,
+        )
+        general_handler.modifiers.register(
+            "subfamily",
+            mark_as_subfamily,
         )
 
         return super(MemberAccessionHandler, self).get(

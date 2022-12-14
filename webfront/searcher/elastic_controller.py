@@ -343,6 +343,8 @@ class ElasticsearchController(SearchController):
             for x in response["aggregations"]["groups"]["buckets"]
         ]
         if reset_direction:
+            if len(facet["aggs"]["groups"]["composite"]["sources"]) > 2:
+                accessions.reverse()
             self.reverseOrderDirection(facet["aggs"]["groups"]["composite"])
         after_key = self.getAfterKey(response, facet, before, qs)
         before_key = self.getBeforeKey(response, facet, before, qs)

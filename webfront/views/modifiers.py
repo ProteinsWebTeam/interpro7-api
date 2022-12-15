@@ -281,17 +281,21 @@ def filter_by_entry_db(value, general_handler):
     return response.first()
 
 
-def filter_by_min_value(endpoint, field, value, sort_direction="asc"):
+def filter_by_min_value(endpoint, field, value, sorting_by=[]):
     def x(_, general_handler):
         general_handler.queryset_manager.add_filter(
             endpoint, **{"{}__gte".format(field): value}
         )
-        if sort_direction in ("asc", "desc"):
-            general_handler.queryset_manager.order_by(
-                "{}:{}".format(field, sort_direction)
-            )
-        else:
-            raise ValueError("{} is not a valid sorting order".format(sort_direction))
+        sort_str = ""
+        connector = ""
+        for sort_field in sorting_by:
+            if sort_field["direction"] in ("asc", "desc"):
+                sort_str += "{}{}:{}".format(connector, sort_field["name"], sort_field["direction"])
+            else:
+                raise ValueError("{} is not a valid sorting order".format(sort_field["direction"]))
+            connector = ","
+        if len(sort_str)>0:
+            general_handler.queryset_manager.order_by(sort_str)
 
     return x
 

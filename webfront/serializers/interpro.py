@@ -232,6 +232,7 @@ class EntrySerializer(ModelContentSerializer):
             "description": instance.description,
             "wikipedia": instance.wikipedia,
             "literature": instance.literature,
+            "set_info": instance.set_info,
             "overlaps_with": instance.overlaps_with,
             "counters": counters,
             "entry_annotations": annotation_types,

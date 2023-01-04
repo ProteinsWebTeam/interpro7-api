@@ -45,6 +45,7 @@ class Entry(models.Model):
     pathways = JSONField(null=True)
     history = JSONField(null=True)
     details = JSONField(null=True)
+    set_info = JSONField(null=True)
 
 
 class EntryTaxa(models.Model):

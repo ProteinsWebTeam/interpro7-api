@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from webfront.views.cache import canonical
+from views.common import map_url_to_levels
+from webfront.views.cache import canonical, get_timeout_from_path, SHOULD_NO_CACHE, FIVE_DAYS
 
 
 class CanonicalTestCase(TestCase):
@@ -54,3 +55,37 @@ class CanonicalTestCase(TestCase):
             "/api/entry/InterPro/?integrated=pfam",
             canonical("/api/entry/InterPro/?integrated=pfam&page_size=20"),
         )
+
+
+class CacheLifespanTestCase(TestCase):
+    def test_urls_no_cacheable(self):
+        urls = [
+            "/entry/InterPro/IPR000001/",
+            "/protein/uniprot/p99999/?extra_features",
+            "/entry/InterPro/?page",
+        ]
+        for url in urls:
+            levels = map_url_to_levels(url.split('?')[0])
+            self.assertEqual(SHOULD_NO_CACHE, get_timeout_from_path(url, levels))
+
+    def test_urls_short_life(self):
+        urls = [
+            "/entry/InterPro/?page=33",
+            "/entry/InterPro/?page_size=33",
+            "/entry/InterPro/?format",
+        ]
+        for url in urls:
+            levels = map_url_to_levels(url.split('?')[0])
+            self.assertEqual(FIVE_DAYS, get_timeout_from_path(url, levels))
+
+    def test_urls_long_life(self):
+        urls = [
+            "/entry/",
+            "/entry/InterPro/",
+            "/entry/InterPro/protein",
+            "/entry/InterPro/IPR000001/protein",
+            "/protein/uniprot/p99999/?conservation",
+        ]
+        for url in urls:
+            levels = map_url_to_levels(url.split('?')[0])
+            self.assertIsNone(get_timeout_from_path(url, levels))

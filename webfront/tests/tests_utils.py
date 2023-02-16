@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from views.common import map_url_to_levels
+from webfront.views.common import map_url_to_levels
 from webfront.views.cache import canonical, get_timeout_from_path, SHOULD_NO_CACHE, FIVE_DAYS
 
 

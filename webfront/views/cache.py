@@ -26,6 +26,7 @@ short_life_parameters = [
     "ida_search",
     "format",
     "page_size",
+    "search",
 ]
 
 no_cache_modifiers = [
@@ -37,6 +38,7 @@ no_cache_modifiers = [
     "model:"
     "annotation:info",
     "subfamilies",
+    "subfamily",
     "page_size",
 ]
 

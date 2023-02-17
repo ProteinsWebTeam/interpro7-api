@@ -1,5 +1,5 @@
 # remember to check the version is compatible with python 3.6
-Django==3.2.17
+Django==3.2.18
 djangorestframework==3.13.1
 PyYAML==6.0
 jsonfield2==4.0.0.post0

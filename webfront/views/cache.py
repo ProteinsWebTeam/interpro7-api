@@ -71,8 +71,7 @@ def get_timeout_from_path(path, endpoint_levels):
         except Exception:
             return SHOULD_NO_CACHE
     for parameter in short_life_parameters:
-        value = query.get(parameter)
-        if value is not None:
+        if parameter in query:
             return FIVE_DAYS
     return None
 

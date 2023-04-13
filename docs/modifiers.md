@@ -28,7 +28,8 @@ This document aims to provide some guidance on how to use the InterPro API modif
 
 ## /api/entry/< _database name_ >
 
-database name can be: interpro, pfam, cdd, panther, sfld, cathgene3d, ssf, hamap, pirsf, prints, prosite, profile, smart, tigrfams
+database name can be: interpro, pfam, cdd, panther, sfld, cathgene3d, ssf, hamap, pirsf, prints, prosite, profile, smart, ncbifam
+Since interPro 94.0 `tigrfams` has been replaced by `ncbifam`. Temporary redirects are in place to avoid immediate issues, however users are highly recommended to start using `ncbifam` as the memberDB nam to avoid any problems. 
 | Modifier                                                                                                                                                 | Compatible with other modifiers | Data returned                                                                                                | Example                                                                                           |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
 | `group_by=type`                                                                                                                                          | x                               | Number of signatures for each member database entry type (e.g. family, domain ...) for the database selected | https://www.ebi.ac.uk:443/interpro/api/entry/pfam?group_by=type                                   |

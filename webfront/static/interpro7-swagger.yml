@@ -375,7 +375,7 @@ components:
         - prodom
         - smart
         - ssf
-        - tigrfams
+        - ncbifam
         - cdd
         - sfld
     EntryDB:
@@ -396,7 +396,7 @@ components:
         - prodom
         - smart
         - ssf
-        - tigrfams
+        - ncbifam
         - cdd
         - sfld
     EntryType:
@@ -829,7 +829,7 @@ components:
           - prodom
           - smart
           - ssf
-          - tigrfams
+          - ncbifam
           - cdd
           - sfld
     proteinExtraFields:

@@ -162,6 +162,23 @@
   {
     "model": "webfront.ProteinEntryFeature",
     "fields": {
+      "entry": "nf000004",
+      "protein": "a1cuj5",
+      "coordinates": [
+        {
+          "fragments": [
+            {
+              "start": 50,
+              "end": 109
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "model": "webfront.ProteinEntryFeature",
+    "fields": {
       "entry": "pthr43214",
       "protein": "m5adk6",
       "coordinates": [

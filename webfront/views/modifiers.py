@@ -290,11 +290,15 @@ def filter_by_min_value(endpoint, field, value, sorting_by=[]):
         connector = ""
         for sort_field in sorting_by:
             if sort_field["direction"] in ("asc", "desc"):
-                sort_str += "{}{}:{}".format(connector, sort_field["name"], sort_field["direction"])
+                sort_str += "{}{}:{}".format(
+                    connector, sort_field["name"], sort_field["direction"]
+                )
             else:
-                raise ValueError("{} is not a valid sorting order".format(sort_field["direction"]))
+                raise ValueError(
+                    "{} is not a valid sorting order".format(sort_field["direction"])
+                )
             connector = ","
-        if len(sort_str)>0:
+        if len(sort_str) > 0:
             general_handler.queryset_manager.order_by(sort_str)
 
     return x
@@ -902,7 +906,7 @@ def get_model(field):
 def get_subfamilies(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset().first()
     entries = Entry.objects.filter(integrated=queryset.accession, is_alive=False)
-    if value is not None and value.strip() != '':
+    if value is not None and value.strip() != "":
         entries = entries.filter(accession=value)
     if len(entries) == 0:
         raise EmptyQuerysetError("There is are not subfamilies for this entry")

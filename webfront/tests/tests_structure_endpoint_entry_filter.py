@@ -132,8 +132,8 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             f"/api/structure/pdb/{pdb_2}/entry/pfam": ["PF17180"],
             f"/api/structure/pdb/{pdb_1}/entry/interpro/pfam": ["PF02171"],
             f"/api/structure/pdb/{pdb_1}/entry/interpro/smart": ["SM00950"],
-            f"/api/structure/pdb/{pdb_1}/entry/interpro/" + acc + "/smart": ["SM00950"],
-            f"/api/structure/pdb/{pdb_1}/entry/interpro/" + acc + "/pfam": ["PF02171"],
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/{acc}/smart": ["SM00950"],
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/{acc}/pfam": ["PF02171"],
             f"/api/structure/pdb/{pdb_2}/entry/unintegrated/pfam": ["PF17180"],
         }
         for url in urls:

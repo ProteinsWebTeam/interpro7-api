@@ -145,7 +145,7 @@ class MemberHandler(CustomView):
     ):
         if endpoint_levels[level - 1].lower() == "tigrfams":
             full_path = request.get_full_path().lower()
-            return redirect(full_path.replace("tigrfams", "NCBIfam"))
+            return redirect(full_path.replace("tigrfams", "ncbifam"))
 
         general_handler.queryset_manager.add_filter(
             "entry", source_database=endpoint_levels[level - 1].lower()
@@ -208,7 +208,7 @@ class MemberHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         if level_name.lower() == "tigrfams":
             full_path = general_handler.request.get_full_path().lower()
-            return redirect(full_path.replace("tigrfams", "NCBIfam"))
+            return redirect(full_path.replace("tigrfams", "ncbifam"))
 
         general_handler.queryset_manager.update_integrated_filter("entry")
         general_handler.queryset_manager.add_filter(

@@ -211,7 +211,7 @@ class ReplaceTIGRFamsTest(InterproRESTTestCase):
             self.assertEqual(response.status_code, status.HTTP_302_FOUND)
             self.assertRedirects(
                 response,
-                url.replace("tigrfams", "NCBIfam"),
+                url.replace("tigrfams", "ncbifam"),
                 status_code=302,
                 target_status_code=200,
                 fetch_redirect_response=True,

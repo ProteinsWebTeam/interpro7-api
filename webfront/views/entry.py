@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.shortcuts import redirect
 from webfront.constants import ModifierType
 
 from webfront.exceptions import DeletedEntryError
@@ -20,7 +21,7 @@ from webfront.views.modifiers import (
     get_model,
     get_sunburst_taxa,
     get_subfamilies,
-mark_as_subfamily,
+    mark_as_subfamily,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -100,10 +101,7 @@ class MemberAccessionHandler(CustomView):
             serializer=SerializerDetail.ENTRY_HEADERS,
             many=True,
         )
-        general_handler.modifiers.register(
-            "subfamily",
-            mark_as_subfamily,
-        )
+        general_handler.modifiers.register("subfamily", mark_as_subfamily)
 
         return super(MemberAccessionHandler, self).get(
             request._request,
@@ -145,6 +143,9 @@ class MemberHandler(CustomView):
         *args,
         **kwargs
     ):
+        if endpoint_levels[level - 1].lower() == "tigrfams":
+            full_path = request.get_full_path().lower()
+            return redirect(full_path.replace("tigrfams", "ncbifam"))
 
         general_handler.queryset_manager.add_filter(
             "entry", source_database=endpoint_levels[level - 1].lower()
@@ -205,6 +206,10 @@ class MemberHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        if level_name.lower() == "tigrfams":
+            full_path = general_handler.request.get_full_path().lower()
+            return redirect(full_path.replace("tigrfams", "ncbifam"))
+
         general_handler.queryset_manager.update_integrated_filter("entry")
         general_handler.queryset_manager.add_filter(
             "entry", source_database=level_name.lower()

@@ -1,7 +1,12 @@
 from django.test import TestCase
 
 from webfront.views.common import map_url_to_levels
-from webfront.views.cache import canonical, get_timeout_from_path, SHOULD_NO_CACHE, FIVE_DAYS
+from webfront.views.cache import (
+    canonical,
+    get_timeout_from_path,
+    SHOULD_NO_CACHE,
+    FIVE_DAYS,
+)
 
 
 class CanonicalTestCase(TestCase):
@@ -65,7 +70,7 @@ class CacheLifespanTestCase(TestCase):
             "/entry/InterPro/?page",
         ]
         for url in urls:
-            levels = map_url_to_levels(url.split('?')[0])
+            levels = map_url_to_levels(url.split("?")[0])
             self.assertEqual(SHOULD_NO_CACHE, get_timeout_from_path(url, levels))
 
     def test_urls_short_life(self):
@@ -75,7 +80,7 @@ class CacheLifespanTestCase(TestCase):
             "/entry/InterPro/?format",
         ]
         for url in urls:
-            levels = map_url_to_levels(url.split('?')[0])
+            levels = map_url_to_levels(url.split("?")[0])
             self.assertEqual(FIVE_DAYS, get_timeout_from_path(url, levels))
 
     def test_urls_long_life(self):
@@ -87,5 +92,5 @@ class CacheLifespanTestCase(TestCase):
             "/protein/uniprot/p99999/?conservation",
         ]
         for url in urls:
-            levels = map_url_to_levels(url.split('?')[0])
+            levels = map_url_to_levels(url.split("?")[0])
             self.assertIsNone(get_timeout_from_path(url, levels))

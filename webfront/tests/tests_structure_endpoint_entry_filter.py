@@ -121,29 +121,20 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         pdb_2 = "2BKM"
         acc = "IPR003165"
         urls = {
-            "/api/structure/pdb/"
-            + pdb_2
-            + "/entry/unintegrated": ["PF17180", "PTHR43214"],
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/entry/unintegrated": ["PF17180", "PF17176", "PTHR43214"],
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/entry/interpro": ["IPR003165", "IPR001165"],
-            "/api/structure/pdb/" + pdb_2 + "/entry/pfam": ["PF17180"],
-            "/api/structure/pdb/" + pdb_1 + "/entry/interpro/pfam": ["PF02171"],
-            "/api/structure/pdb/" + pdb_1 + "/entry/interpro/smart": ["SM00950"],
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/entry/interpro/"
-            + acc
-            + "/smart": ["SM00950"],
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/entry/interpro/"
-            + acc
-            + "/pfam": ["PF02171"],
-            "/api/structure/pdb/" + pdb_2 + "/entry/unintegrated/pfam": ["PF17180"],
+            f"/api/structure/pdb/{pdb_2}/entry/unintegrated": ["PF17180", "PTHR43214"],
+            f"/api/structure/pdb/{pdb_1}/entry/unintegrated": [
+                "PF17180",
+                "PF17176",
+                "PTHR43214",
+                "NF000004",
+            ],
+            f"/api/structure/pdb/{pdb_1}/entry/interpro": ["IPR003165", "IPR001165"],
+            f"/api/structure/pdb/{pdb_2}/entry/pfam": ["PF17180"],
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/pfam": ["PF02171"],
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/smart": ["SM00950"],
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/{acc}/smart": ["SM00950"],
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/{acc}/pfam": ["PF02171"],
+            f"/api/structure/pdb/{pdb_2}/entry/unintegrated/pfam": ["PF17180"],
         }
         for url in urls:
             response = self.client.get(url)
@@ -167,30 +158,22 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
         pdb_2 = "2BKM"
         acc = "IPR003165"
         urls = {
-            "/api/structure/pdb/"
-            + pdb_2
-            + "/B/entry/unintegrated": ["PF17180", "PTHR43214"],
-            "/api/structure/pdb/" + pdb_1 + "/A/entry/unintegrated": ["PF17176"],
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/B/entry/unintegrated": ["PF17180", "PTHR43214"],
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/A/entry/interpro": ["IPR003165", "IPR001165"],
-            "/api/structure/pdb/" + pdb_2 + "/B/entry/pfam": ["PF17180"],
-            "/api/structure/pdb/" + pdb_1 + "/A/entry/interpro/pfam": ["PF02171"],
-            "/api/structure/pdb/" + pdb_1 + "/A/entry/interpro/smart": ["SM00950"],
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/A/entry/interpro/"
-            + acc
-            + "/smart": ["SM00950"],
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/A/entry/interpro/"
-            + acc
-            + "/pfam": ["PF02171"],
-            "/api/structure/pdb/" + pdb_2 + "/B/entry/unintegrated/pfam": ["PF17180"],
+            f"/api/structure/pdb/{pdb_2}/B/entry/unintegrated": [
+                "PF17180",
+                "PTHR43214",
+            ],
+            f"/api/structure/pdb/{pdb_1}/A/entry/unintegrated": ["PF17176", "NF000004"],
+            f"/api/structure/pdb/{pdb_1}/B/entry/unintegrated": [
+                "PF17180",
+                "PTHR43214",
+            ],
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro": ["IPR003165", "IPR001165"],
+            f"/api/structure/pdb/{pdb_2}/B/entry/pfam": ["PF17180"],
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro/pfam": ["PF02171"],
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro/smart": ["SM00950"],
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro/{acc}/smart": ["SM00950"],
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro/{acc}/pfam": ["PF02171"],
+            f"/api/structure/pdb/{pdb_2}/B/entry/unintegrated/pfam": ["PF17180"],
         }
         for url in urls:
             response = self.client.get(url)

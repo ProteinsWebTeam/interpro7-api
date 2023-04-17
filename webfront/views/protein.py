@@ -282,10 +282,16 @@ class ProteinHandler(CustomView):
             "is_fragment", filter_by_boolean_field("protein", "is_fragment")
         )
         general_handler.modifiers.register(
-            "has_model", filter_by_min_value("protein", "protein_af_score", 0, sorting_by=[
-                {"name": "protein_is_fragment", "direction": "asc"},
-                {"name": "protein_af_score", "direction": "desc"},
-            ])
+            "has_model",
+            filter_by_min_value(
+                "protein",
+                "protein_af_score",
+                0,
+                sorting_by=[
+                    {"name": "protein_is_fragment", "direction": "asc"},
+                    {"name": "protein_af_score", "direction": "desc"},
+                ],
+            ),
         )
 
         return super(ProteinHandler, self).get(

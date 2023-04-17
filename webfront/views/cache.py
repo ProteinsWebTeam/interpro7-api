@@ -35,12 +35,13 @@ no_cache_modifiers = [
     "isoforms",
     "ida",
     "taxa",
-    "model:"
+    "model:",
     "annotation:info",
     "subfamilies",
     "subfamily",
     "page_size",
 ]
+
 
 def get_timeout_from_path(path, endpoint_levels):
     parsed = urlparse(path)

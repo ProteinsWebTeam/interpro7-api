@@ -6,14 +6,12 @@ import jsonfield.fields
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('webfront', '0020_alter_entryannotation_num_sequences'),
-    ]
+    dependencies = [("webfront", "0020_alter_entryannotation_num_sequences")]
 
     operations = [
         migrations.AddField(
-            model_name='entry',
-            name='set_info',
+            model_name="entry",
+            name="set_info",
             field=jsonfield.fields.JSONField(null=True),
-        ),
+        )
     ]

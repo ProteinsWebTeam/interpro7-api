@@ -20,7 +20,12 @@ from webfront.views.taxonomy import TaxonomyHandler
 from webfront.views.proteome import ProteomeHandler
 from webfront.views.set import SetHandler
 from webfront.views.utils import UtilsHandler
-from webfront.views.cache import InterProCache, get_timeout_from_path, canonical, SHOULD_NO_CACHE
+from webfront.views.cache import (
+    InterProCache,
+    get_timeout_from_path,
+    canonical,
+    SHOULD_NO_CACHE,
+)
 
 from webfront.models import Database
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED

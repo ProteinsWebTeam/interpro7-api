@@ -1,7 +1,7 @@
 import re
 from django.conf import settings
 from rest_framework.generics import GenericAPIView
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import logging
 
 from django.db.models import Q
@@ -222,13 +222,16 @@ class CustomView(GenericAPIView):
                 level = 0
                 if handler is not None:
                     # Which implies that another endpoint is to be procces and therefore is filtering time.
-                    self.filter_entrypoint(
+                    filter = self.filter_entrypoint(
                         handler_name,
                         handler_class,
                         endpoint_levels,
                         endpoints,
                         general_handler,
                     )
+                    if isinstance(filter, HttpResponseRedirect):
+                        return filter
+
                     return super(handler, self).get(
                         request,
                         endpoint_levels,
@@ -263,6 +266,8 @@ class CustomView(GenericAPIView):
             self.queryset = handler_class.filter(
                 self.queryset, endpoint_levels[level], general_handler
             )
+            if isinstance(self.queryset, HttpResponseRedirect):
+                return self.queryset
             general_handler.register_filter_serializer(
                 handler_class.serializer_detail_filter, endpoint_levels[level]
             )

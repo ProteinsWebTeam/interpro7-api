@@ -311,7 +311,7 @@ class ElasticsearchController(SearchController):
 
         match = re.search(r"&?sort=(\w+):(\w+)", qs)
         if match:
-            fields = self.queryset_manager.order_field.split(',')
+            fields = self.queryset_manager.order_field.split(",")
             fields.reverse()
             for order_field in fields:
                 [field, direction] = order_field.split(":")

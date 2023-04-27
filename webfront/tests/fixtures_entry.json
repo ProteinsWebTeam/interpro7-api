@@ -587,6 +587,35 @@
     "model": "webfront.Entry",
     "fields": {
       "entry_id": null,
+      "accession": "NF000004",
+      "type": "domain",
+      "name": "D-lactate dehydrogenase VanH-D",
+      "short_name": "vanH-D",
+      "go_terms": [],
+      "entry_date": "2014-04-21T00:00:00Z",
+      "is_featured": true,
+      "is_alive": true,
+      "source_database": "ncbifam",
+      "member_databases": null,
+      "integrated": null,
+      "description": [],
+      "wikipedia": null,
+      "literature": {},
+      "cross_references": {},
+      "counts": {
+        "proteins": 0,
+        "structures": 0,
+        "taxa": 0,
+        "proteomes": 0,
+        "sets": 0,
+        "domain_architectures": 0
+      }
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id": null,
       "accession": "IPR123456",
       "type": "D",
       "name": "Deleted",

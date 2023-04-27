@@ -404,31 +404,6 @@ class EntrySerializer(ModelContentSerializer):
             return result
         return instance
 
-    dbcode = {
-        "H": "Pfam",
-        "M": "profile",
-        "R": "SMART",
-        "V": "PHANTER",
-        "g": "MobiDB",
-        "B": "SFLD",
-        "P": "prosite",
-        "X": "GENE 3D",
-        "N": "TIGRFAMs",
-        "J": "CDD",
-        "Y": "SUPERFAMILY",
-        "U": "PIRSF",
-        "D": "ProDom",
-        "Q": "HAMAP",
-        "F": "Prints",
-    }
-
-    @staticmethod
-    def get_key_from_bucket(bucket):
-        key = str(bucket["val"] if "val" in bucket else bucket["key"])
-        if key.upper() in EntrySerializer.dbcode:
-            return EntrySerializer.dbcode[key.upper()].lower()
-        return key
-
     @staticmethod
     def counter_is_empty(instance):
         return EntrySerializer.grouper_is_empty(instance, "databases")

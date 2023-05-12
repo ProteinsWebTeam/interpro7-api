@@ -268,7 +268,8 @@ class ElasticsearchController(SearchController):
                 self.add_subterm_aggs(obj, f, rows)
                 obj = obj["aggs"]["subgroups"]
         if fq is not None:
-            query += " && " + fq
+            # the query might have a sorting parameter, so fq needs to be prepend
+            query = fq + " && " + query
         response = self._elastic_json_query(query, facet)
         buckets = response["aggregations"]["groups"]["buckets"]
         if len(buckets) > 0 and "tops" not in buckets[0]:
@@ -412,7 +413,7 @@ class ElasticsearchController(SearchController):
             query = self.queryset_manager.get_searcher_query()
         q = query
         if fq is not None:
-            q = query + " && " + fq.lower()
+            q = fq.lower() + " && " + query
         q = (
             q.replace(" && ", "%20AND%20")
             .replace(" || ", "%20OR%20")

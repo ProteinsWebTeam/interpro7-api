@@ -107,6 +107,10 @@
         "type": "object",
         "enabled": false
       },
+      "entry_structure_locations": {
+        "type": "object",
+        "enabled": false
+      },
       "protein_structure": {
         "type": "object",
         "enabled": false

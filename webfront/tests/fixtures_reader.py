@@ -281,7 +281,7 @@ class FixtureReader:
             lower.append(
                 {
                     k: v.lower()
-                    if type(v) == str and k != "ida" and "date" not in k
+                    if type(v) == str and k != "ida" and "date" not in k and "chain" not in k
                     else v
                     for k, v in doc.items()
                 }

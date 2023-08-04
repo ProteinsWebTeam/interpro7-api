@@ -106,8 +106,8 @@ class EntrySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
-                    include_structure=SerializerDetail.STRUCTURE_DETAIL
-                    not in detail_filters,
+                    include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters,
+                    include_matches=True,
                     base_query=sq,
                 )
             if (

@@ -315,18 +315,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     for db2 in api_test_map[endpoint2]:
                         for acc in api_test_map[endpoint1][db]:
                             # [endpoint]/[db]/[acc]/[endpoint]/[db]
-                            current = (
-                                "/api/"
-                                + endpoint1
-                                + "/"
-                                + db
-                                + "/"
-                                + acc
-                                + "/"
-                                + endpoint2
-                                + "/"
-                                + db2
-                            )
+                            current = f"/api/{endpoint1}/{db}/{acc}/{endpoint2}/{db2}"
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self.assertEqual(

@@ -134,7 +134,10 @@ class InterproRESTTestCase(APITransactionTestCase):
 
         # self.assertIsInstance(obj["coordinates"], list, msg)
         # TODO: Find a way to check JSON from elasticsearch
-        self.assertIn("accession", obj, msg)
+        try:
+            self.assertIn("accession", obj, msg)
+        except Exception:
+            self.assertIn("chain", obj, msg)
         self.assertIn("source_database", obj, msg)
 
     def _check__organism_match(self, obj, msg=""):
@@ -235,10 +238,10 @@ class InterproRESTTestCase(APITransactionTestCase):
                             if "lineage" not in ch2 and "taxonomy" not in ch2:
                                 self.assertEqual(ch2["chain"].upper(), chain, msg)
                     self.assertIn(
-                        chain.lower(), response_acc.data["metadata"]["chains"], msg
+                        chain, response_acc.data["metadata"]["chains"], msg
                     )
                     self._check_match(
-                        response_acc.data["metadata"]["chains"][chain.lower()], msg
+                        response_acc.data["metadata"]["chains"][chain], msg
                     )
                 elif response_acc.status_code != status.HTTP_204_NO_CONTENT:
                     self.client.get(current)

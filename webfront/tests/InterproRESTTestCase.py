@@ -175,8 +175,7 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertIn("organism", obj)
 
     def _check_entry_structure_details(self, obj):
-        self.assertIn("structure_protein_locations", obj)
-        self.assertIn("entry_protein_locations", obj)
+        self.assertIn("entry_structure_locations", obj)
         self.assertIn("chain", obj)
 
     def _check_counter_by_endpoint(self, endpoint, obj, msg=""):

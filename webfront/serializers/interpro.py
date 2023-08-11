@@ -1,5 +1,6 @@
 from django.conf import settings
 
+from models import ChainSequence
 from webfront.exceptions import EmptyQuerysetError
 from webfront.models import Entry, EntryAnnotation
 from webfront.serializers.content_serializers import ModelContentSerializer
@@ -503,9 +504,11 @@ class EntrySerializer(ModelContentSerializer):
         }
         if for_structure:
             header["chain"] = obj["structure_chain_acc"]
-            header["protein"] = obj["protein_acc"]
-            header["structure_protein_locations"] = obj["structure_protein_locations"]
-            header["protein_structure_mapping"] = obj["protein_structure"]
+            header["entry_structure_locations"] = obj["entry_structure_locations"]
+            chain = ChainSequence.objects.get(structure=obj['structure_acc'], chain=obj["structure_chain_acc"])
+            header["sequence"] = chain.sequence
+            header["sequence_length"] = chain.length
+
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(
                 Entry.objects.get(accession__iexact=obj["entry_acc"]), searcher, sq

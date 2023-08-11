@@ -24,7 +24,6 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
-            # self._check_is_list_of_objects_with_key(response.data["results"], "entries")
 
     def test_can_get_entries_from_structure_id(self):
         urls = [
@@ -233,11 +232,6 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_structure_count_overview(response.data, "URL: [{}]".format(url))
-            # self.assertIsInstance(response.data, dict)
-            # for prot_db in response.data["structures"]:
-            #     self.assertIn(prot_db, ["pdb"])
-            #     self.assertIn("structures", response.data["structures"][prot_db])
-            #     self.assertIn("entries", response.data["structures"][prot_db])
 
     def test_urls_that_return_list_of_structure_accessions_with_matches_and_detailed_entries(
         self
@@ -285,33 +279,18 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         pfam_u = "PF17180"
         smart = "SM00950"
         urls = [
-            "/api/structure/pdb/" + pdb_1 + "/entry/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_1 + "/entry/interpro/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_1 + "/entry/interpro/smart/" + smart,
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/entry/interpro/"
-            + acc
-            + "/smart/"
-            + smart,
-            "/api/structure/pdb/" + pdb_1 + "/entry/interpro/" + acc + "/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_2 + "/entry/unintegrated/pfam/" + pfam_u,
-            "/api/structure/pdb/" + pdb_1 + "/A/entry/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_1 + "/A/entry/interpro/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_1 + "/A/entry/interpro/smart/" + smart,
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/A/entry/interpro/"
-            + acc
-            + "/smart/"
-            + smart,
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/A/entry/interpro/"
-            + acc
-            + "/pfam/"
-            + pfam,
-            "/api/structure/pdb/" + pdb_2 + "/B/entry/unintegrated/pfam/" + pfam_u,
+            f"/api/structure/pdb/{pdb_1}/entry/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/smart/{smart}",
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/{acc}/smart/{smart}",
+            f"/api/structure/pdb/{pdb_1}/entry/interpro/{acc}/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_2}/entry/unintegrated/pfam/{pfam_u}",
+            f"/api/structure/pdb/{pdb_1}/A/entry/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro/smart/{smart}",
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro/{acc}/smart/{smart}",
+            f"/api/structure/pdb/{pdb_1}/A/entry/interpro/{acc}/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_2}/B/entry/unintegrated/pfam/{pfam_u}",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -334,16 +313,11 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         pfam = "PF02171"
         smart = "SM00950"
         tests = [
-            "/api/structure/pdb/" + pdb_2 + "/entry/interpro/" + acc,
-            "/api/structure/pdb/" + pdb_2 + "/entry/unintegrated/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_2 + "/entry/interpro/" + acc,
-            "/api/structure/pdb/"
-            + pdb_2
-            + "/entry/interpro/"
-            + acc
-            + "/smart/"
-            + smart,
-            "/api/structure/pdb/entry/unintegrated/smart/" + smart,
+            f"/api/structure/pdb/{pdb_2}/entry/interpro/{acc}",
+            f"/api/structure/pdb/{pdb_2}/entry/unintegrated/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_2}/entry/interpro/{acc}",
+            f"/api/structure/pdb/{pdb_2}/entry/interpro/{acc}/smart/{smart}",
+            f"/api/structure/pdb/entry/unintegrated/smart/{smart}",
         ]
         for url in tests:
             self._check_HTTP_response_code(
@@ -358,23 +332,13 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
         pfam_u = "PF17180"
         smart = "SM00950"
         tests = [
-            "/api/structure/pdb/" + pdb_1 + "/B/entry/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_1 + "/B/entry/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_1 + "/B/entry/interpro/pfam/" + pfam,
-            "/api/structure/pdb/" + pdb_1 + "/B/entry/interpro/smart/" + smart,
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/B/entry/interpro/"
-            + acc
-            + "/smart/"
-            + smart,
-            "/api/structure/pdb/"
-            + pdb_1
-            + "/B/entry/interpro/"
-            + acc
-            + "/pfam/"
-            + pfam,
-            "/api/structure/pdb/" + pdb_2 + "/A/entry/unintegrated/pfam/" + pfam_u,
+            f"/api/structure/pdb/{pdb_1}/B/entry/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_1}/B/entry/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_1}/B/entry/interpro/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_1}/B/entry/interpro/smart/{smart}",
+            f"/api/structure/pdb/{pdb_1}/B/entry/interpro/{acc}/smart/{smart}",
+            f"/api/structure/pdb/{pdb_1}/B/entry/interpro/{acc}/pfam/{pfam}",
+            f"/api/structure/pdb/{pdb_2}/A/entry/unintegrated/pfam/{pfam_u}",
         ]
         for url in tests:
             self._check_HTTP_response_code(

@@ -161,6 +161,7 @@ class FixtureReader:
                     c["structure_chain_acc"] = sp["chain"]
                     c["text_structure"] = c["structure_acc"] + " " + sp["chain"]
 
+                    c["entry_structure_locations"]= ep["coordinates"],
                     c["structure_protein_locations"] = sp["coordinates"]
                     c["protein_structure"] = sp["mapping"]
                     if e in entry2set:

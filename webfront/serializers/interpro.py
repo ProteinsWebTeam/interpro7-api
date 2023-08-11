@@ -1,8 +1,7 @@
 from django.conf import settings
 
-from models import ChainSequence
 from webfront.exceptions import EmptyQuerysetError
-from webfront.models import Entry, EntryAnnotation
+from webfront.models import Entry, EntryAnnotation, ChainSequence
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot

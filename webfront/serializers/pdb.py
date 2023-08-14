@@ -278,8 +278,9 @@ class StructureSerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def get_chain_from_search_object(obj, include_matches=False):
-        chain=ChainSequence.objects.get(structure=obj['structure_acc'], chain=obj["structure_chain_acc"])
+    def get_chain_from_search_object(obj):
+        chain = ChainSequence.objects.get(structure=obj['structure_acc'],
+                                          chain=obj["structure_chain_acc"])
         output = {
             "structure_protein_locations": obj["structure_protein_locations"],
             "organism": {"taxid": obj["tax_id"]},
@@ -290,18 +291,20 @@ class StructureSerializer(ModelContentSerializer):
             "sequence": chain.sequence,
             "sequence_length": chain.length,
         }
-        if include_matches:
-            if "entry_protein_locations" in obj:
-                output["entry_protein_locations"] = obj["entry_protein_locations"]
-            if "entry_structure_locations" in obj:
-                output["entry_structure_locations"] = obj["entry_structure_locations"]
+        for k in ["entry_protein_locations", "entry_structure_locations"]:
+            try:
+                v = obj[k]
+            except KeyError:
+                pass
+            else:
+                output[k] = v
         return output
 
     @staticmethod
     def get_structure_from_search_object(
         obj, include_structure=False, include_matches=False, search=None, base_query="*:*"
     ):
-        output = StructureSerializer.get_chain_from_search_object(obj, include_matches)
+        output = StructureSerializer.get_chain_from_search_object(obj)
         output["accession"] = obj["structure_acc"]
         output["protein"] = obj["protein_acc"]
         output["source_database"] = "pdb"

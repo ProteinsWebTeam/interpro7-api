@@ -355,10 +355,10 @@ class ProteinSerializer(ModelContentSerializer):
                 else "structure_protein_locations"
             )
             header[key_coord] = obj[key_coord] if key_coord in obj else None
-            if not for_entry:
-                header["protein_structure_mapping"] = (
-                    obj["protein_structure"] if "protein_structure" in obj else None
-                )
+            # if not for_entry:
+            #     header["protein_structure_mapping"] = (
+            #         obj["protein_structure"] if "protein_structure" in obj else None
+            #     )
         if include_protein:
             header["protein"] = ProteinSerializer.to_metadata_representation(
                 Protein.objects.get(accession__iexact=obj["protein_acc"].lower()),

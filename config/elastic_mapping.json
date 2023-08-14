@@ -111,10 +111,6 @@
         "type": "object",
         "enabled": false
       },
-      "protein_structure": {
-        "type": "object",
-        "enabled": false
-      },
       "text_entry": {
         "type": "text",
         "analyzer": "autocomplete"

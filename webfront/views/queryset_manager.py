@@ -73,10 +73,11 @@ class QuerysetManager:
     # It explicitely goes through all the filters and create the query string case by case.
     def get_searcher_query(self, include_search=False, use_lineage=False):
         blocks = []
+        search_blocks = []
         for ep in self.filters:
             for k, v in self.filters[ep].items():
                 if ep == "searcher":
-                    blocks.append("{}:{}".format(k, escape(v)))
+                    search_blocks.append("{}:{}".format(k, escape(v)))
                 elif ep == "proteome" and k == "is_reference":
                     blocks.append("proteome_is_reference:{}".format(escape(v).strip()))
                 elif include_search and ep == "search":
@@ -168,7 +169,12 @@ class QuerysetManager:
         blocks = list(set(blocks))
         blocks.sort()
         q = " && ".join(blocks).lower()
-
+        if len(search_blocks) > 0:
+            sq = " && ".join(search_blocks)
+            if len(q) > 0:
+                q += " && " + sq
+            else:
+                q = sq
         if self.order_field is not None:
             q += "&sort=" + self.order_field
         return q

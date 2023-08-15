@@ -140,6 +140,26 @@ class Structure(models.Model):
     secondary_structures = JSONField(null=True)
 
 
+class ChainSequence(models.Model):
+    id = models.IntegerField(primary_key=True)
+    structure = models.ForeignKey(
+        "Structure", on_delete=models.SET_NULL, null=True, blank=True, db_column="structure_acc"
+    )
+    chain = models.CharField(db_column="chain_acc", max_length=10)
+    sequence_bin = models.BinaryField(db_column="sequence", null=True)
+    length = models.IntegerField(null=False)
+
+    @property
+    def sequence(self):
+        if self.sequence_bin is not None:
+            return gzip.decompress(self.sequence_bin).decode(encoding)
+        else:
+            return None
+
+    class Meta:
+        db_table = "webfront_chain_sequence"
+
+
 class Taxonomy(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
     scientific_name = models.CharField(max_length=255)

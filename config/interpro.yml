@@ -125,7 +125,7 @@ members:
     options: []
     options_per_family: []
   antifam:
-    filter: "funfam"
+    filter: "antifam"
     label: "AntiFam"
     accession: 'ANF[0-9]{5}'
     options: []

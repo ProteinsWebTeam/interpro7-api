@@ -76,12 +76,6 @@ members:
       -
         label: "Active Sites"
         filter: "active_sites"
-  prodom:
-    filter: "prodom"
-    label: "ProDom"
-    accession: 'PD[A-Z0-9]{6}$'
-    options: []
-    options_per_family: []
   smart:
     filter: "smart"
     label: "SMART"
@@ -128,6 +122,12 @@ members:
     filter: "funfam"
     label: "funfam"
     accession: 'G3DSA:[0-9]{1}\.[0-9]{2,3}\.[0-9]{1,4}\.[0-9]{2,5}:.+'
+    options: []
+    options_per_family: []
+  antifam:
+    filter: "antifam"
+    label: "AntiFam"
+    accession: 'ANF[0-9]{5}'
     options: []
     options_per_family: []
 
@@ -180,9 +180,6 @@ cross_references:
         'rank': 29
         'description': 'PDBeMotif is an extremely fast and powerful search tool that facilitates exploration of the Protein Data Bank (PDB) by combining protein sequence, chemical structure and 3D data in a single search.'
         'urlPattern': 'http://www.ebi.ac.uk/pdbe-site/pdbemotif/barChartPattern?pattern1={accession}'
-    'PRODOM':
-        'displayName': 'ProDom'
-        'rank': 5
     'PRINTS':
         'rank': 4
     'GO CLASSIFICATION':

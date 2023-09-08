@@ -161,8 +161,9 @@ class FixtureReader:
                     c["structure_chain_acc"] = sp["chain"]
                     c["text_structure"] = c["structure_acc"] + " " + sp["chain"]
 
+                    c["entry_structure_locations"]= ep["coordinates"],
                     c["structure_protein_locations"] = sp["coordinates"]
-                    c["protein_structure"] = sp["mapping"]
+                    # c["protein_structure"] = sp["mapping"]
                     if e in entry2set:
                         for e2s in entry2set[e]:
                             c2 = copy.copy(c)
@@ -233,7 +234,7 @@ class FixtureReader:
                             "structure_chain_acc": sp["chain"],
                             "text_structure": sp["structure"] + " " + sp["chain"],
                             "structure_protein_locations": sp["coordinates"],
-                            "protein_structure": sp["mapping"],
+                            # "protein_structure": sp["mapping"],
                         }
                     )
 
@@ -281,7 +282,7 @@ class FixtureReader:
             lower.append(
                 {
                     k: v.lower()
-                    if type(v) == str and k != "ida" and "date" not in k
+                    if type(v) == str and k != "ida" and "date" not in k and "chain" not in k
                     else v
                     for k, v in doc.items()
                 }

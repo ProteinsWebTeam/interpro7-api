@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.test import Client
+from rest_framework import status
 
 
 class TestMail(TestCase):
@@ -14,4 +15,5 @@ class TestMail(TestCase):
                 "from_email": "swaathik@ebi.ac.uk",
             },
         )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()["from"], "swaathik@ebi.ac.uk")

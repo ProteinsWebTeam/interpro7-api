@@ -17,3 +17,17 @@ class TestMail(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()["from"], "swaathik@ebi.ac.uk")
+
+    def test_mail_invalid_queue(self):
+        self.client = Client()
+        response = self.client.post(
+            "/api/mail/",
+            {
+                "path": "echo",
+                "subject": "Add annotation test from API",
+                "message": "Test",
+                "queue": "uniprot",
+                "from_email": "swaathik@ebi.ac.uk",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

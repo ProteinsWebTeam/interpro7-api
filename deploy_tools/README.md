@@ -133,20 +133,35 @@ Assume we have a user account at /home/username
 
 ## Testing
 
-*   The unit tests are located in ```[project]/source/webfront/tests/tests.py```
+The unit tests are located in `[project]/source/webfront/tests/`.
 
-    To run unit tests use ```../virtualenv/bin/python manage.py test webfront```
+To run unit tests use 
 
-*   The functional test are in ```[project]/functional_tests/tests.py``` and they are configured to firefox, so you need
-    to have it installed in your machine
+```sh
+../virtualenv/bin/python manage.py test webfront
+```
 
-    To run functional tests use ```../virtualenv/bin/python manage.py test functional_tests```
+The functional test are in `[project]/functional_tests` and are configured to Google Chrome (or Chromium), so you need to have it installed in your machine.
 
-*   As a reference [HERE](https://docs.google.com/presentation/d/13_a6IbTq8KPGRH5AhsauEDJt4jEXNsT7DFdg1PNn4_I/edit?usp=sharing) is a graphic describing the fixtures.
+To run functional tests use
+
+```sh
+export BROWSER_TEST="chrome"
+
+# Only required if ChromeDriver is not in your PATH
+# or if its binary is not `chromedriver` (e.g. `chromium.chromedriver`)
+export BROWSER_TEST_PATH="/path/to/chromedriver"
+
+../virtualenv/bin/python manage.py test functional_tests
+```
+
+As a reference [HERE](https://docs.google.com/presentation/d/13_a6IbTq8KPGRH5AhsauEDJt4jEXNsT7DFdg1PNn4_I/edit?usp=sharing) is a graphic describing the fixtures.
 
 All the test can be run at the same time:
 
-```../virtualenv/bin/python manage.py test```
+```sh
+../virtualenv/bin/python manage.py test
+```
 
 ## Setting up real data (MySQL - elasticsearch)
 

@@ -45,7 +45,17 @@ class Entry(models.Model):
     pathways = JSONField(null=True)
     history = JSONField(null=True)
     details = JSONField(null=True)
-    taxa = JSONField(null=True)
+    set_info = JSONField(null=True)
+
+
+class EntryTaxa(models.Model):
+    accession = models.OneToOneField(
+        Entry, db_column="accession", primary_key=True, on_delete=models.CASCADE
+    )
+    tree = JSONField(null=True)
+
+    class Meta:
+        db_table = "webfront_entrytaxa"
 
 
 class EntryAnnotation(models.Model):
@@ -56,7 +66,7 @@ class EntryAnnotation(models.Model):
     type = models.CharField(max_length=32)
     value = models.BinaryField()
     mime_type = models.CharField(max_length=32)
-    num_sequences = models.FloatField(null=True)
+    num_sequences = models.IntegerField(null=True)
 
 
 class Protein(models.Model):
@@ -128,6 +138,26 @@ class Structure(models.Model):
     resolution = models.FloatField(null=True)
     counts = JSONField(null=True)
     secondary_structures = JSONField(null=True)
+
+
+class ChainSequence(models.Model):
+    id = models.IntegerField(primary_key=True)
+    structure = models.ForeignKey(
+        "Structure", on_delete=models.SET_NULL, null=True, blank=True, db_column="structure_acc"
+    )
+    chain = models.CharField(db_column="chain_acc", max_length=10)
+    sequence_bin = models.BinaryField(db_column="sequence", null=True)
+    length = models.IntegerField(null=False)
+
+    @property
+    def sequence(self):
+        if self.sequence_bin is not None:
+            return gzip.decompress(self.sequence_bin).decode(encoding)
+        else:
+            return None
+
+    class Meta:
+        db_table = "webfront_chain_sequence"
 
 
 class Taxonomy(models.Model):

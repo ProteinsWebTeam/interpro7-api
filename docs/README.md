@@ -40,14 +40,14 @@ This query returns a list of organisms which have a protein which contains a mat
 ### Main data types
 Currently there are six main types of data available through the API.
 
-|Type| Description|Source|
-|----|----|----|
-|Entry| Predicted functional and structural domains on proteins| InterPro, CATH-Gene3D, CDD, HAMAP, PANTHER, Pfam, PIRSF, PRINTS, PROSITE Patterns, PROSITE Profiles, SMART, SFLD, SUPERFAMILY, TIGRFAMs|
-|Protein| Protein sequence| UniProtKB (reviewed and unreviewed)|
-|Structure| Macromolecular structures involving proteins| PDB|
-|Set| Sets describing relationships between entries|Pfam, CDD|
-|Taxonomy| Taxonomic information about proteins|UniProtKB|
-|Proteome| Collections of proteins defined from whole genome sequencing of isolate organisms|UniProtKB|
+|Type| Description| Source                                                                                                                                 |
+|----|----|----------------------------------------------------------------------------------------------------------------------------------------|
+|Entry| Predicted functional and structural domains on proteins| InterPro, CATH-Gene3D, CDD, HAMAP, PANTHER, Pfam, PIRSF, PRINTS, PROSITE Patterns, PROSITE Profiles, SMART, SFLD, SUPERFAMILY, NCBIfam |
+|Protein| Protein sequence| UniProtKB (reviewed and unreviewed)                                                                                                    |
+|Structure| Macromolecular structures involving proteins| PDB                                                                                                                                    |
+|Set| Sets describing relationships between entries| Pfam, CDD                                                                                                                              |
+|Taxonomy| Taxonomic information about proteins| UniProtKB                                                                                                                              |
+|Proteome| Collections of proteins defined from whole genome sequencing of isolate organisms| UniProtKB                                                                                                                              |
 
 ### REST interface
 Queries to the API are formatted as URL queries. As a general principle a short query to the API will return general

@@ -5,20 +5,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('webfront', '0015_structural_model_lddt'),
-    ]
+    dependencies = [("webfront", "0015_structural_model_lddt")]
 
     operations = [
         migrations.AddField(
-            model_name='structuralmodel',
-            name='algorithm',
-            field=models.CharField(default='trRosetta', max_length=20),
+            model_name="structuralmodel",
+            name="algorithm",
+            field=models.CharField(default="trRosetta", max_length=20),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='structuralmodel',
-            name='lddt',
-            field=models.BinaryField(),
+            model_name="structuralmodel", name="lddt", field=models.BinaryField()
         ),
     ]

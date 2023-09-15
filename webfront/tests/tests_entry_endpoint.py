@@ -51,7 +51,7 @@ class EntryRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/unintegrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self.assertEqual(len(response.data["results"]), 4)
+        self.assertEqual(len(response.data["results"]), 7)
 
     def test_can_read_entry_interpro_id(self):
         acc = "IPR003165"
@@ -145,6 +145,11 @@ class EntryRESTTest(InterproRESTTestCase):
         self.assertIn("metadata", response.data.keys())
         self.assertIn("counters", response.data["metadata"].keys())
         self.assertIn("proteins", response.data["metadata"]["counters"].keys())
+        self.assertIn("entry_annotations", response.data["metadata"].keys())
+        self.assertIsInstance(response.data["metadata"]["entry_annotations"], dict)
+        for k, v in response.data["metadata"]["entry_annotations"].items():
+            self.assertIsInstance(k, str)
+            self.assertIsInstance(v, int)
         self._check_entry_details(response.data["metadata"])
 
     def test_can_read_entry_unintegrated_pfam_id(self):
@@ -182,3 +187,32 @@ class EntryRESTTest(InterproRESTTestCase):
             "'proteins' should be one of the keys in the response",
         )
         self.assertEqual(response.data["metadata"]["counters"]["proteins"], 1)
+
+
+class ReplaceTIGRFamsTest(InterproRESTTestCase):
+    def test_can_read_ncbifam(self):
+        urls = [
+            "/api/entry/ncbifam",
+            "/api/entry/ncbifam/nf000004",
+            "/api/protein/uniprot/entry/ncbifam/nf000004",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_can_redirect_db(self):
+        urls = [
+            "/api/entry/tigrfams",
+            "/api/entry/tigrfams/nf000004",
+            "/api/protein/uniprot/entry/tigrfams/nf000004",
+        ]
+        for url in urls:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+            self.assertRedirects(
+                response,
+                url.replace("tigrfams", "ncbifam"),
+                status_code=302,
+                target_status_code=200,
+                fetch_redirect_response=True,
+            )

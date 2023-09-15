@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from webfront.exceptions import EmptyQuerysetError
-from webfront.models import Entry, EntryAnnotation
+from webfront.models import Entry, EntryAnnotation, ChainSequence
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 import webfront.serializers.uniprot
@@ -106,8 +106,8 @@ class EntrySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
-                    include_structure=SerializerDetail.STRUCTURE_DETAIL
-                    not in detail_filters,
+                    include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters,
+                    include_matches=True,
                     base_query=sq,
                 )
             if (
@@ -204,9 +204,9 @@ class EntrySerializer(ModelContentSerializer):
     @staticmethod
     def to_metadata_representation(instance, searcher, sq, counters=None):
         results = EntryAnnotation.objects.filter(accession=instance.accession).only(
-            "type"
+            "type", "num_sequences"
         )
-        annotation_types = [x.type for x in results]
+        annotation_types = {x.type: x.num_sequences or 0 for x in results}
         if counters is None:
             counters = EntrySerializer.get_counters(instance, searcher, sq)
 
@@ -232,6 +232,7 @@ class EntrySerializer(ModelContentSerializer):
             "description": instance.description,
             "wikipedia": instance.wikipedia,
             "literature": instance.literature,
+            "set_info": instance.set_info,
             "overlaps_with": instance.overlaps_with,
             "counters": counters,
             "entry_annotations": annotation_types,
@@ -403,31 +404,6 @@ class EntrySerializer(ModelContentSerializer):
             return result
         return instance
 
-    dbcode = {
-        "H": "Pfam",
-        "M": "profile",
-        "R": "SMART",
-        "V": "PHANTER",
-        "g": "MobiDB",
-        "B": "SFLD",
-        "P": "prosite",
-        "X": "GENE 3D",
-        "N": "TIGRFAMs",
-        "J": "CDD",
-        "Y": "SUPERFAMILY",
-        "U": "PIRSF",
-        "D": "ProDom",
-        "Q": "HAMAP",
-        "F": "Prints",
-    }
-
-    @staticmethod
-    def get_key_from_bucket(bucket):
-        key = str(bucket["val"] if "val" in bucket else bucket["key"])
-        if key.upper() in EntrySerializer.dbcode:
-            return EntrySerializer.dbcode[key.upper()].lower()
-        return key
-
     @staticmethod
     def counter_is_empty(instance):
         return EntrySerializer.grouper_is_empty(instance, "databases")
@@ -527,9 +503,11 @@ class EntrySerializer(ModelContentSerializer):
         }
         if for_structure:
             header["chain"] = obj["structure_chain_acc"]
-            header["protein"] = obj["protein_acc"]
-            header["structure_protein_locations"] = obj["structure_protein_locations"]
-            header["protein_structure_mapping"] = obj["protein_structure"]
+            header["entry_structure_locations"] = obj["entry_structure_locations"]
+            chain = ChainSequence.objects.get(structure=obj['structure_acc'], chain=obj["structure_chain_acc"])
+            header["sequence"] = chain.sequence
+            header["sequence_length"] = chain.length
+
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(
                 Entry.objects.get(accession__iexact=obj["entry_acc"]), searcher, sq

@@ -86,6 +86,7 @@ if INTERPRO_CONFIG.get("django_cors", False):
     MIDDLEWARE = ("corsheaders.middleware.CorsMiddleware",) + MIDDLEWARE
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = False
+    CORS_EXPOSE_HEADERS = ["InterPro-Version"]
 
 ROOT_URLCONF = "interpro.urls"
 
@@ -141,6 +142,7 @@ SEARCHER_IDA_INDEX = INTERPRO_CONFIG.get("searcher_ida_index", "ida")
 if INTERPRO_CONFIG.get("use_test_db", True):
     SEARCHER_URL = SEARCHER_TEST_URL
     SEARCHER_INDEX = "test"
+    SEARCHER_IDA_INDEX = "ida"
 TEST_RUNNER = "webfront.tests.managed_model_test_runner.UnManagedModelTestRunner"
 
 # Internationalization

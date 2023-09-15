@@ -18,6 +18,30 @@ SHOULD_NO_CACHE = -1
 
 names = [ep["name"].lower() for ep in endpoints]
 
+short_life_parameters = [
+    "cursor",
+    "size",
+    "go_terms",
+    "ida_ignore",
+    "ida_search",
+    "format",
+    "page_size",
+    "search",
+]
+
+no_cache_modifiers = [
+    "extra_features",
+    "residues",
+    "isoforms",
+    "ida",
+    "taxa",
+    "model:",
+    "annotation:info",
+    "subfamilies",
+    "subfamily",
+    "page_size",
+]
+
 
 def get_timeout_from_path(path, endpoint_levels):
     parsed = urlparse(path)
@@ -26,18 +50,14 @@ def get_timeout_from_path(path, endpoint_levels):
 
     if (  # is requesting by accession
         len(endpoint_levels) == 3
-        and len([ep for ep in endpoint_levels if ep in names]) < 2
+        and len([ep for ep in endpoint_levels if ep.lower() in names]) == 1
     ):
         # it doesn't have modifiers
         if len(query.keys()) == 0:
             return SHOULD_NO_CACHE
-        if (  # The only modifier is page_size=20 or default
-            len(query.keys()) == 1
-            and "page_size" in query
-            and query["page_size"]
-            == settings.INTERPRO_CONFIG.get("default_page_size", 20)
-        ):
-            return SHOULD_NO_CACHE
+        for parameter in no_cache_modifiers:
+            if parameter in query:
+                return SHOULD_NO_CACHE
 
     # order querystring, lowercase keys
     query = OrderedDict(
@@ -50,18 +70,9 @@ def get_timeout_from_path(path, endpoint_levels):
             if page > 1:
                 return FIVE_DAYS
         except Exception:
-            return 0
-    short_life_parameters = [
-        "cursor",
-        "size",
-        "go_terms",
-        "ida_ignore",
-        "ida_search",
-        "format",
-    ]
+            return SHOULD_NO_CACHE
     for parameter in short_life_parameters:
-        value = query.get(parameter)
-        if value is not None:
+        if parameter in query:
             return FIVE_DAYS
     return None
 

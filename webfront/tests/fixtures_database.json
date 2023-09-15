@@ -210,7 +210,7 @@
             "integrated": 1625
           },
           {
-            "name": "TIGRFAMs",
+            "name": "NCBIfam",
             "version": "15.0",
             "count": 4488,
             "integrated": 4457
@@ -233,7 +233,7 @@
             "reviewed": 450702,
             "unreviewed": 80020266
           },
-          "tigrfams": {
+          "ncbifam": {
             "reviewed": 273418,
             "unreviewed": 25101094
           },

@@ -158,6 +158,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         searcher,
         query,
         include_structure=True,
+        include_matches=False,
         include_chain=True,
         base_query="*:*",
     ):
@@ -166,6 +167,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
                 r,
                 include_structure=include_structure,
+                include_matches=include_matches,
                 search=searcher,
                 base_query=base_query,
             )

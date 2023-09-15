@@ -24,7 +24,10 @@ class GroupByModifierTest(InterproRESTTestCase):
     def test_can_get_the_entry_type_groups_proteins_by_tax_id(self):
         response = self.client.get("/api/protein?group_by=tax_id")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual({}, response.data)
+        # Only Mus musculus is a key species
+        self.assertEqual(
+            {"10090": {"value": 1, "title": "Mus musculus"}}, response.data
+        )
 
     def test_can_group_interpro_entries_with_member_databases(self):
         response = self.client.get("/api/entry/interpro?group_by=member_databases")
@@ -45,7 +48,7 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertIn("true", response.data["match_presence"])
         self.assertIn("false", response.data["match_presence"])
         self.assertEqual(response.data["match_presence"]["true"], 3)
-        self.assertEqual(response.data["match_presence"]["false"], 1)
+        self.assertEqual(response.data["match_presence"]["false"], 2)
 
     def test_can_get_the_fragment_groups(self):
         response = self.client.get("/api/protein?group_by=is_fragment")
@@ -375,18 +378,27 @@ class EntryAnnotationModifiersTest(InterproRESTTestCase):
     def test_annotation_modifier_hmm(self):
         response = self.client.get("/api/entry/pfam/pf02171?annotation=hmm")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response["content-type"], "application/octet-stream")
+        self.assertEqual(response["content-type"], "application/gzip")
 
-    def test_annotation_modifier_alignment(self):
-        response = self.client.get("/api/entry/pfam/pf02171?annotation=alignment")
+    def test_annotation_modifier_logo(self):
+        response = self.client.get("/api/entry/pfam/pf02171?annotation=logo")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response["content-type"], "application/octet-stream")
+        self.assertEqual(response["content-type"], "application/json")
+        data = json.loads(response.content)
+        self.assertIn("ali_map", data)
+        self.assertEqual(302, len(data["ali_map"]))
 
-    # TODO Problem encoding logo as byte-coded json
-    # def test_annotation_modifier_logo(self):
-    #     response = self.client.get("/api/entry/pfam/pf02171?annotation=logo")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(response['content-type'], "application/json")
+    def test_annotation_modifier_pfam_alignment(self):
+        response = self.client.get("/api/entry/pfam/pf02171?annotation=alignment:seed")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["content-type"], "text/plain")
+
+    def test_annotation_modifier_interpro_alignment(self):
+        response = self.client.get(
+            "/api/entry/interpro/ipr003165?annotation=alignment:seed"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["content-type"], "text/plain")
 
     # TODO This test should fail but doesn't
     # def test_annotation_wrong_acc_modifier(self):
@@ -429,7 +441,8 @@ class ValueForFieldModifiersTest(InterproRESTTestCase):
     def test_no_taxa_modifier(self):
         response = self.client.get("/api/entry/interpro/IPR001165?taxa")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        
+
+
 class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
     def test_scientific_name_modifier(self):
         response = self.client.get("/api/taxonomy/uniprot/?scientific_name=Bacteria")
@@ -497,3 +510,39 @@ class StructuralModelTest(InterproRESTTestCase):
         data = json.loads(content)
         self.assertEqual(3, len(data))
         self.assertTrue(all([0 <= item <= 1 for item in data]))
+
+
+class SubfamiliesTest(InterproRESTTestCase):
+    entries = [
+        {"db": "panther", "acc": "PTHR43214", "sf": "PTHR43214:sf24"},
+        {"db": "cathgene3d", "acc": "G3DSA:1.10.10.10", "sf": "G3DSA:1.10.10.10:1"},
+    ]
+
+    def test_subfamilies_counter(self):
+        for entry in self.entries:
+            response = self.client.get(f"/api/entry/{entry['db']}/{entry['acc']}")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn("counters", response.data["metadata"])
+            self.assertEqual(response.data["metadata"]["counters"]["subfamilies"], 1)
+
+    def test_panther_subfamilies(self):
+        for entry in self.entries:
+            response = self.client.get(
+                f"/api/entry/{entry['db']}/{entry['acc']}?subfamilies"
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data["results"]), 1)
+            self.assertEqual(
+                response.data["results"][0]["metadata"]["accession"], entry["sf"]
+            )
+            self.assertEqual(
+                response.data["results"][0]["metadata"]["integrated"], entry["acc"]
+            )
+
+    def test_no_subfamilies_in_pfam(self):
+        response = self.client.get(f"/api/entry/pfam/PF02171")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("counters", response.data["metadata"])
+        self.assertNotIn("subfamilies", response.data["metadata"]["counters"])
+        response2 = self.client.get(f"/api/entry/pfam/PF02171?subfamilies")
+        self.assertEqual(response2.status_code, status.HTTP_204_NO_CONTENT)

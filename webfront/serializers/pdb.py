@@ -1,7 +1,7 @@
 from webfront.exceptions import EmptyQuerysetError
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
-from webfront.models import Structure
+from webfront.models import Structure, ChainSequence
 import webfront.serializers.uniprot
 import webfront.serializers.interpro
 from webfront.views.queryset_manager import escape
@@ -279,24 +279,30 @@ class StructureSerializer(ModelContentSerializer):
 
     @staticmethod
     def get_chain_from_search_object(obj):
+        chain = ChainSequence.objects.get(structure=obj['structure_acc'],
+                                          chain=obj["structure_chain_acc"])
         output = {
             "structure_protein_locations": obj["structure_protein_locations"],
-            "protein_structure_mapping": obj["protein_structure"],
             "organism": {"taxid": obj["tax_id"]},
-            "accession": obj["protein_acc"],
+            "protein": obj["protein_acc"],
             "chain": obj["structure_chain_acc"],
             "protein_length": obj["protein_length"],
-            "resolution": obj["structure_resolution"],
-            "experiment_type": obj["structure_evidence"],
             "source_database": obj["protein_db"],
+            "sequence": chain.sequence,
+            "sequence_length": chain.length,
         }
-        if "entry_protein_locations" in obj:
-            output["entry_protein_locations"] = obj["entry_protein_locations"]
+        for k in ["entry_protein_locations", "entry_structure_locations"]:
+            try:
+                v = obj[k]
+            except KeyError:
+                pass
+            else:
+                output[k] = v
         return output
 
     @staticmethod
     def get_structure_from_search_object(
-        obj, include_structure=False, search=None, base_query="*:*"
+        obj, include_structure=False, include_matches=False, search=None, base_query="*:*"
     ):
         output = StructureSerializer.get_chain_from_search_object(obj)
         output["accession"] = obj["structure_acc"]

@@ -79,27 +79,3 @@ class SearchController(metaclass=abc.ABCMeta):
         raise NotImplementedError(
             "users must define clear_all_docs to use this base class"
         )
-
-    # TODO: check if we can do that only once when building the data instead, to remove it here
-    @staticmethod
-    def to_dbcodes(q):
-        re.sub(r"pfam", "p", "some pFam ", flags=re.IGNORECASE)
-
-        q = re.sub(r"Pfam", "h", q, flags=re.IGNORECASE)
-        q = re.sub(r"Prosite?profiles", "m", q, flags=re.IGNORECASE)
-        q = re.sub(r"SMART", "r", q, flags=re.IGNORECASE)
-        q = re.sub(r"PHANTER", "v", q, flags=re.IGNORECASE)
-        q = re.sub(r"MobiDB", "g", q, flags=re.IGNORECASE)
-        q = re.sub(r"SFLD", "b", q, flags=re.IGNORECASE)
-        q = re.sub(r"Prosite?patterns", "p", q, flags=re.IGNORECASE)
-        q = re.sub(r"GENE 3D", "x", q, flags=re.IGNORECASE)
-        q = re.sub(r"TIGRFAMs", "n", q, flags=re.IGNORECASE)
-        q = re.sub(r"CDD", "j", q, flags=re.IGNORECASE)
-        q = re.sub(r"SUPERFAMILY", "y", q, flags=re.IGNORECASE)
-        q = re.sub(r"PIRSF", "u", q, flags=re.IGNORECASE)
-        q = re.sub(r"ProDom", "d", q, flags=re.IGNORECASE)
-        q = re.sub(r"HAMAP", "q", q, flags=re.IGNORECASE)
-        q = re.sub(r"Prints", "f", q, flags=re.IGNORECASE)
-        q = re.sub(r"reviewed", "s", q, flags=re.IGNORECASE)
-        q = re.sub(r"unreviewed", "t", q, flags=re.IGNORECASE)
-        return q

@@ -5,6 +5,7 @@ from django.db.models import Count
 from webfront.models import (
     Entry,
     EntryAnnotation,
+    EntryTaxa,
     Alignment,
     Isoforms,
     Release_Note,
@@ -16,14 +17,17 @@ from webfront.models import (
     StructuralModel,
 )
 from webfront.views.custom import filter_queryset_accession_in
-from webfront.exceptions import EmptyQuerysetError, HmmerWebError, ExpectedUniqueError, InvalidOperationRequest
+from webfront.exceptions import (
+    EmptyQuerysetError,
+    HmmerWebError,
+    ExpectedUniqueError,
+    InvalidOperationRequest,
+)
 from django.conf import settings
 
-from requests import Session
 from urllib import request, parse
 from json import loads
 import gzip
-# import ssl
 
 # MAQ bypassing SSL errors
 # ssl._create_default_https_context = ssl._create_unverified_context
@@ -277,6 +281,29 @@ def filter_by_entry_db(value, general_handler):
     return response.first()
 
 
+def filter_by_min_value(endpoint, field, value, sorting_by=[]):
+    def x(_, general_handler):
+        general_handler.queryset_manager.add_filter(
+            endpoint, **{"{}__gte".format(field): value}
+        )
+        sort_str = ""
+        connector = ""
+        for sort_field in sorting_by:
+            if sort_field["direction"] in ("asc", "desc"):
+                sort_str += "{}{}:{}".format(
+                    connector, sort_field["name"], sort_field["direction"]
+                )
+            else:
+                raise ValueError(
+                    "{} is not a valid sorting order".format(sort_field["direction"])
+                )
+            connector = ","
+        if len(sort_str) > 0:
+            general_handler.queryset_manager.order_by(sort_str)
+
+    return x
+
+
 def filter_by_boolean_field(endpoint, field):
     def x(value, general_handler):
         if value.lower() == "false":
@@ -405,7 +432,7 @@ def filter_by_domain_architectures(field, general_handler):
         general_handler.queryset_manager.get_searcher_query() + " && ida_id:" + field
     )
     endpoint = general_handler.queryset_manager.main_endpoint
-    res, length, after_key, before_key = searcher.get_list_of_endpoint(
+    res, length, after_key, before_key, _ = searcher.get_list_of_endpoint(
         endpoint, rows=size, query=query, cursor=cursor
     )
     general_handler.modifiers.search_size = length
@@ -527,22 +554,23 @@ def get_isoforms(value, general_handler):
 
     return {"results": [iso.accession for iso in isoforms], "count": len(isoforms)}
 
+
 def run_hmmsearch(model):
     """
         run hmmsearch using hmm model against reviewed uniprot proteins
     """
-    parameters = {
-        "seq": model, 
-        "seqdb": "swissprot", 
-    }
-    
+    parameters = {"seq": model, "seqdb": "swissprot"}
+
     enc_params = parse.urlencode(parameters).encode()
     url = "https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch"
-    req = request.Request(url=url, data=enc_params, headers={"Accept": "application/json"})
+    req = request.Request(
+        url=url, data=enc_params, headers={"Accept": "application/json"}
+    )
     with request.urlopen(req) as response:
         raw_results = response.read().decode("utf-8")
         results = loads(raw_results)
-        return results['results']['hits']
+        return results["results"]["hits"]
+
 
 def calculate_conservation_scores(entry_acc):
     """
@@ -646,45 +674,65 @@ def calculate_residue_conservation(entry_db, general_handler):
     # will always have one protein in queryset
     protein = queryset[0]
 
-    if protein.source_database != 'reviewed':
+    if protein.source_database != "reviewed":
         raise InvalidOperationRequest(
-                f"Conservation data can only be calculated for proteins in UniProt reviewed."
-            )
+            f"Conservation data can only be calculated for proteins in UniProt reviewed."
+        )
 
     # get entries matching the sequence from the selected database
-    q = "protein_acc:{} && entry_db:{}".format(protein.accession.lower(), entry_db.lower())
+    q = "protein_acc:{} && entry_db:{}".format(
+        protein.accession.lower(), entry_db.lower()
+    )
     searcher = general_handler.searcher
     results = searcher.execute_query(q, None, None)
     # process each hit
     sequence = protein.sequence
     alignments = {"sequence": sequence, entry_db: {"entries": {}}}
 
-    if "hits" in results.keys() and "hits" in results["hits"] and len(results["hits"]["hits"]) > 0 :
+    if (
+        "hits" in results.keys()
+        and "hits" in results["hits"]
+        and len(results["hits"]["hits"]) > 0
+    ):
         entries = results["hits"]["hits"]
         for entry in entries:
-            entry_annotation = EntryAnnotation.objects.filter(accession_id=entry["_source"]["entry_acc"], type="hmm")[0]
+            entry_annotation = EntryAnnotation.objects.filter(
+                accession_id=entry["_source"]["entry_acc"], type="hmm"
+            )[0]
             model = gzip.decompress(entry_annotation.value).decode("utf-8")
             hits = run_hmmsearch(model)
-            protein_dict = {x['acc']: x for x in hits}
-            protein_hits = list(filter(lambda x: x['acc'] == protein.identifier, hits))
+            protein_dict = {x["acc"]: x for x in hits}
+            protein_hits = list(filter(lambda x: x["acc"] == protein.identifier, hits))
             if len(protein_hits) > 0:
                 alignments[entry_db]["entries"][entry_annotation.accession_id] = []
-                logo_score = calculate_conservation_scores(entry_annotation.accession_id)
-                domains = [hit['domains'] for hit in protein_hits][0]
+                logo_score = calculate_conservation_scores(
+                    entry_annotation.accession_id
+                )
+                domains = [hit["domains"] for hit in protein_hits][0]
                 for hit in domains:
                     # calculate scores for each domain hit for each entry
                     mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(
                         hit, sequence
                     )
                     matrixseq = get_hmm_matrix(
-                        logo_score, alisqfrom, alisqto, hmmfrom, hmmto, mappedseq, modelseq
+                        logo_score,
+                        alisqfrom,
+                        alisqto,
+                        hmmfrom,
+                        hmmto,
+                        mappedseq,
+                        modelseq,
                     )
                     formatted_matrix = format_logo(matrixseq)
-                    alignments[entry_db]["entries"][entry_annotation.accession_id].append(formatted_matrix)
+                    alignments[entry_db]["entries"][
+                        entry_annotation.accession_id
+                    ].append(formatted_matrix)
             else:
-                if 'warnings' not in alignments[entry_db]:
-                    alignments[entry_db]['warnings'] = []
-                alignments[entry_db]['warnings'].append(f"Hmmer did not match Entry {entry_annotation.accession_id} with Protein {protein.identifier}.")
+                if "warnings" not in alignments[entry_db]:
+                    alignments[entry_db]["warnings"] = []
+                alignments[entry_db]["warnings"].append(
+                    f"Hmmer did not match Entry {entry_annotation.accession_id} with Protein {protein.identifier}."
+                )
     return alignments
 
 
@@ -761,6 +809,15 @@ def add_taxonomy_names(value, current_payload):
     for t in qs:
         names[t.accession] = t.scientific_name
     return names
+
+
+def get_sunburst_taxa(value, general_handler):
+    taxa = EntryTaxa.objects.filter(
+        accession__in=general_handler.queryset_manager.get_queryset()
+    )
+    if taxa.count() == 0:
+        raise EmptyQuerysetError("This entry doesn't have taxa")
+    return {"taxa": taxa.first().tree}
 
 
 def extra_features(value, general_handler):
@@ -844,6 +901,21 @@ def get_model(field):
         return [payload]
 
     return get_model_structure
+
+
+def get_subfamilies(value, general_handler):
+    queryset = general_handler.queryset_manager.get_queryset().first()
+    entries = Entry.objects.filter(integrated=queryset.accession, is_alive=False)
+    if isinstance(value, str) and value.strip():
+        entries = entries.filter(accession=value)
+    if len(entries) == 0:
+        raise EmptyQuerysetError("There is are not subfamilies for this entry")
+    general_handler.modifiers.search_size = len(entries)
+    return entries
+
+
+def mark_as_subfamily(value, general_handler):
+    general_handler.queryset_manager.add_filter("entry", is_alive=False)
 
 
 def passing(x, y):

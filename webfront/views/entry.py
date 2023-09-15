@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.shortcuts import redirect
 from webfront.constants import ModifierType
 
 from webfront.exceptions import DeletedEntryError
@@ -18,6 +19,9 @@ from webfront.views.modifiers import (
     filter_by_latest_entries,
     get_value_for_field,
     get_model,
+    get_sunburst_taxa,
+    get_subfamilies,
+    mark_as_subfamily,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -88,8 +92,16 @@ class MemberAccessionHandler(CustomView):
             serializer=SerializerDetail.IDA_LIST,
         )
         general_handler.modifiers.register(
-            "taxa", get_value_for_field("taxa"), type=ModifierType.REPLACE_PAYLOAD
+            "taxa", get_sunburst_taxa, type=ModifierType.REPLACE_PAYLOAD
         )
+        general_handler.modifiers.register(
+            "subfamilies",
+            get_subfamilies,
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ENTRY_HEADERS,
+            many=True,
+        )
+        general_handler.modifiers.register("subfamily", mark_as_subfamily)
 
         return super(MemberAccessionHandler, self).get(
             request._request,
@@ -131,6 +143,9 @@ class MemberHandler(CustomView):
         *args,
         **kwargs
     ):
+        if endpoint_levels[level - 1].lower() == "tigrfams":
+            full_path = request.get_full_path().lower()
+            return redirect(full_path.replace("tigrfams", "ncbifam"))
 
         general_handler.queryset_manager.add_filter(
             "entry", source_database=endpoint_levels[level - 1].lower()
@@ -191,6 +206,10 @@ class MemberHandler(CustomView):
 
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
+        if level_name.lower() == "tigrfams":
+            full_path = general_handler.request.get_full_path().lower()
+            return redirect(full_path.replace("tigrfams", "ncbifam"))
+
         general_handler.queryset_manager.update_integrated_filter("entry")
         general_handler.queryset_manager.add_filter(
             "entry", source_database=level_name.lower()
@@ -238,6 +257,17 @@ class AccessionHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry", is_alive=True)
 
         general_handler.modifiers.register(
+            "annotation",
+            get_entry_annotation,
+            type=ModifierType.REPLACE_PAYLOAD,
+            serializer=SerializerDetail.ANNOTATION_BLOB,
+        )
+        general_handler.modifiers.register(
+            "annotation:info",
+            get_entry_annotation_info,
+            type=ModifierType.REPLACE_PAYLOAD,
+        )
+        general_handler.modifiers.register(
             "ida",
             get_domain_architectures,
             type=ModifierType.REPLACE_PAYLOAD,
@@ -254,7 +284,7 @@ class AccessionHandler(CustomView):
             type=ModifierType.REPLACE_PAYLOAD,
         )
         general_handler.modifiers.register(
-            "taxa", get_value_for_field("taxa"), type=ModifierType.REPLACE_PAYLOAD
+            "taxa", get_sunburst_taxa, type=ModifierType.REPLACE_PAYLOAD
         )
 
         return super(AccessionHandler, self).get(

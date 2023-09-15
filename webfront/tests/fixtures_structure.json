@@ -100,7 +100,7 @@
   {
     "model": "webfront.Structure",
     "fields": {
-      "accession": "1t2V",
+      "accession": "1t2v",
       "resolution": 2.9,
       "name": "Structural basis of phospho-peptide recognition by the brct domain of brca1, structure with phosphopeptide",
       "experiment_type": "x-ray",
@@ -175,7 +175,7 @@
   {
     "model": "webfront.Structure",
     "fields": {
-      "accession": "1jZ8",
+      "accession": "1jz8",
       "resolution": 59.2,
       "name": "E. COLI (lacZ) BETA-GALACTOSIDASE (E537Q) IN COMPLEX WITH ALLOLACTOSE",
       "experiment_type": "X-ray diffraction, resolution 1.50",
@@ -227,6 +227,105 @@
         "contacts": "H4sIAKMfQmEC/4uONtSBQj2DWB0FINdIB4SNDXQM9EwhIsZAERMg1wLENdKBQKh6oEogByRrCeIaA7kmQAiSjQUAU15YL10AAAA=",
         "plddt": "H4sIAKMfQmEC/x3IwQ3AIAwDwFU6AEIm2NiZBXX/NSr1nncxHThbm2B3nPFgJizllNNLhP477EhRrTKs9wMKEasjPAAAAA==",
         "structure": "H4sIAKMfQmEC/43SS27EIAwG4P2cggvEssE8sqR0NJvpRKqqLnr/g9Q2VZUZEgkW4aHw8Zukfm0fzho595Duu95d7VNtC0JGHRPkjNaH1WuHMmPQ8X/T/Zf6KtbP24uI6yoDhMTF5jsR7bkXd6C81eoAaqTQQS4djEwnYHsCgy0MoAc0kKBw7GBIUyA7t7mjhJm8wZnlzEUThxNwewLl+PZ2BKaULJlnNrCEuZJlV7uNYABi7KWSwn9XMAFmWXg/ApnQktGqYJCS5xLKJ3xcR5Ch+F4qR29gxLnfRupoPyMYgX00MLMUsbDcaTlLePkFk6MiNykDAAA="
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1jm7",
+      "chain":  "A",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "543"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1jm7",
+      "chain":  "B",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "543"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "2bkm",
+      "chain":  "A",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "2bkm",
+      "chain":  "B",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1t2v",
+      "chain":  "A",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1t2v",
+      "chain":  "B",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1t2v",
+      "chain":  "C",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1t2v",
+      "chain":  "D",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1t2v",
+      "chain":  "E",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1jz8",
+      "chain":  "A",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
+    }
+  },
+  {
+    "model": "webfront.chainsequence",
+    "fields": {
+      "structure": "1jz8",
+      "chain":  "B",
+      "sequence_bin": "H4sIAEFb/F8C/xWRbQpFIQhE1yb5UeiVyjDc/0Ze74eIysDM8dtpE45ZCsAByDl5rWFiU1UAj4VO68iLlumbEGFvu0gJ2nlifNh9Jsdf0M/eb9Uv9pH7yXNF3jwCLqS0KVHUCAptp56DU8BkvJa66kgZopOjduO6zBTbceqrTLvmIlNahB0xNjKZEQNDh84sR4br4RA52HDN9JSKCgnIwJMAopgFZseYdfGkAl3IfYBQFEiv8ZJA0LDoqtuHm0baEBd7Zu2swl57ftAERWpCGhJEWw+Dg83dNL5B0coPRdxsOSFGNX/XIbPWPrI8Cx8ebYQUbq1UPqkMKnN9kDbBe8cfVmE0Zxy+nY274P10Vt+WU8xoPb82nnME5NH8mrjCDQKjO2XpSxhARmg5aDn1JapD1tDo4nz421Yi0r+c32P2shgx+75DhC7/APPZcnUfAgAA",
+      "length":  "343"
     }
   }
 ]

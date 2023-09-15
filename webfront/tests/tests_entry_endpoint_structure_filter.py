@@ -97,7 +97,7 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
             self.assertIn(
                 "structure_subset",
                 response.data,
-                "'structures' should be one of the keys in the response",
+                f"'structures' should be one of the keys in the response {url}",
             )
             self.assertEqual(
                 len(response.data["structure_subset"]),

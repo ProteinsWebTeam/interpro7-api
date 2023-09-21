@@ -11,7 +11,7 @@ class ModelTest(InterproRESTTestCase):
         )
         self.assertIn(
             Entry.objects.filter(source_database="interpro").first().accession.upper(),
-            ["IPR003165", "IPR001165"],
+            ["IPR003165", "IPR001165", "IPR000005"],
         )
 
     def test_content_of_a_json_attribute(self):

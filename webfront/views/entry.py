@@ -61,14 +61,9 @@ class MemberAccessionHandler(CustomView):
         qs = general_handler.queryset_manager.get_queryset()
         if qs.count() > 0:
             first = qs.first()
-            date = first.deletion_date
-            history = first.history
-            raise DeletedEntryError(
-                acc,
-                date,
-                "The entry {} is not active. Removed: {}".format(acc, date),
-                history,
-            )
+            raise DeletedEntryError(acc, first.source_database, first.name,
+                                    first.short_name, first.history,
+                                    first.deletion_date)
 
         general_handler.queryset_manager.add_filter("entry",
                                                     deletion_date__isnull=True)
@@ -265,14 +260,9 @@ class AccessionHandler(CustomView):
         qs = general_handler.queryset_manager.get_queryset()
         if qs.count() > 0:
             first = qs.first()
-            date = first.deletion_date
-            history = first.history
-            raise DeletedEntryError(
-                acc,
-                date,
-                "The entry {} is not active. Removed: {}".format(acc, date),
-                history,
-            )
+            raise DeletedEntryError(acc, first.source_database, first.name,
+                                    first.short_name, first.history,
+                                    first.deletion_date)
         general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=True)
 
         general_handler.modifiers.register(

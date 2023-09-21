@@ -204,14 +204,15 @@ class GeneralHandler(CustomView):
                 # DeletedEntryError is still a valid response so a response object is created and saved in cache
                 if settings.DEBUG:
                     raise
-                content = {
-                    "detail": e.args[2],
-                    "accession": e.args[0],
-                    "date": e.args[1],
-                }
-                if len(e.args) > 3 and e.args[3] is not None:
-                    content["history"] = e.args[3]
-                response = Response(content, status=status.HTTP_410_GONE)
+
+                response = Response({
+                    "accession": e.accession,
+                    "source_database": e.database,
+                    "name": e.name,
+                    "short_name": e.short_name,
+                    "date": e.date.strftime("%d %B %Y"),
+                    "history": e.history
+                }, status=status.HTTP_410_GONE)
                 self._set_in_cache(caching_allowed, full_path, response)
             except EmptyQuerysetError as e:
                 # EmptyQuerysetError is still a valid response so a response object is created and saved in cache

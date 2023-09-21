@@ -50,9 +50,28 @@ class MemberAccessionHandler(CustomView):
         *args,
         **kwargs
     ):
+        acc = endpoint_levels[level - 1].lower()
         general_handler.queryset_manager.add_filter(
-            "entry", accession__iexact=endpoint_levels[level - 1].lower()
+            "entry", accession__iexact=acc
         )
+
+        # Check whether the entry is deleted
+        general_handler.queryset_manager.add_filter("entry",
+                                                    deletion_date__isnull=False)
+        qs = general_handler.queryset_manager.get_queryset()
+        if qs.count() > 0:
+            first = qs.first()
+            date = first.deletion_date
+            history = first.history
+            raise DeletedEntryError(
+                acc,
+                date,
+                "The entry {} is not active. Removed: {}".format(acc, date),
+                history,
+            )
+
+        general_handler.queryset_manager.add_filter("entry",
+                                                    deletion_date__isnull=True)
 
         general_handler.modifiers.register(
             "model:structure",

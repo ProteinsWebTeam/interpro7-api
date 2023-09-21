@@ -616,12 +616,13 @@
     "model": "webfront.Entry",
     "fields": {
       "entry_id": null,
-      "accession": "IPR123456",
-      "type": "D",
-      "name": "Deleted",
-      "entry_date": "1994-04-21T00:00:00Z",
-      "deletion_date": "1994-04-21T00:00:00Z",
-      "is_public": false,
+      "accession": "IPR000005",
+      "type": "domain",
+      "name": "HTH transcriptional regulator, AraC",
+      "short_name": "HTH_AraC",
+      "entry_date": "1999-10-08T17:07:25Z",
+      "deletion_date": "2010-10-28T10:51:29Z",
+      "is_public": true,
       "source_database": "interpro",
       "history": {
         "names": [
@@ -630,32 +631,45 @@
           "Helix-turn-helix, AraC type",
           "HTH transcriptional regulator, AraC"
         ],
-        "signatures": [
-          {
-            "accession": "PS00041",
-            "exists": true,
-            "integrated_id": "IPR018062"
+        "short_names": [
+          "HTHAraC",
+          "HTH_AraC-typ",
+          "HTH_AraC"
+        ],
+        "signatures": {
+          "prosite": {
+            "PS00041": "IPR018062"
           },
-          {
-            "accession": "PR00032",
-            "exists": true,
-            "integrated_id": "IPR020449"
+          "pfam": {
+            "PF00165": "IPR018060"
           },
-          {
-            "accession": "PF00165",
-            "exists": true,
-            "integrated_id": "IPR018060"
+          "prints": {
+            "PR00032": "IPR020449"
           },
-          {
-            "accession": "PS01124",
-            "exists": true,
-            "integrated_id": "IPR018060"
+          "profile": {
+            "PS01124": "IPR018060"
           },
-          {
-            "accession": "SM00342",
-            "exists": true,
-            "integrated_id": "IPR018060"
+          "smart": {
+            "SM00342": "IPR018060"
           }
+        }
+      }
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id": null,
+      "accession": "PF20534",
+      "type": "domain",
+      "short_name": "DUF6749",
+      "entry_date": "2022-07-01T14:20:35Z",
+      "deletion_date": "2023-07-24T17:42:21Z",
+      "is_public": true,
+      "source_database": "pfam",
+      "history": {
+        "short_names": [
+          "DUF6749"
         ]
       }
     }

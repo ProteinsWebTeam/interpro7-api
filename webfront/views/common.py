@@ -208,6 +208,7 @@ class GeneralHandler(CustomView):
                 response = Response({
                     "accession": e.accession,
                     "source_database": e.database,
+                    "type": e.type,
                     "name": e.name,
                     "short_name": e.short_name,
                     "date": e.date.strftime("%d %B %Y"),

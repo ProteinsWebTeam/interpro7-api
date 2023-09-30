@@ -38,7 +38,7 @@ class Entry(models.Model):
     entry_date = models.DateTimeField(null=True)
     is_featured = models.BooleanField(default=False)
     overlaps_with = JSONField(default=[])
-    is_alive = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False)
     deletion_date = models.DateTimeField(null=True)
     counts = JSONField(null=True)
     interactions = JSONField(null=True)

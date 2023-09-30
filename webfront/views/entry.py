@@ -50,9 +50,23 @@ class MemberAccessionHandler(CustomView):
         *args,
         **kwargs
     ):
+        acc = endpoint_levels[level - 1].lower()
         general_handler.queryset_manager.add_filter(
-            "entry", accession__iexact=endpoint_levels[level - 1].lower()
+            "entry", accession__iexact=acc
         )
+
+        # Check whether the entry is deleted
+        general_handler.queryset_manager.add_filter("entry",
+                                                    deletion_date__isnull=False)
+        qs = general_handler.queryset_manager.get_queryset()
+        if qs.count() > 0:
+            first = qs.first()
+            raise DeletedEntryError(acc, first.source_database, first.type,
+                                    first.name, first.short_name, first.history,
+                                    first.deletion_date)
+
+        general_handler.queryset_manager.add_filter("entry",
+                                                    deletion_date__isnull=True)
 
         general_handler.modifiers.register(
             "model:structure",
@@ -242,19 +256,14 @@ class AccessionHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry", accession__iexact=acc)
 
         # Checking if the entry has been marked as deleted
-        general_handler.queryset_manager.add_filter("entry", is_alive=False)
+        general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=False)
         qs = general_handler.queryset_manager.get_queryset()
         if qs.count() > 0:
             first = qs.first()
-            date = first.deletion_date
-            history = first.history
-            raise DeletedEntryError(
-                acc,
-                date,
-                "The entry {} is not active. Removed: {}".format(acc, date),
-                history,
-            )
-        general_handler.queryset_manager.add_filter("entry", is_alive=True)
+            raise DeletedEntryError(acc, first.source_database, first.type,
+                                    first.name, first.short_name, first.history,
+                                    first.deletion_date)
+        general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=True)
 
         general_handler.modifiers.register(
             "annotation",
@@ -596,7 +605,7 @@ class EntryHandler(CustomView):
     ):
         general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
-        general_handler.queryset_manager.add_filter("entry", is_alive=True)
+        general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=True)
         general_handler.modifiers.register(
             "group_by",
             group_by(
@@ -655,5 +664,5 @@ class EntryHandler(CustomView):
     @staticmethod
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
-        general_handler.queryset_manager.add_filter("entry", is_alive=True)
+        general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=True)
         return queryset

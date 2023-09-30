@@ -11,7 +11,7 @@ class ModelTest(InterproRESTTestCase):
         )
         self.assertIn(
             Entry.objects.filter(source_database="interpro").first().accession.upper(),
-            ["IPR003165", "IPR001165"],
+            ["IPR003165", "IPR001165", "IPR000005"],
         )
 
     def test_content_of_a_json_attribute(self):
@@ -64,8 +64,8 @@ class EntryRESTTest(InterproRESTTestCase):
             "/api/entry/interpro/IPR999999", code=status.HTTP_204_NO_CONTENT
         )
 
-    def test_gets_410_for_deleted_entry(self):
-        url = "/api/entry/interpro/ipr123456"
+    def test_deleted_entry(self):
+        url = "/api/entry/interpro/IPR000005"
         self._check_HTTP_response_code(url, code=status.HTTP_410_GONE)
         response = self.client.get(url)
         self.assertIn("history", response.data)

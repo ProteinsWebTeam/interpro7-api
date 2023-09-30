@@ -905,7 +905,7 @@ def get_model(field):
 
 def get_subfamilies(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset().first()
-    entries = Entry.objects.filter(integrated=queryset.accession, is_alive=False)
+    entries = Entry.objects.filter(integrated=queryset.accession, is_public=False)
     if isinstance(value, str) and value.strip():
         entries = entries.filter(accession=value)
     if len(entries) == 0:
@@ -915,7 +915,7 @@ def get_subfamilies(value, general_handler):
 
 
 def mark_as_subfamily(value, general_handler):
-    general_handler.queryset_manager.add_filter("entry", is_alive=False)
+    general_handler.queryset_manager.add_filter("entry", is_public=False)
 
 
 def passing(x, y):

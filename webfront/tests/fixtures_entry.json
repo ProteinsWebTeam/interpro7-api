@@ -10,7 +10,7 @@
       "source_database": "interpro",
       "entry_date": "2001-04-21T00:00:00Z",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "member_databases": {
         "smart": {
           "SM00950": "Piwi domain"
@@ -173,7 +173,7 @@
       "member_databases": {},
       "entry_date": "2002-04-21T00:00:00Z",
       "is_featured": false,
-      "is_alive": true,
+      "is_public": true,
       "integrated": null,
       "hierarchy": {
         "children": [
@@ -284,7 +284,7 @@
       "type": "domain",
       "name": "Piwi domain",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "entry_date": "2003-04-21T00:00:00Z",
       "short_name": "Piwi",
       "go_terms": [
@@ -392,7 +392,7 @@
       "name": "Piwi domain",
       "entry_date": "2004-04-21T00:00:00Z",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "short_name": "Piwi",
       "go_terms": [
         {
@@ -432,7 +432,7 @@
       "entry_date": "2001-04-21T00:00:00Z",
       "name": "PIWI",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "short_name": "Piwi",
       "go_terms": [],
       "source_database": "profile",
@@ -461,7 +461,7 @@
       "entry_id": "id3",
       "type": "domain",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "entry_date": "2002-04-21T00:00:00Z",
       "go_terms": [],
       "source_database": "pfam",
@@ -491,7 +491,7 @@
       "type": "domain",
       "entry_date": "2002-04-21T00:00:00Z",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "go_terms": [],
       "source_database": "pfam",
       "member_databases": {},
@@ -521,7 +521,7 @@
       "name": "Myelin family",
       "entry_date": "2003-04-21T00:00:00Z",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "short_name": "Myelin",
       "go_terms": [
         {
@@ -563,7 +563,7 @@
       "go_terms": [],
       "entry_date": "2004-04-21T00:00:00Z",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "source_database": "profile",
       "member_databases": null,
       "integrated": null,
@@ -594,7 +594,7 @@
       "go_terms": [],
       "entry_date": "2014-04-21T00:00:00Z",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "source_database": "ncbifam",
       "member_databases": null,
       "integrated": null,
@@ -616,12 +616,13 @@
     "model": "webfront.Entry",
     "fields": {
       "entry_id": null,
-      "accession": "IPR123456",
-      "type": "D",
-      "name": "Deleted",
-      "entry_date": "1994-04-21T00:00:00Z",
-      "deletion_date": "1994-04-21T00:00:00Z",
-      "is_alive": false,
+      "accession": "IPR000005",
+      "type": "domain",
+      "name": "HTH transcriptional regulator, AraC",
+      "short_name": "HTH_AraC",
+      "entry_date": "1999-10-08T17:07:25Z",
+      "deletion_date": "2010-10-28T10:51:29Z",
+      "is_public": true,
       "source_database": "interpro",
       "history": {
         "names": [
@@ -630,32 +631,45 @@
           "Helix-turn-helix, AraC type",
           "HTH transcriptional regulator, AraC"
         ],
-        "signatures": [
-          {
-            "accession": "PS00041",
-            "exists": true,
-            "integrated_id": "IPR018062"
+        "short_names": [
+          "HTHAraC",
+          "HTH_AraC-typ",
+          "HTH_AraC"
+        ],
+        "signatures": {
+          "prosite": {
+            "PS00041": "IPR018062"
           },
-          {
-            "accession": "PR00032",
-            "exists": true,
-            "integrated_id": "IPR020449"
+          "pfam": {
+            "PF00165": "IPR018060"
           },
-          {
-            "accession": "PF00165",
-            "exists": true,
-            "integrated_id": "IPR018060"
+          "prints": {
+            "PR00032": "IPR020449"
           },
-          {
-            "accession": "PS01124",
-            "exists": true,
-            "integrated_id": "IPR018060"
+          "profile": {
+            "PS01124": "IPR018060"
           },
-          {
-            "accession": "SM00342",
-            "exists": true,
-            "integrated_id": "IPR018060"
+          "smart": {
+            "SM00342": "IPR018060"
           }
+        }
+      }
+    }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id": null,
+      "accession": "PF20534",
+      "type": "domain",
+      "short_name": "DUF6749",
+      "entry_date": "2022-07-01T14:20:35Z",
+      "deletion_date": "2023-07-24T17:42:21Z",
+      "is_public": true,
+      "source_database": "pfam",
+      "history": {
+        "short_names": [
+          "DUF6749"
         ]
       }
     }
@@ -671,7 +685,7 @@
       "go_terms": [],
       "entry_date": "2014-03-02T00:00:00Z",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "source_database": "panther",
       "member_databases": null,
       "integrated": null,
@@ -703,7 +717,7 @@
       "go_terms": [],
       "entry_date": "2014-03-02T00:00:00Z",
       "is_featured": true,
-      "is_alive": false,
+      "is_public": false,
       "source_database": "panther",
       "member_databases": null,
       "integrated": "PTHR43214",
@@ -733,7 +747,7 @@
       "go_terms": [],
       "entry_date": "2004-03-02T00:00:00Z",
       "is_featured": true,
-      "is_alive": true,
+      "is_public": true,
       "source_database": "cathgene3d",
       "member_databases": null,
       "integrated": null,
@@ -763,7 +777,7 @@
       "go_terms": [],
       "entry_date": "2004-03-02T00:00:00Z",
       "is_featured": true,
-      "is_alive": false,
+      "is_public": false,
       "source_database": "cathgene3d",
       "member_databases": null,
       "integrated": "G3DSA:1.10.10.10",

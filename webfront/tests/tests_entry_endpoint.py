@@ -51,7 +51,7 @@ class EntryRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/unintegrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self.assertEqual(len(response.data["results"]), 7)
+        self.assertEqual(len(response.data["results"]), 8)
 
     def test_can_read_entry_interpro_id(self):
         acc = "IPR003165"
@@ -187,6 +187,12 @@ class EntryRESTTest(InterproRESTTestCase):
             "'proteins' should be one of the keys in the response",
         )
         self.assertEqual(response.data["metadata"]["counters"]["proteins"], 1)
+
+    def test_entry_with_llm_description(self):
+        response = self.client.get("/api/entry/panther/PTHR10000/")
+        meta = response.data["metadata"]
+        self.assertIn("llm_description", meta)
+        self.assertTrue(meta["llm_description"] is not None)
 
 
 class ReplaceTIGRFamsTest(InterproRESTTestCase):

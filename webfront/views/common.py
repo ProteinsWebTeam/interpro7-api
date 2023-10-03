@@ -211,7 +211,7 @@ class GeneralHandler(CustomView):
                     "type": e.type,
                     "name": e.name,
                     "short_name": e.short_name,
-                    "deletion_date": e.date.strftime("%B %Y"),
+                    "deletion_date": e.date.strftime("%Y-%m-%dT00:00:00.000Z"),
                     "history": e.history
                 }, status=status.HTTP_410_GONE)
                 self._set_in_cache(caching_allowed, full_path, response)

@@ -300,11 +300,22 @@ class GeneralHandler(CustomView):
             return
         if general_handler.queryset_manager.main_endpoint == "taxonomy":
             self.queryset_manager.add_filter(
-                "search", accession__icontains=search, full_name__icontains=search
+                "search",
+                accession__icontains=search,
+                full_name__icontains=search
+            )
+        elif general_handler.queryset_manager.main_endpoint == "entry":
+            self.queryset_manager.add_filter(
+                "search",
+                accession__icontains=search,
+                name__icontains=search,
+                short_name__icontains=search
             )
         else:
             self.queryset_manager.add_filter(
-                "search", accession__icontains=search, name__icontains=search
+                "search",
+                accession__icontains=search,
+                name__icontains=search
             )
 
     @staticmethod

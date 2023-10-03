@@ -606,6 +606,7 @@ class EntryHandler(CustomView):
         general_handler.queryset_manager.reset_filters("entry", endpoint_levels)
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
         general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=True)
+        general_handler.queryset_manager.add_filter("entry", is_public=True)
         general_handler.modifiers.register(
             "group_by",
             group_by(
@@ -665,4 +666,5 @@ class EntryHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("entry", accession__isnull=False)
         general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=True)
+        general_handler.queryset_manager.add_filter("entry", is_public=True)
         return queryset

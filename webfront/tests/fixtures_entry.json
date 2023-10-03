@@ -794,5 +794,35 @@
         "domain_architectures": 0
       }
     }
+  },
+  {
+    "model": "webfront.Entry",
+    "fields": {
+      "entry_id": null,
+      "accession": "PTHR10000",
+      "type": "family",
+      "name": "PHOSPHOSERINE PHOSPHATASE",
+      "source_database": "panther",
+      "llm_description": "<p>The protein family belongs to the HAD-like hydrolase superfamily and includes subfamilies such as the Cof family, CbbY/CbbZ/Gph/YieH family, SupH subfamily, the archaeal SPP-like hydrolase family, and the MPGP family. The proteins in this family function as phosphatases, catalyzing the dephosphorylation of various substrates. These include 2-phosphoglycolate, the riboflavin precursor 5-amino-6-(5-phospho-D-ribitylamino)uracil, flavin mononucleotide (FMN), pyridoxal-phosphate (PLP), and different sugar phosphates. Some proteins specifically hydrolyze mannosyl-3-phosphoglycerate (MPG) to form the osmolyte mannosylglycerate (MG), while others are involved in the biosynthesis of kanosamine and glucosylglycerate. The activity of these proteins can be inhibited by high concentrations of Ca(2+) ions and chloride ions.</p>",
+      "is_featured": false,
+      "is_public": true,
+      "entry_date": "2005-09-11T00:00:00Z",
+      "counts": {
+        "subfamilies": 8,
+        "domain_architectures": 0,
+        "interactions": 0,
+        "matches": 91777,
+        "pathways": 0,
+        "proteins": 91777,
+        "proteomes": 6899,
+        "sets": 0,
+        "structural_models": {
+          "alphafold": 79631,
+          "rosettafold": 0
+        },
+        "structures": 36,
+        "taxa": 28523
+      }
+    }
   }
 ]

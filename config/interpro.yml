@@ -37,7 +37,7 @@ members:
   panther:
     filter: "panther"
     label: "PANTHER"
-    accession: 'PTHR[0-9]{5}(:SF[0-9]{1,3})?$'
+    accession: 'PTHR[0-9]{5}(:SF[0-9]{1,4})?$'
     options: []
     options_per_family: []
   pirsf:

@@ -1,9 +1,12 @@
 class DeletedEntryError(Exception):
-    def __init__(self, accession, date, message, history):
+    def __init__(self, accession, database, _type, name, short_name, history, date):
         self.accession = accession
-        self.message = message
-        self.date = date
+        self.database = database
+        self.type = _type
+        self.name = name
+        self.short_name = short_name
         self.history = history
+        self.date = date
 
 
 class EmptyQuerysetError(Exception):

@@ -11,7 +11,7 @@ class ModelTest(InterproRESTTestCase):
         )
         self.assertIn(
             Entry.objects.filter(source_database="interpro").first().accession.upper(),
-            ["IPR003165", "IPR001165"],
+            ["IPR003165", "IPR001165", "IPR000005"],
         )
 
     def test_content_of_a_json_attribute(self):
@@ -51,7 +51,7 @@ class EntryRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/entry/unintegrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self.assertEqual(len(response.data["results"]), 7)
+        self.assertEqual(len(response.data["results"]), 8)
 
     def test_can_read_entry_interpro_id(self):
         acc = "IPR003165"
@@ -64,8 +64,8 @@ class EntryRESTTest(InterproRESTTestCase):
             "/api/entry/interpro/IPR999999", code=status.HTTP_204_NO_CONTENT
         )
 
-    def test_gets_410_for_deleted_entry(self):
-        url = "/api/entry/interpro/ipr123456"
+    def test_deleted_entry(self):
+        url = "/api/entry/interpro/IPR000005"
         self._check_HTTP_response_code(url, code=status.HTTP_410_GONE)
         response = self.client.get(url)
         self.assertIn("history", response.data)
@@ -187,6 +187,12 @@ class EntryRESTTest(InterproRESTTestCase):
             "'proteins' should be one of the keys in the response",
         )
         self.assertEqual(response.data["metadata"]["counters"]["proteins"], 1)
+
+    def test_entry_with_llm_description(self):
+        response = self.client.get("/api/entry/panther/PTHR10000/")
+        meta = response.data["metadata"]
+        self.assertIn("llm_description", meta)
+        self.assertTrue(meta["llm_description"] is not None)
 
 
 class ReplaceTIGRFamsTest(InterproRESTTestCase):

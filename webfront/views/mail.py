@@ -8,7 +8,7 @@ from django.conf import settings
 
 
 @csrf_exempt
-def mail_interhelp(request):
+def send_email(request):
     ip_address = get_client_ip(request)
     now = datetime.now()
     if not hasattr(settings, "credentials"):
@@ -47,10 +47,15 @@ def mail(request):
     subject = request.POST.get("subject", "")
     message = request.POST.get("message", "")
     from_email = request.POST.get("from_email", "")
-    if path and subject and message and from_email:
+    queue = request.POST.get("queue", "interpro").lower()
+    to_email = {
+        "interpro": "interhelp@ebi.ac.uk",
+        "pfam": "pfam-help@ebi.ac.uk"
+    }.get(queue, "")
+    if path and subject and message and from_email and to_email:
         message = MIMEText(message)
         message["From"] = from_email
-        message["To"] = "interhelp@ebi.ac.uk"
+        message["To"] = to_email
         message["Subject"] = subject
         p = Popen([path, "-t", "-oi"], stdin=PIPE)
         p.communicate(message.as_bytes())

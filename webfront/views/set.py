@@ -1,12 +1,11 @@
 from django.db.models import Count
 
-from webfront.models import Set, Alignment
+from webfront.models import Set
 from webfront.serializers.collection import SetSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from django.conf import settings
-from webfront.constants import ModifierType
 
-from webfront.views.modifiers import add_extra_fields, get_set_alignment
+from webfront.views.modifiers import add_extra_fields, get_deprecated_response
 
 entry_sets = "|".join(settings.ENTRY_SETS) + "|all"
 entry_sets_accessions = r"^({})$".format(
@@ -14,30 +13,11 @@ entry_sets_accessions = r"^({})$".format(
 )
 
 
-#
-# class SetAlignmentHandler(CustomView):
-#     level_description = 'Set alignment level'
-#     many = False
-#     serializer_class = SetSerializer
-#     serializer_detail = SerializerDetail.SET_ALIGNMENTS
-#     def get(self, request, endpoint_levels, available_endpoint_handlers=None, level=0,
-#             parent_queryset=None, handler=None, general_handler=None, *args, **kwargs):
-#         general_handler.queryset_manager.set_main_endpoint("set_alignment")
-#         # general_handler.queryset_manager.add_filter("set", accession__iexact=endpoint_levels[level - 1].lower())
-#         return super(SetAlignmentHandler, self).get(
-#             request._request, endpoint_levels, available_endpoint_handlers,
-#             level, self.queryset, handler, general_handler, request, *args, **kwargs
-#         )
-
-
 class SetAccessionHandler(CustomView):
     level_description = "Set accession level"
     serializer_class = SetSerializer
     queryset = Set.objects.all()
     many = False
-    # child_handlers = [
-    #     ("alignment", SetAlignmentHandler),
-    # ]
     serializer_detail_filter = SerializerDetail.SET_DETAIL
 
     def get(
@@ -57,10 +37,7 @@ class SetAccessionHandler(CustomView):
         )
         general_handler.modifiers.register(
             "alignments",
-            get_set_alignment,
-            type=ModifierType.REPLACE_PAYLOAD,
-            many=True,
-            serializer=SerializerDetail.SET_ALIGNMENT,
+            get_deprecated_response("The 'alignments' modifier was removed with InterPro 98. Contact interhelp@ebi.ac.uk if you are interested in this data.")
         )
 
         return super(SetAccessionHandler, self).get(
@@ -189,19 +166,3 @@ class SetHandler(CustomView):
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
         return queryset
 
-
-def get_aligments(clan, entry, limit=20):
-    qs = Alignment.objects.filter(set_acc=clan, entry_acc=entry).order_by("score")[
-        :limit
-    ]
-    return {
-        al.target_acc.accession: {
-            "set_acc": None
-            if al.target_set_acc is None
-            else al.target_set_acc.accession,
-            "score": al.score,
-            "length": al.seq_length,
-            "domains": al.domains,
-        }
-        for al in qs
-    }

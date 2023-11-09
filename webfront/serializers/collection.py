@@ -7,7 +7,6 @@ import webfront.serializers.taxonomy
 from webfront.views.custom import SerializerDetail
 from webfront.views.queryset_manager import escape
 from webfront.exceptions import EmptyQuerysetError
-from webfront.models import Alignment
 
 
 class SetSerializer(ModelContentSerializer):
@@ -40,8 +39,6 @@ class SetSerializer(ModelContentSerializer):
             representation = self.to_counter_representation(instance)
         elif detail == SerializerDetail.SET_HEADERS:
             representation = self.to_headers_representation(instance)
-        elif detail == SerializerDetail.SET_ALIGNMENT:
-            representation = self.to_alignment_representation(instance)
         return representation
 
     def filter_representation(self, representation, instance, detail_filters, detail):
@@ -63,12 +60,7 @@ class SetSerializer(ModelContentSerializer):
                 instance
             )
         if detail != SerializerDetail.SET_OVERVIEW:
-            acc = (
-                instance.set_acc.accession
-                if isinstance(instance, Alignment)
-                else instance.accession
-            )
-            q = "set_acc:" + escape(acc.lower())
+            q = "set_acc:" + escape(instance.accession.lower())
             sq = self.queryset_manager.get_searcher_query()
             if (
                 SerializerDetail.ENTRY_DB in detail_filters
@@ -216,17 +208,6 @@ class SetSerializer(ModelContentSerializer):
             }
         }
         return obj
-
-    @staticmethod
-    def to_alignment_representation(instance):
-        from webfront.views.set import get_aligments
-
-        (clan, entry, count) = instance
-        return {
-            "accession": entry,
-            "alignments_count": count,
-            "alignedTo": get_aligments(clan, entry),
-        }
 
     def to_entries_count_representation(self, instance):
         query = (

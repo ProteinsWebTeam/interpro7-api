@@ -5,7 +5,6 @@ from webfront.models import (
     Taxonomy,
     Proteome,
     Set,
-    Alignment,
 )
 from django.db.models import Q
 from functools import reduce
@@ -47,7 +46,6 @@ class QuerysetManager:
             "taxonomy": {},
             "proteome": {},
             "set": {},
-            "set_alignment": {},
         }
         self.exclusions = self.filters.copy()
         self.order_field = None
@@ -193,8 +191,6 @@ class QuerysetManager:
             queryset = Taxonomy.objects.all()
         elif endpoint == "set":
             queryset = Set.objects.all()
-        elif endpoint == "set_alignment":
-            queryset = Alignment.objects.all()
         return queryset
 
     @staticmethod

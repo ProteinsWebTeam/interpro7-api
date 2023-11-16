@@ -18,10 +18,10 @@ from webfront.views.modifiers import (
     ida_search,
     filter_by_latest_entries,
     get_value_for_field,
-    get_model,
     get_sunburst_taxa,
     get_subfamilies,
     mark_as_subfamily,
+    get_deprecated_response,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -70,23 +70,17 @@ class MemberAccessionHandler(CustomView):
 
         general_handler.modifiers.register(
             "model:structure",
-            get_model("structure"),
-            type=ModifierType.REPLACE_PAYLOAD,
-            serializer=SerializerDetail.ANNOTATION_BLOB,
+            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
         )
 
         # get-model:[structure,contacts,lddt]
         general_handler.modifiers.register(
             "model:contacts",
-            get_model("contacts"),
-            type=ModifierType.REPLACE_PAYLOAD,
-            serializer=SerializerDetail.ANNOTATION_BLOB,
+            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
         )
         general_handler.modifiers.register(
             "model:lddt",
-            get_model("lddt"),
-            type=ModifierType.REPLACE_PAYLOAD,
-            serializer=SerializerDetail.ANNOTATION_BLOB,
+            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
         )
         general_handler.modifiers.register(
             "annotation",
@@ -444,21 +438,15 @@ class InterproHandler(CustomView):
 
         general_handler.modifiers.register(
             "model:structure",
-            get_model("structure"),
-            type=ModifierType.REPLACE_PAYLOAD,
-            serializer=SerializerDetail.ANNOTATION_BLOB,
+            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
         )
         general_handler.modifiers.register(
             "model:contacts",
-            get_model("contacts"),
-            type=ModifierType.REPLACE_PAYLOAD,
-            serializer=SerializerDetail.ANNOTATION_BLOB,
+            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
         )
         general_handler.modifiers.register(
             "model:lddt",
-            get_model("lddt"),
-            type=ModifierType.REPLACE_PAYLOAD,
-            serializer=SerializerDetail.ANNOTATION_BLOB,
+            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
         )
 
         general_handler.modifiers.register(

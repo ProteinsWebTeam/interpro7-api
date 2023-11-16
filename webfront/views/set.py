@@ -37,7 +37,7 @@ class SetAccessionHandler(CustomView):
         )
         general_handler.modifiers.register(
             "alignments",
-            get_deprecated_response("The 'alignments' modifier was removed with InterPro 98. Contact interhelp@ebi.ac.uk if you are interested in this data.")
+            get_deprecated_response("Profile-profile alignments have been permanently removed in InterPro 98.0.")
         )
 
         return super(SetAccessionHandler, self).get(

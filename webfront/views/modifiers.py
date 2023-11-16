@@ -6,7 +6,6 @@ from webfront.models import (
     Entry,
     EntryAnnotation,
     EntryTaxa,
-    Alignment,
     Isoforms,
     Release_Note,
     TaxonomyPerEntry,
@@ -19,7 +18,7 @@ from webfront.models import (
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import (
     EmptyQuerysetError,
-    HmmerWebError,
+    DeprecatedModifier,
     ExpectedUniqueError,
     InvalidOperationRequest,
 )
@@ -468,18 +467,6 @@ def get_entry_annotation_info(field, general_handler):
     return {}
 
 
-def get_set_alignment(field, general_handler):
-    acc = general_handler.queryset_manager.get_queryset().first().accession
-    qs = (
-        Alignment.objects.filter(set_acc=acc)
-        .values_list("set_acc", "entry_acc")
-        .annotate(count=Count("target_acc"))
-    )
-    if field is not None and field != "":
-        qs = qs.filter(entry_acc__accession__iexact=field)
-    general_handler.modifiers.search_size = qs.count()
-    return qs.order_by("entry_acc")
-
 
 def add_extra_fields(endpoint, *argv):
     supported_fields = [
@@ -920,3 +907,9 @@ def mark_as_subfamily(value, general_handler):
 
 def passing(x, y):
     pass
+
+def get_deprecated_response(message):
+    def deprecated(value, general_handler):
+        raise DeprecatedModifier(message)
+
+    return deprecated

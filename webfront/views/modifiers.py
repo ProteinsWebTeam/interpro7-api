@@ -13,7 +13,6 @@ from webfront.models import (
     Taxonomy,
     ProteinExtraFeatures,
     ProteinResidues,
-    StructuralModel,
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import (
@@ -856,38 +855,6 @@ def residues(value, general_handler):
             }
         )
     return payload
-
-
-def get_model(field):
-    def get_model_structure(value, general_handler):
-        entry = general_handler.queryset_manager.get_queryset()
-        if len(entry) == 0:
-            raise EmptyQuerysetError(
-                "There is are not entries with the given accession"
-            )
-        queryset = StructuralModel.objects.filter(accession=entry.first().accession)
-        if len(queryset) == 0:
-            raise EmptyQuerysetError("The selected entry doesn't have a linked model")
-
-        annotation = queryset.first()
-
-        payload = lambda: None
-        payload.accession = annotation.accession
-        payload.type = "model:pdb"
-
-        if field == "structure":
-            payload.mime_type = "chemical/x-pdb"
-            payload.value = annotation.structure
-        elif field == "contacts":
-            payload.mime_type = "application/json"
-            payload.value = annotation.contacts
-        elif field == "lddt":
-            payload.mime_type = "application/json"
-            payload.value = annotation.plddt
-
-        return [payload]
-
-    return get_model_structure
 
 
 def get_subfamilies(value, general_handler):

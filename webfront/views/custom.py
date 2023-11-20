@@ -98,7 +98,7 @@ class CustomView(GenericAPIView):
                             content=anno_value, content_type=mime_type
                         )
 
-                        if anno_type.startswith(("alignment:", "model:")):
+                        if anno_type.startswith("alignment:"):
                             if "download" in request.GET:
                                 response["Content-Type"] = "application/gzip"
                             else:

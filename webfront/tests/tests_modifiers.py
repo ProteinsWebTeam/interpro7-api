@@ -485,31 +485,15 @@ class ResidueModifierTest(InterproRESTTestCase):
 class StructuralModelTest(InterproRESTTestCase):
     def test_model_structure_modifier(self):
         response = self.client.get("/api/entry/pfam/PF17176?model:structure")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.charset, "utf-8")
-        self.assertEqual(response["content-type"], "chemical/x-pdb")
-        content = gzip.decompress(response.content)
-        self.assertIn("ATOM", str(content))
+        self.assertEqual(response.status_code, status.HTTP_410_GONE)
 
     def test_model_contacts_modifier(self):
         response = self.client.get("/api/entry/pfam/PF17176?model:contacts")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.charset, "utf-8")
-        self.assertEqual(response["content-type"], "application/json")
-        content = gzip.decompress(response.content)
-        data = json.loads(content)
-        self.assertEqual(6, len(data))
-        self.assertEqual(5, len(data[0]))
+        self.assertEqual(response.status_code, status.HTTP_410_GONE)
 
     def test_model_lddt_modifier(self):
         response = self.client.get("/api/entry/pfam/PF17176?model:lddt")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.charset, "utf-8")
-        self.assertEqual(response["content-type"], "application/json")
-        content = gzip.decompress(response.content)
-        data = json.loads(content)
-        self.assertEqual(3, len(data))
-        self.assertTrue(all([0 <= item <= 1 for item in data]))
+        self.assertEqual(response.status_code, status.HTTP_410_GONE)
 
 
 class SubfamiliesTest(InterproRESTTestCase):

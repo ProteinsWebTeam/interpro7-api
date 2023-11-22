@@ -4,7 +4,7 @@ import logging
 
 from rest_framework import status
 
-from webfront.exceptions import DeletedEntryError, EmptyQuerysetError
+from webfront.exceptions import DeletedEntryError, EmptyQuerysetError, DeprecatedModifier
 from webfront.response import Response
 
 from django.conf import settings
@@ -222,6 +222,9 @@ class GeneralHandler(CustomView):
                 content = {"detail": e.args[0]}
                 response = Response(content, status=status.HTTP_204_NO_CONTENT)
                 self._set_in_cache(caching_allowed, full_path, response)
+            except DeprecatedModifier as e:
+                content = {"detail": e.args[0]}
+                response = Response(content, status=status.HTTP_410_GONE)
             except Exception as e:
                 # Any other type of error will be responded as a 404, not in cache as it might be a temporary problem
                 if settings.DEBUG:

@@ -221,35 +221,6 @@ class Release_Note(models.Model):
     content = JSONField(null=True)
 
 
-class Alignment(models.Model):
-    class Meta:
-        ordering = ["set_acc", "entry_acc"]
-
-    set_acc = models.ForeignKey(
-        "Set", db_column="set_acc", on_delete=models.SET_NULL, null=True
-    )
-    entry_acc = models.ForeignKey(
-        "Entry", db_column="entry_acc", on_delete=models.SET_NULL, null=True
-    )
-    target_acc = models.ForeignKey(
-        "Entry",
-        db_column="target_acc",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="target_acc",
-    )
-    target_set_acc = models.ForeignKey(
-        "Set",
-        db_column="target_set_acc",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="target_set_acc",
-    )
-    score = models.FloatField(null=True)
-    seq_length = models.IntegerField(null=True)
-    domains = JSONField(null=True)
-
-
 class Isoforms(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
     protein_acc = models.CharField(max_length=20)
@@ -260,14 +231,3 @@ class Isoforms(models.Model):
     class Meta:
         db_table = "webfront_varsplic"
 
-
-class StructuralModel(models.Model):
-    model_id = models.IntegerField(primary_key=True)
-    accession = models.CharField(max_length=25, null=False)
-    algorithm = models.CharField(max_length=20, null=False)
-    contacts = models.BinaryField(null=False)
-    plddt = models.BinaryField(null=False)
-    structure = models.BinaryField(null=False)
-
-    class Meta:
-        db_table = "webfront_structuralmodel"

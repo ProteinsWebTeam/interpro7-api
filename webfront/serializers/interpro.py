@@ -230,7 +230,6 @@ class EntrySerializer(ModelContentSerializer):
                 # "other": instance.other_names,
             },
             "description": instance.description,
-            "llm_description": instance.llm_description,
             "wikipedia": instance.wikipedia,
             "literature": instance.literature,
             "set_info": instance.set_info,

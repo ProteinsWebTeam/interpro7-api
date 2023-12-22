@@ -88,21 +88,6 @@ Information on member database signatures integrated/unintegrated in InterPro en
 | --------------------------------- | ---------------------------------| --------------------------------------------------- | ------------------------------------------------------------------------ |
 | `annotation=[hmm, alignment, logo]` | x                               | Download compressed signature hmm file if it exists | https://www.ebi.ac.uk:443/interpro/api/entry/pfam/pf02171?annotation=hmm |
 
-## /api/entry/interpro/< _InterPro entry acession_ > or entry/pfam/< _signature accession_ >
-
-Information on RoseTTAFold models available for InterPro and Pfam entries
-
-| Modifier          | Compatible with  other modifiers | Data returned                                                                              | Example                                                                         |
-|------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| `model:structure` | x                                | download pdb file of the predicted structure from RoseTTAFold                              | https://www.ebi.ac.uk:443/interpro/api/entry/InterPro/IPR025743?model:structure |
-|                   |                                  |                                                                                            | https://www.ebi.ac.uk:443/interpro/api/entry/pfam/PF14331?model:structure       |
-| `model:contacts`  | x                                | list of contacts for each residue in the structural model                                  | https://www.ebi.ac.uk:443/interpro/api/entry/InterPro/IPR025743?model:contacts  |
-|                   |                                  |                                                                                            | https://www.ebi.ac.uk/interpro/api/entry/pfam/PF14331?model:contacts            |
-| `model:lddt`      | x                                | list of residues predicted lddt scores                                                     | https://www.ebi.ac.uk:443/interpro/api/entry/InterPro/IPR025743?model:lddt      |
-|                   |                                  |                                                                                            | https://www.ebi.ac.uk/interpro/api/entry/pfam/PF14331?model:lddt                |
-| `ida`             | x                                | Different domain architectures matching the entry (only for entries with a Pfam signature) | https://www.ebi.ac.uk:443/interpro/api/entry/InterPro/IPR025743?ida             |
-|                   |                                  |                                                                                            | https://www.ebi.ac.uk:443/interpro/api/entry/pfam/PF14331?ida                   |
-
 ## /api/entry/protein
 
 | Modifier      | Compatible with  other modifiers | Data returned                                                         | Example                                                            |

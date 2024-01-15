@@ -31,7 +31,6 @@ class Entry(models.Model):
     )
     go_terms = JSONField(null=True)
     description = JSONField(null=True)
-    llm_description = models.TextField(null=True)
     wikipedia = JSONField(null=True)
     literature = JSONField(null=True)
     hierarchy = JSONField(null=True)

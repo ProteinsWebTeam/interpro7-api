@@ -188,11 +188,10 @@ class EntryRESTTest(InterproRESTTestCase):
         )
         self.assertEqual(response.data["metadata"]["counters"]["proteins"], 1)
 
-    def test_entry_with_llm_description(self):
+    def test_entry_llm_description_removed(self):
         response = self.client.get("/api/entry/panther/PTHR10000/")
         meta = response.data["metadata"]
-        self.assertIn("llm_description", meta)
-        self.assertTrue(meta["llm_description"] is not None)
+        self.assertTrue("llm_description" not in meta)
 
 
 class ReplaceTIGRFamsTest(InterproRESTTestCase):

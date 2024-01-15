@@ -165,6 +165,7 @@ class ProteinSerializer(ModelContentSerializer):
                 "source_database": instance.source_database,
                 "length": instance.length,
                 "source_organism": instance.organism,
+                "gene": instance.gene,
             }
         }
 

@@ -114,6 +114,7 @@ class StructureSerializer(ModelContentSerializer):
                     include_chains=True,
                     for_structure=True,
                     base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters

@@ -83,6 +83,7 @@ class ProteinSerializer(ModelContentSerializer):
                     s,
                     "protein_acc:" + escape(instance.accession.lower()),
                     base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters

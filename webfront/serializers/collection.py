@@ -72,7 +72,7 @@ class SetSerializer(ModelContentSerializer):
                     else "entry_subset"
                 )
                 representation[key] = self.to_entries_detail_representation(
-                    instance, s, q, base_query=sq
+                    instance, s, q, base_query=sq, queryset_manager=self.queryset_manager
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters

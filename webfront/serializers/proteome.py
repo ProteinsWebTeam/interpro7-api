@@ -70,7 +70,7 @@ class ProteomeSerializer(ModelContentSerializer):
                     else "entry_subset"
                 )
                 representation[key] = self.to_entries_detail_representation(
-                    instance, self.searcher, query_searcher, base_query=sq
+                    instance, self.searcher, query_searcher, base_query=sq, queryset_manager=self.queryset_manager
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters

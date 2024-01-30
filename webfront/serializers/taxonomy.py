@@ -16,13 +16,12 @@ class TaxonomySerializer(ModelContentSerializer):
             representation, instance, self.detail_filters, self.detail
         )
         if self.queryset_manager.other_fields is not None:
-
             def counter_function():
                 get_c = TaxonomySerializer.get_counters
                 return get_c(
                     instance,
                     self.searcher,
-                    self.queryset_manager.get_searcher_query(use_lineage=True),
+                    self.queryset_manager,
                 )
 
             representation = self.add_other_fields(
@@ -94,7 +93,7 @@ class TaxonomySerializer(ModelContentSerializer):
                     else "entry_subset"
                 )
                 representation[key] = self.to_entries_detail_representation(
-                    instance, s, self.get_searcher_query(instance), base_query=sq
+                    instance, s, self.get_searcher_query(instance), base_query=sq, queryset_manager=self.queryset_manager
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -155,12 +154,11 @@ class TaxonomySerializer(ModelContentSerializer):
 
     def to_full_representation(self, instance):
         searcher = self.searcher
-        sq = self.queryset_manager.get_searcher_query()
         counters = instance.counts
         if self.queryset_manager.is_single_endpoint():
             self.reformatEntryCounters(counters)
         else:
-            counters = TaxonomySerializer.get_counters(instance, searcher, sq)
+            counters = TaxonomySerializer.get_counters(instance, searcher, self.queryset_manager)
         obj = {
             "metadata": {
                 "accession": str(instance.accession),
@@ -213,24 +211,54 @@ class TaxonomySerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def get_counters(instance, searcher, sq):
-        return {
-            "entries": searcher.get_number_of_field_by_endpoint(
-                "taxonomy", "entry_acc", instance.accession, sq
-            ),
-            "structures": searcher.get_number_of_field_by_endpoint(
-                "taxonomy", "structure_acc", instance.accession, sq
-            ),
-            "proteins": searcher.get_number_of_field_by_endpoint(
-                "taxonomy", "protein_acc", instance.accession, sq
-            ),
-            "sets": searcher.get_number_of_field_by_endpoint(
-                "taxonomy", "set_acc", instance.accession, sq
-            ),
-            "proteomes": searcher.get_number_of_field_by_endpoint(
-                "taxonomy", "proteome_acc", instance.accession, sq
-            ),
+    def can_use_taxonomy_per_entry(filters):
+        for key in filters:
+            if filters[key] != {} and key not in ["entry", "taxonomy"]:
+                return False
+        if "accession" in filters["entry"]:
+            return True
+        return False
+
+    @staticmethod
+    def can_use_taxonomy_per_db(filters):
+        for key in filters:
+            if filters[key] != {} and key not in ["entry", "taxonomy"]:
+                return False
+        if "source_database" in filters["entry"]:
+            return True
+        return False
+
+    @staticmethod
+    def get_counters(instance, searcher, queryset_manager):
+        if TaxonomySerializer.can_use_taxonomy_per_entry(queryset_manager.filters):
+            match = TaxonomyPerEntry.objects.filter(
+                entry_acc=queryset_manager.filters["entry"]["accession"],
+                taxonomy_id=instance.accession,
+            ).first()
+            return match.counts
+        if TaxonomySerializer.can_use_taxonomy_per_db(queryset_manager.filters):
+            match = TaxonomyPerEntryDB.objects.filter(
+                source_database=queryset_manager.filters["entry"]["source_database"],
+                taxonomy_id=instance.accession,
+            ).first()
+            return match.counts
+        sq = queryset_manager.get_searcher_query(use_lineage=True)
+        counters = {}
+        endpoints = {
+            "entry": "entries",
+            "structure": "structures",
+            "protein": "proteins",
+            "set": "sets",
+            "proteome": "proteomes",
         }
+        for ep in endpoints:
+            if ("accession" not in queryset_manager.filters[ep]
+                and "accession__iexact" not in queryset_manager.filters[ep]
+            ):
+                counters[endpoints[ep]] = searcher.get_number_of_field_by_endpoint(
+                    "taxonomy", f"{ep}_acc", instance.accession, sq
+                )
+        return counters
 
     @staticmethod
     def to_counter_representation(instance, filter=None):

@@ -20,7 +20,7 @@ class SetSerializer(ModelContentSerializer):
 
             def counter_function():
                 return SetSerializer.get_counters(
-                    instance, self.searcher, self.queryset_manager.get_searcher_query()
+                    instance, self.searcher, self.queryset_manager
                 )
 
             representation = self.add_other_fields(
@@ -167,8 +167,7 @@ class SetSerializer(ModelContentSerializer):
             counters = instance.counts
             self.reformatEntryCounters(counters)
         else:
-            sq = self.queryset_manager.get_searcher_query()
-            counters = SetSerializer.get_counters(instance, searcher, sq)
+            counters = SetSerializer.get_counters(instance, searcher, self.queryset_manager)
         obj = {
             "metadata": {
                 "accession": instance.accession,
@@ -184,24 +183,21 @@ class SetSerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def get_counters(instance, searcher, sq):
-        return {
-            "entries": searcher.get_number_of_field_by_endpoint(
-                "set", "entry_acc", instance.accession, sq
-            ),
-            "structures": searcher.get_number_of_field_by_endpoint(
-                "set", "structure_acc", instance.accession, sq
-            ),
-            "proteins": searcher.get_number_of_field_by_endpoint(
-                "set", "protein_acc", instance.accession, sq
-            ),
-            "taxa": searcher.get_number_of_field_by_endpoint(
-                "set", "tax_id", instance.accession, sq
-            ),
-            "proteomes": searcher.get_number_of_field_by_endpoint(
-                "set", "proteome_acc", instance.accession, sq
-            ),
+    def get_counters(instance, searcher, queryset_manager):
+        endpoints = {
+            "entry": ["entries", "entry_acc"],
+            "structure": ["structures", "structure_acc"],
+            "protein": ["proteins", "protein_acc"],
+            "taxonomy": ["taxa", "tax_id"],
+            "proteome": ["proteomes", "proteome_acc"],
         }
+        return ModelContentSerializer.generic_get_counters(
+            "set",
+            endpoints,
+            instance,
+            searcher,
+            queryset_manager
+        )
 
     @staticmethod
     def to_headers_representation(instance):

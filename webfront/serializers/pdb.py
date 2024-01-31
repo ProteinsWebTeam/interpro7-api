@@ -209,23 +209,7 @@ class StructureSerializer(ModelContentSerializer):
             searcher,
             queryset_manager
         )
-        # return {
-        #     "sets": searcher.get_number_of_field_by_endpoint(
-        #         "structure", "set_acc", instance.accession, base_query
-        #     ),
-        #     "entries": searcher.get_number_of_field_by_endpoint(
-        #         "structure", "entry_acc", instance.accession, base_query
-        #     ),
-        #     "proteins": searcher.get_number_of_field_by_endpoint(
-        #         "structure", "protein_acc", instance.accession, base_query
-        #     ),
-        #     "taxa": searcher.get_number_of_field_by_endpoint(
-        #         "structure", "tax_id", instance.accession, base_query
-        #     ),
-        #     "proteomes": searcher.get_number_of_field_by_endpoint(
-        #         "structure", "proteome_acc", instance.accession, base_query
-        #     ),
-        # }
+
 
     @staticmethod
     def get_search_query_from_representation(representation):

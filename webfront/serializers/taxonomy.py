@@ -260,24 +260,21 @@ class TaxonomySerializer(ModelContentSerializer):
                     ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy")
                 )
             return match.counts
-        sq = queryset_manager.get_searcher_query(use_lineage=True)
-        counters = {}
         endpoints = {
-            "entry": "entries",
-            "structure": "structures",
-            "protein": "proteins",
-            "set": "sets",
-            "proteome": "proteomes",
+            "entry": ["entries", "entry_acc"],
+            "structure": ["structures", "structure_acc"],
+            "protein": ["proteins", "protein_acc"],
+            "set": ["sets", "set_acc"],
+            "proteome": ["proteomes", "proteome_acc"],
         }
-        for ep in endpoints:
-            if (
-                "accession" not in queryset_manager.filters[ep]
-                and "accession__iexact" not in queryset_manager.filters[ep]
-            ):
-                counters[endpoints[ep]] = searcher.get_number_of_field_by_endpoint(
-                    "taxonomy", f"{ep}_acc", instance.accession, sq
-                )
-        return counters
+        return ModelContentSerializer.generic_get_counters(
+            "taxonomy",
+            endpoints,
+            instance,
+            searcher,
+            queryset_manager
+        )
+
 
     @staticmethod
     def to_counter_representation(instance, filter=None):

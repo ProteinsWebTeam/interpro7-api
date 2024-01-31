@@ -248,28 +248,21 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def get_counters(instance, searcher, queryset_manager):
-        sq = queryset_manager.get_searcher_query()
-        counters = {
-            "domain_architectures": searcher.get_number_of_field_by_endpoint(
-                "entry", "ida_id", instance.accession, sq
-            ),
-        }
         endpoints = {
             "protein": ["proteins", "protein_acc"],
             "structure": ["structures", "structure_acc"],
             "taxonomy": ["taxa", "tax_id"],
             "proteome": ["proteomes", "proteome_acc"],
             "set": ["sets", "set_acc"],
+            "ida": ["domain_architectures", "ida_id"],
         }
-        for ep in endpoints:
-            if (
-                "accession" not in queryset_manager.filters[ep]
-                and "accession__iexact" not in queryset_manager.filters[ep]
-            ):
-                counters[endpoints[ep][0]] = searcher.get_number_of_field_by_endpoint(
-                    "entry", endpoints[ep][1], instance.accession, sq
-                )
-        return counters
+        return ModelContentSerializer.generic_get_counters(
+            "entry",
+            endpoints,
+            instance,
+            searcher,
+            queryset_manager
+        )
 
     def to_headers_representation(self, instance):
         headers = {

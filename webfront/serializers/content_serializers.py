@@ -187,7 +187,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         include_chains=False,
         for_structure=False,
         base_query=None,
-        queryset_manager=None
+        queryset_manager=None,
     ):
         if include_chains:
             search = searcher.get_group_obj_of_field_by_query(
@@ -200,7 +200,10 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_search_object(
-                r, searcher=searcher, for_structure=for_structure, queryset_manager=queryset_manager,
+                r,
+                searcher=searcher,
+                for_structure=for_structure,
+                queryset_manager=queryset_manager,
             )
             for r in search
         ]

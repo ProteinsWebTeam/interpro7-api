@@ -234,7 +234,7 @@ class StructureWithFilterEntryDatabaseAccessionRESTTest(InterproRESTTestCase):
             self._check_structure_count_overview(response.data, "URL: [{}]".format(url))
 
     def test_urls_that_return_list_of_structure_accessions_with_matches_and_detailed_entries(
-        self
+        self,
     ):
         acc = "IPR003165"
         pfam = "PF02171"

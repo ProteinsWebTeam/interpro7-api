@@ -230,7 +230,7 @@ class ProteinHandler(CustomView):
             total=Count("source_database")
         )
         output = {}
-        for (source_database, total) in protein_counter:
+        for source_database, total in protein_counter:
             output[source_database] = total
 
         output["uniprot"] = sum(output.values())

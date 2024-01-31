@@ -17,6 +17,7 @@ chains = {
 
 @override_settings(SEARCHER_URL=settings.SEARCHER_TEST_URL)
 @override_settings(SEARCHER_INDEX="test")
+@override_settings(SEARCHER_IDA_INDEX="ida")
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [
         "webfront/tests/fixtures_entry.json",
@@ -243,9 +244,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                         for ch2 in response_acc.data[key]:
                             if "lineage" not in ch2 and "taxonomy" not in ch2:
                                 self.assertEqual(ch2["chain"].upper(), chain, msg)
-                    self.assertIn(
-                        chain, response_acc.data["metadata"]["chains"], msg
-                    )
+                    self.assertIn(chain, response_acc.data["metadata"]["chains"], msg)
                     self._check_match(
                         response_acc.data["metadata"]["chains"][chain], msg
                     )

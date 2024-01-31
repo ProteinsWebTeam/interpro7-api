@@ -163,7 +163,7 @@ class StructureHandler(CustomView):
             total=Count("source_database")
         )
         output = {"pdb": 0}
-        for (source_database, total) in protein_counter:
+        for source_database, total in protein_counter:
             output[source_database] = total
         return {"structures": output}
 

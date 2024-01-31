@@ -394,7 +394,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_204_NO_CONTENT,
-                                        "URL : [{}]".format(current)
+                                        "URL : [{}]".format(current),
                                     )
 
 
@@ -1342,12 +1342,14 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             + endpoint3,
                                         )
 
-                                        tested += self._check_structure_chains_as_filter(
-                                            endpoint2,
-                                            db2,
-                                            acc2,
-                                            endpoint1 + "/" + db1 + "/" + acc1,
-                                            "/" + endpoint3,
+                                        tested += (
+                                            self._check_structure_chains_as_filter(
+                                                endpoint2,
+                                                db2,
+                                                acc2,
+                                                endpoint1 + "/" + db1 + "/" + acc1,
+                                                "/" + endpoint3,
+                                            )
                                         )
 
                                     elif (

@@ -48,10 +48,9 @@ def mail(request):
     message = request.POST.get("message", "")
     from_email = request.POST.get("from_email", "")
     queue = request.POST.get("queue", "interpro").lower()
-    to_email = {
-        "interpro": "interhelp@ebi.ac.uk",
-        "pfam": "pfam-help@ebi.ac.uk"
-    }.get(queue, "")
+    to_email = {"interpro": "interhelp@ebi.ac.uk", "pfam": "pfam-help@ebi.ac.uk"}.get(
+        queue, ""
+    )
     if path and subject and message and from_email and to_email:
         message = MIMEText(message)
         message["From"] = from_email

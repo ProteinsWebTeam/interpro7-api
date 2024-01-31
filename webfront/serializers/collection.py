@@ -72,7 +72,11 @@ class SetSerializer(ModelContentSerializer):
                     else "entry_subset"
                 )
                 representation[key] = self.to_entries_detail_representation(
-                    instance, s, q, base_query=sq, queryset_manager=self.queryset_manager
+                    instance,
+                    s,
+                    q,
+                    base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -252,13 +256,13 @@ class SetSerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "taxonomy", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "taxa"
-        ]
+        return (
+            webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "taxonomy", query, self.get_extra_endpoints_to_count()
+                )
+            )["taxa"]
+        )
 
     def to_proteome_count_representation(self, instance):
         query = (
@@ -266,13 +270,13 @@ class SetSerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "proteome", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "proteomes"
-        ]
+        return (
+            webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "proteome", query, self.get_extra_endpoints_to_count()
+                )
+            )["proteomes"]
+        )
 
     @staticmethod
     def get_set_from_search_object(obj, include_chain=False):

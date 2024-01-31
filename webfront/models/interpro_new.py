@@ -143,7 +143,11 @@ class Structure(models.Model):
 class ChainSequence(models.Model):
     id = models.IntegerField(primary_key=True)
     structure = models.ForeignKey(
-        "Structure", on_delete=models.SET_NULL, null=True, blank=True, db_column="structure_acc"
+        "Structure",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="structure_acc",
     )
     chain = models.CharField(db_column="chain_acc", max_length=10)
     sequence_bin = models.BinaryField(db_column="sequence", null=True)
@@ -229,4 +233,3 @@ class Isoforms(models.Model):
 
     class Meta:
         db_table = "webfront_varsplic"
-

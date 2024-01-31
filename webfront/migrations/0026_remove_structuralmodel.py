@@ -6,11 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('webfront', '0025_remove_set_alignment'),
+        ("webfront", "0025_remove_set_alignment"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='StructuralModel',
+            name="StructuralModel",
         ),
     ]

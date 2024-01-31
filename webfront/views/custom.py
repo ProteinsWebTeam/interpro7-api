@@ -340,8 +340,8 @@ class CustomView(GenericAPIView):
         cursor = general_handler.pagination["cursor"]
 
         qs = general_handler.queryset_manager.get_searcher_query(include_search=True)
-        elastic_result, length, after_key, before_key, should_keep_elastic_order = searcher.get_list_of_endpoint(
-            ep, rows=s, query=qs, cursor=cursor
+        elastic_result, length, after_key, before_key, should_keep_elastic_order = (
+            searcher.get_list_of_endpoint(ep, rows=s, query=qs, cursor=cursor)
         )
 
         self.queryset = general_handler.queryset_manager.get_base_queryset(ep)

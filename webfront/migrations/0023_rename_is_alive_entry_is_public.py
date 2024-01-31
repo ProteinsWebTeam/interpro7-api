@@ -6,13 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('webfront', '0022_chain_sequence'),
+        ("webfront", "0022_chain_sequence"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='entry',
-            old_name='is_alive',
-            new_name='is_public',
+            model_name="entry",
+            old_name="is_alive",
+            new_name="is_public",
         ),
     ]

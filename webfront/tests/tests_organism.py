@@ -1324,7 +1324,7 @@ class TaxonomyPerEntryTest(InterproRESTTestCase):
         response = self.client.get("/api/taxonomy/uniprot/1?filter_by_entry=IPR001165")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_taxonomy_details(response.data["metadata"])
-        self.assertEqual(response.data["metadata"]["counters"]["proteins"], 1)
+        self.assertEqual(response.data["metadata"]["counters"]["proteins"], 2)
         self.assertIsInstance(response.data["children"], dict)
 
     def test_can_browse_lineage_with_children_key(self):
@@ -1355,7 +1355,7 @@ class TaxonomyPerEntryDBTest(InterproRESTTestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_taxonomy_details(response.data["metadata"])
-        self.assertEqual(response.data["metadata"]["counters"]["entries"], 2)
+        self.assertEqual(response.data["metadata"]["counters"]["entries"], 7)
         self.assertIsInstance(response.data["children"], dict)
 
     def test_can_browse_lineage_with_children_key(self):

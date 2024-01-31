@@ -16,6 +16,7 @@ class TaxonomySerializer(ModelContentSerializer):
             representation, instance, self.detail_filters, self.detail
         )
         if self.queryset_manager.other_fields is not None:
+
             def counter_function():
                 get_c = TaxonomySerializer.get_counters
                 return get_c(
@@ -93,7 +94,11 @@ class TaxonomySerializer(ModelContentSerializer):
                     else "entry_subset"
                 )
                 representation[key] = self.to_entries_detail_representation(
-                    instance, s, self.get_searcher_query(instance), base_query=sq, queryset_manager=self.queryset_manager
+                    instance,
+                    s,
+                    self.get_searcher_query(instance),
+                    base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -158,7 +163,9 @@ class TaxonomySerializer(ModelContentSerializer):
         if self.queryset_manager.is_single_endpoint():
             self.reformatEntryCounters(counters)
         else:
-            counters = TaxonomySerializer.get_counters(instance, searcher, self.queryset_manager)
+            counters = TaxonomySerializer.get_counters(
+                instance, searcher, self.queryset_manager
+            )
         obj = {
             "metadata": {
                 "accession": str(instance.accession),
@@ -166,9 +173,11 @@ class TaxonomySerializer(ModelContentSerializer):
                 "rank": instance.rank,
                 "children": self.get_children(instance),
                 "source_database": "uniprot",
-                "parent": str(instance.parent.accession)
-                if instance.parent is not None
-                else None,
+                "parent": (
+                    str(instance.parent.accession)
+                    if instance.parent is not None
+                    else None
+                ),
                 "name": {"name": instance.scientific_name, "short": instance.full_name},
                 "counters": counters,
             }
@@ -202,9 +211,9 @@ class TaxonomySerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.full_name,
                 "children": instance.children,
-                "parent": instance.parent.accession
-                if instance.parent is not None
-                else None,
+                "parent": (
+                    instance.parent.accession if instance.parent is not None else None
+                ),
                 "source_database": "uniprot",
             }
         }
@@ -261,7 +270,8 @@ class TaxonomySerializer(ModelContentSerializer):
             "proteome": "proteomes",
         }
         for ep in endpoints:
-            if ("accession" not in queryset_manager.filters[ep]
+            if (
+                "accession" not in queryset_manager.filters[ep]
                 and "accession__iexact" not in queryset_manager.filters[ep]
             ):
                 counters[endpoints[ep]] = searcher.get_number_of_field_by_endpoint(
@@ -332,13 +342,13 @@ class TaxonomySerializer(ModelContentSerializer):
 
     def to_proteomes_count_representation(self, instance):
         query = self.get_searcher_query(instance)
-        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "proteome", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "proteomes"
-        ]
+        return (
+            webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "proteome", query, self.get_extra_endpoints_to_count()
+                )
+            )["proteomes"]
+        )
 
     def to_set_count_representation(self, instance):
         query = self.get_searcher_query(instance)

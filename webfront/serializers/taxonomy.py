@@ -232,15 +232,24 @@ class TaxonomySerializer(ModelContentSerializer):
     def get_counters(instance, searcher, queryset_manager):
         if TaxonomySerializer.can_use_taxonomy_per_entry(queryset_manager.filters):
             match = TaxonomyPerEntry.objects.filter(
-                entry_acc=queryset_manager.filters["entry"]["accession"],
+                entry_acc=queryset_manager.filters["entry"]["accession"].upper(),
                 taxonomy_id=instance.accession,
             ).first()
+            if not match:
+                raise EmptyQuerysetError(
+                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy")
+                )
+
             return match.counts
         if TaxonomySerializer.can_use_taxonomy_per_db(queryset_manager.filters):
             match = TaxonomyPerEntryDB.objects.filter(
                 source_database=queryset_manager.filters["entry"]["source_database"],
                 taxonomy_id=instance.accession,
             ).first()
+            if not match:
+                raise EmptyQuerysetError(
+                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy")
+                )
             return match.counts
         sq = queryset_manager.get_searcher_query(use_lineage=True)
         counters = {}

@@ -4,6 +4,7 @@ import copy
 
 from webfront.searcher.elastic_controller import ElasticsearchController
 
+from webfront.models import Entry, Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
 
 def get_id(*args):
     return "-".join([a for a in args if a is not None])
@@ -293,6 +294,35 @@ class FixtureReader:
         self.search = ElasticsearchController()
         self.search.add(docs)
         self.search.add(self.ida_to_add.values(), True)
+
+
+    def generate_tax_per_entry_fixtures(self, docs):
+        counters = {}
+        for doc in docs:
+            if "entry_acc" not in doc or "tax_lineage" not in doc:
+                continue
+            entry = doc["entry_acc"]
+            lineage = doc["tax_lineage"]
+            if entry not in counters:
+                counters[entry] = {}
+            for tax in lineage:
+                if tax not in counters[entry]:
+                    counters[entry][tax] = {
+                        "structures": 0,
+                        "proteins": 0,
+                        "proteomes": 0
+                    }
+                if doc["structure_acc"] is not None:
+                    counters[entry][tax]["structures"] += 1
+                if doc["protein_acc"] is not None:
+                    counters[entry][tax]["proteins"] += 1
+                if doc["proteome_acc"] is not None:
+                    counters[entry][tax]["proteins"] += 1
+        for entry in counters:
+            for tax in counters[entry]:
+                txe = TaxonomyPerEntry(entry_acc=Entry.objects.get(accession=entry.upper()), taxonomy=Taxonomy.objects.get(accession=tax), counts=counters[entry][tax])
+                txe.save()
+
 
     def clear_search_engine(self):
         self.search.clear_all_docs()

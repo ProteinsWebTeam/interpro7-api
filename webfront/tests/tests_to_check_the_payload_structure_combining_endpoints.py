@@ -392,7 +392,9 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                     )
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     self.assertEqual(
-                                        response.status_code, status.HTTP_204_NO_CONTENT
+                                        response.status_code,
+                                        status.HTTP_204_NO_CONTENT,
+                                        "URL : [{}]".format(current)
                                     )
 
 

@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
-from webfront.models import Taxonomy
+from webfront.models import TaxonomyPerEntry
 from webfront.tests.fixtures_reader import FixtureReader
 
 chains = {
@@ -17,7 +17,6 @@ chains = {
 
 @override_settings(SEARCHER_URL=settings.SEARCHER_TEST_URL)
 @override_settings(SEARCHER_INDEX="test")
-@override_settings(SEARCHER_IDA_INDEX="ida")
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [
         "webfront/tests/fixtures_entry.json",
@@ -36,7 +35,6 @@ class InterproRESTTestCase(APITransactionTestCase):
         cls.fr = FixtureReader(cls.fixtures + [cls.links_fixtures])
         cls.docs = cls.fr.get_fixtures()
         cls.fr.add_to_search_engine(cls.docs)
-        cls.has_load_taxonomy = False
 
     @classmethod
     def tearDownClass(cls):
@@ -44,9 +42,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         super(InterproRESTTestCase, cls).tearDownClass()
 
     def setUp(self):
-        if not self.has_load_taxonomy:
+        if TaxonomyPerEntry.objects.all().count() == 0:
             self.fr.generate_tax_per_entry_fixtures(self.docs)
-            self.has_load_taxonomy = True
 
     # methods to check entry related responses
     def _check_single_entry_response(self, response, msg=""):

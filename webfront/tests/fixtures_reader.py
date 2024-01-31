@@ -12,20 +12,20 @@ def get_id(*args):
 
 
 class FixtureReader:
-    entries = {}
-    proteins = {}
-    structures = {}
-    entry_protein_list = []
-    protein_structure_list = {}
-    tax2lineage = {}
-    tax2rank = {}
-    sets = {}
-    proteomes = {}
-    entry_annotations = {}
-    search = None
 
     def __init__(self, fixture_paths):
         self.ida_to_add = {}
+        self.entries = {}
+        self.proteins = {}
+        self.structures = {}
+        self.entry_protein_list = []
+        self.protein_structure_list = {}
+        self.tax2lineage = {}
+        self.tax2rank = {}
+        self.sets = {}
+        self.proteomes = {}
+        self.entry_annotations = {}
+        self.search = None
         for path in fixture_paths:
             with open(path) as data_file:
                 data = json.load(data_file)

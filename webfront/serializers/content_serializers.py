@@ -227,7 +227,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         include_chains=False,
         include_coordinates=True,
         for_entry=False,
-        base_query="*:*",
+        queryset_manager=None,
     ):
         field = "structure_chain" if include_chains else "protein_acc"
         response = [
@@ -236,7 +236,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 for_entry=for_entry,
                 searcher=searcher,
                 include_coordinates=include_coordinates,
-                sq=base_query,
+                queryset_manager=queryset_manager,
             )
             for r in searcher.get_group_obj_of_field_by_query(
                 None, field, fq=searcher_query, rows=20

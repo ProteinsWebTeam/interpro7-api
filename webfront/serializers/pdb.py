@@ -95,7 +95,7 @@ class StructureSerializer(ModelContentSerializer):
                         s,
                         "structure_acc:" + escape(instance.accession.lower()),
                         include_chains=True,
-                        base_query=sq,
+                        queryset_manager=self.queryset_manager,
                     )
                 )
             if (

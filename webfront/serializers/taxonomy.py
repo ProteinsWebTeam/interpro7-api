@@ -129,7 +129,7 @@ class TaxonomySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     self.get_searcher_query(instance),
-                    base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.PROTEOME_DB in detail_filters

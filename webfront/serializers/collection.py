@@ -100,7 +100,7 @@ class SetSerializer(ModelContentSerializer):
                     else "protein_subset"
                 )
                 representation[key] = self.to_proteins_detail_representation(
-                    instance, self.searcher, q, base_query=sq
+                    instance, self.searcher, q, queryset_manager=self.queryset_manager
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters

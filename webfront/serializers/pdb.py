@@ -16,7 +16,7 @@ class StructureSerializer(ModelContentSerializer):
 
             def counter_function():
                 return StructureSerializer.get_counters(
-                    instance, self.searcher, self.queryset_manager.get_searcher_query()
+                    instance, self.searcher, self.queryset_manager
                 )
 
             representation = self.add_other_fields(
@@ -52,7 +52,7 @@ class StructureSerializer(ModelContentSerializer):
             self.reformatEntryCounters(counters)
         return {
             "metadata": self.to_metadata_representation(
-                instance, self.searcher, base_query, counters
+                instance, self.searcher, self.queryset_manager, counters
             )
         }
 
@@ -176,7 +176,7 @@ class StructureSerializer(ModelContentSerializer):
         }
 
     @staticmethod
-    def to_metadata_representation(instance, searcher, base_query, counters=None):
+    def to_metadata_representation(instance, searcher, queryset_manager, counters=None):
         return {
             "accession": instance.accession,
             "name": {"name": instance.name},
@@ -187,31 +187,45 @@ class StructureSerializer(ModelContentSerializer):
             "resolution": instance.resolution,
             "source_database": instance.source_database,
             "counters": (
-                StructureSerializer.get_counters(instance, searcher, base_query)
+                StructureSerializer.get_counters(instance, searcher, queryset_manager)
                 if counters is None
                 else counters
             ),
         }
 
     @staticmethod
-    def get_counters(instance, searcher, base_query):
-        return {
-            "sets": searcher.get_number_of_field_by_endpoint(
-                "structure", "set_acc", instance.accession, base_query
-            ),
-            "entries": searcher.get_number_of_field_by_endpoint(
-                "structure", "entry_acc", instance.accession, base_query
-            ),
-            "proteins": searcher.get_number_of_field_by_endpoint(
-                "structure", "protein_acc", instance.accession, base_query
-            ),
-            "taxa": searcher.get_number_of_field_by_endpoint(
-                "structure", "tax_id", instance.accession, base_query
-            ),
-            "proteomes": searcher.get_number_of_field_by_endpoint(
-                "structure", "proteome_acc", instance.accession, base_query
-            ),
+    def get_counters(instance, searcher, queryset_manager):
+        endpoints = {
+            "entry": ["entries", "entry_acc"],
+            "protein": ["proteins", "protein_acc"],
+            "taxonomy": ["taxa", "tax_id"],
+            "proteome": ["proteomes", "proteome_acc"],
+            "set": ["sets", "set_acc"],
         }
+        return ModelContentSerializer.generic_get_counters(
+            "structure",
+            endpoints,
+            instance,
+            searcher,
+            queryset_manager
+        )
+        # return {
+        #     "sets": searcher.get_number_of_field_by_endpoint(
+        #         "structure", "set_acc", instance.accession, base_query
+        #     ),
+        #     "entries": searcher.get_number_of_field_by_endpoint(
+        #         "structure", "entry_acc", instance.accession, base_query
+        #     ),
+        #     "proteins": searcher.get_number_of_field_by_endpoint(
+        #         "structure", "protein_acc", instance.accession, base_query
+        #     ),
+        #     "taxa": searcher.get_number_of_field_by_endpoint(
+        #         "structure", "tax_id", instance.accession, base_query
+        #     ),
+        #     "proteomes": searcher.get_number_of_field_by_endpoint(
+        #         "structure", "proteome_acc", instance.accession, base_query
+        #     ),
+        # }
 
     @staticmethod
     def get_search_query_from_representation(representation):
@@ -310,7 +324,7 @@ class StructureSerializer(ModelContentSerializer):
         include_structure=False,
         include_matches=False,
         search=None,
-        base_query="*:*",
+        queryset_manager=None,
     ):
         output = StructureSerializer.get_chain_from_search_object(obj)
         output["accession"] = obj["structure_acc"]
@@ -320,7 +334,7 @@ class StructureSerializer(ModelContentSerializer):
             output["structure"] = StructureSerializer.to_metadata_representation(
                 Structure.objects.get(accession__iexact=obj["structure_acc"]),
                 search,
-                base_query,
+                queryset_manager,
             )
         return output
 

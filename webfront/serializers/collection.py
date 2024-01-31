@@ -88,7 +88,8 @@ class SetSerializer(ModelContentSerializer):
                     else "structure_subset"
                 )
                 representation[key] = self.to_structures_detail_representation(
-                    instance, s, q, include_chain=True, base_query=sq
+                    instance, s, q, include_chain=True,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.PROTEIN_DB in detail_filters

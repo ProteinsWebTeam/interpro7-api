@@ -99,7 +99,7 @@ class ProteinSerializer(ModelContentSerializer):
                     s,
                     "protein_acc:" + escape(instance.accession.lower()),
                     include_chain=True,
-                    base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters

@@ -108,7 +108,7 @@ class EntrySerializer(ModelContentSerializer):
                     include_structure=SerializerDetail.STRUCTURE_DETAIL
                     not in detail_filters,
                     include_matches=True,
-                    base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters

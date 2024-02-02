@@ -473,14 +473,18 @@ def add_extra_fields(endpoint, *argv):
 
     def x(fields, general_handler):
         fs = fields.split(",")
+        other_fields = {}
         for field in fs:
-            if field not in supported_fields:
+            parts = field.split(":")
+            f_name = parts[0]
+            other_fields[f_name] = parts[1] if len(parts) > 1 else None
+            if f_name not in supported_fields:
                 raise URLError(
                     "{} is not a valid field to to be included. Allowed fields : {}".format(
                         field, ", ".join(supported_fields)
                     )
                 )
-        general_handler.queryset_manager.other_fields = fs
+        general_handler.queryset_manager.other_fields = other_fields
 
     return x
 

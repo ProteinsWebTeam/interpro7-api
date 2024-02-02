@@ -327,6 +327,9 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_counters_as_extra_fields(self):
+
+
 
 class ExtraFeaturesModifierTest(InterproRESTTestCase):
     def test_extra_features_modifier_is_different_than_acc_protein(self):

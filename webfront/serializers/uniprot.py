@@ -25,9 +25,9 @@ class ProteinSerializer(ModelContentSerializer):
         )
         if self.queryset_manager.other_fields is not None:
 
-            def counter_function():
+            def counter_function(counters_to_include):
                 return ProteinSerializer.get_counters(
-                    instance, self.searcher, self.queryset_manager
+                    instance, self.searcher, self.queryset_manager, counters_to_include
                 )
 
             representation = self.add_other_fields(
@@ -200,7 +200,7 @@ class ProteinSerializer(ModelContentSerializer):
         return protein
 
     @staticmethod
-    def get_counters(instance, searcher, queryset_manager):
+    def get_counters(instance, searcher, queryset_manager, counters_to_include):
         endpoints = {
             "entry": ["entries", "entry_acc"],
             "structure": ["structures", "structure_acc"],
@@ -213,9 +213,9 @@ class ProteinSerializer(ModelContentSerializer):
             endpoints,
             instance,
             searcher,
-            queryset_manager
+            queryset_manager,
+            counters_to_include,
         )
-
 
     @staticmethod
     def to_group_representation(instance):

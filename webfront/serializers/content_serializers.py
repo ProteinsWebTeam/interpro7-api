@@ -277,7 +277,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         }
         for f in functions:
             if f in other_fields:
-                representation["extra_fields"][f] = functions[f]()
+                representation["extra_fields"][f] = functions[f](other_fields[f])
         return representation
 
     @staticmethod
@@ -304,16 +304,32 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return {"next": next_page, "previous": previous, **payload}
 
     @staticmethod
-    def generic_get_counters(main_endpoint, counter_endpoints, instance, searcher, queryset_manager):
+    def generic_get_counters(
+        main_endpoint,
+        counter_endpoints,
+        instance,
+        searcher,
+        queryset_manager,
+        counters_to_include=None,
+    ):
         sq = queryset_manager.get_searcher_query()
+        if counters_to_include is not None:
+            split_counters_to_include = counters_to_include.split("-")
+            counter_endpoints = {
+                k: v
+                for k, v in counter_endpoints.items()
+                if k in split_counters_to_include
+            }
+
         counters = {}
         for ep in counter_endpoints:
-            if (
-                ep not in queryset_manager.filters or(
+            if ep not in queryset_manager.filters or (
                 "accession" not in queryset_manager.filters[ep]
-                and "accession__iexact" not in queryset_manager.filters[ep])
+                and "accession__iexact" not in queryset_manager.filters[ep]
             ):
-                counters[counter_endpoints[ep][0]] = searcher.get_number_of_field_by_endpoint(
-                    main_endpoint, counter_endpoints[ep][1], instance.accession, sq
+                counters[counter_endpoints[ep][0]] = (
+                    searcher.get_number_of_field_by_endpoint(
+                        main_endpoint, counter_endpoints[ep][1], instance.accession, sq
+                    )
                 )
         return counters

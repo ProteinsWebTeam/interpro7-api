@@ -17,12 +17,10 @@ class TaxonomySerializer(ModelContentSerializer):
         )
         if self.queryset_manager.other_fields is not None:
 
-            def counter_function():
+            def counter_function(counters_to_include):
                 get_c = TaxonomySerializer.get_counters
                 return get_c(
-                    instance,
-                    self.searcher,
-                    self.queryset_manager,
+                    instance, self.searcher, self.queryset_manager, counters_to_include
                 )
 
             representation = self.add_other_fields(
@@ -238,7 +236,7 @@ class TaxonomySerializer(ModelContentSerializer):
         return False
 
     @staticmethod
-    def get_counters(instance, searcher, queryset_manager):
+    def get_counters(instance, searcher, queryset_manager, counters_to_include):
         if TaxonomySerializer.can_use_taxonomy_per_entry(queryset_manager.filters):
             match = TaxonomyPerEntry.objects.filter(
                 entry_acc=queryset_manager.filters["entry"]["accession"].upper(),
@@ -272,9 +270,9 @@ class TaxonomySerializer(ModelContentSerializer):
             endpoints,
             instance,
             searcher,
-            queryset_manager
+            queryset_manager,
+            counters_to_include,
         )
-
 
     @staticmethod
     def to_counter_representation(instance, filter=None):

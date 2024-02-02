@@ -247,7 +247,7 @@ class EntrySerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def get_counters(instance, searcher, queryset_manager, counters_to_include):
+    def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
         endpoints = {
             "protein": ["proteins", "protein_acc"],
             "structure": ["structures", "structure_acc"],

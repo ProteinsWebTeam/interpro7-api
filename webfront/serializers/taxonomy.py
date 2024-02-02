@@ -234,7 +234,7 @@ class TaxonomySerializer(ModelContentSerializer):
         return "source_database" in filters["entry"]
 
     @staticmethod
-    def get_counters(instance, searcher, queryset_manager, counters_to_include):
+    def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
         if TaxonomySerializer.can_use_taxonomy_per_entry(queryset_manager.filters):
             match = TaxonomyPerEntry.objects.filter(
                 entry_acc=queryset_manager.filters["entry"]["accession"].upper(),

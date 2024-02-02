@@ -157,7 +157,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         query,
-        include_structure=True,
+        include_structure=False,
         include_matches=False,
         include_chain=True,
         queryset_manager=None,

@@ -6,11 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('webfront', '0024_entry_llm_description'),
+        ("webfront", "0024_entry_llm_description"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='Alignment',
+            name="Alignment",
         ),
     ]

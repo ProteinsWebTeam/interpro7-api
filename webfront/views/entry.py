@@ -51,36 +51,46 @@ class MemberAccessionHandler(CustomView):
         **kwargs
     ):
         acc = endpoint_levels[level - 1].lower()
-        general_handler.queryset_manager.add_filter(
-            "entry", accession__iexact=acc
-        )
+        general_handler.queryset_manager.add_filter("entry", accession__iexact=acc)
 
         # Check whether the entry is deleted
-        general_handler.queryset_manager.add_filter("entry",
-                                                    deletion_date__isnull=False)
+        general_handler.queryset_manager.add_filter(
+            "entry", deletion_date__isnull=False
+        )
         qs = general_handler.queryset_manager.get_queryset()
         if qs.count() > 0:
             first = qs.first()
-            raise DeletedEntryError(acc, first.source_database, first.type,
-                                    first.name, first.short_name, first.history,
-                                    first.deletion_date)
+            raise DeletedEntryError(
+                acc,
+                first.source_database,
+                first.type,
+                first.name,
+                first.short_name,
+                first.history,
+                first.deletion_date,
+            )
 
-        general_handler.queryset_manager.add_filter("entry",
-                                                    deletion_date__isnull=True)
+        general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=True)
 
         general_handler.modifiers.register(
             "model:structure",
-            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
+            get_deprecated_response(
+                "RosseTTaFold models have been permanently removed in InterPro 96.0."
+            ),
         )
 
         # get-model:[structure,contacts,lddt]
         general_handler.modifiers.register(
             "model:contacts",
-            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
+            get_deprecated_response(
+                "RosseTTaFold models have been permanently removed in InterPro 96.0."
+            ),
         )
         general_handler.modifiers.register(
             "model:lddt",
-            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
+            get_deprecated_response(
+                "RosseTTaFold models have been permanently removed in InterPro 96.0."
+            ),
         )
         general_handler.modifiers.register(
             "annotation",
@@ -250,13 +260,21 @@ class AccessionHandler(CustomView):
         general_handler.queryset_manager.add_filter("entry", accession__iexact=acc)
 
         # Checking if the entry has been marked as deleted
-        general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=False)
+        general_handler.queryset_manager.add_filter(
+            "entry", deletion_date__isnull=False
+        )
         qs = general_handler.queryset_manager.get_queryset()
         if qs.count() > 0:
             first = qs.first()
-            raise DeletedEntryError(acc, first.source_database, first.type,
-                                    first.name, first.short_name, first.history,
-                                    first.deletion_date)
+            raise DeletedEntryError(
+                acc,
+                first.source_database,
+                first.type,
+                first.name,
+                first.short_name,
+                first.history,
+                first.deletion_date,
+            )
         general_handler.queryset_manager.add_filter("entry", deletion_date__isnull=True)
 
         general_handler.modifiers.register(
@@ -438,15 +456,21 @@ class InterproHandler(CustomView):
 
         general_handler.modifiers.register(
             "model:structure",
-            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
+            get_deprecated_response(
+                "RosseTTaFold models have been permanently removed in InterPro 96.0."
+            ),
         )
         general_handler.modifiers.register(
             "model:contacts",
-            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
+            get_deprecated_response(
+                "RosseTTaFold models have been permanently removed in InterPro 96.0."
+            ),
         )
         general_handler.modifiers.register(
             "model:lddt",
-            get_deprecated_response("RosseTTaFold models have been permanently removed in InterPro 96.0.")
+            get_deprecated_response(
+                "RosseTTaFold models have been permanently removed in InterPro 96.0."
+            ),
         )
 
         general_handler.modifiers.register(
@@ -544,9 +568,7 @@ class AllHandler(CustomView):
 
 class EntryHandler(CustomView):
     level_description = "Entry level"
-    from_model = (
-        False
-    )  # The object generated will be serialized as JSON, without checking the model
+    from_model = False  # The object generated will be serialized as JSON, without checking the model
     child_handlers = [
         ("all", AllHandler),
         ("interpro", InterproHandler),
@@ -565,7 +587,7 @@ class EntryHandler(CustomView):
             total=Count("source_database")
         )
         output = {"interpro": 0, "unintegrated": 0, "member_databases": {}}
-        for (source_database, total) in entry_counter:
+        for source_database, total in entry_counter:
             if source_database.lower() == "interpro":
                 output["interpro"] += total
             else:

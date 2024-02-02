@@ -4,6 +4,7 @@ from django.conf import settings
 from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
+from webfront.models import TaxonomyPerEntry
 from webfront.tests.fixtures_reader import FixtureReader
 
 chains = {
@@ -32,13 +33,17 @@ class InterproRESTTestCase(APITransactionTestCase):
     def setUpClass(cls):
         super(InterproRESTTestCase, cls).setUpClass()
         cls.fr = FixtureReader(cls.fixtures + [cls.links_fixtures])
-        docs = cls.fr.get_fixtures()
-        cls.fr.add_to_search_engine(docs)
+        cls.docs = cls.fr.get_fixtures()
+        cls.fr.add_to_search_engine(cls.docs)
 
     @classmethod
     def tearDownClass(cls):
         # cls.fr.clear_search_engine()
         super(InterproRESTTestCase, cls).tearDownClass()
+
+    def setUp(self):
+        if TaxonomyPerEntry.objects.all().count() == 0:
+            self.fr.generate_tax_per_entry_fixtures(self.docs)
 
     # methods to check entry related responses
     def _check_single_entry_response(self, response, msg=""):
@@ -236,9 +241,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                         for ch2 in response_acc.data[key]:
                             if "lineage" not in ch2 and "taxonomy" not in ch2:
                                 self.assertEqual(ch2["chain"].upper(), chain, msg)
-                    self.assertIn(
-                        chain, response_acc.data["metadata"]["chains"], msg
-                    )
+                    self.assertIn(chain, response_acc.data["metadata"]["chains"], msg)
                     self._check_match(
                         response_acc.data["metadata"]["chains"][chain], msg
                     )

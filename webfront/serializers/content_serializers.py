@@ -322,14 +322,12 @@ class ModelContentSerializer(serializers.ModelSerializer):
             }
 
         counters = {}
-        for ep in counter_endpoints:
+        for ep, (name, field) in counter_endpoints.items():
             if ep not in queryset_manager.filters or (
                 "accession" not in queryset_manager.filters[ep]
                 and "accession__iexact" not in queryset_manager.filters[ep]
             ):
-                counters[counter_endpoints[ep][0]] = (
-                    searcher.get_number_of_field_by_endpoint(
-                        main_endpoint, counter_endpoints[ep][1], instance.accession, sq
-                    )
+                counters[name] = searcher.get_number_of_field_by_endpoint(
+                    main_endpoint, field, instance.accession, sq
                 )
         return counters

@@ -219,21 +219,19 @@ class TaxonomySerializer(ModelContentSerializer):
 
     @staticmethod
     def can_use_taxonomy_per_entry(filters):
-        for key in filters:
-            if filters[key] != {} and key not in ["entry", "taxonomy"]:
+        for key, value in filters.items():
+            if key not in ["entry", "taxonomy"] and value:
                 return False
-        if "accession" in filters["entry"]:
-            return True
-        return False
+
+        return "accession" in filters["entry"]
 
     @staticmethod
     def can_use_taxonomy_per_db(filters):
-        for key in filters:
-            if filters[key] != {} and key not in ["entry", "taxonomy"]:
+        for key, value in filters.items():
+            if key not in ["entry", "taxonomy"] and value:
                 return False
-        if "source_database" in filters["entry"]:
-            return True
-        return False
+
+        return "source_database" in filters["entry"]
 
     @staticmethod
     def get_counters(instance, searcher, queryset_manager, counters_to_include):

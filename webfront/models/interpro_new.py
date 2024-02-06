@@ -186,6 +186,11 @@ class TaxonomyPerEntry(models.Model):
     )
     counts = JSONField(null=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["entry_acc", "taxonomy"]),
+        ]
+
 
 class TaxonomyPerEntryDB(models.Model):
     taxonomy = models.ForeignKey(
@@ -193,6 +198,11 @@ class TaxonomyPerEntryDB(models.Model):
     )
     source_database = models.CharField(max_length=100, db_index=True)
     counts = JSONField(null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["source_database", "taxonomy"]),
+        ]
 
 
 class Proteome(models.Model):

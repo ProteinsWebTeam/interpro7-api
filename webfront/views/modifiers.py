@@ -260,19 +260,26 @@ def filter_by_key_species(value, general_handler):
 
 def filter_by_entry(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
-    response = TaxonomyPerEntry.objects.filter(taxonomy__in=queryset).filter(
-        entry_acc__accession__iexact=value
-    )
+    response = (TaxonomyPerEntry.objects
+                .filter(taxonomy__in=queryset)
+                .filter(entry_acc__accession=value.upper())
+                )
     if len(response) == 0:
-        raise EmptyQuerysetError("No documents found with the current selection")
+        response = (TaxonomyPerEntry.objects
+                    .filter(taxonomy__in=queryset)
+                    .filter(entry_acc__accession=value.lower())
+                    )
+        if len(response) == 0:
+            raise EmptyQuerysetError("No documents found with the current selection")
     return response.first()
 
 
 def filter_by_entry_db(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
-    response = TaxonomyPerEntryDB.objects.filter(taxonomy__in=queryset).filter(
-        source_database__iexact=value
-    )
+    response = (TaxonomyPerEntryDB.objects
+                .filter(taxonomy__in=queryset)
+                .filter(source_database=value.lower())
+                )
     if len(response) == 0:
         raise EmptyQuerysetError("No documents found with the current selection")
 

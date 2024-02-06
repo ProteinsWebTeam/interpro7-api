@@ -330,4 +330,6 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 counters[name] = searcher.get_number_of_field_by_endpoint(
                     main_endpoint, field, instance.accession, sq
                 )
+            else:
+                counters[name] = 1
         return counters

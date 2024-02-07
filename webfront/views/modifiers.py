@@ -259,27 +259,24 @@ def filter_by_key_species(value, general_handler):
 
 
 def filter_by_entry(value, general_handler):
-    queryset = general_handler.queryset_manager.get_queryset()
-    response = (TaxonomyPerEntry.objects
-                .filter(taxonomy__in=queryset)
-                .filter(entry_acc__accession=value.upper())
-                )
+    tax_id = general_handler.queryset_manager.filters["taxonomy"]["accession"]
+    response = TaxonomyPerEntry.objects.filter(taxonomy__accession=tax_id).filter(
+        entry_acc__accession=value.upper()
+    )
     if len(response) == 0:
-        response = (TaxonomyPerEntry.objects
-                    .filter(taxonomy__in=queryset)
-                    .filter(entry_acc__accession=value.lower())
-                    )
+        response = TaxonomyPerEntry.objects.filter(taxonomy__in=tax_id).filter(
+            entry_acc__accession=value.lower()
+        )
         if len(response) == 0:
             raise EmptyQuerysetError("No documents found with the current selection")
     return response.first()
 
 
 def filter_by_entry_db(value, general_handler):
-    queryset = general_handler.queryset_manager.get_queryset()
-    response = (TaxonomyPerEntryDB.objects
-                .filter(taxonomy__in=queryset)
-                .filter(source_database=value.lower())
-                )
+    tax_id = general_handler.queryset_manager.filters["taxonomy"]["accession"]
+    response = TaxonomyPerEntryDB.objects.filter(taxonomy__accession=tax_id).filter(
+        source_database=value.lower()
+    )
     if len(response) == 0:
         raise EmptyQuerysetError("No documents found with the current selection")
 

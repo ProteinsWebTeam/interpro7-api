@@ -62,7 +62,11 @@ class ElasticsearchController(SearchController):
         self.index = settings.SEARCHER_INDEX
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
-        self.auth = HTTPBasicAuth(settings.SEARCHER_USER, settings.SEARCHER_PASSWORD)
+        self.auth = (
+            HTTPBasicAuth(settings.SEARCHER_USER, settings.SEARCHER_PASSWORD)
+            if settings.SEARCHER_USER != ""
+            else None
+        )
 
     def add(self, docs, is_ida=False):
         body = ""

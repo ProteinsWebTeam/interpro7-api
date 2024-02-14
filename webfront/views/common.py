@@ -103,9 +103,13 @@ def getDataForRoot(handlers, queryset_manager, searcher):
                 "status": "OK" if total > 0 else "ERROR",
             },
             "cache": {
-                "server": settings.CACHES["default"]["LOCATION"] if settings.ENABLE_CACHING else "",
-                "status": "enabled" if settings.ENABLE_CACHING else "disabled"
-            }
+                "server": (
+                    settings.CACHES["default"]["LOCATION"]
+                    if settings.ENABLE_CACHING
+                    else ""
+                ),
+                "status": "enabled" if settings.ENABLE_CACHING else "disabled",
+            },
         },
     }
 

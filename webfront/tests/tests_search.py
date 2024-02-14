@@ -9,7 +9,10 @@ class ElasticContorllerTest(InterproRESTTestCase):
         elastic = ElasticsearchController(obj)
         self.assertEqual(obj, elastic.queryset_manager)
         self.assertIsNotNone(elastic.headers)
-        self.assertIsNotNone(elastic.auth)
+        if settings.SEARCHER_USER == "":
+            self.assertIsNone(elastic.auth)
+        else:
+            self.assertIsNotNone(elastic.auth)
 
 
 class EntryRESTSearchTest(InterproRESTTestCase):

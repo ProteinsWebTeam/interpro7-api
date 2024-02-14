@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-
+import urllib.parse
 import json
 import re
 
@@ -57,6 +57,8 @@ def getAfterBeforeFromCursor(cursor):
 
 class ElasticsearchController(SearchController):
     def __init__(self, queryset_manager=None):
+        url = urllib.parse.urlparse(settings.SEARCHER_URL)
+        self.server = url.hostname
         self.index = settings.SEARCHER_INDEX
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
@@ -78,7 +80,7 @@ class ElasticsearchController(SearchController):
             auth=self.auth,
             headers=self.headers,
             data=body,
-            verify=False
+            verify=False,
         )
         return response
 
@@ -90,7 +92,7 @@ class ElasticsearchController(SearchController):
             auth=self.auth,
             headers=self.headers,
             data=body,
-            verify=False
+            verify=False,
         )
 
         return response
@@ -424,11 +426,11 @@ class ElasticsearchController(SearchController):
             path += "&size={}".format(rows)
         logger.debug("URL:" + path)
         response = requests.get(
-            settings.SEARCHER_URL+path,
+            settings.SEARCHER_URL + path,
             auth=self.auth,
             headers=self.headers,
             data=query_obj and json.dumps(query_obj),
-            verify=False
+            verify=False,
         )
         return response.json()
 
@@ -450,7 +452,7 @@ class ElasticsearchController(SearchController):
             auth=self.auth,
             headers=self.headers,
             data=json.dumps(query_obj),
-            verify=False
+            verify=False,
         )
         obj = response.json()
         if settings.DEBUG:

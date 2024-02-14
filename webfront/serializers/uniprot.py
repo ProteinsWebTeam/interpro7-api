@@ -348,7 +348,6 @@ class ProteinSerializer(ModelContentSerializer):
             "protein_length": obj["protein_length"],
             "source_database": obj["protein_db"],
             "organism": obj["tax_id"],
-            "has_alphafold": not obj["protein_af_score"] == -1,
         }
         if not for_entry and "structure_chain_acc" in obj:
             header["chain"] = obj["structure_chain_acc"]

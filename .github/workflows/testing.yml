@@ -22,7 +22,8 @@ jobs:
     - name: 🔎 - Runs Elasticsearch
       uses: elastic/elastic-github-actions/elasticsearch@master
       with:
-        stack-version: 7.3.0
+        stack-version: 8.2.0
+        security-enabled: false
     - name: ⚙️🔎 - Setup elastic search
       run: |
         curl 'localhost:9200'

@@ -1,6 +1,8 @@
-import http.client
+import requests
+from requests.auth import HTTPBasicAuth
+
+
 import json
-import urllib.parse
 import re
 
 from webfront.views.queryset_manager import escape
@@ -55,19 +57,10 @@ def getAfterBeforeFromCursor(cursor):
 
 class ElasticsearchController(SearchController):
     def __init__(self, queryset_manager=None):
-        url = urllib.parse.urlparse(settings.SEARCHER_URL)
-        proxy = settings.HTTP_PROXY
-        self.server = url.hostname
-        self.port = url.port
         self.index = settings.SEARCHER_INDEX
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
-        if proxy is not None and proxy != "":
-            proxy = urllib.parse.urlparse(proxy)
-            self.connection = http.client.HTTPConnection(proxy.hostname, proxy.port)
-            self.connection.set_tunnel(self.server, self.port)
-        else:
-            self.connection = http.client.HTTPConnection(self.server, self.port)
+        self.auth = HTTPBasicAuth(settings.SEARCHER_USER, settings.SEARCHER_PASSWORD)
 
     def add(self, docs, is_ida=False):
         body = ""
@@ -79,22 +72,28 @@ class ElasticsearchController(SearchController):
                 + json.dumps(doc)
                 + "\n"
             )
-        conn = http.client.HTTPConnection(self.server, self.port)
         index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
-        conn.request("POST", "/" + index + "/_bulk/", body, self.headers)
-        response = conn.getresponse()
+        response = requests.post(
+            f"{settings.SEARCHER_URL}/{index}/_bulk/",
+            auth=self.auth,
+            headers=self.headers,
+            data=body,
+            verify=False
+        )
         return response
 
     def clear_all_docs(self):
         body = '{ "query": { "match_all": {} } }'
-        conn = http.client.HTTPConnection(self.server, self.port)
-        conn.request(
-            "POST",
-            "/" + self.index + "/_delete_by_query?conflicts=proceed",
-            body,
-            self.headers,
+
+        response = requests.post(
+            f"{settings.SEARCHER_URL}/{self.index}/_bulk/",
+            auth=self.auth,
+            headers=self.headers,
+            data=body,
+            verify=False
         )
-        return conn.getresponse()
+
+        return response
 
     def get_grouped_object(
         self, endpoint, field, query=None, extra_counters=[], size=10
@@ -424,12 +423,14 @@ class ElasticsearchController(SearchController):
         if rows is not None:
             path += "&size={}".format(rows)
         logger.debug("URL:" + path)
-        self.connection.request(
-            "GET", path, query_obj and json.dumps(query_obj), self.headers
+        response = requests.get(
+            settings.SEARCHER_URL+path,
+            auth=self.auth,
+            headers=self.headers,
+            data=query_obj and json.dumps(query_obj),
+            verify=False
         )
-        response = self.connection.getresponse()
-        data = response.read().decode()
-        return json.loads(data)
+        return response.json()
 
     def _elastic_json_query(self, q, query_obj=None, is_ida=False):
         logger = logging.getLogger("interpro.elastic")
@@ -442,12 +443,16 @@ class ElasticsearchController(SearchController):
             .replace(" || ", "%20OR%20")
         )
         index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
-        path = "/" + index + "/_search?request_cache=true&q=" + q
+        path = f"/{index}/_search?request_cache=true&q={q}"
         logger.debug("URL:" + path)
-        self.connection.request("GET", path, json.dumps(query_obj), self.headers)
-        response = self.connection.getresponse()
-        data = response.read().decode()
-        obj = json.loads(data)
+        response = requests.get(
+            settings.SEARCHER_URL + path,
+            auth=self.auth,
+            headers=self.headers,
+            data=json.dumps(query_obj),
+            verify=False
+        )
+        obj = response.json()
         if settings.DEBUG:
             es_results.append(obj)
         return obj

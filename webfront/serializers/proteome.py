@@ -142,12 +142,14 @@ class ProteomeSerializer(ModelContentSerializer):
                 "is_reference": instance.is_reference,
                 "strain": instance.strain,
                 "assembly": instance.assembly,
-                "taxonomy": instance.taxonomy.accession
-                if instance.taxonomy is not None
-                else None,
-                "lineage": instance.taxonomy.lineage
-                if instance.taxonomy is not None
-                else None,
+                "taxonomy": (
+                    instance.taxonomy.accession
+                    if instance.taxonomy is not None
+                    else None
+                ),
+                "lineage": (
+                    instance.taxonomy.lineage if instance.taxonomy is not None else None
+                ),
                 "counters": counters,
             }
         }
@@ -159,12 +161,14 @@ class ProteomeSerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.name,
                 "is_reference": instance.is_reference,
-                "taxonomy": instance.taxonomy.accession
-                if instance.taxonomy is not None
-                else None,
-                "lineage": instance.taxonomy.lineage
-                if instance.taxonomy is not None
-                else None,
+                "taxonomy": (
+                    instance.taxonomy.accession
+                    if instance.taxonomy is not None
+                    else None
+                ),
+                "lineage": (
+                    instance.taxonomy.lineage if instance.taxonomy is not None else None
+                ),
                 "source_database": "uniprot",
             }
         }

@@ -80,9 +80,9 @@ class FixtureReader:
             elif fixture["model"] == "webfront.Set":
                 self.sets[fixture["fields"]["accession"].lower()] = fixture["fields"]
             elif fixture["model"] == "webfront.EntryAnnotation":
-                self.entry_annotations[
-                    fixture["fields"]["accession"].lower()
-                ] = fixture["fields"]
+                self.entry_annotations[fixture["fields"]["accession"].lower()] = (
+                    fixture["fields"]
+                )
 
     def get_entry2set(self):
         e2s = {}
@@ -161,7 +161,7 @@ class FixtureReader:
                     c["structure_chain_acc"] = sp["chain"]
                     c["text_structure"] = c["structure_acc"] + " " + sp["chain"]
 
-                    c["entry_structure_locations"]= ep["coordinates"],
+                    c["entry_structure_locations"] = (ep["coordinates"],)
                     c["structure_protein_locations"] = sp["coordinates"]
                     # c["protein_structure"] = sp["mapping"]
                     if e in entry2set:
@@ -281,9 +281,14 @@ class FixtureReader:
         for doc in to_add:
             lower.append(
                 {
-                    k: v.lower()
-                    if type(v) == str and k != "ida" and "date" not in k and "chain" not in k
-                    else v
+                    k: (
+                        v.lower()
+                        if type(v) == str
+                        and k != "ida"
+                        and "date" not in k
+                        and "chain" not in k
+                        else v
+                    )
                     for k, v in doc.items()
                 }
             )

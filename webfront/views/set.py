@@ -37,7 +37,9 @@ class SetAccessionHandler(CustomView):
         )
         general_handler.modifiers.register(
             "alignments",
-            get_deprecated_response("Profile-profile alignments have been permanently removed in InterPro 97.0.")
+            get_deprecated_response(
+                "Profile-profile alignments have been permanently removed in InterPro 97.0."
+            ),
         )
 
         return super(SetAccessionHandler, self).get(
@@ -165,4 +167,3 @@ class SetHandler(CustomView):
     def filter(queryset, level_name="", general_handler=None):
         general_handler.queryset_manager.add_filter("set", accession__isnull=False)
         return queryset
-

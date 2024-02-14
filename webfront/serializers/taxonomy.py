@@ -168,9 +168,11 @@ class TaxonomySerializer(ModelContentSerializer):
                 "rank": instance.rank,
                 "children": self.get_children(instance),
                 "source_database": "uniprot",
-                "parent": str(instance.parent.accession)
-                if instance.parent is not None
-                else None,
+                "parent": (
+                    str(instance.parent.accession)
+                    if instance.parent is not None
+                    else None
+                ),
                 "name": {"name": instance.scientific_name, "short": instance.full_name},
                 "counters": counters,
             }
@@ -204,9 +206,9 @@ class TaxonomySerializer(ModelContentSerializer):
                 "accession": instance.accession,
                 "name": instance.full_name,
                 "children": instance.children,
-                "parent": instance.parent.accession
-                if instance.parent is not None
-                else None,
+                "parent": (
+                    instance.parent.accession if instance.parent is not None else None
+                ),
                 "source_database": "uniprot",
             }
         }
@@ -295,13 +297,13 @@ class TaxonomySerializer(ModelContentSerializer):
 
     def to_proteomes_count_representation(self, instance):
         query = self.get_searcher_query(instance)
-        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "proteome", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "proteomes"
-        ]
+        return (
+            webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "proteome", query, self.get_extra_endpoints_to_count()
+                )
+            )["proteomes"]
+        )
 
     def to_set_count_representation(self, instance):
         query = self.get_searcher_query(instance)

@@ -466,7 +466,6 @@ def get_entry_annotation_info(field, general_handler):
     return {}
 
 
-
 def add_extra_fields(endpoint, *argv):
     supported_fields = [
         f.name for f in endpoint._meta.get_fields() if not f.is_relation
@@ -498,9 +497,11 @@ def ida_search(value, general_handler):
         query = "/{}/".format(
             "\-".join(
                 [
-                    f"PF[0-9]{{5}}\:{e}"
-                    if e.startswith("IPR")
-                    else f"{e}(\:IPR[0-9]{{6}})?"
+                    (
+                        f"PF[0-9]{{5}}\:{e}"
+                        if e.startswith("IPR")
+                        else f"{e}(\:IPR[0-9]{{6}})?"
+                    )
                     for e in entries
                 ]
             )
@@ -543,7 +544,7 @@ def get_isoforms(value, general_handler):
 
 def run_hmmsearch(model):
     """
-        run hmmsearch using hmm model against reviewed uniprot proteins
+    run hmmsearch using hmm model against reviewed uniprot proteins
     """
     parameters = {"seq": model, "seqdb": "swissprot"}
 
@@ -581,7 +582,7 @@ def calculate_conservation_scores(entry_acc):
 
 def align_seq_to_model(domains, sequence):
     """
-        align result of hmmscan with uniprot sequence
+    align result of hmmscan with uniprot sequence
     """
     hmmfrom = domains["alihmmfrom"]
     hmmto = domains["alihmmto"]
@@ -608,7 +609,7 @@ def align_seq_to_model(domains, sequence):
 
 def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmotif):
     """
-        generate sequence matrix (i.e. matrix[res] = "conservation_score_seqAA_modelposition")
+    generate sequence matrix (i.e. matrix[res] = "conservation_score_seqAA_modelposition")
     """
     matrix = {}
     count = hmmfrom - 1
@@ -635,7 +636,7 @@ def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmoti
 
 def format_logo(matrix):
     """
-        re-arrange the data
+    re-arrange the data
     """
     output = []
     for res in matrix:
@@ -697,8 +698,8 @@ def calculate_residue_conservation(entry_db, general_handler):
                 domains = [hit["domains"] for hit in protein_hits][0]
                 for hit in domains:
                     # calculate scores for each domain hit for each entry
-                    mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(
-                        hit, sequence
+                    mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = (
+                        align_seq_to_model(hit, sequence)
                     )
                     matrixseq = get_hmm_matrix(
                         logo_score,
@@ -874,6 +875,7 @@ def mark_as_subfamily(value, general_handler):
 
 def passing(x, y):
     pass
+
 
 def get_deprecated_response(message):
     def deprecated(value, general_handler):

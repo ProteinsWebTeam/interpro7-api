@@ -7,21 +7,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('webfront', '0021_set_info'),
+        ("webfront", "0021_set_info"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ChainSequence',
+            name="ChainSequence",
             fields=[
-                ('id', models.IntegerField(primary_key=True, serialize=False)),
-                ('chain', models.CharField(db_column='chain_acc', max_length=10)),
-                ('sequence_bin', models.BinaryField(db_column='sequence', null=True)),
-                ('length', models.IntegerField()),
-                ('structure', models.ForeignKey(blank=True, db_column='structure_acc', null=True, on_delete=django.db.models.deletion.SET_NULL, to='webfront.structure')),
+                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                ("chain", models.CharField(db_column="chain_acc", max_length=10)),
+                ("sequence_bin", models.BinaryField(db_column="sequence", null=True)),
+                ("length", models.IntegerField()),
+                (
+                    "structure",
+                    models.ForeignKey(
+                        blank=True,
+                        db_column="structure_acc",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="webfront.structure",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'webfront_chain_sequence',
+                "db_table": "webfront_chain_sequence",
             },
         ),
     ]

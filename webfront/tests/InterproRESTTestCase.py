@@ -236,9 +236,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                         for ch2 in response_acc.data[key]:
                             if "lineage" not in ch2 and "taxonomy" not in ch2:
                                 self.assertEqual(ch2["chain"].upper(), chain, msg)
-                    self.assertIn(
-                        chain, response_acc.data["metadata"]["chains"], msg
-                    )
+                    self.assertIn(chain, response_acc.data["metadata"]["chains"], msg)
                     self._check_match(
                         response_acc.data["metadata"]["chains"][chain], msg
                     )

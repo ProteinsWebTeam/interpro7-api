@@ -106,7 +106,8 @@ class EntrySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
-                    include_structure=SerializerDetail.STRUCTURE_DETAIL not in detail_filters,
+                    include_structure=SerializerDetail.STRUCTURE_DETAIL
+                    not in detail_filters,
                     include_matches=True,
                     base_query=sq,
                 )
@@ -220,9 +221,9 @@ class EntrySerializer(ModelContentSerializer):
             "go_terms": instance.go_terms,
             "source_database": instance.source_database,
             "member_databases": instance.member_databases,
-            "integrated": instance.integrated.accession
-            if instance.integrated
-            else None,
+            "integrated": (
+                instance.integrated.accession if instance.integrated else None
+            ),
             "hierarchy": instance.hierarchy,
             "name": {
                 "name": instance.name,
@@ -274,9 +275,9 @@ class EntrySerializer(ModelContentSerializer):
                 "name": instance.name if instance.name else instance.short_name,
                 "source_database": instance.source_database,
                 "type": instance.type,
-                "integrated": instance.integrated.accession
-                if instance.integrated
-                else None,
+                "integrated": (
+                    instance.integrated.accession if instance.integrated else None
+                ),
                 "member_databases": instance.member_databases,
                 "go_terms": instance.go_terms,
             }
@@ -371,10 +372,10 @@ class EntrySerializer(ModelContentSerializer):
                 )
                 > 0
             ):
-                result["entries"][
-                    "unintegrated"
-                ] = EntrySerializer.serialize_counter_bucket(
-                    instance["unintegrated"], "entries"
+                result["entries"]["unintegrated"] = (
+                    EntrySerializer.serialize_counter_bucket(
+                        instance["unintegrated"], "entries"
+                    )
                 )
             if "all" in instance and (
                 ("count" in instance["all"] and instance["all"]["count"])
@@ -391,10 +392,10 @@ class EntrySerializer(ModelContentSerializer):
                 )
                 > 0
             ):
-                result["entries"][
-                    "integrated"
-                ] = EntrySerializer.serialize_counter_bucket(
-                    instance["integrated"], "entries"
+                result["entries"]["integrated"] = (
+                    EntrySerializer.serialize_counter_bucket(
+                        instance["integrated"], "entries"
+                    )
                 )
             if "interpro" in result["entries"]["member_databases"]:
                 result["entries"]["interpro"] = result["entries"]["member_databases"][
@@ -452,13 +453,13 @@ class EntrySerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "taxonomy", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "taxa"
-        ]
+        return (
+            webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "taxonomy", query, self.get_extra_endpoints_to_count()
+                )
+            )["taxa"]
+        )
 
     def to_proteome_count_representation(self, instance):
         query = (
@@ -466,13 +467,13 @@ class EntrySerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "proteome", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "proteomes"
-        ]
+        return (
+            webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "proteome", query, self.get_extra_endpoints_to_count()
+                )
+            )["proteomes"]
+        )
 
     def to_set_count_representation(self, instance):
         query = (
@@ -492,9 +493,11 @@ class EntrySerializer(ModelContentSerializer):
     ):
         header = {
             # Only CDD accession are lowercase.
-            "accession": obj["entry_acc"]
-            if obj["entry_db"] == "cdd"
-            else obj["entry_acc"].upper(),
+            "accession": (
+                obj["entry_acc"]
+                if obj["entry_db"] == "cdd"
+                else obj["entry_acc"].upper()
+            ),
             "entry_protein_locations": obj["entry_protein_locations"],
             "protein_length": obj["protein_length"],
             "source_database": obj["entry_db"],
@@ -504,7 +507,9 @@ class EntrySerializer(ModelContentSerializer):
         if for_structure:
             header["chain"] = obj["structure_chain_acc"]
             header["entry_structure_locations"] = obj["entry_structure_locations"]
-            chain = ChainSequence.objects.get(structure=obj['structure_acc'], chain=obj["structure_chain_acc"])
+            chain = ChainSequence.objects.get(
+                structure=obj["structure_acc"], chain=obj["structure_chain_acc"]
+            )
             header["sequence"] = chain.sequence
             header["sequence_length"] = chain.length
 

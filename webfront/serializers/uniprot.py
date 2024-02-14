@@ -186,9 +186,11 @@ class ProteinSerializer(ModelContentSerializer):
             "source_database": instance.source_database,
             "is_fragment": instance.is_fragment,
             "ida_accession": instance.ida_id,
-            "counters": ProteinSerializer.get_counters(instance, searcher, sq)
-            if counters is None
-            else counters,
+            "counters": (
+                ProteinSerializer.get_counters(instance, searcher, sq)
+                if counters is None
+                else counters
+            ),
         }
         if instance.ida_id is not None:
             protein["counters"]["similar_proteins"] = Protein.objects.filter(
@@ -298,13 +300,13 @@ class ProteinSerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "taxonomy", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "taxa"
-        ]
+        return (
+            webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "taxonomy", query, self.get_extra_endpoints_to_count()
+                )
+            )["taxa"]
+        )
 
     def to_proteome_count_representation(self, instance):
         query = (
@@ -312,13 +314,13 @@ class ProteinSerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "proteome", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "proteomes"
-        ]
+        return (
+            webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "proteome", query, self.get_extra_endpoints_to_count()
+                )
+            )["proteomes"]
+        )
 
     def to_set_count_representation(self, instance):
         query = (

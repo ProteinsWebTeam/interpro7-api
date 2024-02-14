@@ -33,6 +33,7 @@ class InvalidOperationRequest(Exception):
     def __init__(self, message):
         self.message = message
 
+
 class DeprecatedModifier(Exception):
     def __init__(self, message):
         self.message = message

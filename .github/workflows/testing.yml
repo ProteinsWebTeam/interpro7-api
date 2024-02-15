@@ -27,9 +27,9 @@ jobs:
         elasticsearch_password: "elasticsearch_password"
     - name: ⚙️🔎 - Setup elastic search
       run: |
-        curl --user elastic:elasticsearch_password 'localhost:9200' -k
-        curl --user elastic:elasticsearch_password -XPUT 'localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json -k
-        curl --user elastic:elasticsearch_password -XPUT 'localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json -k
+        curl --user elastic:elasticsearch_password 'https://localhost:9200' -k
+        curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json -k
+        curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json -k
     - name: 🔧 - Install Dependencies
       run: |
         pip install -r requirements.txt

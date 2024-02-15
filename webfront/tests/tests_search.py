@@ -10,9 +10,9 @@ class ElasticContorllerTest(InterproRESTTestCase):
         self.assertEqual(obj, elastic.queryset_manager)
         self.assertIsNotNone(elastic.headers)
         if settings.SEARCHER_USER == "":
-            self.assertIsNone(elastic.auth)
+            self.assertNotIn("Authorization", elastic.headers)
         else:
-            self.assertIsNotNone(elastic.auth)
+            self.assertIn("Authorization", elastic.headers)
 
 
 class EntryRESTSearchTest(InterproRESTTestCase):

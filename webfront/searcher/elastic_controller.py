@@ -72,19 +72,24 @@ class ElasticsearchController(SearchController):
         self.index = settings.SEARCHER_INDEX
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
-        if settings.SEARCHER_USER != "":
+        using_auth = settings.SEARCHER_USER != ""
+        if using_auth:
             self.headers["Authorization"] = basic_auth(
                 settings.SEARCHER_USER, settings.SEARCHER_PASSWORD
             )
         if proxy is not None and proxy != "":
             proxy = urllib.parse.urlparse(proxy)
             self.connection = HTTPSConnection(
-                proxy.hostname, proxy.port, context=ssl._create_unverified_context()
+                proxy.hostname,
+                proxy.port,
+                context=ssl._create_unverified_context() if using_auth else None,
             )
             self.connection.set_tunnel(self.server, self.port)
         else:
             self.connection = HTTPSConnection(
-                self.server, self.port, context=ssl._create_unverified_context()
+                self.server,
+                self.port,
+                context=ssl._create_unverified_context() if using_auth else None,
             )
 
     def add(self, docs, is_ida=False):

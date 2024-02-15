@@ -23,7 +23,8 @@ jobs:
       uses: elastic/elastic-github-actions/elasticsearch@master
       with:
         stack-version: 8.2.0
-        security-enabled: false
+        security-enabled: true
+        elasticsearch_password: "elasticsearch_password"
     - name: ⚙️🔎 - Setup elastic search
       run: |
         curl 'localhost:9200'
@@ -37,6 +38,8 @@ jobs:
         pip freeze
     - name: 🧪 - Testing
       run: |
+        pwd
+        echo 'searcher_user: "elastic"\nsearcher_password: "elasticsearch_password"' > config/interpro.local.yml 
         export BROWSER_TEST=chrome
         coverage run --source='.' manage.py test
     - name: 🧥‍ - Coveralls

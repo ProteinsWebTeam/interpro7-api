@@ -88,6 +88,7 @@ class Protein(models.Model):
     # extra_features = JSONField(null=True)
     structure = JSONField(default={}, null=True)
     is_fragment = models.BooleanField(default=False)
+    in_alphafold = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
     ida_id = models.CharField(max_length=40, null=True)
     ida = models.TextField(null=True)
@@ -143,7 +144,11 @@ class Structure(models.Model):
 class ChainSequence(models.Model):
     id = models.IntegerField(primary_key=True)
     structure = models.ForeignKey(
-        "Structure", on_delete=models.SET_NULL, null=True, blank=True, db_column="structure_acc"
+        "Structure",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="structure_acc",
     )
     chain = models.CharField(db_column="chain_acc", max_length=10)
     sequence_bin = models.BinaryField(db_column="sequence", null=True)
@@ -229,4 +234,3 @@ class Isoforms(models.Model):
 
     class Meta:
         db_table = "webfront_varsplic"
-

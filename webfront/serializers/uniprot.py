@@ -166,6 +166,7 @@ class ProteinSerializer(ModelContentSerializer):
                 "length": instance.length,
                 "source_organism": instance.organism,
                 "gene": instance.gene,
+                "in_alphafold": instance.in_alphafold,
             }
         }
 
@@ -185,10 +186,13 @@ class ProteinSerializer(ModelContentSerializer):
             "protein_evidence": instance.evidence_code,
             "source_database": instance.source_database,
             "is_fragment": instance.is_fragment,
+            "in_alphafold": instance.in_alphafold,
             "ida_accession": instance.ida_id,
-            "counters": ProteinSerializer.get_counters(instance, searcher, sq)
-            if counters is None
-            else counters,
+            "counters": (
+                ProteinSerializer.get_counters(instance, searcher, sq)
+                if counters is None
+                else counters
+            ),
         }
         if instance.ida_id is not None:
             protein["counters"]["similar_proteins"] = Protein.objects.filter(
@@ -298,13 +302,13 @@ class ProteinSerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "taxonomy", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "taxa"
-        ]
+        return (
+            webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "taxonomy", query, self.get_extra_endpoints_to_count()
+                )
+            )["taxa"]
+        )
 
     def to_proteome_count_representation(self, instance):
         query = (
@@ -312,13 +316,13 @@ class ProteinSerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "proteome", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "proteomes"
-        ]
+        return (
+            webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "proteome", query, self.get_extra_endpoints_to_count()
+                )
+            )["proteomes"]
+        )
 
     def to_set_count_representation(self, instance):
         query = (
@@ -346,6 +350,7 @@ class ProteinSerializer(ModelContentSerializer):
             "protein_length": obj["protein_length"],
             "source_database": obj["protein_db"],
             "organism": obj["tax_id"],
+            "in_alphafold": not obj["protein_af_score"] == -1,
         }
         if not for_entry and "structure_chain_acc" in obj:
             header["chain"] = obj["structure_chain_acc"]

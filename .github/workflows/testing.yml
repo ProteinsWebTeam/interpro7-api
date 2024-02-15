@@ -38,7 +38,7 @@ jobs:
         pip freeze
     - name: 🧪 - Testing
       run: |
-        echo 'searcher_user: elastic \nsearcher_password: elasticsearch_password\n' > config/interpro.local.yml
+        echo -e "searcher_user: elastic \nsearcher_password: elasticsearch_password" > config/interpro.local.yml
         cat config/interpro.local.yml
         export BROWSER_TEST=chrome
         coverage run --source='.' manage.py test

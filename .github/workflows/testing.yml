@@ -38,8 +38,8 @@ jobs:
         pip freeze
     - name: 🧪 - Testing
       run: |
-        pwd
-        echo 'searcher_user: "elastic"\nsearcher_password: "elasticsearch_password"' > config/interpro.local.yml 
+        echo 'searcher_user: elastic \nsearcher_password: elasticsearch_password\n' > config/interpro.local.yml
+        cat config/interpro.local.yml
         export BROWSER_TEST=chrome
         coverage run --source='.' manage.py test
     - name: 🧥‍ - Coveralls

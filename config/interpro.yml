@@ -4,7 +4,7 @@ django_cors: true
 searcher_path: "http://hmmer-prod-db01:9200"
 searcher_index: "current"
 searcher_ida_index: "ida"
-searcher_test_path: "https://localhost:9200"
+searcher_test_path: "http://localhost:9200"
 searcher_user: ""
 searcher_password: ""
 api_url: "http://localhost:8007/api/"

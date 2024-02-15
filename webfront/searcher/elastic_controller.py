@@ -1,5 +1,6 @@
-import requests
-from requests.auth import HTTPBasicAuth
+from http.client import HTTPSConnection
+from base64 import b64encode
+import ssl
 
 import urllib.parse
 import json
@@ -55,18 +56,36 @@ def getAfterBeforeFromCursor(cursor):
     return after, before
 
 
+# Authorization token: we need to base 64 encode it and then
+# decode it to acsii as python 3 stores it as a byte string
+def basic_auth(username, password):
+    token = b64encode(f"{username}:{password}".encode("utf-8")).decode("ascii")
+    return f"Basic {token}"
+
+
 class ElasticsearchController(SearchController):
     def __init__(self, queryset_manager=None):
         url = urllib.parse.urlparse(settings.SEARCHER_URL)
+        proxy = settings.HTTP_PROXY
         self.server = url.hostname
+        self.port = url.port
         self.index = settings.SEARCHER_INDEX
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
-        self.auth = (
-            HTTPBasicAuth(settings.SEARCHER_USER, settings.SEARCHER_PASSWORD)
-            if settings.SEARCHER_USER != ""
-            else None
-        )
+        if settings.SEARCHER_USER != "":
+            self.headers["Authorization"] = basic_auth(
+                settings.SEARCHER_USER, settings.SEARCHER_PASSWORD
+            )
+        if proxy is not None and proxy != "":
+            proxy = urllib.parse.urlparse(proxy)
+            self.connection = HTTPSConnection(
+                proxy.hostname, proxy.port, context=ssl._create_unverified_context()
+            )
+            self.connection.set_tunnel(self.server, self.port)
+        else:
+            self.connection = HTTPSConnection(
+                self.server, self.port, context=ssl._create_unverified_context()
+            )
 
     def add(self, docs, is_ida=False):
         body = ""
@@ -79,27 +98,20 @@ class ElasticsearchController(SearchController):
                 + "\n"
             )
         index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
-        response = requests.post(
-            f"{settings.SEARCHER_URL}/{index}/_bulk/",
-            auth=self.auth,
-            headers=self.headers,
-            data=body,
-            verify=False,
-        )
+        self.connection.request("POST", "/" + index + "/_bulk/", body, self.headers)
+        response = self.connection.getresponse()
         return response
 
     def clear_all_docs(self):
         body = '{ "query": { "match_all": {} } }'
 
-        response = requests.post(
-            f"{settings.SEARCHER_URL}/{self.index}/_bulk/",
-            auth=self.auth,
-            headers=self.headers,
-            data=body,
-            verify=False,
+        self.connection.request(
+            "POST",
+            "/" + self.index + "/_delete_by_query?conflicts=proceed",
+            body,
+            self.headers,
         )
-
-        return response
+        return self.connection.getresponse()
 
     def get_grouped_object(
         self, endpoint, field, query=None, extra_counters=[], size=10
@@ -429,14 +441,13 @@ class ElasticsearchController(SearchController):
         if rows is not None:
             path += "&size={}".format(rows)
         logger.debug("URL:" + path)
-        response = requests.get(
-            settings.SEARCHER_URL + path,
-            auth=self.auth,
-            headers=self.headers,
-            data=query_obj and json.dumps(query_obj),
-            verify=False,
+
+        self.connection.request(
+            "GET", path, query_obj and json.dumps(query_obj), self.headers
         )
-        return response.json()
+        response = self.connection.getresponse()
+        data = response.read().decode()
+        return json.loads(data)
 
     def _elastic_json_query(self, q, query_obj=None, is_ida=False):
         logger = logging.getLogger("interpro.elastic")
@@ -451,14 +462,10 @@ class ElasticsearchController(SearchController):
         index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
         path = f"/{index}/_search?request_cache=true&q={q}"
         logger.debug("URL:" + path)
-        response = requests.get(
-            settings.SEARCHER_URL + path,
-            auth=self.auth,
-            headers=self.headers,
-            data=json.dumps(query_obj),
-            verify=False,
-        )
-        obj = response.json()
+        self.connection.request("GET", path, json.dumps(query_obj), self.headers)
+        response = self.connection.getresponse()
+        data = response.read().decode()
+        obj = json.loads(data)
         if settings.DEBUG:
             es_results.append(obj)
         return obj

@@ -15,6 +15,7 @@ chains = {
 
 
 @override_settings(SEARCHER_URL=settings.SEARCHER_TEST_URL)
+@override_settings(SEARCHER_PASSWORD=settings.SEARCHER_TEST_PASSWORD)
 @override_settings(SEARCHER_INDEX="test")
 class InterproRESTTestCase(APITransactionTestCase):
     fixtures = [

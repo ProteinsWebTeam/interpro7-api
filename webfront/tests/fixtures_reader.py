@@ -80,9 +80,9 @@ class FixtureReader:
             elif fixture["model"] == "webfront.Set":
                 self.sets[fixture["fields"]["accession"].lower()] = fixture["fields"]
             elif fixture["model"] == "webfront.EntryAnnotation":
-                self.entry_annotations[
-                    fixture["fields"]["accession"].lower()
-                ] = fixture["fields"]
+                self.entry_annotations[fixture["fields"]["accession"].lower()] = (
+                    fixture["fields"]
+                )
 
     def get_entry2set(self):
         e2s = {}
@@ -121,6 +121,7 @@ class FixtureReader:
                 + (" ".join(self.entries[e]["description"])),
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
+                "protein_af_score": 0.5 if self.proteins[p]["in_alphafold"] else -1,
                 "text_protein": p
                 + " "
                 + self.proteins[p]["source_database"]
@@ -161,7 +162,7 @@ class FixtureReader:
                     c["structure_chain_acc"] = sp["chain"]
                     c["text_structure"] = c["structure_acc"] + " " + sp["chain"]
 
-                    c["entry_structure_locations"]= ep["coordinates"],
+                    c["entry_structure_locations"] = (ep["coordinates"],)
                     c["structure_protein_locations"] = sp["coordinates"]
                     # c["protein_structure"] = sp["mapping"]
                     if e in entry2set:
@@ -200,6 +201,9 @@ class FixtureReader:
                             "text": p + " " + sp["structure"],
                             "protein_acc": p,
                             "protein_db": self.proteins[p]["source_database"],
+                            "protein_af_score": (
+                                0.5 if self.proteins[p]["in_alphafold"] else -1
+                            ),
                             "text_protein": p
                             + " "
                             + self.proteins[p]["source_database"]
@@ -258,6 +262,9 @@ class FixtureReader:
                         "text": p,
                         "protein_acc": p,
                         "protein_db": self.proteins[p]["source_database"],
+                        "protein_af_score": (
+                            0.5 if self.proteins[p]["in_alphafold"] else -1
+                        ),
                         "text_protein": p + " " + self.proteins[p]["source_database"],
                         "tax_id": self.proteins[p]["organism"]["taxId"],
                         "tax_name": self.proteins[p]["organism"]["name"],
@@ -281,9 +288,14 @@ class FixtureReader:
         for doc in to_add:
             lower.append(
                 {
-                    k: v.lower()
-                    if type(v) == str and k != "ida" and "date" not in k and "chain" not in k
-                    else v
+                    k: (
+                        v.lower()
+                        if type(v) == str
+                        and k != "ida"
+                        and "date" not in k
+                        and "chain" not in k
+                        else v
+                    )
                     for k, v in doc.items()
                 }
             )

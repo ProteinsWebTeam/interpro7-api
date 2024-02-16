@@ -78,6 +78,9 @@
       "structure_evidence": {
         "type": "keyword"
       },
+      "protein_af_score": {
+        "type": "float"
+      },
       "proteome_acc": {
         "type": "keyword"
       },

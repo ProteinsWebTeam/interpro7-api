@@ -17,6 +17,7 @@
       "length": "543",
       "proteome": "UP000006701",
       "gene": "cpyA",
+      "in_alphafold": true,
       "go_terms": [
         {
           "identifier": "GO:0016740",
@@ -59,6 +60,7 @@
       "length": 297,
       "proteome": "UP000012042",
       "gene": "LVISKB_0797",
+      "in_alphafold": true,
       "go_terms": [
         {
           "identifier": "GO:0016740",
@@ -164,6 +166,7 @@
       "length": "550",
       "proteome": "UP000030104",
       "gene": "PITC_084940",
+      "in_alphafold": false,
       "go_terms": [
         {
           "identifier": "GO:0005515",
@@ -204,6 +207,7 @@
       "length": 696,
       "proteome": "UP000030104",
       "gene": "LHCGR",
+      "in_alphafold": true,
       "go_terms": [
         {
           "identifier": "GO:0005515",
@@ -246,6 +250,7 @@
       "length": 696,
       "proteome": "UP000000589",
       "gene": "FOLH1",
+      "in_alphafold": true,
       "go_terms": null,
       "evidence_code": 1,
       "source_database": "unreviewed",

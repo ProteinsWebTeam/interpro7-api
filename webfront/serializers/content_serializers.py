@@ -160,7 +160,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         include_structure=True,
         include_matches=False,
         include_chain=True,
-        base_query="*:*",
+        queryset_manager=None,
     ):
         field = "structure_chain" if include_chain else "structure_acc"
         response = [
@@ -169,7 +169,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 include_structure=include_structure,
                 include_matches=include_matches,
                 search=searcher,
-                base_query=base_query,
+                queryset_manager=queryset_manager,
             )
             for r in searcher.get_group_obj_of_field_by_query(
                 None, field, fq=query, rows=20
@@ -187,6 +187,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         include_chains=False,
         for_structure=False,
         base_query=None,
+        queryset_manager=None,
     ):
         if include_chains:
             search = searcher.get_group_obj_of_field_by_query(
@@ -199,7 +200,10 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_search_object(
-                r, searcher=searcher, for_structure=for_structure, sq=base_query
+                r,
+                searcher=searcher,
+                for_structure=for_structure,
+                queryset_manager=queryset_manager,
             )
             for r in search
         ]
@@ -223,7 +227,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         include_chains=False,
         include_coordinates=True,
         for_entry=False,
-        base_query="*:*",
+        queryset_manager=None,
     ):
         field = "structure_chain" if include_chains else "protein_acc"
         response = [
@@ -232,7 +236,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 for_entry=for_entry,
                 searcher=searcher,
                 include_coordinates=include_coordinates,
-                sq=base_query,
+                queryset_manager=queryset_manager,
             )
             for r in searcher.get_group_obj_of_field_by_query(
                 None, field, fq=searcher_query, rows=20
@@ -298,3 +302,19 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if "before_key" in obj and obj["before_key"] is not None:
             previous = replace_query_param(url, "cursor", obj["before_key"])
         return {"next": next_page, "previous": previous, **payload}
+
+    @staticmethod
+    def generic_get_counters(
+        main_endpoint, counter_endpoints, instance, searcher, queryset_manager
+    ):
+        sq = queryset_manager.get_searcher_query()
+        counters = {}
+        for ep, (name, field) in counter_endpoints.items():
+            if ep not in queryset_manager.filters or (
+                "accession" not in queryset_manager.filters[ep]
+                and "accession__iexact" not in queryset_manager.filters[ep]
+            ):
+                counters[name] = searcher.get_number_of_field_by_endpoint(
+                    main_endpoint, field, instance.accession, sq
+                )
+        return counters

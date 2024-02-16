@@ -25,7 +25,7 @@ class EntrySerializer(ModelContentSerializer):
 
             def counter_function():
                 return EntrySerializer.get_counters(
-                    instance, self.searcher, self.queryset_manager.get_searcher_query()
+                    instance, self.searcher, self.queryset_manager
                 )
 
             representation = self.add_other_fields(
@@ -38,11 +38,10 @@ class EntrySerializer(ModelContentSerializer):
 
     def endpoint_representation(self, representation, instance, detail):
         if detail == SerializerDetail.ALL or detail == SerializerDetail.ENTRY_DETAIL:
-            sq = self.queryset_manager.get_searcher_query()
             representation["metadata"] = self.to_metadata_representation(
                 instance,
                 self.searcher,
-                sq,
+                self.queryset_manager,
                 instance.counts if self.queryset_manager.is_single_endpoint() else None,
             )
         elif detail == SerializerDetail.ENTRY_OVERVIEW:
@@ -91,7 +90,7 @@ class EntrySerializer(ModelContentSerializer):
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
                     for_entry=True,
-                    base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -109,7 +108,7 @@ class EntrySerializer(ModelContentSerializer):
                     include_structure=SerializerDetail.STRUCTURE_DETAIL
                     not in detail_filters,
                     include_matches=True,
-                    base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters
@@ -203,13 +202,15 @@ class EntrySerializer(ModelContentSerializer):
         return reformattedCrossReferences
 
     @staticmethod
-    def to_metadata_representation(instance, searcher, sq, counters=None):
+    def to_metadata_representation(instance, searcher, queryset_manager, counters=None):
         results = EntryAnnotation.objects.filter(accession=instance.accession).only(
             "type", "num_sequences"
         )
         annotation_types = {x.type: x.num_sequences or 0 for x in results}
         if counters is None:
-            counters = EntrySerializer.get_counters(instance, searcher, sq)
+            counters = EntrySerializer.get_counters(
+                instance, searcher, queryset_manager
+            )
 
         if "domains" in counters:
             counters["domain_architectures"] = counters["domains"]
@@ -246,27 +247,18 @@ class EntrySerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def get_counters(instance, searcher, sq):
-        return {
-            "proteins": searcher.get_number_of_field_by_endpoint(
-                "entry", "protein_acc", instance.accession, sq
-            ),
-            "structures": searcher.get_number_of_field_by_endpoint(
-                "entry", "structure_acc", instance.accession, sq
-            ),
-            "taxa": searcher.get_number_of_field_by_endpoint(
-                "entry", "tax_id", instance.accession, sq
-            ),
-            "proteomes": searcher.get_number_of_field_by_endpoint(
-                "entry", "proteome_acc", instance.accession, sq
-            ),
-            "sets": searcher.get_number_of_field_by_endpoint(
-                "entry", "set_acc", instance.accession, sq
-            ),
-            "domain_architectures": searcher.get_number_of_field_by_endpoint(
-                "entry", "ida_id", instance.accession, sq
-            ),
+    def get_counters(instance, searcher, queryset_manager):
+        endpoints = {
+            "protein": ["proteins", "protein_acc"],
+            "structure": ["structures", "structure_acc"],
+            "taxonomy": ["taxa", "tax_id"],
+            "proteome": ["proteomes", "proteome_acc"],
+            "set": ["sets", "set_acc"],
+            "ida": ["domain_architectures", "ida_id"],
         }
+        return ModelContentSerializer.generic_get_counters(
+            "entry", endpoints, instance, searcher, queryset_manager
+        )
 
     def to_headers_representation(self, instance):
         headers = {
@@ -489,7 +481,11 @@ class EntrySerializer(ModelContentSerializer):
 
     @staticmethod
     def get_entry_header_from_search_object(
-        obj, for_structure=False, include_entry=False, searcher=None, sq=None
+        obj,
+        for_structure=False,
+        include_entry=False,
+        searcher=None,
+        queryset_manager=None,
     ):
         header = {
             # Only CDD accession are lowercase.
@@ -515,7 +511,9 @@ class EntrySerializer(ModelContentSerializer):
 
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(
-                Entry.objects.get(accession__iexact=obj["entry_acc"]), searcher, sq
+                Entry.objects.get(accession__iexact=obj["entry_acc"]),
+                searcher,
+                queryset_manager,
             )
 
         return header

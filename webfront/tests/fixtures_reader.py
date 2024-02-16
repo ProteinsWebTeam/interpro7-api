@@ -4,26 +4,28 @@ import copy
 
 from webfront.searcher.elastic_controller import ElasticsearchController
 
+from webfront.models import Entry, Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
+
 
 def get_id(*args):
     return "-".join([a for a in args if a is not None])
 
 
 class FixtureReader:
-    entries = {}
-    proteins = {}
-    structures = {}
-    entry_protein_list = []
-    protein_structure_list = {}
-    tax2lineage = {}
-    tax2rank = {}
-    sets = {}
-    proteomes = {}
-    entry_annotations = {}
-    search = None
 
     def __init__(self, fixture_paths):
         self.ida_to_add = {}
+        self.entries = {}
+        self.proteins = {}
+        self.structures = {}
+        self.entry_protein_list = []
+        self.protein_structure_list = {}
+        self.tax2lineage = {}
+        self.tax2rank = {}
+        self.sets = {}
+        self.proteomes = {}
+        self.entry_annotations = {}
+        self.search = None
         for path in fixture_paths:
             with open(path) as data_file:
                 data = json.load(data_file)
@@ -161,7 +163,7 @@ class FixtureReader:
                     c["structure_chain_acc"] = sp["chain"]
                     c["text_structure"] = c["structure_acc"] + " " + sp["chain"]
 
-                    c["entry_structure_locations"] = (ep["coordinates"],)
+                    c["entry_structure_locations"] = ep["coordinates"]
                     c["structure_protein_locations"] = sp["coordinates"]
                     # c["protein_structure"] = sp["mapping"]
                     if e in entry2set:
@@ -300,6 +302,60 @@ class FixtureReader:
         # apparently you can't reuse the connection, so I create a second one
         search2 = ElasticsearchController()
         search2.add(self.ida_to_add.values(), True)
+
+    def generate_tax_per_entry_fixtures(self, docs):
+        counters = {}
+        counters_db = {}
+        for doc in docs:
+            if "entry_acc" not in doc or "tax_lineage" not in doc:
+                continue
+            entry = doc["entry_acc"]
+            entry_db = doc["entry_db"]
+            lineage = doc["tax_lineage"]
+            if entry not in counters:
+                counters[entry] = {}
+            if entry_db not in counters_db:
+                counters_db[entry_db] = {}
+            for tax in lineage:
+                if tax not in counters[entry]:
+                    counters[entry][tax] = {
+                        "structures": 0,
+                        "proteins": 0,
+                        "proteomes": 0,
+                    }
+                if tax not in counters_db[entry_db]:
+                    counters_db[entry_db][tax] = {
+                        "entries": 0,
+                        "proteomes": 0,
+                        "proteins": 0,
+                        "structures": 0,
+                    }
+                counters_db[entry_db][tax]["entries"] += 1
+                if doc["structure_acc"] is not None:
+                    counters[entry][tax]["structures"] += 1
+                    counters_db[entry_db][tax]["structures"] += 1
+                if doc["protein_acc"] is not None:
+                    counters[entry][tax]["proteins"] += 1
+                    counters_db[entry_db][tax]["proteins"] += 1
+                if doc["proteome_acc"] is not None:
+                    counters[entry][tax]["proteins"] += 1
+                    counters_db[entry_db][tax]["proteins"] += 1
+        for entry in counters:
+            for tax in counters[entry]:
+                txe = TaxonomyPerEntry(
+                    entry_acc=Entry.objects.get(accession=entry.upper()),
+                    taxonomy=Taxonomy.objects.get(accession=tax),
+                    counts=counters[entry][tax],
+                )
+                txe.save()
+        for db in counters_db:
+            for tax in counters_db[db]:
+                txe = TaxonomyPerEntryDB(
+                    source_database=db,
+                    taxonomy=Taxonomy.objects.get(accession=tax),
+                    counts=counters_db[db][tax],
+                )
+                txe.save()
 
     def clear_search_engine(self):
         search = ElasticsearchController()

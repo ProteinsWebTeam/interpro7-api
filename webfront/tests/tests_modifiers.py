@@ -463,8 +463,8 @@ class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
         self.assertIn("accession", response.data["metadata"])
         self.assertIn("counters", response.data["metadata"])
         self.assertEqual("2", response.data["metadata"]["accession"])
-        self.assertEqual(1, response.data["metadata"]["counters"]["entries"])
-        self.assertEqual(1, response.data["metadata"]["counters"]["proteins"])
+        self.assertEqual(5, response.data["metadata"]["counters"]["entries"])
+        self.assertEqual(10, response.data["metadata"]["counters"]["proteins"])
 
 
 class ResidueModifierTest(InterproRESTTestCase):

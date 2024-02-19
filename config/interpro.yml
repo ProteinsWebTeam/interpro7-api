@@ -135,7 +135,11 @@ cross_references:
     'EC':
         'rank': 19
         'description': 'ENZYME is a repository of information relative to the nomenclature of enzymes. It is primarily based on the recommendations of the Nomenclature Committee of the International Union of Biochemistry and Molecular Biology (IUBMB) and it describes each type of characterized enzyme for which an EC (Enzyme Commission) number has been provided.'
-        'urlPattern': 'http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec={accession}'
+        'urlPattern': 'https://enzyme.expasy.org/EC/{accession}'
+    'GP':
+        'rank': 45
+        'description': 'Genome properties is an annotation system whereby functional attributes can be assigned to a genome, based on the presence of a defined set of protein signatures within that genome.'
+        'urlPattern': 'https://www.ebi.ac.uk/interpro/genomeproperties/genome-property/{accession}'
     'COME':
         'displayName': 'COMe'
         'rank': 27
@@ -201,8 +205,6 @@ cross_references:
         'rank': 7
     'TIGRFAMS':
         'rank': 9
-    'COG':
-        'rank': 23
     'PROSITE PATTERNS':
         'displayName': 'PROSITE patterns'
         'rank': 6
@@ -237,10 +239,6 @@ cross_references:
         'rank': 26
     'DBD':
         'rank': 34
-    'ENZYME':
-        'rank': 19
-        'description': 'ENZYME is a repository of information relative to the nomenclature of enzymes. It is primarily based on the recommendations of the Nomenclature Committee of the International Union of Biochemistry and Molecular Biology (IUBMB) and it describes each type of characterized enzyme for which an EC (Enzyme Commission) number has been provided.'
-        'urlPattern': 'http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec={accession}'
     'MOBIDB LITE':
         'rank': 44
     'KEGG':
@@ -251,6 +249,8 @@ cross_references:
     'MEROPS':
         'rank': 21
     'OMIM':
+        'description': 'An Online Catalog of Human Genes and Genetic Disorders'
+        'urlPattern': 'https://www.omim.org/entry/{accession}'
         'rank': 31
     'REACTOME':
         'displayName': 'Reactome'

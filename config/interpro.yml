@@ -205,9 +205,6 @@ cross_references:
         'rank': 7
     'TIGRFAMS':
         'rank': 9
-    'COG':
-        'description': 'COGs stands for Clusters of Orthologous Genes'
-        'urlPattern': 'https://www.ncbi.nlm.nih.gov/research/cog/cog/{accession}'
         'rank': 23
     'PROSITE PATTERNS':
         'displayName': 'PROSITE patterns'

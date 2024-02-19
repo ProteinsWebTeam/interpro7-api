@@ -205,7 +205,6 @@ cross_references:
         'rank': 7
     'TIGRFAMS':
         'rank': 9
-        'rank': 23
     'PROSITE PATTERNS':
         'displayName': 'PROSITE patterns'
         'rank': 6
@@ -240,10 +239,6 @@ cross_references:
         'rank': 26
     'DBD':
         'rank': 34
-    'ENZYME':
-        'rank': 19
-        'description': 'ENZYME is a repository of information relative to the nomenclature of enzymes. It is primarily based on the recommendations of the Nomenclature Committee of the International Union of Biochemistry and Molecular Biology (IUBMB) and it describes each type of characterized enzyme for which an EC (Enzyme Commission) number has been provided.'
-        'urlPattern': 'https://enzyme.expasy.org/EC/{accession}'
     'MOBIDB LITE':
         'rank': 44
     'KEGG':

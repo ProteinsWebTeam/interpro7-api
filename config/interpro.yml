@@ -133,10 +133,12 @@ members:
 
 cross_references:
     'EC':
+        'displayName': 'ENZYME'
         'rank': 19
         'description': 'ENZYME is a repository of information relative to the nomenclature of enzymes. It is primarily based on the recommendations of the Nomenclature Committee of the International Union of Biochemistry and Molecular Biology (IUBMB) and it describes each type of characterized enzyme for which an EC (Enzyme Commission) number has been provided.'
         'urlPattern': 'https://enzyme.expasy.org/EC/{accession}'
     'GP':
+        'displayName': 'Genome Properties'
         'rank': 45
         'description': 'Genome properties is an annotation system whereby functional attributes can be assigned to a genome, based on the presence of a defined set of protein signatures within that genome.'
         'urlPattern': 'https://www.ebi.ac.uk/interpro/genomeproperties/genome-property/{accession}'
@@ -159,6 +161,7 @@ cross_references:
         'urlPattern': 'http://www.cathdb.info/version/latest/superfamily/{accession}'
         'description': 'CATH is a classification of protein structures downloaded from the Protein Data Bank.'
     'PROSITEDOC':
+        'displayName': 'PROSITE Doc'
         'rank': 18
         'description': 'PROSITE is a database of protein families and domains.'
         'urlPattern': 'http://prosite.expasy.org/{accession}'

@@ -74,15 +74,9 @@ def pagination_information(request):
 def getDataForRoot(handlers, queryset_manager, searcher):
     qs = queryset_manager.get_base_queryset("entry")
     elastic_query = searcher._elastic_json_query("*:*")
-    host_parts = settings.DATABASES["default"]["HOST"].split(".")[0].split("-")
-    host = ""
-    if len(host_parts) > 2:
-        if host_parts[0] == "mysql":
-            host = host_parts[2]
-        else:
-            host = host_parts[0]
+    host = settings.DATABASES["default"]["HOST"].split(".")[0].replace("mysql-", "")
 
-    elastic_host = searcher.server.split("-")[0]
+    elastic_host = searcher.server.split(".")[0]
     total = elastic_query["hits"]["total"]
     if type(total) == dict:
         total = elastic_query["hits"]["total"]["value"]
@@ -107,6 +101,14 @@ def getDataForRoot(handlers, queryset_manager, searcher):
             "elasticsearch": {
                 "server": elastic_host,
                 "status": "OK" if total > 0 else "ERROR",
+            },
+            "cache": {
+                "server": (
+                    settings.CACHES["default"]["LOCATION"]
+                    if settings.ENABLE_CACHING
+                    else ""
+                ),
+                "status": "enabled" if settings.ENABLE_CACHING else "disabled",
             },
         },
     }

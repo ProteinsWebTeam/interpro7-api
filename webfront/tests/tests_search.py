@@ -8,18 +8,11 @@ class ElasticContorllerTest(InterproRESTTestCase):
         obj = {}
         elastic = ElasticsearchController(obj)
         self.assertEqual(obj, elastic.queryset_manager)
-        self.assertEqual(elastic.server, elastic.connection.host)
-        self.assertEqual(elastic.port, elastic.connection.port)
-
-    def test_elastic_class_init_with_proxy(self):
-        obj = {}
-        settings.HTTP_PROXY = "http://test.proxy.com:8080"
-        elastic = ElasticsearchController(obj)
-        self.assertEqual(obj, elastic.queryset_manager)
-        self.assertNotEqual(elastic.server, elastic.connection.host)
-        self.assertNotEqual(elastic.port, elastic.connection.port)
-        self.assertEqual("test.proxy.com", elastic.connection.host)
-        self.assertEqual(8080, elastic.connection.port)
+        self.assertIsNotNone(elastic.headers)
+        if settings.SEARCHER_USER == "":
+            self.assertNotIn("Authorization", elastic.headers)
+        else:
+            self.assertIn("Authorization", elastic.headers)
 
 
 class EntryRESTSearchTest(InterproRESTTestCase):

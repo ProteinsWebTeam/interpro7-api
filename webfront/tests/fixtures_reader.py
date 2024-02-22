@@ -297,9 +297,11 @@ class FixtureReader:
         return lower
 
     def add_to_search_engine(self, docs):
-        self.search = ElasticsearchController()
-        self.search.add(docs)
-        self.search.add(self.ida_to_add.values(), True)
+        search = ElasticsearchController()
+        search.add(docs)
+        # apparently you can't reuse the connection, so I create a second one
+        search2 = ElasticsearchController()
+        search2.add(self.ida_to_add.values(), True)
 
     def generate_tax_per_entry_fixtures(self, docs):
         counters = {}
@@ -356,4 +358,5 @@ class FixtureReader:
                 txe.save()
 
     def clear_search_engine(self):
-        self.search.clear_all_docs()
+        search = ElasticsearchController()
+        search.clear_all_docs()

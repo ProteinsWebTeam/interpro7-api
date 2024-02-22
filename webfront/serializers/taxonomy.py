@@ -17,12 +17,10 @@ class TaxonomySerializer(ModelContentSerializer):
         )
         if self.queryset_manager.other_fields is not None:
 
-            def counter_function():
+            def counter_function(counters_to_include):
                 get_c = TaxonomySerializer.get_counters
                 return get_c(
-                    instance,
-                    self.searcher,
-                    self.queryset_manager,
+                    instance, self.searcher, self.queryset_manager, counters_to_include
                 )
 
             representation = self.add_other_fields(
@@ -236,7 +234,7 @@ class TaxonomySerializer(ModelContentSerializer):
         return "source_database" in filters["entry"]
 
     @staticmethod
-    def get_counters(instance, searcher, queryset_manager):
+    def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
         if TaxonomySerializer.can_use_taxonomy_per_entry(queryset_manager.filters):
             match = TaxonomyPerEntry.objects.filter(
                 entry_acc=queryset_manager.filters["entry"]["accession"].upper(),
@@ -266,7 +264,12 @@ class TaxonomySerializer(ModelContentSerializer):
             "proteome": ["proteomes", "proteome_acc"],
         }
         return ModelContentSerializer.generic_get_counters(
-            "taxonomy", endpoints, instance, searcher, queryset_manager
+            "taxonomy",
+            endpoints,
+            instance,
+            searcher,
+            queryset_manager,
+            counters_to_include,
         )
 
     @staticmethod

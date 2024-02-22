@@ -18,9 +18,9 @@ class SetSerializer(ModelContentSerializer):
         )
         if self.queryset_manager.other_fields is not None:
 
-            def counter_function():
+            def counter_function(counters_to_include):
                 return SetSerializer.get_counters(
-                    instance, self.searcher, self.queryset_manager
+                    instance, self.searcher, self.queryset_manager, counters_to_include
                 )
 
             representation = self.add_other_fields(
@@ -188,7 +188,7 @@ class SetSerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def get_counters(instance, searcher, queryset_manager):
+    def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
         endpoints = {
             "entry": ["entries", "entry_acc"],
             "structure": ["structures", "structure_acc"],
@@ -197,7 +197,7 @@ class SetSerializer(ModelContentSerializer):
             "proteome": ["proteomes", "proteome_acc"],
         }
         return ModelContentSerializer.generic_get_counters(
-            "set", endpoints, instance, searcher, queryset_manager
+            "set", endpoints, instance, searcher, queryset_manager, counters_to_include
         )
 
     @staticmethod

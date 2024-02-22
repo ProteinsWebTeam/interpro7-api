@@ -23,9 +23,9 @@ class EntrySerializer(ModelContentSerializer):
         )
         if self.queryset_manager.other_fields is not None:
 
-            def counter_function():
+            def counter_function(counters_to_include):
                 return EntrySerializer.get_counters(
-                    instance, self.searcher, self.queryset_manager
+                    instance, self.searcher, self.queryset_manager, counters_to_include
                 )
 
             representation = self.add_other_fields(
@@ -247,7 +247,7 @@ class EntrySerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def get_counters(instance, searcher, queryset_manager):
+    def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
         endpoints = {
             "protein": ["proteins", "protein_acc"],
             "structure": ["structures", "structure_acc"],
@@ -257,7 +257,12 @@ class EntrySerializer(ModelContentSerializer):
             "ida": ["domain_architectures", "ida_id"],
         }
         return ModelContentSerializer.generic_get_counters(
-            "entry", endpoints, instance, searcher, queryset_manager
+            "entry",
+            endpoints,
+            instance,
+            searcher,
+            queryset_manager,
+            counters_to_include,
         )
 
     def to_headers_representation(self, instance):

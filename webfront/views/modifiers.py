@@ -259,19 +259,23 @@ def filter_by_key_species(value, general_handler):
 
 
 def filter_by_entry(value, general_handler):
-    queryset = general_handler.queryset_manager.get_queryset()
-    response = TaxonomyPerEntry.objects.filter(taxonomy__in=queryset).filter(
-        entry_acc__accession__iexact=value
+    tax_id = general_handler.queryset_manager.filters["taxonomy"]["accession"]
+    response = TaxonomyPerEntry.objects.filter(taxonomy__accession=tax_id).filter(
+        entry_acc__accession=value.upper()
     )
     if len(response) == 0:
-        raise EmptyQuerysetError("No documents found with the current selection")
+        response = TaxonomyPerEntry.objects.filter(taxonomy__in=tax_id).filter(
+            entry_acc__accession=value.lower()
+        )
+        if len(response) == 0:
+            raise EmptyQuerysetError("No documents found with the current selection")
     return response.first()
 
 
 def filter_by_entry_db(value, general_handler):
-    queryset = general_handler.queryset_manager.get_queryset()
-    response = TaxonomyPerEntryDB.objects.filter(taxonomy__in=queryset).filter(
-        source_database__iexact=value
+    tax_id = general_handler.queryset_manager.filters["taxonomy"]["accession"]
+    response = TaxonomyPerEntryDB.objects.filter(taxonomy__accession=tax_id).filter(
+        source_database=value.lower()
     )
     if len(response) == 0:
         raise EmptyQuerysetError("No documents found with the current selection")
@@ -473,14 +477,18 @@ def add_extra_fields(endpoint, *argv):
 
     def x(fields, general_handler):
         fs = fields.split(",")
+        other_fields = {}
         for field in fs:
-            if field not in supported_fields:
+            parts = field.split(":")
+            f_name = parts[0]
+            other_fields[f_name] = parts[1] if len(parts) > 1 else None
+            if f_name not in supported_fields:
                 raise URLError(
                     "{} is not a valid field to to be included. Allowed fields : {}".format(
                         field, ", ".join(supported_fields)
                     )
                 )
-        general_handler.queryset_manager.other_fields = fs
+        general_handler.queryset_manager.other_fields = other_fields
 
     return x
 

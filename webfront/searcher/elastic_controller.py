@@ -82,14 +82,14 @@ class ElasticsearchController(SearchController):
             self.connection = HTTPSConnection(
                 proxy.hostname,
                 proxy.port,
-                context=ssl._create_unverified_context() if using_auth else None,
+                context=ssl._create_unverified_context() if url.scheme == "https" else None,
             )
             self.connection.set_tunnel(self.server, self.port)
         else:
             self.connection = HTTPSConnection(
                 self.server,
                 self.port,
-                context=ssl._create_unverified_context() if using_auth else None,
+                context=ssl._create_unverified_context() if url.scheme == "https" else None,
             )
 
     def add(self, docs, is_ida=False):

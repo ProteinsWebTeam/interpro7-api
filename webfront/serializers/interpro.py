@@ -243,6 +243,9 @@ class EntrySerializer(ModelContentSerializer):
                 if instance.cross_references is not None
                 else {}
             ),
+            "is_llm": instance.is_llm,
+            "is_reviewed_llm": instance.is_reviewed_llm,
+            "representative_structure": instance.representative_structure,
         }
         return obj
 
@@ -508,6 +511,7 @@ class EntrySerializer(ModelContentSerializer):
             )
             header["sequence"] = chain.sequence
             header["sequence_length"] = chain.length
+            header["protein"] = obj["structure_protein_acc"]
 
         if include_entry:
             header["entry"] = EntrySerializer.to_metadata_representation(

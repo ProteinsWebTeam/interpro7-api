@@ -102,6 +102,9 @@
       "tax_rank": {
         "type": "keyword"
       },
+      "structure_protein_acc": {
+        "type": "keyword"
+      },
       "structure_protein_locations": {
         "type": "object",
         "enabled": false

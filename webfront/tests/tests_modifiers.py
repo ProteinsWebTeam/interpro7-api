@@ -224,7 +224,6 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             "hierarchy",
             "cross_references",
             "entry_date",
-            "is_featured",
         ],
         "protein": [
             "accession",

@@ -93,9 +93,13 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertIn("accession", obj["metadata"], msg)
             self.assertIn("name", obj["metadata"], msg)
 
-    def _check_is_list_of_objects_with_key(self, _list, key, msg=""):
+    def _check_is_list_of_objects_with_key(
+        self, _list, key, msg="", extra_checks_fn=None
+    ):
         for obj in _list:
             self.assertIn(key, obj, msg)
+            if extra_checks_fn is not None:
+                extra_checks_fn(obj)
 
     def _check_HTTP_response_code(self, url, code=status.HTTP_204_NO_CONTENT, msg=""):
         prev = settings.DEBUG

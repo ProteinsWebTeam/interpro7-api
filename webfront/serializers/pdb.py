@@ -286,12 +286,13 @@ class StructureSerializer(ModelContentSerializer):
         output = {
             "structure_protein_locations": obj["structure_protein_locations"],
             "organism": {"taxid": obj["tax_id"]},
-            "protein": obj["protein_acc"],
+            "protein": obj["structure_protein_acc"],
             "chain": obj["structure_chain_acc"],
             "protein_length": obj["protein_length"],
             "source_database": obj["protein_db"],
             "sequence": chain.sequence,
             "sequence_length": chain.length,
+            # "structure_protein_acc": obj["structure_protein_acc"],
         }
         for k in ["entry_protein_locations", "entry_structure_locations"]:
             try:
@@ -312,7 +313,7 @@ class StructureSerializer(ModelContentSerializer):
     ):
         output = StructureSerializer.get_chain_from_search_object(obj)
         output["accession"] = obj["structure_acc"]
-        output["protein"] = obj["protein_acc"]
+        output["protein"] = obj["structure_protein_acc"]
         output["source_database"] = "pdb"
         if include_structure:
             output["structure"] = StructureSerializer.to_metadata_representation(

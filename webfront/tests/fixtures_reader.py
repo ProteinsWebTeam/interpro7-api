@@ -123,6 +123,7 @@ class FixtureReader:
                 + (" ".join(self.entries[e]["description"])),
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
+                "protein_af_score": 0.5 if self.proteins[p]["in_alphafold"] else -1,
                 "text_protein": p
                 + " "
                 + self.proteins[p]["source_database"]
@@ -165,6 +166,7 @@ class FixtureReader:
 
                     c["entry_structure_locations"] = ep["coordinates"]
                     c["structure_protein_locations"] = sp["coordinates"]
+                    c["structure_protein_acc"] = p
                     # c["protein_structure"] = sp["mapping"]
                     if e in entry2set:
                         for e2s in entry2set[e]:
@@ -202,6 +204,9 @@ class FixtureReader:
                             "text": p + " " + sp["structure"],
                             "protein_acc": p,
                             "protein_db": self.proteins[p]["source_database"],
+                            "protein_af_score": (
+                                0.5 if self.proteins[p]["in_alphafold"] else -1
+                            ),
                             "text_protein": p
                             + " "
                             + self.proteins[p]["source_database"]
@@ -236,6 +241,7 @@ class FixtureReader:
                             "structure_chain_acc": sp["chain"],
                             "text_structure": sp["structure"] + " " + sp["chain"],
                             "structure_protein_locations": sp["coordinates"],
+                            "structure_protein_acc": p,
                             # "protein_structure": sp["mapping"],
                         }
                     )
@@ -260,6 +266,9 @@ class FixtureReader:
                         "text": p,
                         "protein_acc": p,
                         "protein_db": self.proteins[p]["source_database"],
+                        "protein_af_score": (
+                            0.5 if self.proteins[p]["in_alphafold"] else -1
+                        ),
                         "text_protein": p + " " + self.proteins[p]["source_database"],
                         "tax_id": self.proteins[p]["organism"]["taxId"],
                         "tax_name": self.proteins[p]["organism"]["name"],

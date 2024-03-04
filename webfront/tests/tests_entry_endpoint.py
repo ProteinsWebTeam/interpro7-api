@@ -47,6 +47,31 @@ class EntryRESTTest(InterproRESTTestCase):
         self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
         self.assertEqual(len(response.data["results"]), 2)
 
+    def test_check_interpro_llm_as_extra_field(self):
+        def _check_llm_flags(obj):
+            self.assertIn("extra_fields", obj.keys())
+            self.assertIn("is_llm", obj["extra_fields"])
+            self.assertIn("is_reviewed_llm", obj["extra_fields"])
+            # the only entry in the fixtures with these values as true
+            is_llm = obj["metadata"]["accession"] == "IPR003165"
+            self.assertEqual(
+                obj["extra_fields"]["is_llm"],
+                is_llm,
+            )
+            self.assertEqual(
+                obj["extra_fields"]["is_reviewed_llm"],
+                is_llm,
+            )
+
+        response = self.client.get(
+            "/api/entry/interpro?extra_fields=is_llm,is_reviewed_llm"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._check_is_list_of_objects_with_key(
+            response.data["results"], "metadata", extra_checks_fn=_check_llm_flags
+        )
+        self.assertEqual(len(response.data["results"]), 2)
+
     def test_can_read_entry_unintegrated(self):
         response = self.client.get("/api/entry/unintegrated")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

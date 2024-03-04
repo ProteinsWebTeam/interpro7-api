@@ -9,7 +9,6 @@
       "short_name": "Piwi",
       "source_database": "interpro",
       "entry_date": "2001-04-21T00:00:00Z",
-      "is_featured": true,
       "is_public": true,
       "member_databases": {
         "smart": {
@@ -135,7 +134,13 @@
         "sets": 0,
         "domain_architectures": 2
       },
-      "interactions": null
+      "interactions": null,
+      "is_llm": true,
+      "is_reviewed_llm": true,
+      "representative_structure": {
+        "accession": "1jm7",
+        "name": "the name of 1jm7"
+      }
     }
   },
   {
@@ -172,7 +177,6 @@
       "source_database": "interpro",
       "member_databases": {},
       "entry_date": "2002-04-21T00:00:00Z",
-      "is_featured": false,
       "is_public": true,
       "integrated": null,
       "hierarchy": {
@@ -283,7 +287,6 @@
       "accession": "PF02171",
       "type": "domain",
       "name": "Piwi domain",
-      "is_featured": true,
       "is_public": true,
       "entry_date": "2003-04-21T00:00:00Z",
       "short_name": "Piwi",
@@ -391,7 +394,6 @@
       "type": "domain",
       "name": "Piwi domain",
       "entry_date": "2004-04-21T00:00:00Z",
-      "is_featured": true,
       "is_public": true,
       "short_name": "Piwi",
       "go_terms": [
@@ -431,7 +433,6 @@
       "type": "MATRIX",
       "entry_date": "2001-04-21T00:00:00Z",
       "name": "PIWI",
-      "is_featured": true,
       "is_public": true,
       "short_name": "Piwi",
       "go_terms": [],
@@ -460,7 +461,6 @@
       "accession": "PF17180",
       "entry_id": "id3",
       "type": "domain",
-      "is_featured": true,
       "is_public": true,
       "entry_date": "2002-04-21T00:00:00Z",
       "go_terms": [],
@@ -490,7 +490,6 @@
       "entry_id": "id4",
       "type": "domain",
       "entry_date": "2002-04-21T00:00:00Z",
-      "is_featured": true,
       "is_public": true,
       "go_terms": [],
       "source_database": "pfam",
@@ -520,7 +519,6 @@
       "type": "family",
       "name": "Myelin family",
       "entry_date": "2003-04-21T00:00:00Z",
-      "is_featured": true,
       "is_public": true,
       "short_name": "Myelin",
       "go_terms": [
@@ -562,7 +560,6 @@
       "short_name": "HSP20",
       "go_terms": [],
       "entry_date": "2004-04-21T00:00:00Z",
-      "is_featured": true,
       "is_public": true,
       "source_database": "profile",
       "member_databases": null,
@@ -593,7 +590,6 @@
       "short_name": "vanH-D",
       "go_terms": [],
       "entry_date": "2014-04-21T00:00:00Z",
-      "is_featured": true,
       "is_public": true,
       "source_database": "ncbifam",
       "member_databases": null,
@@ -684,7 +680,6 @@
       "short_name": "PTHR43214",
       "go_terms": [],
       "entry_date": "2014-03-02T00:00:00Z",
-      "is_featured": true,
       "is_public": true,
       "source_database": "panther",
       "member_databases": null,
@@ -716,7 +711,6 @@
       "short_name": "PTHR43214:sf24",
       "go_terms": [],
       "entry_date": "2014-03-02T00:00:00Z",
-      "is_featured": true,
       "is_public": false,
       "source_database": "panther",
       "member_databases": null,
@@ -746,7 +740,6 @@
       "short_name": "G3DSA:1.10.10.10",
       "go_terms": [],
       "entry_date": "2004-03-02T00:00:00Z",
-      "is_featured": true,
       "is_public": true,
       "source_database": "cathgene3d",
       "member_databases": null,
@@ -776,7 +769,6 @@
       "short_name": "G3DSA:1.10.10.10:1",
       "go_terms": [],
       "entry_date": "2004-03-02T00:00:00Z",
-      "is_featured": true,
       "is_public": false,
       "source_database": "cathgene3d",
       "member_databases": null,
@@ -803,7 +795,6 @@
       "type": "family",
       "name": "PHOSPHOSERINE PHOSPHATASE",
       "source_database": "panther",
-      "is_featured": false,
       "is_public": true,
       "entry_date": "2005-09-11T00:00:00Z",
       "counts": {

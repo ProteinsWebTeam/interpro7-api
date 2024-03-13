@@ -1,5 +1,5 @@
 import re
-from django.conf import settings
+
 from rest_framework.generics import GenericAPIView
 from django.http import HttpResponse, HttpResponseRedirect
 import logging
@@ -8,11 +8,15 @@ from django.db.models import Q
 from functools import reduce
 from operator import or_
 
-from webfront.exceptions import EmptyQuerysetError, BadURLParameterError
+from webfront.exceptions import EmptyQuerysetError
 from webfront.response import Response
 from webfront.constants import SerializerDetail
-from webfront.models import Entry
+from webfront.models import Entry, Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
 from webfront.pagination import CustomPagination
+from webfront.views.queryset_manager import (
+    can_use_taxonomy_per_entry,
+    can_use_taxonomy_per_db,
+)
 
 logger = logging.getLogger("interpro.request")
 
@@ -132,8 +136,23 @@ class CustomView(GenericAPIView):
                     )
                     self.search_size = self.queryset.count()
                 else:
-                    # It uses multiple endpoints, so we need to use the elastic index
-                    self.update_queryset_from_search(searcher, general_handler)
+                    if (
+                        general_handler.queryset_manager.main_endpoint == "taxonomy"
+                        and can_use_taxonomy_per_entry(
+                            general_handler.queryset_manager.filters
+                        )
+                    ):
+                        self.update_queryset_from_taxonomy_per_entry(general_handler)
+                    # elif (
+                    #     general_handler.queryset_manager.main_endpoint == "taxonomy"
+                    #     and can_use_taxonomy_per_db(
+                    #         general_handler.queryset_manager.filters
+                    #     )
+                    # ):
+                    #     self.update_queryset_from_taxonomy_per_entry_db(general_handler)
+                    else:
+                        # It uses multiple endpoints, so we need to use the elastic index
+                        self.update_queryset_from_search(searcher, general_handler)
 
                 if self.queryset.count() == 0:
                     raise EmptyQuerysetError(
@@ -353,6 +372,14 @@ class CustomView(GenericAPIView):
         self.after_key = after_key
         self.before_key = before_key
         self.elastic_result = elastic_result if should_keep_elastic_order else None
+
+    def update_queryset_from_taxonomy_per_entry(self, general_handler):
+        entry_acc = general_handler.queryset_manager.filters["entry"]["accession"]
+        Taxonomy.objects.filter()
+        self.queryset = TaxonomyPerEntry.objects.filter(
+            entry_acc=entry_acc.upper()
+        ).order_by("num_proteins")
+        self.search_size = len(self.queryset)
 
 
 def filter_queryset_accession_in(queryset, list):

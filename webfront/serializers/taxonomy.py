@@ -15,21 +15,27 @@ from webfront.views.queryset_manager import (
 class TaxonomySerializer(ModelContentSerializer):
     def to_representation(self, instance):
         representation = {}
-        representation = self.endpoint_representation(representation, instance)
+        tax_instance = instance
+        if isinstance(instance, TaxonomyPerEntry):
+            tax_instance = instance.taxonomy
+        representation = self.endpoint_representation(representation, tax_instance)
         representation = self.filter_representation(
-            representation, instance, self.detail_filters, self.detail
+            representation, tax_instance, self.detail_filters, self.detail
         )
         if self.queryset_manager.other_fields is not None:
 
             def counter_function(counters_to_include):
                 get_c = TaxonomySerializer.get_counters
                 return get_c(
-                    instance, self.searcher, self.queryset_manager, counters_to_include
+                    tax_instance,
+                    self.searcher,
+                    self.queryset_manager,
+                    counters_to_include,
                 )
 
             representation = self.add_other_fields(
                 representation,
-                instance,
+                tax_instance,
                 self.queryset_manager.other_fields,
                 {"counters": counter_function},
             )

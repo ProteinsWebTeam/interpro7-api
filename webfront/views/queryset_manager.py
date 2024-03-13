@@ -255,3 +255,19 @@ class QuerysetManager:
             if f != main_ep and f != "search" and self.filters[f] != {}
         ]
         return len(filters) == 0
+
+
+def can_use_taxonomy_per_entry(filters):
+    for key, value in filters.items():
+        if key not in ["entry", "taxonomy"] and value:
+            return False
+
+    return "accession" in filters["entry"]
+
+
+def can_use_taxonomy_per_db(filters):
+    for key, value in filters.items():
+        if key not in ["entry", "taxonomy"] and value:
+            return False
+
+    return "source_database" in filters["entry"]

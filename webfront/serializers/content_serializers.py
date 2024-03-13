@@ -320,16 +320,24 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 for k, v in counter_endpoints.items()
                 if k in split_counters_to_include
             }
-
         counters = {}
-        for ep, (name, field) in counter_endpoints.items():
-            if ep not in queryset_manager.filters or (
-                "accession" not in queryset_manager.filters[ep]
-                and "accession__iexact" not in queryset_manager.filters[ep]
-            ):
-                counters[name] = searcher.get_number_of_field_by_endpoint(
-                    main_endpoint, field, instance.accession, sq
-                )
+        if queryset_manager.is_single_endpoint():
+            if counters_to_include is not None and counter_endpoints != {}:
+                for ep, (name, field) in counter_endpoints.items():
+                    counters[name] = (
+                        instance.counts[name] if name in instance.counts else 0
+                    )
             else:
-                counters[name] = 1
+                counters = instance.counts
+        else:
+            for ep, (name, field) in counter_endpoints.items():
+                if ep not in queryset_manager.filters or (
+                    "accession" not in queryset_manager.filters[ep]
+                    and "accession__iexact" not in queryset_manager.filters[ep]
+                ):
+                    counters[name] = searcher.get_number_of_field_by_endpoint(
+                        main_endpoint, field, instance.accession, sq
+                    )
+                else:
+                    counters[name] = 1
         return counters

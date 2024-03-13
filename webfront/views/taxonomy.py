@@ -94,6 +94,7 @@ class UniprotHandler(CustomView):
         **kwargs
     ):
         general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
+        general_handler.queryset_manager.order_by("-num_proteins")
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Taxonomy, "counters")
         )

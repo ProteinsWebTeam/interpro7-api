@@ -68,9 +68,9 @@ class UniprotHandler(CustomView):
         *args,
         **kwargs
     ):
-        general_handler.queryset_manager.main_endpoint = "proteome"
         self.serializer_detail = SerializerDetail.PROTEOME_HEADERS
         general_handler.queryset_manager.add_filter("proteome", accession__isnull=False)
+        general_handler.queryset_manager.order_by("-num_proteins")
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Proteome, "counters")
         )

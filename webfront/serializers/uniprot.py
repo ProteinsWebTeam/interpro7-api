@@ -144,7 +144,6 @@ class ProteinSerializer(ModelContentSerializer):
         return representation
 
     def to_full_representation(self, instance):
-        sq = self.queryset_manager.get_searcher_query()
         counters = None
         if self.queryset_manager.is_single_endpoint():
             counters = instance.counts

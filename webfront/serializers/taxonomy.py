@@ -5,7 +5,11 @@ from webfront.models import Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
 import webfront.serializers.interpro
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
-from webfront.views.queryset_manager import escape
+from webfront.views.queryset_manager import (
+    escape,
+    can_use_taxonomy_per_entry,
+    can_use_taxonomy_per_db,
+)
 
 
 class TaxonomySerializer(ModelContentSerializer):
@@ -218,24 +222,8 @@ class TaxonomySerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def can_use_taxonomy_per_entry(filters):
-        for key, value in filters.items():
-            if key not in ["entry", "taxonomy"] and value:
-                return False
-
-        return "accession" in filters["entry"]
-
-    @staticmethod
-    def can_use_taxonomy_per_db(filters):
-        for key, value in filters.items():
-            if key not in ["entry", "taxonomy"] and value:
-                return False
-
-        return "source_database" in filters["entry"]
-
-    @staticmethod
     def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
-        if TaxonomySerializer.can_use_taxonomy_per_entry(queryset_manager.filters):
+        if can_use_taxonomy_per_entry(queryset_manager.filters):
             match = TaxonomyPerEntry.objects.filter(
                 entry_acc=queryset_manager.filters["entry"]["accession"].upper(),
                 taxonomy_id=instance.accession,
@@ -246,7 +234,7 @@ class TaxonomySerializer(ModelContentSerializer):
                 )
 
             return match.counts
-        if TaxonomySerializer.can_use_taxonomy_per_db(queryset_manager.filters):
+        if can_use_taxonomy_per_db(queryset_manager.filters):
             match = TaxonomyPerEntryDB.objects.filter(
                 source_database=queryset_manager.filters["entry"]["source_database"],
                 taxonomy_id=instance.accession,

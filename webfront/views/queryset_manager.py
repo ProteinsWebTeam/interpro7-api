@@ -173,7 +173,11 @@ class QuerysetManager:
                 q += " && " + sq
             else:
                 q = sq
-        if self.order_field is not None:
+        if (
+            self.order_field is not None
+            and self.order_field != "num_proteins"
+            and self.order_field != "-num_proteins"
+        ):
             q += "&sort=" + self.order_field
         return q
 

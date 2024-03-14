@@ -45,6 +45,7 @@ class InterproRESTTestCase(APITransactionTestCase):
     def setUp(self):
         if TaxonomyPerEntry.objects.all().count() == 0:
             self.fr.generate_tax_per_entry_fixtures(self.docs)
+            self.fr.generate_proteom_per_entry_fixtures(self.docs)
 
     # methods to check entry related responses
     def _check_single_entry_response(self, response, msg=""):

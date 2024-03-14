@@ -421,6 +421,13 @@ class CustomView(GenericAPIView):
         self.queryset = ProteomePerEntryDB.objects.filter(
             source_database=entry_db
         ).order_by("num_proteins")
+        if "is_reference" in general_handler.queryset_manager.filters["proteome"]:
+            self.queryset.filter(
+                proteome__is_reference=general_handler.queryset_manager.filters[
+                    "proteome"
+                ]["is_reference"]
+            )
+
         self.search_size = len(self.queryset)
 
 

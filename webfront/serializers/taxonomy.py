@@ -18,7 +18,9 @@ class TaxonomySerializer(ModelContentSerializer):
         tax_instance = instance
         if isinstance(instance, TaxonomyPerEntry):
             tax_instance = instance.taxonomy
-        representation = self.endpoint_representation(representation, tax_instance)
+        representation = self.endpoint_representation(
+            representation, tax_instance, instance
+        )
         representation = self.filter_representation(
             representation, tax_instance, self.detail_filters, self.detail
         )
@@ -41,7 +43,7 @@ class TaxonomySerializer(ModelContentSerializer):
             )
         return representation
 
-    def endpoint_representation(self, representation, instance):
+    def endpoint_representation(self, representation, instance, original_instance=None):
         detail = self.detail
         if detail == SerializerDetail.ALL:
             representation = self.to_full_representation(instance)
@@ -53,21 +55,21 @@ class TaxonomySerializer(ModelContentSerializer):
             representation = self.to_full_representation(instance)
             representation["names"] = self.get_names_map(instance)
         elif detail == SerializerDetail.TAXONOMY_PER_ENTRY:
-            representation = self.to_full_representation(instance.taxonomy)
-            representation["metadata"]["counters"] = instance.counts
-            representation["names"] = self.get_names_map(instance.taxonomy)
+            representation = self.to_full_representation(original_instance.taxonomy)
+            representation["metadata"]["counters"] = original_instance.counts
+            representation["names"] = self.get_names_map(original_instance.taxonomy)
             representation["children"] = self.get_counter_for_children_filtered_by_acc(
-                instance
+                original_instance
             )
             representation["metadata"]["children"] = list(
                 representation["children"].keys()
             )
         elif detail == SerializerDetail.TAXONOMY_PER_ENTRY_DB:
-            representation = self.to_full_representation(instance.taxonomy)
-            representation["metadata"]["counters"] = instance.counts
-            representation["names"] = self.get_names_map(instance.taxonomy)
+            representation = self.to_full_representation(original_instance.taxonomy)
+            representation["metadata"]["counters"] = original_instance.counts
+            representation["names"] = self.get_names_map(original_instance.taxonomy)
             representation["children"] = self.get_counter_for_children_filtered_by_db(
-                instance
+                original_instance
             )
             representation["metadata"]["children"] = list(
                 representation["children"].keys()

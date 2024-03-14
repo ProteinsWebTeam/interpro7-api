@@ -143,13 +143,13 @@ class CustomView(GenericAPIView):
                         )
                     ):
                         self.update_queryset_from_taxonomy_per_entry(general_handler)
-                    # elif (
-                    #     general_handler.queryset_manager.main_endpoint == "taxonomy"
-                    #     and can_use_taxonomy_per_db(
-                    #         general_handler.queryset_manager.filters
-                    #     )
-                    # ):
-                    #     self.update_queryset_from_taxonomy_per_entry_db(general_handler)
+                    elif (
+                        general_handler.queryset_manager.main_endpoint == "taxonomy"
+                        and can_use_taxonomy_per_db(
+                            general_handler.queryset_manager.filters
+                        )
+                    ):
+                        self.update_queryset_from_taxonomy_per_entry_db(general_handler)
                     else:
                         # It uses multiple endpoints, so we need to use the elastic index
                         self.update_queryset_from_search(searcher, general_handler)
@@ -375,16 +375,24 @@ class CustomView(GenericAPIView):
 
     def update_queryset_from_taxonomy_per_entry(self, general_handler):
         entry_acc = general_handler.queryset_manager.filters["entry"]["accession"]
-        Taxonomy.objects.filter()
         self.queryset = TaxonomyPerEntry.objects.filter(
             entry_acc=entry_acc.upper()
         ).order_by("num_proteins")
         self.search_size = len(self.queryset)
 
+    def update_queryset_from_taxonomy_per_entry_db(self, general_handler):
+        entry_db = general_handler.queryset_manager.filters["entry"]["source_database"]
+        self.queryset = TaxonomyPerEntryDB.objects.filter(
+            source_database=entry_db
+        ).order_by("num_proteins")
+        self.search_size = len(self.queryset)
 
-def filter_queryset_accession_in(queryset, list):
-    if len(list) > 0:
-        or_filter = reduce(or_, (Q(**{"accession__iexact": acc}) for acc in list))
+
+def filter_queryset_accession_in(queryset, list_of_accessions):
+    if len(list_of_accessions) > 0:
+        or_filter = reduce(
+            or_, (Q(**{"accession__iexact": acc}) for acc in list_of_accessions)
+        )
         return queryset.filter(or_filter)
     else:
         return queryset.filter(accession__in=[])

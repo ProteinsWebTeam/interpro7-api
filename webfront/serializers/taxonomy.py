@@ -16,7 +16,9 @@ class TaxonomySerializer(ModelContentSerializer):
     def to_representation(self, instance):
         representation = {}
         tax_instance = instance
-        if isinstance(instance, TaxonomyPerEntry):
+        if isinstance(instance, TaxonomyPerEntry) or isinstance(
+            instance, TaxonomyPerEntryDB
+        ):
             tax_instance = instance.taxonomy
         representation = self.endpoint_representation(
             representation, tax_instance, instance

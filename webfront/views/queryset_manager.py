@@ -266,7 +266,9 @@ def can_use_taxonomy_per_entry(filters):
         if key not in ["entry", "taxonomy"] and value:
             return False
 
-    return "accession" in filters["entry"]
+    return (
+        "accession" in filters["entry"] and "integrated__isnull" not in filters["entry"]
+    )
 
 
 def can_use_taxonomy_per_db(filters):
@@ -274,4 +276,7 @@ def can_use_taxonomy_per_db(filters):
         if key not in ["entry", "taxonomy"] and value:
             return False
 
-    return "source_database" in filters["entry"]
+    return (
+        "source_database" in filters["entry"]
+        and "integrated__isnull" not in filters["entry"]
+    )

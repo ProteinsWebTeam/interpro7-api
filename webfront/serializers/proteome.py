@@ -1,4 +1,5 @@
 from webfront.exceptions import EmptyQuerysetError
+from webfront.models import ProteomePerEntry, ProteomePerEntryDB
 from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.views.custom import SerializerDetail
 from webfront.views.queryset_manager import escape
@@ -7,21 +8,30 @@ from webfront.views.queryset_manager import escape
 class ProteomeSerializer(ModelContentSerializer):
     def to_representation(self, instance):
         representation = {}
-        representation = self.endpoint_representation(representation, instance)
+        proteome_instance = instance
+        if isinstance(instance, ProteomePerEntry) or isinstance(
+            instance, ProteomePerEntryDB
+        ):
+            proteome_instance = instance.proteome
+
+        representation = self.endpoint_representation(representation, proteome_instance)
         representation = self.filter_representation(
-            representation, instance, self.detail_filters, self.detail
+            representation, proteome_instance, self.detail_filters, self.detail
         )
         if self.queryset_manager.other_fields is not None:
 
             def counter_function(counters_to_include):
                 get_c = ProteomeSerializer.get_counters
                 return get_c(
-                    instance, self.searcher, self.queryset_manager, counters_to_include
+                    proteome_instance,
+                    self.searcher,
+                    self.queryset_manager,
+                    counters_to_include,
                 )
 
             representation = self.add_other_fields(
                 representation,
-                instance,
+                proteome_instance,
                 self.queryset_manager.other_fields,
                 {"counters": counter_function},
             )

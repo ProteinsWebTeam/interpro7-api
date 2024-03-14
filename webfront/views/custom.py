@@ -11,11 +11,19 @@ from operator import or_
 from webfront.exceptions import EmptyQuerysetError
 from webfront.response import Response
 from webfront.constants import SerializerDetail
-from webfront.models import Entry, Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
+from webfront.models import (
+    Entry,
+    TaxonomyPerEntry,
+    TaxonomyPerEntryDB,
+    ProteomePerEntry,
+    ProteomePerEntryDB,
+)
 from webfront.pagination import CustomPagination
 from webfront.views.queryset_manager import (
     can_use_taxonomy_per_entry,
     can_use_taxonomy_per_db,
+    can_use_proteome_per_entry,
+    can_use_proteome_per_db,
 )
 
 logger = logging.getLogger("interpro.request")
@@ -136,23 +144,8 @@ class CustomView(GenericAPIView):
                     )
                     self.search_size = self.queryset.count()
                 else:
-                    if (
-                        general_handler.queryset_manager.main_endpoint == "taxonomy"
-                        and can_use_taxonomy_per_entry(
-                            general_handler.queryset_manager.filters
-                        )
-                    ):
-                        self.update_queryset_from_taxonomy_per_entry(general_handler)
-                    elif (
-                        general_handler.queryset_manager.main_endpoint == "taxonomy"
-                        and can_use_taxonomy_per_db(
-                            general_handler.queryset_manager.filters
-                        )
-                    ):
-                        self.update_queryset_from_taxonomy_per_entry_db(general_handler)
-                    else:
-                        # It uses multiple endpoints, so we need to use the elastic index
-                        self.update_queryset_from_search(searcher, general_handler)
+                    # The  queryset needs to be updated to query other sources
+                    self.update_queryset(searcher, general_handler)
 
                 if self.queryset.count() == 0:
                     raise EmptyQuerysetError(
@@ -351,6 +344,35 @@ class CustomView(GenericAPIView):
 
     search_size = None
 
+    def update_queryset(self, searcher, general_handler):
+        if (
+            # it uses the taxonomy endpoint filtered by an entry accession
+            general_handler.queryset_manager.main_endpoint == "taxonomy"
+            and can_use_taxonomy_per_entry(general_handler.queryset_manager.filters)
+        ):
+            self.update_queryset_from_taxonomy_per_entry(general_handler)
+        elif (
+            # it uses the taxonomy endpoint filtered by an entry database
+            general_handler.queryset_manager.main_endpoint == "taxonomy"
+            and can_use_taxonomy_per_db(general_handler.queryset_manager.filters)
+        ):
+            self.update_queryset_from_taxonomy_per_entry_db(general_handler)
+        elif (
+            # it uses the proteome endpoint filtered by an entry accession
+            general_handler.queryset_manager.main_endpoint == "proteome"
+            and can_use_proteome_per_entry(general_handler.queryset_manager.filters)
+        ):
+            self.update_queryset_from_proteome_per_entry(general_handler)
+        elif (
+            # it uses the proteome endpoint filtered by an entry database
+            general_handler.queryset_manager.main_endpoint == "proteome"
+            and can_use_proteome_per_db(general_handler.queryset_manager.filters)
+        ):
+            self.update_queryset_from_proteome_per_entry_db(general_handler)
+        else:
+            # It uses multiple endpoints, so we need to use the elastic index
+            self.update_queryset_from_search(searcher, general_handler)
+
     # Queries the elastic searcher core to get a list of accessions of the main endpoint,
     # then builds a queryset matching those accessions.
     # This is the main connection point between elastic and MySQL
@@ -383,6 +405,20 @@ class CustomView(GenericAPIView):
     def update_queryset_from_taxonomy_per_entry_db(self, general_handler):
         entry_db = general_handler.queryset_manager.filters["entry"]["source_database"]
         self.queryset = TaxonomyPerEntryDB.objects.filter(
+            source_database=entry_db
+        ).order_by("num_proteins")
+        self.search_size = len(self.queryset)
+
+    def update_queryset_from_proteome_per_entry(self, general_handler):
+        entry_acc = general_handler.queryset_manager.filters["entry"]["accession"]
+        self.queryset = ProteomePerEntry.objects.filter(
+            entry_acc=entry_acc.upper()
+        ).order_by("num_proteins")
+        self.search_size = len(self.queryset)
+
+    def update_queryset_from_proteome_per_entry_db(self, general_handler):
+        entry_db = general_handler.queryset_manager.filters["entry"]["source_database"]
+        self.queryset = ProteomePerEntryDB.objects.filter(
             source_database=entry_db
         ).order_by("num_proteins")
         self.search_size = len(self.queryset)

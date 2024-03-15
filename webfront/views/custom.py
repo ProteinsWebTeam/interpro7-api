@@ -345,33 +345,29 @@ class CustomView(GenericAPIView):
     search_size = None
 
     def update_queryset(self, searcher, general_handler):
-        if (
-            # it uses the taxonomy endpoint filtered by an entry accession
-            general_handler.queryset_manager.main_endpoint == "taxonomy"
-            and can_use_taxonomy_per_entry(general_handler.queryset_manager.filters)
-        ):
-            self.update_queryset_from_taxonomy_per_entry(general_handler)
-        elif (
-            # it uses the taxonomy endpoint filtered by an entry database
-            general_handler.queryset_manager.main_endpoint == "taxonomy"
-            and can_use_taxonomy_per_db(general_handler.queryset_manager.filters)
-        ):
-            self.update_queryset_from_taxonomy_per_entry_db(general_handler)
-        elif (
-            # it uses the proteome endpoint filtered by an entry accession
-            general_handler.queryset_manager.main_endpoint == "proteome"
-            and can_use_proteome_per_entry(general_handler.queryset_manager.filters)
-        ):
-            self.update_queryset_from_proteome_per_entry(general_handler)
-        elif (
-            # it uses the proteome endpoint filtered by an entry database
-            general_handler.queryset_manager.main_endpoint == "proteome"
-            and can_use_proteome_per_db(general_handler.queryset_manager.filters)
-        ):
-            self.update_queryset_from_proteome_per_entry_db(general_handler)
-        else:
-            # It uses multiple endpoints, so we need to use the elastic index
-            self.update_queryset_from_search(searcher, general_handler)
+        if general_handler.queryset_manager.main_endpoint == "taxonomy":
+            # taxonomy endpoint
+            if can_use_taxonomy_per_entry(general_handler.queryset_manager.filters):
+                # filtered by an entry accession
+                self.update_queryset_from_taxonomy_per_entry(general_handler)
+                return
+            elif can_use_taxonomy_per_db(general_handler.queryset_manager.filters):
+                # filtered by an entry database
+                self.update_queryset_from_taxonomy_per_entry_db(general_handler)
+                return
+        elif general_handler.queryset_manager.main_endpoint == "proteome":
+            # proteome endpoint
+            if can_use_proteome_per_entry(general_handler.queryset_manager.filters):
+                # filtered by an entry accession
+                self.update_queryset_from_proteome_per_entry(general_handler)
+                return
+            elif can_use_proteome_per_db(general_handler.queryset_manager.filters):
+                # filtered by an entry database
+                self.update_queryset_from_proteome_per_entry_db(general_handler)
+                return
+
+        # so we need to use the elastic index
+        self.update_queryset_from_search(searcher, general_handler)
 
     # Queries the elastic searcher core to get a list of accessions of the main endpoint,
     # then builds a queryset matching those accessions.

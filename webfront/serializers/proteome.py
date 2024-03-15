@@ -1,8 +1,16 @@
 from webfront.exceptions import EmptyQuerysetError
 from webfront.models import ProteomePerEntry, ProteomePerEntryDB
-from webfront.serializers.content_serializers import ModelContentSerializer
+from webfront.serializers.content_serializers import (
+    ModelContentSerializer,
+    select_counters,
+    process_counters_attribute,
+)
 from webfront.views.custom import SerializerDetail
-from webfront.views.queryset_manager import escape
+from webfront.views.queryset_manager import (
+    escape,
+    can_use_proteome_per_entry,
+    can_use_proteome_per_db,
+)
 
 
 class ProteomeSerializer(ModelContentSerializer):
@@ -201,6 +209,28 @@ class ProteomeSerializer(ModelContentSerializer):
             "tax": ["taxa", "tax_id"],
             "set": ["sets", "set_acc"],
         }
+        counter_endpoints = process_counters_attribute(counters_to_include, endpoints)
+        if can_use_proteome_per_entry(queryset_manager.filters):
+            match = ProteomePerEntry.objects.filter(
+                entry_acc=queryset_manager.filters["entry"]["accession"].upper(),
+                proteome=instance.accession,
+            ).first()
+            if not match:
+                raise EmptyQuerysetError(
+                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome")
+                )
+
+            return select_counters(match.counts, counter_endpoints, counters_to_include)
+        if can_use_proteome_per_db(queryset_manager.filters):
+            match = ProteomePerEntryDB.objects.filter(
+                source_database=queryset_manager.filters["entry"]["source_database"],
+                proteome=instance.accession,
+            ).first()
+            if not match:
+                raise EmptyQuerysetError(
+                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome")
+                )
+            return select_counters(match.counts, counter_endpoints, counters_to_include)
         return ModelContentSerializer.generic_get_counters(
             "proteome",
             endpoints,

@@ -1,5 +1,9 @@
 from webfront.exceptions import EmptyQuerysetError
-from webfront.serializers.content_serializers import ModelContentSerializer
+from webfront.serializers.content_serializers import (
+    ModelContentSerializer,
+    process_counters_attribute,
+    select_counters,
+)
 from webfront.views.custom import SerializerDetail
 from webfront.models import Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
 import webfront.serializers.interpro
@@ -233,6 +237,14 @@ class TaxonomySerializer(ModelContentSerializer):
 
     @staticmethod
     def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
+        endpoints = {
+            "entry": ["entries", "entry_acc"],
+            "structure": ["structures", "structure_acc"],
+            "protein": ["proteins", "protein_acc"],
+            "set": ["sets", "set_acc"],
+            "proteome": ["proteomes", "proteome_acc"],
+        }
+        counter_endpoints = process_counters_attribute(counters_to_include, endpoints)
         if can_use_taxonomy_per_entry(queryset_manager.filters):
             match = TaxonomyPerEntry.objects.filter(
                 entry_acc=queryset_manager.filters["entry"]["accession"].upper(),
@@ -243,7 +255,7 @@ class TaxonomySerializer(ModelContentSerializer):
                     ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy")
                 )
 
-            return match.counts
+            return select_counters(match.counts, counter_endpoints, counters_to_include)
         if can_use_taxonomy_per_db(queryset_manager.filters):
             match = TaxonomyPerEntryDB.objects.filter(
                 source_database=queryset_manager.filters["entry"]["source_database"],
@@ -253,14 +265,7 @@ class TaxonomySerializer(ModelContentSerializer):
                 raise EmptyQuerysetError(
                     ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy")
                 )
-            return match.counts
-        endpoints = {
-            "entry": ["entries", "entry_acc"],
-            "structure": ["structures", "structure_acc"],
-            "protein": ["proteins", "protein_acc"],
-            "set": ["sets", "set_acc"],
-            "proteome": ["proteomes", "proteome_acc"],
-        }
+            return select_counters(match.counts, counter_endpoints, counters_to_include)
         return ModelContentSerializer.generic_get_counters(
             "taxonomy",
             endpoints,

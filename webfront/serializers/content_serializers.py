@@ -313,22 +313,14 @@ class ModelContentSerializer(serializers.ModelSerializer):
         counters_to_include=None,
     ):
         sq = queryset_manager.get_searcher_query()
-        if counters_to_include is not None:
-            split_counters_to_include = counters_to_include.split("-")
-            counter_endpoints = {
-                k: v
-                for k, v in counter_endpoints.items()
-                if k in split_counters_to_include
-            }
+        counter_endpoints = process_counters_attribute(
+            counters_to_include, counter_endpoints
+        )
         counters = {}
         if queryset_manager.is_single_endpoint():
-            if counters_to_include is not None and counter_endpoints != {}:
-                for ep, (name, field) in counter_endpoints.items():
-                    counters[name] = (
-                        instance.counts[name] if name in instance.counts else 0
-                    )
-            else:
-                counters = instance.counts
+            counters = select_counters(
+                instance.counts, counter_endpoints, counters_to_include
+            )
         else:
             for ep, (name, field) in counter_endpoints.items():
                 if ep not in queryset_manager.filters or (
@@ -341,3 +333,22 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 else:
                     counters[name] = 1
         return counters
+
+
+def select_counters(counts, counter_endpoints, counters_to_include):
+    counters = {}
+    if counters_to_include is not None and counter_endpoints != {}:
+        for ep, (name, field) in counter_endpoints.items():
+            counters[name] = counts[name] if name in counts else 0
+    else:
+        counters = counts
+    return counters
+
+
+def process_counters_attribute(granular_counters, counter_endpoints):
+    if granular_counters is not None:
+        split_counters_to_include = granular_counters.split("-")
+        return {
+            k: v for k, v in counter_endpoints.items() if k in split_counters_to_include
+        }
+    return counter_endpoints

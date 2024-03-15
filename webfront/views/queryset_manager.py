@@ -173,7 +173,11 @@ class QuerysetManager:
                 q += " && " + sq
             else:
                 q = sq
-        if self.order_field is not None:
+        if (
+            self.order_field is not None
+            and self.order_field != "num_proteins"
+            and self.order_field != "-num_proteins"
+        ):
             q += "&sort=" + self.order_field
         return q
 
@@ -255,3 +259,45 @@ class QuerysetManager:
             if f != main_ep and f != "search" and self.filters[f] != {}
         ]
         return len(filters) == 0
+
+
+def can_use_taxonomy_per_entry(filters):
+    for key, value in filters.items():
+        if key not in ["entry", "taxonomy"] and value:
+            return False
+
+    return (
+        "accession" in filters["entry"] and "integrated__isnull" not in filters["entry"]
+    )
+
+
+def can_use_taxonomy_per_db(filters):
+    for key, value in filters.items():
+        if key not in ["entry", "taxonomy"] and value:
+            return False
+
+    return (
+        "source_database" in filters["entry"]
+        and "integrated__isnull" not in filters["entry"]
+    )
+
+
+def can_use_proteome_per_entry(filters):
+    for key, value in filters.items():
+        if key not in ["entry", "proteome"] and value:
+            return False
+
+    return (
+        "accession" in filters["entry"] and "integrated__isnull" not in filters["entry"]
+    )
+
+
+def can_use_proteome_per_db(filters):
+    for key, value in filters.items():
+        if key not in ["entry", "proteome"] and value:
+            return False
+
+    return (
+        "source_database" in filters["entry"]
+        and "integrated__isnull" not in filters["entry"]
+    )

@@ -1,5 +1,5 @@
 import re
-from django.conf import settings
+
 from rest_framework.generics import GenericAPIView
 from django.http import HttpResponse, HttpResponseRedirect
 import logging
@@ -8,11 +8,23 @@ from django.db.models import Q
 from functools import reduce
 from operator import or_
 
-from webfront.exceptions import EmptyQuerysetError, BadURLParameterError
+from webfront.exceptions import EmptyQuerysetError
 from webfront.response import Response
 from webfront.constants import SerializerDetail
-from webfront.models import Entry
+from webfront.models import (
+    Entry,
+    TaxonomyPerEntry,
+    TaxonomyPerEntryDB,
+    ProteomePerEntry,
+    ProteomePerEntryDB,
+)
 from webfront.pagination import CustomPagination
+from webfront.views.queryset_manager import (
+    can_use_taxonomy_per_entry,
+    can_use_taxonomy_per_db,
+    can_use_proteome_per_entry,
+    can_use_proteome_per_db,
+)
 
 logger = logging.getLogger("interpro.request")
 
@@ -132,8 +144,8 @@ class CustomView(GenericAPIView):
                     )
                     self.search_size = self.queryset.count()
                 else:
-                    # It uses multiple endpoints, so we need to use the elastic index
-                    self.update_queryset_from_search(searcher, general_handler)
+                    # The  queryset needs to be updated to query other sources
+                    self.update_queryset(searcher, general_handler)
 
                 if self.queryset.count() == 0:
                     raise EmptyQuerysetError(
@@ -151,6 +163,7 @@ class CustomView(GenericAPIView):
                         after_key=self.after_key,
                         before_key=self.before_key,
                         elastic_result=self.elastic_result,
+                        ordering=general_handler.queryset_manager.order_field,
                     )
                 else:
                     self.queryset = self.get_queryset().first()
@@ -331,6 +344,31 @@ class CustomView(GenericAPIView):
 
     search_size = None
 
+    def update_queryset(self, searcher, general_handler):
+        if general_handler.queryset_manager.main_endpoint == "taxonomy":
+            # taxonomy endpoint
+            if can_use_taxonomy_per_entry(general_handler.queryset_manager.filters):
+                # filtered by an entry accession
+                self.update_queryset_from_taxonomy_per_entry(general_handler)
+                return
+            elif can_use_taxonomy_per_db(general_handler.queryset_manager.filters):
+                # filtered by an entry database
+                self.update_queryset_from_taxonomy_per_entry_db(general_handler)
+                return
+        elif general_handler.queryset_manager.main_endpoint == "proteome":
+            # proteome endpoint
+            if can_use_proteome_per_entry(general_handler.queryset_manager.filters):
+                # filtered by an entry accession
+                self.update_queryset_from_proteome_per_entry(general_handler)
+                return
+            elif can_use_proteome_per_db(general_handler.queryset_manager.filters):
+                # filtered by an entry database
+                self.update_queryset_from_proteome_per_entry_db(general_handler)
+                return
+
+        # so we need to use the elastic index
+        self.update_queryset_from_search(searcher, general_handler)
+
     # Queries the elastic searcher core to get a list of accessions of the main endpoint,
     # then builds a queryset matching those accessions.
     # This is the main connection point between elastic and MySQL
@@ -353,10 +391,47 @@ class CustomView(GenericAPIView):
         self.before_key = before_key
         self.elastic_result = elastic_result if should_keep_elastic_order else None
 
+    def update_queryset_from_taxonomy_per_entry(self, general_handler):
+        entry_acc = general_handler.queryset_manager.filters["entry"]["accession"]
+        self.queryset = TaxonomyPerEntry.objects.filter(
+            entry_acc=entry_acc.upper()
+        ).order_by("-num_proteins")
+        self.search_size = len(self.queryset)
 
-def filter_queryset_accession_in(queryset, list):
-    if len(list) > 0:
-        or_filter = reduce(or_, (Q(**{"accession__iexact": acc}) for acc in list))
+    def update_queryset_from_taxonomy_per_entry_db(self, general_handler):
+        entry_db = general_handler.queryset_manager.filters["entry"]["source_database"]
+        self.queryset = TaxonomyPerEntryDB.objects.filter(
+            source_database=entry_db
+        ).order_by("-num_proteins")
+        self.search_size = len(self.queryset)
+
+    def update_queryset_from_proteome_per_entry(self, general_handler):
+        entry_acc = general_handler.queryset_manager.filters["entry"]["accession"]
+        self.queryset = ProteomePerEntry.objects.filter(
+            entry_acc=entry_acc.upper()
+        ).order_by("-num_proteins")
+        self.search_size = len(self.queryset)
+
+    def update_queryset_from_proteome_per_entry_db(self, general_handler):
+        entry_db = general_handler.queryset_manager.filters["entry"]["source_database"]
+        self.queryset = ProteomePerEntryDB.objects.filter(
+            source_database=entry_db
+        ).order_by("-num_proteins")
+        if "is_reference" in general_handler.queryset_manager.filters["proteome"]:
+            self.queryset.filter(
+                proteome__is_reference=general_handler.queryset_manager.filters[
+                    "proteome"
+                ]["is_reference"]
+            )
+
+        self.search_size = len(self.queryset)
+
+
+def filter_queryset_accession_in(queryset, list_of_accessions):
+    if len(list_of_accessions) > 0:
+        or_filter = reduce(
+            or_, (Q(**{"accession__iexact": acc}) for acc in list_of_accessions)
+        )
         return queryset.filter(or_filter)
     else:
         return queryset.filter(accession__in=[])

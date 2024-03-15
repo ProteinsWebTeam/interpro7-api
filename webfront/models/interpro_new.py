@@ -175,6 +175,7 @@ class Taxonomy(models.Model):
     rank = models.CharField(max_length=20)
     children = JSONField(null=True)
     counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
 
 
 class TaxonomyPerEntry(models.Model):
@@ -185,6 +186,7 @@ class TaxonomyPerEntry(models.Model):
         "Entry", db_column="entry_acc", on_delete=models.SET_NULL, null=True
     )
     counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
 
     class Meta:
         indexes = [
@@ -198,10 +200,49 @@ class TaxonomyPerEntryDB(models.Model):
     )
     source_database = models.CharField(max_length=100, db_index=True)
     counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
 
     class Meta:
         indexes = [
             models.Index(fields=["source_database", "taxonomy"]),
+        ]
+
+
+class ProteomePerEntry(models.Model):
+    proteome = models.ForeignKey(
+        "Proteome",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="accession",
+    )
+    entry_acc = models.ForeignKey(
+        "Entry", db_column="entry_acc", on_delete=models.SET_NULL, null=True
+    )
+    counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["entry_acc", "proteome"]),
+        ]
+
+
+class ProteomePerEntryDB(models.Model):
+    proteome = models.ForeignKey(
+        "Proteome",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="accession",
+    )
+    source_database = models.CharField(max_length=100, db_index=True)
+    counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["source_database", "proteome"]),
         ]
 
 
@@ -215,6 +256,7 @@ class Proteome(models.Model):
         "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True
     )
     counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
 
 
 class Set(models.Model):

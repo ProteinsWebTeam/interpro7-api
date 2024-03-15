@@ -379,17 +379,11 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
                         for result in response.data["results"]:
                             self.assertIn("extra_fields", result)
                             self.assertIn("counters", result["extra_fields"])
-                            if endpoint1 == "taxonomy" and endpoint2 == "entry":
-                                # In this case the counters come from TaxonomyPerEntry and are always 3.
-                                self.assertEqual(
-                                    len(result["extra_fields"]["counters"].keys()), 3
-                                )
-                            else:
-                                # Otherwise it should be equal to the counters requested
-                                self.assertEqual(
-                                    len(result["extra_fields"]["counters"].keys()),
-                                    len(counters),
-                                )
+                            # It should be equal to the counters requested
+                            self.assertEqual(
+                                len(result["extra_fields"]["counters"].keys()),
+                                len(counters),
+                            )
                     else:
                         self.assertEqual(
                             response.status_code,

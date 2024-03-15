@@ -1,27 +1,45 @@
 from webfront.exceptions import EmptyQuerysetError
-from webfront.serializers.content_serializers import ModelContentSerializer
+from webfront.models import ProteomePerEntry, ProteomePerEntryDB
+from webfront.serializers.content_serializers import (
+    ModelContentSerializer,
+    select_counters,
+    process_counters_attribute,
+)
 from webfront.views.custom import SerializerDetail
-from webfront.views.queryset_manager import escape
+from webfront.views.queryset_manager import (
+    escape,
+    can_use_proteome_per_entry,
+    can_use_proteome_per_db,
+)
 
 
 class ProteomeSerializer(ModelContentSerializer):
     def to_representation(self, instance):
         representation = {}
-        representation = self.endpoint_representation(representation, instance)
+        proteome_instance = instance
+        if isinstance(instance, ProteomePerEntry) or isinstance(
+            instance, ProteomePerEntryDB
+        ):
+            proteome_instance = instance.proteome
+
+        representation = self.endpoint_representation(representation, proteome_instance)
         representation = self.filter_representation(
-            representation, instance, self.detail_filters, self.detail
+            representation, proteome_instance, self.detail_filters, self.detail
         )
         if self.queryset_manager.other_fields is not None:
 
             def counter_function(counters_to_include):
                 get_c = ProteomeSerializer.get_counters
                 return get_c(
-                    instance, self.searcher, self.queryset_manager, counters_to_include
+                    proteome_instance,
+                    self.searcher,
+                    self.queryset_manager,
+                    counters_to_include,
                 )
 
             representation = self.add_other_fields(
                 representation,
-                instance,
+                proteome_instance,
                 self.queryset_manager.other_fields,
                 {"counters": counter_function},
             )
@@ -191,6 +209,28 @@ class ProteomeSerializer(ModelContentSerializer):
             "tax": ["taxa", "tax_id"],
             "set": ["sets", "set_acc"],
         }
+        counter_endpoints = process_counters_attribute(counters_to_include, endpoints)
+        if can_use_proteome_per_entry(queryset_manager.filters):
+            match = ProteomePerEntry.objects.filter(
+                entry_acc=queryset_manager.filters["entry"]["accession"].upper(),
+                proteome=instance.accession,
+            ).first()
+            if not match:
+                raise EmptyQuerysetError(
+                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome")
+                )
+
+            return select_counters(match.counts, counter_endpoints, counters_to_include)
+        if can_use_proteome_per_db(queryset_manager.filters):
+            match = ProteomePerEntryDB.objects.filter(
+                source_database=queryset_manager.filters["entry"]["source_database"],
+                proteome=instance.accession,
+            ).first()
+            if not match:
+                raise EmptyQuerysetError(
+                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome")
+                )
+            return select_counters(match.counts, counter_endpoints, counters_to_include)
         return ModelContentSerializer.generic_get_counters(
             "proteome",
             endpoints,

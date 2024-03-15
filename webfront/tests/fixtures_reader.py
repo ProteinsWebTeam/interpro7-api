@@ -4,7 +4,15 @@ import copy
 
 from webfront.searcher.elastic_controller import ElasticsearchController
 
-from webfront.models import Entry, Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
+from webfront.models import (
+    Entry,
+    Taxonomy,
+    TaxonomyPerEntry,
+    TaxonomyPerEntryDB,
+    ProteomePerEntry,
+    ProteomePerEntryDB,
+    Proteome,
+)
 
 
 def get_id(*args):
@@ -365,6 +373,56 @@ class FixtureReader:
                     counts=counters_db[db][tax],
                 )
                 txe.save()
+
+    def generate_proteom_per_entry_fixtures(self, docs):
+        counters = {}
+        counters_db = {}
+        for doc in docs:
+            if "entry_acc" not in doc or "proteome_acc" not in doc:
+                continue
+            entry = doc["entry_acc"]
+            entry_db = doc["entry_db"]
+            proteome = doc["proteome_acc"]
+            if entry not in counters:
+                counters[entry] = {}
+            if entry_db not in counters_db:
+                counters_db[entry_db] = {}
+            if proteome not in counters[entry]:
+                counters[entry][proteome] = {
+                    "structures": 0,
+                    "proteins": 0,
+                }
+            if proteome not in counters_db[entry_db]:
+                counters_db[entry_db][proteome] = {
+                    "entries": 0,
+                    "proteins": 0,
+                    "structures": 0,
+                }
+            counters_db[entry_db][proteome]["entries"] += 1
+            if doc["structure_acc"] is not None:
+                counters[entry][proteome]["structures"] += 1
+                counters_db[entry_db][proteome]["structures"] += 1
+            if doc["protein_acc"] is not None:
+                counters[entry][proteome]["proteins"] += 1
+                counters_db[entry_db][proteome]["proteins"] += 1
+        for entry in counters:
+            for proteome in counters[entry]:
+                pxe = ProteomePerEntry(
+                    entry_acc=Entry.objects.get(accession=entry.upper()),
+                    proteome=Proteome.objects.get(accession=proteome.upper()),
+                    counts=counters[entry][proteome],
+                    num_proteins=counters[entry][proteome]["proteins"],
+                )
+                pxe.save()
+        for db in counters_db:
+            for proteome in counters_db[db]:
+                pxe = ProteomePerEntryDB(
+                    source_database=db,
+                    proteome=Proteome.objects.get(accession=proteome.upper()),
+                    counts=counters_db[db][proteome],
+                    num_proteins=counters_db[db][proteome]["proteins"],
+                )
+                pxe.save()
 
     def clear_search_engine(self):
         search = ElasticsearchController()

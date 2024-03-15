@@ -1,37 +1,55 @@
 from webfront.exceptions import EmptyQuerysetError
-from webfront.serializers.content_serializers import ModelContentSerializer
+from webfront.serializers.content_serializers import (
+    ModelContentSerializer,
+    process_counters_attribute,
+    select_counters,
+)
 from webfront.views.custom import SerializerDetail
 from webfront.models import Taxonomy, TaxonomyPerEntry, TaxonomyPerEntryDB
 import webfront.serializers.interpro
 import webfront.serializers.uniprot
 import webfront.serializers.pdb
-from webfront.views.queryset_manager import escape
+from webfront.views.queryset_manager import (
+    escape,
+    can_use_taxonomy_per_entry,
+    can_use_taxonomy_per_db,
+)
 
 
 class TaxonomySerializer(ModelContentSerializer):
     def to_representation(self, instance):
         representation = {}
-        representation = self.endpoint_representation(representation, instance)
+        tax_instance = instance
+        if isinstance(instance, TaxonomyPerEntry) or isinstance(
+            instance, TaxonomyPerEntryDB
+        ):
+            tax_instance = instance.taxonomy
+        representation = self.endpoint_representation(
+            representation, tax_instance, instance
+        )
         representation = self.filter_representation(
-            representation, instance, self.detail_filters, self.detail
+            representation, tax_instance, self.detail_filters, self.detail
         )
         if self.queryset_manager.other_fields is not None:
 
             def counter_function(counters_to_include):
                 get_c = TaxonomySerializer.get_counters
                 return get_c(
-                    instance, self.searcher, self.queryset_manager, counters_to_include
+                    tax_instance,
+                    self.searcher,
+                    self.queryset_manager,
+                    counters_to_include,
                 )
 
             representation = self.add_other_fields(
                 representation,
-                instance,
+                tax_instance,
                 self.queryset_manager.other_fields,
                 {"counters": counter_function},
             )
         return representation
 
-    def endpoint_representation(self, representation, instance):
+    def endpoint_representation(self, representation, instance, original_instance=None):
         detail = self.detail
         if detail == SerializerDetail.ALL:
             representation = self.to_full_representation(instance)
@@ -43,21 +61,21 @@ class TaxonomySerializer(ModelContentSerializer):
             representation = self.to_full_representation(instance)
             representation["names"] = self.get_names_map(instance)
         elif detail == SerializerDetail.TAXONOMY_PER_ENTRY:
-            representation = self.to_full_representation(instance.taxonomy)
-            representation["metadata"]["counters"] = instance.counts
-            representation["names"] = self.get_names_map(instance.taxonomy)
+            representation = self.to_full_representation(original_instance.taxonomy)
+            representation["metadata"]["counters"] = original_instance.counts
+            representation["names"] = self.get_names_map(original_instance.taxonomy)
             representation["children"] = self.get_counter_for_children_filtered_by_acc(
-                instance
+                original_instance
             )
             representation["metadata"]["children"] = list(
                 representation["children"].keys()
             )
         elif detail == SerializerDetail.TAXONOMY_PER_ENTRY_DB:
-            representation = self.to_full_representation(instance.taxonomy)
-            representation["metadata"]["counters"] = instance.counts
-            representation["names"] = self.get_names_map(instance.taxonomy)
+            representation = self.to_full_representation(original_instance.taxonomy)
+            representation["metadata"]["counters"] = original_instance.counts
+            representation["names"] = self.get_names_map(original_instance.taxonomy)
             representation["children"] = self.get_counter_for_children_filtered_by_db(
-                instance
+                original_instance
             )
             representation["metadata"]["children"] = list(
                 representation["children"].keys()
@@ -218,24 +236,16 @@ class TaxonomySerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def can_use_taxonomy_per_entry(filters):
-        for key, value in filters.items():
-            if key not in ["entry", "taxonomy"] and value:
-                return False
-
-        return "accession" in filters["entry"]
-
-    @staticmethod
-    def can_use_taxonomy_per_db(filters):
-        for key, value in filters.items():
-            if key not in ["entry", "taxonomy"] and value:
-                return False
-
-        return "source_database" in filters["entry"]
-
-    @staticmethod
     def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
-        if TaxonomySerializer.can_use_taxonomy_per_entry(queryset_manager.filters):
+        endpoints = {
+            "entry": ["entries", "entry_acc"],
+            "structure": ["structures", "structure_acc"],
+            "protein": ["proteins", "protein_acc"],
+            "set": ["sets", "set_acc"],
+            "proteome": ["proteomes", "proteome_acc"],
+        }
+        counter_endpoints = process_counters_attribute(counters_to_include, endpoints)
+        if can_use_taxonomy_per_entry(queryset_manager.filters):
             match = TaxonomyPerEntry.objects.filter(
                 entry_acc=queryset_manager.filters["entry"]["accession"].upper(),
                 taxonomy_id=instance.accession,
@@ -245,8 +255,8 @@ class TaxonomySerializer(ModelContentSerializer):
                     ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy")
                 )
 
-            return match.counts
-        if TaxonomySerializer.can_use_taxonomy_per_db(queryset_manager.filters):
+            return select_counters(match.counts, counter_endpoints, counters_to_include)
+        if can_use_taxonomy_per_db(queryset_manager.filters):
             match = TaxonomyPerEntryDB.objects.filter(
                 source_database=queryset_manager.filters["entry"]["source_database"],
                 taxonomy_id=instance.accession,
@@ -255,14 +265,7 @@ class TaxonomySerializer(ModelContentSerializer):
                 raise EmptyQuerysetError(
                     ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Taxonomy")
                 )
-            return match.counts
-        endpoints = {
-            "entry": ["entries", "entry_acc"],
-            "structure": ["structures", "structure_acc"],
-            "protein": ["proteins", "protein_acc"],
-            "set": ["sets", "set_acc"],
-            "proteome": ["proteomes", "proteome_acc"],
-        }
+            return select_counters(match.counts, counter_endpoints, counters_to_include)
         return ModelContentSerializer.generic_get_counters(
             "taxonomy",
             endpoints,

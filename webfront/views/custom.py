@@ -399,28 +399,28 @@ class CustomView(GenericAPIView):
         entry_acc = general_handler.queryset_manager.filters["entry"]["accession"]
         self.queryset = TaxonomyPerEntry.objects.filter(
             entry_acc=entry_acc.upper()
-        ).order_by("num_proteins")
+        ).order_by("-num_proteins")
         self.search_size = len(self.queryset)
 
     def update_queryset_from_taxonomy_per_entry_db(self, general_handler):
         entry_db = general_handler.queryset_manager.filters["entry"]["source_database"]
         self.queryset = TaxonomyPerEntryDB.objects.filter(
             source_database=entry_db
-        ).order_by("num_proteins")
+        ).order_by("-num_proteins")
         self.search_size = len(self.queryset)
 
     def update_queryset_from_proteome_per_entry(self, general_handler):
         entry_acc = general_handler.queryset_manager.filters["entry"]["accession"]
         self.queryset = ProteomePerEntry.objects.filter(
             entry_acc=entry_acc.upper()
-        ).order_by("num_proteins")
+        ).order_by("-num_proteins")
         self.search_size = len(self.queryset)
 
     def update_queryset_from_proteome_per_entry_db(self, general_handler):
         entry_db = general_handler.queryset_manager.filters["entry"]["source_database"]
         self.queryset = ProteomePerEntryDB.objects.filter(
             source_database=entry_db
-        ).order_by("num_proteins")
+        ).order_by("-num_proteins")
         if "is_reference" in general_handler.queryset_manager.filters["proteome"]:
             self.queryset.filter(
                 proteome__is_reference=general_handler.queryset_manager.filters[

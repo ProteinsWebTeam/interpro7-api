@@ -4,7 +4,11 @@ import logging
 
 from rest_framework import status
 
-from webfront.exceptions import DeletedEntryError, EmptyQuerysetError, DeprecatedModifier
+from webfront.exceptions import (
+    DeletedEntryError,
+    EmptyQuerysetError,
+    DeprecatedModifier,
+)
 from webfront.response import Response
 
 from django.conf import settings
@@ -70,15 +74,9 @@ def pagination_information(request):
 def getDataForRoot(handlers, queryset_manager, searcher):
     qs = queryset_manager.get_base_queryset("entry")
     elastic_query = searcher._elastic_json_query("*:*")
-    host_parts = settings.DATABASES["default"]["HOST"].split(".")[0].split("-")
-    host = ""
-    if len(host_parts) > 2:
-        if host_parts[0] == "mysql":
-            host = host_parts[2]
-        else:
-            host = host_parts[0]
+    host = settings.DATABASES["default"]["HOST"].split(".")[0].replace("mysql-", "")
 
-    elastic_host = searcher.server.split("-")[0]
+    elastic_host = searcher.server.split(".")[0]
     total = elastic_query["hits"]["total"]
     if type(total) == dict:
         total = elastic_query["hits"]["total"]["value"]
@@ -103,6 +101,14 @@ def getDataForRoot(handlers, queryset_manager, searcher):
             "elasticsearch": {
                 "server": elastic_host,
                 "status": "OK" if total > 0 else "ERROR",
+            },
+            "cache": {
+                "server": (
+                    settings.CACHES["default"]["LOCATION"]
+                    if settings.ENABLE_CACHING
+                    else ""
+                ),
+                "status": "enabled" if settings.ENABLE_CACHING else "disabled",
             },
         },
     }
@@ -205,15 +211,18 @@ class GeneralHandler(CustomView):
                 if settings.DEBUG:
                     raise
 
-                response = Response({
-                    "accession": e.accession,
-                    "source_database": e.database,
-                    "type": e.type,
-                    "name": e.name,
-                    "short_name": e.short_name,
-                    "deletion_date": e.date.strftime("%Y-%m-%dT00:00:00.000Z"),
-                    "history": e.history
-                }, status=status.HTTP_410_GONE)
+                response = Response(
+                    {
+                        "accession": e.accession,
+                        "source_database": e.database,
+                        "type": e.type,
+                        "name": e.name,
+                        "short_name": e.short_name,
+                        "deletion_date": e.date.strftime("%Y-%m-%dT00:00:00.000Z"),
+                        "history": e.history,
+                    },
+                    status=status.HTTP_410_GONE,
+                )
                 self._set_in_cache(caching_allowed, full_path, response)
             except EmptyQuerysetError as e:
                 # EmptyQuerysetError is still a valid response so a response object is created and saved in cache
@@ -303,22 +312,18 @@ class GeneralHandler(CustomView):
             return
         if general_handler.queryset_manager.main_endpoint == "taxonomy":
             self.queryset_manager.add_filter(
-                "search",
-                accession__icontains=search,
-                full_name__icontains=search
+                "search", accession__icontains=search, full_name__icontains=search
             )
         elif general_handler.queryset_manager.main_endpoint == "entry":
             self.queryset_manager.add_filter(
                 "search",
                 accession__icontains=search,
                 name__icontains=search,
-                short_name__icontains=search
+                short_name__icontains=search,
             )
         else:
             self.queryset_manager.add_filter(
-                "search",
-                accession__icontains=search,
-                name__icontains=search
+                "search", accession__icontains=search, name__icontains=search
             )
 
     @staticmethod

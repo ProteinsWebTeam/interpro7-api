@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('webfront', '0026_remove_structuralmodel'),
+        ("webfront", "0026_remove_structuralmodel"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='entry',
-            name='llm_description',
+            model_name="entry",
+            name="llm_description",
         ),
     ]

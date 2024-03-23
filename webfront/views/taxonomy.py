@@ -34,7 +34,7 @@ class TaxonomyAccessionHandler(CustomView):
         **kwargs
     ):
         general_handler.queryset_manager.add_filter(
-            "taxonomy", accession__iexact=endpoint_levels[level - 1]
+            "taxonomy", accession=endpoint_levels[level - 1]
         )
         general_handler.modifiers.register(
             "with_names", passing, serializer=SerializerDetail.TAXONOMY_DETAIL_NAMES
@@ -94,6 +94,7 @@ class UniprotHandler(CustomView):
         **kwargs
     ):
         general_handler.queryset_manager.add_filter("taxonomy", accession__isnull=False)
+        general_handler.queryset_manager.order_by("-num_proteins")
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Taxonomy, "counters")
         )

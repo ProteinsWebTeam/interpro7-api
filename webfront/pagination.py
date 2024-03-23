@@ -93,6 +93,8 @@ class CustomPagination(CursorPagination):
             self.before_key = kwargs["before_key"]
         if "elastic_result" in kwargs and kwargs["elastic_result"] is not None:
             self.elastic_result = kwargs["elastic_result"]
+        if "ordering" in kwargs and kwargs["ordering"] is not None:
+            self.ordering = kwargs["ordering"]
         return super(CustomPagination, self).paginate_queryset(
             queryset, request, kwargs["view"]
         )

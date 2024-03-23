@@ -259,19 +259,23 @@ def filter_by_key_species(value, general_handler):
 
 
 def filter_by_entry(value, general_handler):
-    queryset = general_handler.queryset_manager.get_queryset()
-    response = TaxonomyPerEntry.objects.filter(taxonomy__in=queryset).filter(
-        entry_acc__accession__iexact=value
+    tax_id = general_handler.queryset_manager.filters["taxonomy"]["accession"]
+    response = TaxonomyPerEntry.objects.filter(taxonomy__accession=tax_id).filter(
+        entry_acc__accession=value.upper()
     )
     if len(response) == 0:
-        raise EmptyQuerysetError("No documents found with the current selection")
+        response = TaxonomyPerEntry.objects.filter(taxonomy__in=tax_id).filter(
+            entry_acc__accession=value.lower()
+        )
+        if len(response) == 0:
+            raise EmptyQuerysetError("No documents found with the current selection")
     return response.first()
 
 
 def filter_by_entry_db(value, general_handler):
-    queryset = general_handler.queryset_manager.get_queryset()
-    response = TaxonomyPerEntryDB.objects.filter(taxonomy__in=queryset).filter(
-        source_database__iexact=value
+    tax_id = general_handler.queryset_manager.filters["taxonomy"]["accession"]
+    response = TaxonomyPerEntryDB.objects.filter(taxonomy__accession=tax_id).filter(
+        source_database=value.lower()
     )
     if len(response) == 0:
         raise EmptyQuerysetError("No documents found with the current selection")
@@ -466,7 +470,6 @@ def get_entry_annotation_info(field, general_handler):
     return {}
 
 
-
 def add_extra_fields(endpoint, *argv):
     supported_fields = [
         f.name for f in endpoint._meta.get_fields() if not f.is_relation
@@ -474,14 +477,18 @@ def add_extra_fields(endpoint, *argv):
 
     def x(fields, general_handler):
         fs = fields.split(",")
+        other_fields = {}
         for field in fs:
-            if field not in supported_fields:
+            parts = field.split(":")
+            f_name = parts[0]
+            other_fields[f_name] = parts[1] if len(parts) > 1 else None
+            if f_name not in supported_fields:
                 raise URLError(
                     "{} is not a valid field to to be included. Allowed fields : {}".format(
                         field, ", ".join(supported_fields)
                     )
                 )
-        general_handler.queryset_manager.other_fields = fs
+        general_handler.queryset_manager.other_fields = other_fields
 
     return x
 
@@ -498,9 +505,11 @@ def ida_search(value, general_handler):
         query = "/{}/".format(
             "\-".join(
                 [
-                    f"PF[0-9]{{5}}\:{e}"
-                    if e.startswith("IPR")
-                    else f"{e}(\:IPR[0-9]{{6}})?"
+                    (
+                        f"PF[0-9]{{5}}\:{e}"
+                        if e.startswith("IPR")
+                        else f"{e}(\:IPR[0-9]{{6}})?"
+                    )
                     for e in entries
                 ]
             )
@@ -543,7 +552,7 @@ def get_isoforms(value, general_handler):
 
 def run_hmmsearch(model):
     """
-        run hmmsearch using hmm model against reviewed uniprot proteins
+    run hmmsearch using hmm model against reviewed uniprot proteins
     """
     parameters = {"seq": model, "seqdb": "swissprot"}
 
@@ -581,7 +590,7 @@ def calculate_conservation_scores(entry_acc):
 
 def align_seq_to_model(domains, sequence):
     """
-        align result of hmmscan with uniprot sequence
+    align result of hmmscan with uniprot sequence
     """
     hmmfrom = domains["alihmmfrom"]
     hmmto = domains["alihmmto"]
@@ -608,7 +617,7 @@ def align_seq_to_model(domains, sequence):
 
 def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmotif):
     """
-        generate sequence matrix (i.e. matrix[res] = "conservation_score_seqAA_modelposition")
+    generate sequence matrix (i.e. matrix[res] = "conservation_score_seqAA_modelposition")
     """
     matrix = {}
     count = hmmfrom - 1
@@ -635,7 +644,7 @@ def get_hmm_matrix(logo, alisqfrom, alisqto, hmmfrom, hmmto, seqmotif, modelmoti
 
 def format_logo(matrix):
     """
-        re-arrange the data
+    re-arrange the data
     """
     output = []
     for res in matrix:
@@ -697,8 +706,8 @@ def calculate_residue_conservation(entry_db, general_handler):
                 domains = [hit["domains"] for hit in protein_hits][0]
                 for hit in domains:
                     # calculate scores for each domain hit for each entry
-                    mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = align_seq_to_model(
-                        hit, sequence
+                    mappedseq, modelseq, hmmfrom, hmmto, alisqfrom, alisqto = (
+                        align_seq_to_model(hit, sequence)
                     )
                     matrixseq = get_hmm_matrix(
                         logo_score,
@@ -874,6 +883,7 @@ def mark_as_subfamily(value, general_handler):
 
 def passing(x, y):
     pass
+
 
 def get_deprecated_response(message):
     def deprecated(value, general_handler):

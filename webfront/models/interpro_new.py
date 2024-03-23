@@ -23,7 +23,6 @@ class Entry(models.Model):
     type = models.CharField(max_length=50)
     name = models.TextField()
     short_name = models.CharField(max_length=100)
-    # other_names = JSONField(null=True)
     source_database = models.CharField(max_length=100, db_index=True)
     member_databases = JSONField(null=True)
     integrated = models.ForeignKey(
@@ -36,7 +35,6 @@ class Entry(models.Model):
     hierarchy = JSONField(null=True)
     cross_references = JSONField(null=True)
     entry_date = models.DateTimeField(null=True)
-    is_featured = models.BooleanField(default=False)
     overlaps_with = JSONField(default=[])
     is_public = models.BooleanField(default=False)
     deletion_date = models.DateTimeField(null=True)
@@ -46,6 +44,9 @@ class Entry(models.Model):
     history = JSONField(null=True)
     details = JSONField(null=True)
     set_info = JSONField(null=True)
+    is_llm = models.BooleanField(default=False)
+    is_reviewed_llm = models.BooleanField(default=False)
+    representative_structure = JSONField(null=True)
 
 
 class EntryTaxa(models.Model):
@@ -84,10 +85,9 @@ class Protein(models.Model):
     source_database = models.CharField(
         max_length=20, default="unreviewed", db_index=True
     )
-    # residues = JSONField(null=True)
-    # extra_features = JSONField(null=True)
     structure = JSONField(default={}, null=True)
     is_fragment = models.BooleanField(default=False)
+    in_alphafold = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
     ida_id = models.CharField(max_length=40, null=True)
     ida = models.TextField(null=True)
@@ -143,7 +143,11 @@ class Structure(models.Model):
 class ChainSequence(models.Model):
     id = models.IntegerField(primary_key=True)
     structure = models.ForeignKey(
-        "Structure", on_delete=models.SET_NULL, null=True, blank=True, db_column="structure_acc"
+        "Structure",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="structure_acc",
     )
     chain = models.CharField(db_column="chain_acc", max_length=10)
     sequence_bin = models.BinaryField(db_column="sequence", null=True)
@@ -171,6 +175,7 @@ class Taxonomy(models.Model):
     rank = models.CharField(max_length=20)
     children = JSONField(null=True)
     counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
 
 
 class TaxonomyPerEntry(models.Model):
@@ -181,6 +186,12 @@ class TaxonomyPerEntry(models.Model):
         "Entry", db_column="entry_acc", on_delete=models.SET_NULL, null=True
     )
     counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["entry_acc", "taxonomy"]),
+        ]
 
 
 class TaxonomyPerEntryDB(models.Model):
@@ -189,6 +200,50 @@ class TaxonomyPerEntryDB(models.Model):
     )
     source_database = models.CharField(max_length=100, db_index=True)
     counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["source_database", "taxonomy"]),
+        ]
+
+
+class ProteomePerEntry(models.Model):
+    proteome = models.ForeignKey(
+        "Proteome",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="accession",
+    )
+    entry_acc = models.ForeignKey(
+        "Entry", db_column="entry_acc", on_delete=models.SET_NULL, null=True
+    )
+    counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["entry_acc", "proteome"]),
+        ]
+
+
+class ProteomePerEntryDB(models.Model):
+    proteome = models.ForeignKey(
+        "Proteome",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="accession",
+    )
+    source_database = models.CharField(max_length=100, db_index=True)
+    counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["source_database", "proteome"]),
+        ]
 
 
 class Proteome(models.Model):
@@ -201,6 +256,7 @@ class Proteome(models.Model):
         "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True
     )
     counts = JSONField(null=True)
+    num_proteins = models.IntegerField(null=False, default=0)
 
 
 class Set(models.Model):
@@ -229,4 +285,3 @@ class Isoforms(models.Model):
 
     class Meta:
         db_table = "webfront_varsplic"
-

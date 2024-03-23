@@ -4,26 +4,36 @@ import copy
 
 from webfront.searcher.elastic_controller import ElasticsearchController
 
+from webfront.models import (
+    Entry,
+    Taxonomy,
+    TaxonomyPerEntry,
+    TaxonomyPerEntryDB,
+    ProteomePerEntry,
+    ProteomePerEntryDB,
+    Proteome,
+)
+
 
 def get_id(*args):
     return "-".join([a for a in args if a is not None])
 
 
 class FixtureReader:
-    entries = {}
-    proteins = {}
-    structures = {}
-    entry_protein_list = []
-    protein_structure_list = {}
-    tax2lineage = {}
-    tax2rank = {}
-    sets = {}
-    proteomes = {}
-    entry_annotations = {}
-    search = None
 
     def __init__(self, fixture_paths):
         self.ida_to_add = {}
+        self.entries = {}
+        self.proteins = {}
+        self.structures = {}
+        self.entry_protein_list = []
+        self.protein_structure_list = {}
+        self.tax2lineage = {}
+        self.tax2rank = {}
+        self.sets = {}
+        self.proteomes = {}
+        self.entry_annotations = {}
+        self.search = None
         for path in fixture_paths:
             with open(path) as data_file:
                 data = json.load(data_file)
@@ -80,9 +90,9 @@ class FixtureReader:
             elif fixture["model"] == "webfront.Set":
                 self.sets[fixture["fields"]["accession"].lower()] = fixture["fields"]
             elif fixture["model"] == "webfront.EntryAnnotation":
-                self.entry_annotations[
-                    fixture["fields"]["accession"].lower()
-                ] = fixture["fields"]
+                self.entry_annotations[fixture["fields"]["accession"].lower()] = (
+                    fixture["fields"]
+                )
 
     def get_entry2set(self):
         e2s = {}
@@ -121,6 +131,7 @@ class FixtureReader:
                 + (" ".join(self.entries[e]["description"])),
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
+                "protein_af_score": 0.5 if self.proteins[p]["in_alphafold"] else -1,
                 "text_protein": p
                 + " "
                 + self.proteins[p]["source_database"]
@@ -161,8 +172,9 @@ class FixtureReader:
                     c["structure_chain_acc"] = sp["chain"]
                     c["text_structure"] = c["structure_acc"] + " " + sp["chain"]
 
-                    c["entry_structure_locations"]= ep["coordinates"],
+                    c["entry_structure_locations"] = ep["coordinates"]
                     c["structure_protein_locations"] = sp["coordinates"]
+                    c["structure_protein_acc"] = p
                     # c["protein_structure"] = sp["mapping"]
                     if e in entry2set:
                         for e2s in entry2set[e]:
@@ -200,6 +212,9 @@ class FixtureReader:
                             "text": p + " " + sp["structure"],
                             "protein_acc": p,
                             "protein_db": self.proteins[p]["source_database"],
+                            "protein_af_score": (
+                                0.5 if self.proteins[p]["in_alphafold"] else -1
+                            ),
                             "text_protein": p
                             + " "
                             + self.proteins[p]["source_database"]
@@ -234,6 +249,7 @@ class FixtureReader:
                             "structure_chain_acc": sp["chain"],
                             "text_structure": sp["structure"] + " " + sp["chain"],
                             "structure_protein_locations": sp["coordinates"],
+                            "structure_protein_acc": p,
                             # "protein_structure": sp["mapping"],
                         }
                     )
@@ -258,6 +274,9 @@ class FixtureReader:
                         "text": p,
                         "protein_acc": p,
                         "protein_db": self.proteins[p]["source_database"],
+                        "protein_af_score": (
+                            0.5 if self.proteins[p]["in_alphafold"] else -1
+                        ),
                         "text_protein": p + " " + self.proteins[p]["source_database"],
                         "tax_id": self.proteins[p]["organism"]["taxId"],
                         "tax_name": self.proteins[p]["organism"]["name"],
@@ -281,18 +300,130 @@ class FixtureReader:
         for doc in to_add:
             lower.append(
                 {
-                    k: v.lower()
-                    if type(v) == str and k != "ida" and "date" not in k and "chain" not in k
-                    else v
+                    k: (
+                        v.lower()
+                        if type(v) == str
+                        and k != "ida"
+                        and "date" not in k
+                        and "chain" not in k
+                        else v
+                    )
                     for k, v in doc.items()
                 }
             )
         return lower
 
     def add_to_search_engine(self, docs):
-        self.search = ElasticsearchController()
-        self.search.add(docs)
-        self.search.add(self.ida_to_add.values(), True)
+        search = ElasticsearchController()
+        search.add(docs)
+        # apparently you can't reuse the connection, so I create a second one
+        search2 = ElasticsearchController()
+        search2.add(self.ida_to_add.values(), True)
+
+    def generate_tax_per_entry_fixtures(self, docs):
+        counters = {}
+        counters_db = {}
+        for doc in docs:
+            if "entry_acc" not in doc or "tax_lineage" not in doc:
+                continue
+            entry = doc["entry_acc"]
+            entry_db = doc["entry_db"]
+            lineage = doc["tax_lineage"]
+            if entry not in counters:
+                counters[entry] = {}
+            if entry_db not in counters_db:
+                counters_db[entry_db] = {}
+            for tax in lineage:
+                if tax not in counters[entry]:
+                    counters[entry][tax] = {
+                        "structures": 0,
+                        "proteins": 0,
+                        "proteomes": 0,
+                    }
+                if tax not in counters_db[entry_db]:
+                    counters_db[entry_db][tax] = {
+                        "entries": 0,
+                        "proteomes": 0,
+                        "proteins": 0,
+                        "structures": 0,
+                    }
+                counters_db[entry_db][tax]["entries"] += 1
+                if doc["structure_acc"] is not None:
+                    counters[entry][tax]["structures"] += 1
+                    counters_db[entry_db][tax]["structures"] += 1
+                if doc["protein_acc"] is not None:
+                    counters[entry][tax]["proteins"] += 1
+                    counters_db[entry_db][tax]["proteins"] += 1
+                if doc["proteome_acc"] is not None:
+                    counters[entry][tax]["proteins"] += 1
+                    counters_db[entry_db][tax]["proteins"] += 1
+        for entry in counters:
+            for tax in counters[entry]:
+                txe = TaxonomyPerEntry(
+                    entry_acc=Entry.objects.get(accession=entry.upper()),
+                    taxonomy=Taxonomy.objects.get(accession=tax),
+                    counts=counters[entry][tax],
+                )
+                txe.save()
+        for db in counters_db:
+            for tax in counters_db[db]:
+                txe = TaxonomyPerEntryDB(
+                    source_database=db,
+                    taxonomy=Taxonomy.objects.get(accession=tax),
+                    counts=counters_db[db][tax],
+                )
+                txe.save()
+
+    def generate_proteom_per_entry_fixtures(self, docs):
+        counters = {}
+        counters_db = {}
+        for doc in docs:
+            if "entry_acc" not in doc or "proteome_acc" not in doc:
+                continue
+            entry = doc["entry_acc"]
+            entry_db = doc["entry_db"]
+            proteome = doc["proteome_acc"]
+            if entry not in counters:
+                counters[entry] = {}
+            if entry_db not in counters_db:
+                counters_db[entry_db] = {}
+            if proteome not in counters[entry]:
+                counters[entry][proteome] = {
+                    "structures": 0,
+                    "proteins": 0,
+                }
+            if proteome not in counters_db[entry_db]:
+                counters_db[entry_db][proteome] = {
+                    "entries": 0,
+                    "proteins": 0,
+                    "structures": 0,
+                }
+            counters_db[entry_db][proteome]["entries"] += 1
+            if doc["structure_acc"] is not None:
+                counters[entry][proteome]["structures"] += 1
+                counters_db[entry_db][proteome]["structures"] += 1
+            if doc["protein_acc"] is not None:
+                counters[entry][proteome]["proteins"] += 1
+                counters_db[entry_db][proteome]["proteins"] += 1
+        for entry in counters:
+            for proteome in counters[entry]:
+                pxe = ProteomePerEntry(
+                    entry_acc=Entry.objects.get(accession=entry.upper()),
+                    proteome=Proteome.objects.get(accession=proteome.upper()),
+                    counts=counters[entry][proteome],
+                    num_proteins=counters[entry][proteome]["proteins"],
+                )
+                pxe.save()
+        for db in counters_db:
+            for proteome in counters_db[db]:
+                pxe = ProteomePerEntryDB(
+                    source_database=db,
+                    proteome=Proteome.objects.get(accession=proteome.upper()),
+                    counts=counters_db[db][proteome],
+                    num_proteins=counters_db[db][proteome]["proteins"],
+                )
+                pxe.save()
 
     def clear_search_engine(self):
-        self.search.clear_all_docs()
+        search = ElasticsearchController()
+        search.clear_all_docs()

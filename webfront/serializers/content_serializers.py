@@ -157,10 +157,10 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         query,
-        include_structure=True,
+        include_structure=False,
         include_matches=False,
         include_chain=True,
-        base_query="*:*",
+        queryset_manager=None,
     ):
         field = "structure_chain" if include_chain else "structure_acc"
         response = [
@@ -169,7 +169,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 include_structure=include_structure,
                 include_matches=include_matches,
                 search=searcher,
-                base_query=base_query,
+                queryset_manager=queryset_manager,
             )
             for r in searcher.get_group_obj_of_field_by_query(
                 None, field, fq=query, rows=20
@@ -187,6 +187,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         include_chains=False,
         for_structure=False,
         base_query=None,
+        queryset_manager=None,
     ):
         if include_chains:
             search = searcher.get_group_obj_of_field_by_query(
@@ -199,7 +200,10 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
         response = [
             webfront.serializers.interpro.EntrySerializer.get_entry_header_from_search_object(
-                r, searcher=searcher, for_structure=for_structure, sq=base_query
+                r,
+                searcher=searcher,
+                for_structure=for_structure,
+                queryset_manager=queryset_manager,
             )
             for r in search
         ]
@@ -223,7 +227,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         include_chains=False,
         include_coordinates=True,
         for_entry=False,
-        base_query="*:*",
+        queryset_manager=None,
     ):
         field = "structure_chain" if include_chains else "protein_acc"
         response = [
@@ -232,7 +236,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 for_entry=for_entry,
                 searcher=searcher,
                 include_coordinates=include_coordinates,
-                sq=base_query,
+                queryset_manager=queryset_manager,
             )
             for r in searcher.get_group_obj_of_field_by_query(
                 None, field, fq=searcher_query, rows=20
@@ -273,7 +277,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         }
         for f in functions:
             if f in other_fields:
-                representation["extra_fields"][f] = functions[f]()
+                representation["extra_fields"][f] = functions[f](other_fields[f])
         return representation
 
     @staticmethod
@@ -298,3 +302,53 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if "before_key" in obj and obj["before_key"] is not None:
             previous = replace_query_param(url, "cursor", obj["before_key"])
         return {"next": next_page, "previous": previous, **payload}
+
+    @staticmethod
+    def generic_get_counters(
+        main_endpoint,
+        counter_endpoints,
+        instance,
+        searcher,
+        queryset_manager,
+        counters_to_include=None,
+    ):
+        sq = queryset_manager.get_searcher_query()
+        counter_endpoints = process_counters_attribute(
+            counters_to_include, counter_endpoints
+        )
+        counters = {}
+        if queryset_manager.is_single_endpoint():
+            counters = select_counters(
+                instance.counts, counter_endpoints, counters_to_include
+            )
+        else:
+            for ep, (name, field) in counter_endpoints.items():
+                if ep not in queryset_manager.filters or (
+                    "accession" not in queryset_manager.filters[ep]
+                    and "accession__iexact" not in queryset_manager.filters[ep]
+                ):
+                    counters[name] = searcher.get_number_of_field_by_endpoint(
+                        main_endpoint, field, instance.accession, sq
+                    )
+                else:
+                    counters[name] = 1
+        return counters
+
+
+def select_counters(counts, counter_endpoints, counters_to_include):
+    counters = {}
+    if counters_to_include is not None and counter_endpoints != {}:
+        for ep, (name, field) in counter_endpoints.items():
+            counters[name] = counts[name] if name in counts else 0
+    else:
+        counters = counts
+    return counters
+
+
+def process_counters_attribute(granular_counters, counter_endpoints):
+    if granular_counters is not None:
+        split_counters_to_include = granular_counters.split("-")
+        return {
+            k: v for k, v in counter_endpoints.items() if k in split_counters_to_include
+        }
+    return counter_endpoints

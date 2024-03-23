@@ -137,8 +137,11 @@ if TESTING:
 
 SEARCHER_URL = INTERPRO_CONFIG.get("searcher_path", "http://127.0.0.1:9200")
 SEARCHER_TEST_URL = INTERPRO_CONFIG.get("searcher_test_path", "http://127.0.0.1:9200")
+SEARCHER_TEST_PASSWORD = INTERPRO_CONFIG.get("searcher_test_password", "")
 SEARCHER_INDEX = INTERPRO_CONFIG.get("searcher_index", "current")
 SEARCHER_IDA_INDEX = INTERPRO_CONFIG.get("searcher_ida_index", "ida")
+SEARCHER_USER = INTERPRO_CONFIG.get("searcher_user", "")
+SEARCHER_PASSWORD = INTERPRO_CONFIG.get("searcher_password", "")
 if INTERPRO_CONFIG.get("use_test_db", True):
     SEARCHER_URL = SEARCHER_TEST_URL
     SEARCHER_INDEX = "test"

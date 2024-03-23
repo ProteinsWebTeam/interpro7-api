@@ -9,10 +9,11 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
 
 from webfront.tests.fixtures_reader import FixtureReader
-from interpro.settings import SEARCHER_TEST_URL
+from interpro.settings import SEARCHER_TEST_URL, SEARCHER_TEST_PASSWORD
 
 
 @override_settings(SEARCHER_URL=SEARCHER_TEST_URL)
+@override_settings(SEARCHER_PASSWORD=SEARCHER_TEST_PASSWORD)
 @override_settings(SEARCHER_INDEX="test")
 class FunctionalTest(StaticLiveServerTestCase):
     fixtures = [
@@ -52,10 +53,10 @@ class FunctionalTest(StaticLiveServerTestCase):
                 if "BROWSER_TEST_PATH" in os.environ:
                     self.browser = webdriver.Chrome(
                         executable_path=os.environ["BROWSER_TEST_PATH"],
-                        chrome_options=chrome_options)
+                        chrome_options=chrome_options,
+                    )
                 else:
-                    self.browser = webdriver.Chrome(
-                        chrome_options=chrome_options)
+                    self.browser = webdriver.Chrome(chrome_options=chrome_options)
             else:
                 raise KeyError
         except KeyError:

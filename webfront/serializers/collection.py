@@ -18,9 +18,9 @@ class SetSerializer(ModelContentSerializer):
         )
         if self.queryset_manager.other_fields is not None:
 
-            def counter_function():
+            def counter_function(counters_to_include):
                 return SetSerializer.get_counters(
-                    instance, self.searcher, self.queryset_manager.get_searcher_query()
+                    instance, self.searcher, self.queryset_manager, counters_to_include
                 )
 
             representation = self.add_other_fields(
@@ -72,7 +72,11 @@ class SetSerializer(ModelContentSerializer):
                     else "entry_subset"
                 )
                 representation[key] = self.to_entries_detail_representation(
-                    instance, s, q, base_query=sq
+                    instance,
+                    s,
+                    q,
+                    base_query=sq,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -84,7 +88,11 @@ class SetSerializer(ModelContentSerializer):
                     else "structure_subset"
                 )
                 representation[key] = self.to_structures_detail_representation(
-                    instance, s, q, include_chain=True, base_query=sq
+                    instance,
+                    s,
+                    q,
+                    include_chain=True,
+                    queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.PROTEIN_DB in detail_filters
@@ -96,7 +104,7 @@ class SetSerializer(ModelContentSerializer):
                     else "protein_subset"
                 )
                 representation[key] = self.to_proteins_detail_representation(
-                    instance, self.searcher, q, base_query=sq
+                    instance, self.searcher, q, queryset_manager=self.queryset_manager
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters
@@ -162,8 +170,9 @@ class SetSerializer(ModelContentSerializer):
             counters = instance.counts
             self.reformatEntryCounters(counters)
         else:
-            sq = self.queryset_manager.get_searcher_query()
-            counters = SetSerializer.get_counters(instance, searcher, sq)
+            counters = SetSerializer.get_counters(
+                instance, searcher, self.queryset_manager
+            )
         obj = {
             "metadata": {
                 "accession": instance.accession,
@@ -179,24 +188,17 @@ class SetSerializer(ModelContentSerializer):
         return obj
 
     @staticmethod
-    def get_counters(instance, searcher, sq):
-        return {
-            "entries": searcher.get_number_of_field_by_endpoint(
-                "set", "entry_acc", instance.accession, sq
-            ),
-            "structures": searcher.get_number_of_field_by_endpoint(
-                "set", "structure_acc", instance.accession, sq
-            ),
-            "proteins": searcher.get_number_of_field_by_endpoint(
-                "set", "protein_acc", instance.accession, sq
-            ),
-            "taxa": searcher.get_number_of_field_by_endpoint(
-                "set", "tax_id", instance.accession, sq
-            ),
-            "proteomes": searcher.get_number_of_field_by_endpoint(
-                "set", "proteome_acc", instance.accession, sq
-            ),
+    def get_counters(instance, searcher, queryset_manager, counters_to_include=None):
+        endpoints = {
+            "entry": ["entries", "entry_acc"],
+            "structure": ["structures", "structure_acc"],
+            "protein": ["proteins", "protein_acc"],
+            "taxonomy": ["taxa", "tax_id"],
+            "proteome": ["proteomes", "proteome_acc"],
         }
+        return ModelContentSerializer.generic_get_counters(
+            "set", endpoints, instance, searcher, queryset_manager, counters_to_include
+        )
 
     @staticmethod
     def to_headers_representation(instance):
@@ -252,13 +254,13 @@ class SetSerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "taxonomy", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "taxa"
-        ]
+        return (
+            webfront.serializers.taxonomy.TaxonomySerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "taxonomy", query, self.get_extra_endpoints_to_count()
+                )
+            )["taxa"]
+        )
 
     def to_proteome_count_representation(self, instance):
         query = (
@@ -266,13 +268,13 @@ class SetSerializer(ModelContentSerializer):
             if hasattr(instance, "accession")
             else None
         )
-        return webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
-            self.searcher.get_counter_object(
-                "proteome", query, self.get_extra_endpoints_to_count()
-            )
-        )[
-            "proteomes"
-        ]
+        return (
+            webfront.serializers.proteome.ProteomeSerializer.to_counter_representation(
+                self.searcher.get_counter_object(
+                    "proteome", query, self.get_extra_endpoints_to_count()
+                )
+            )["proteomes"]
+        )
 
     @staticmethod
     def get_set_from_search_object(obj, include_chain=False):

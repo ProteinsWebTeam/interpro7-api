@@ -224,7 +224,6 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
             "hierarchy",
             "cross_references",
             "entry_date",
-            "is_featured",
         ],
         "protein": [
             "accession",
@@ -326,6 +325,71 @@ class ExtraFieldsModifierTest(InterproRESTTestCase):
                 )
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    accession = {
+        "entry": "IPR003165",
+        "protein": "a1cuj5",
+        "structure": "1jm7",
+        "taxonomy": "2579",
+        "proteome": "up000006701",
+        "set": "cl0001",
+    }
+
+    def test_counters_as_extra_fields(self):
+        for endpoint1, path1 in self.list_url.items():
+            for endpoint2, path2 in self.list_url.items():
+                if endpoint1 == endpoint2:
+                    continue
+                url = f"/api{path1}{path2}/{self.accession[endpoint2]}?extra_fields=counters"
+                response = self.client.get(url)
+                if response.status_code == status.HTTP_200_OK:
+                    self.assertIn("results", response.data)
+                    for result in response.data["results"]:
+                        self.assertIn("extra_fields", result)
+                        self.assertIn("counters", result["extra_fields"])
+                        self.assertGreater(
+                            len(result["extra_fields"]["counters"].keys()), 1
+                        )
+                else:
+                    self.assertEqual(
+                        response.status_code,
+                        status.HTTP_204_NO_CONTENT,
+                        f"ERROR CODE [{response.status_code}]: {url}",
+                    )
+
+    def test_granular_counters_as_extra_fields(self):
+        counters_to_ask = [
+            ["entry"],
+            ["protein"],
+            ["entry", "protein"],
+        ]
+        for endpoint1, path1 in self.list_url.items():
+            for endpoint2, path2 in self.list_url.items():
+                for counters in counters_to_ask:
+                    if (
+                        endpoint1 == endpoint2
+                        or endpoint1 in counters
+                        or endpoint2 in counters
+                    ):
+                        continue
+                    url = f"/api{path1}{path2}/{self.accession[endpoint2]}?extra_fields=counters:{'-'.join(counters)}"
+                    response = self.client.get(url)
+                    if response.status_code == status.HTTP_200_OK:
+                        self.assertIn("results", response.data)
+                        for result in response.data["results"]:
+                            self.assertIn("extra_fields", result)
+                            self.assertIn("counters", result["extra_fields"])
+                            # It should be equal to the counters requested
+                            self.assertEqual(
+                                len(result["extra_fields"]["counters"].keys()),
+                                len(counters),
+                            )
+                    else:
+                        self.assertEqual(
+                            response.status_code,
+                            status.HTTP_204_NO_CONTENT,
+                            f"ERROR CODE [{response.status_code}]: {url}",
+                        )
 
 
 class ExtraFeaturesModifierTest(InterproRESTTestCase):
@@ -463,8 +527,8 @@ class TaxonomyScientificNameModifierTest(InterproRESTTestCase):
         self.assertIn("accession", response.data["metadata"])
         self.assertIn("counters", response.data["metadata"])
         self.assertEqual("2", response.data["metadata"]["accession"])
-        self.assertEqual(1, response.data["metadata"]["counters"]["entries"])
-        self.assertEqual(1, response.data["metadata"]["counters"]["proteins"])
+        self.assertEqual(5, response.data["metadata"]["counters"]["entries"])
+        self.assertEqual(10, response.data["metadata"]["counters"]["proteins"])
 
 
 class ResidueModifierTest(InterproRESTTestCase):

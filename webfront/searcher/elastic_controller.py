@@ -1,6 +1,9 @@
-import http.client
-import json
+from http.client import HTTPSConnection
+from base64 import b64encode
+import ssl
+
 import urllib.parse
+import json
 import re
 
 from webfront.views.queryset_manager import escape
@@ -53,6 +56,13 @@ def getAfterBeforeFromCursor(cursor):
     return after, before
 
 
+# Authorization token: we need to base 64 encode it and then
+# decode it to acsii as python 3 stores it as a byte string
+def basic_auth(username, password):
+    token = b64encode(f"{username}:{password}".encode("utf-8")).decode("ascii")
+    return f"Basic {token}"
+
+
 class ElasticsearchController(SearchController):
     def __init__(self, queryset_manager=None):
         url = urllib.parse.urlparse(settings.SEARCHER_URL)
@@ -62,12 +72,25 @@ class ElasticsearchController(SearchController):
         self.index = settings.SEARCHER_INDEX
         self.queryset_manager = queryset_manager
         self.headers = {"Content-Type": "application/json"}
+        using_auth = settings.SEARCHER_USER != ""
+        if using_auth:
+            self.headers["Authorization"] = basic_auth(
+                settings.SEARCHER_USER, settings.SEARCHER_PASSWORD
+            )
         if proxy is not None and proxy != "":
             proxy = urllib.parse.urlparse(proxy)
-            self.connection = http.client.HTTPConnection(proxy.hostname, proxy.port)
+            self.connection = HTTPSConnection(
+                proxy.hostname,
+                proxy.port,
+                context=ssl._create_unverified_context() if url.scheme == "https" else None,
+            )
             self.connection.set_tunnel(self.server, self.port)
         else:
-            self.connection = http.client.HTTPConnection(self.server, self.port)
+            self.connection = HTTPSConnection(
+                self.server,
+                self.port,
+                context=ssl._create_unverified_context() if url.scheme == "https" else None,
+            )
 
     def add(self, docs, is_ida=False):
         body = ""
@@ -79,22 +102,21 @@ class ElasticsearchController(SearchController):
                 + json.dumps(doc)
                 + "\n"
             )
-        conn = http.client.HTTPConnection(self.server, self.port)
         index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
-        conn.request("POST", "/" + index + "/_bulk/", body, self.headers)
-        response = conn.getresponse()
+        self.connection.request("POST", "/" + index + "/_bulk/", body, self.headers)
+        response = self.connection.getresponse()
         return response
 
     def clear_all_docs(self):
         body = '{ "query": { "match_all": {} } }'
-        conn = http.client.HTTPConnection(self.server, self.port)
-        conn.request(
+
+        self.connection.request(
             "POST",
             "/" + self.index + "/_delete_by_query?conflicts=proceed",
             body,
             self.headers,
         )
-        return conn.getresponse()
+        return self.connection.getresponse()
 
     def get_grouped_object(
         self, endpoint, field, query=None, extra_counters=[], size=10
@@ -424,6 +446,7 @@ class ElasticsearchController(SearchController):
         if rows is not None:
             path += "&size={}".format(rows)
         logger.debug("URL:" + path)
+
         self.connection.request(
             "GET", path, query_obj and json.dumps(query_obj), self.headers
         )
@@ -442,7 +465,7 @@ class ElasticsearchController(SearchController):
             .replace(" || ", "%20OR%20")
         )
         index = settings.SEARCHER_IDA_INDEX if is_ida else self.index
-        path = "/" + index + "/_search?request_cache=true&q=" + q
+        path = f"/{index}/_search?request_cache=true&q={q}"
         logger.debug("URL:" + path)
         self.connection.request("GET", path, json.dumps(query_obj), self.headers)
         response = self.connection.getresponse()

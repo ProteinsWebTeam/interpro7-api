@@ -283,7 +283,8 @@ def filter_by_entry_db(value, general_handler):
     return response.first()
 
 
-def filter_by_min_value(endpoint, field, value, sorting_by=[]):
+def filter_by_min_value(endpoint, field, value, sorting_by=[],
+                        sort_pagination=True):
     def x(_, general_handler):
         general_handler.queryset_manager.add_filter(
             endpoint, **{"{}__gte".format(field): value}
@@ -301,7 +302,7 @@ def filter_by_min_value(endpoint, field, value, sorting_by=[]):
                 )
             connector = ","
         if len(sort_str) > 0:
-            general_handler.queryset_manager.order_by(sort_str)
+            general_handler.queryset_manager.order_by(sort_str, sort_pagination)
 
     return x
 

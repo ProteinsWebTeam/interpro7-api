@@ -4,14 +4,14 @@ This document aims to provide some guidance on how to use the InterPro API modif
 
 ## Apply to any API call
 
-| Modifier                                               | Compatible with  other modifiers | Data returned                                     | Example                                                               |
-|--------------------------------------------------------|------------------------------------------|---------------------------------------------------|-----------------------------------------------------------------------|
-| `page_size=< number up to 200 >` |           &check;               | Number of results returned at a time (default=20) | https://www.ebi.ac.uk:443/interpro/api/protein/reviewed?page_size=100 |
-| `search=< text >`                |           &check;               | Entries matching the text search                  | https://www.ebi.ac.uk:443/interpro/api/taxonomy/uniprot/?search=9606  |
+| Modifier                         | Compatible with  other modifiers | Data returned                                     | Example                                                               |
+|----------------------------------|----------------------------------|---------------------------------------------------|-----------------------------------------------------------------------|
+| `page_size=< number up to 200 >` | &check;                          | Number of results returned at a time (default=20) | https://www.ebi.ac.uk:443/interpro/api/protein/reviewed?page_size=100 |
+| `search=< text >`                | &check;                          | Entries matching the text search                  | https://www.ebi.ac.uk:443/interpro/api/taxonomy/uniprot/?search=9606  |
 
 ## /api/entry
 
-| Modifier                                               | Compatible with  other modifiers | Data returned                                                                                                                  | Example                                                                                        |
+| Modifier                                               | Compatible with  other modifiers         | Data returned                                                                                                                  | Example                                                                                        |
 |--------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
 | `group_by=type`                                        | x                                        | Number of entries for each entry type (e.g. family, domain, site...)                                                           | https://www.ebi.ac.uk:443/interpro/api/entry?group_by=type                                     |
 | `group_by=source_database`                             | x                                        | Number of entries for each member database (e.g. pfam, CDD...)                                                                 | https://www.ebi.ac.uk:443/interpro/api/entry?group_by=source_database                          |
@@ -30,6 +30,7 @@ This document aims to provide some guidance on how to use the InterPro API modif
 
 database name can be: interpro, pfam, cdd, panther, sfld, cathgene3d, ssf, hamap, pirsf, prints, prosite, profile, smart, ncbifam
 Since interPro 94.0 `tigrfams` has been replaced by `ncbifam`. Temporary redirects are in place to avoid immediate issues, however users are highly recommended to start using `ncbifam` as the memberDB nam to avoid any problems. 
+
 | Modifier                                                                                                                                                 | Compatible with other modifiers | Data returned                                                                                                | Example                                                                                           |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
 | `group_by=type`                                                                                                                                          | x                               | Number of signatures for each member database entry type (e.g. family, domain ...) for the database selected | https://www.ebi.ac.uk:443/interpro/api/entry/pfam?group_by=type                                   |
@@ -46,6 +47,7 @@ Since interPro 94.0 `tigrfams` has been replaced by `ncbifam`. Temporary redirec
 ## /api/entry/< _integrated, unintegrated_ >
 
 Information on member database signatures integrated/unintegrated in InterPro entries
+
 | Modifier                                                                                                                                                 | Compatible with  other modifiers | Data returned                                                                                | Example                                                                                         |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
 | `group_by=type`                                                                                                                                          | x                                | Number of integrated/unintegrated entries for each entry type (e.g. family, domain, site...) | https://www.ebi.ac.uk:443/interpro/api/entry/unintegrated?group_by=type                         |
@@ -84,15 +86,15 @@ Information on member database signatures integrated/unintegrated in InterPro en
 
 ## /api/entry/< _member database_ >/< _accession_>
 
-| Modifier                          | Compatible with other modifiers | Data returned                                       | Example                                                                  |
-| --------------------------------- | ---------------------------------| --------------------------------------------------- | ------------------------------------------------------------------------ |
+| Modifier                            | Compatible with other modifiers | Data returned                                       | Example                                                                  |
+|-------------------------------------|---------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------|
 | `annotation=[hmm, alignment, logo]` | x                               | Download compressed signature hmm file if it exists | https://www.ebi.ac.uk:443/interpro/api/entry/pfam/pf02171?annotation=hmm |
 
 ## /api/entry/protein
 
-| Modifier      | Compatible with  other modifiers | Data returned                                                         | Example                                                            |
- ------------- | --------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `group_by=type` |  x                                | Number of proteins for each entry type (e.g. family, domain, site...) | https://www.ebi.ac.uk:443/interpro/api/entry/protein?group_by=type |
+| Modifier        | Compatible with  other modifiers | Data returned                                                         | Example                                                            |
+|-----------------|----------------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------|
+| `group_by=type` | x                                | Number of proteins for each entry type (e.g. family, domain, site...) | https://www.ebi.ac.uk:443/interpro/api/entry/protein?group_by=type |
 
 ## /api/protein
 
@@ -139,28 +141,29 @@ Information on member database signatures integrated/unintegrated in InterPro en
 
 ## /api/proteome/uniprot
 
-| Modifier                                  | Compatible with other modifiers | Data returned                                                                   | Example                                                                                |
-| ----------------------------------------- |---------------------------------| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Modifier                                    | Compatible with other modifiers | Data returned                                                                   | Example                                                                                |
+|---------------------------------------------|---------------------------------|---------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
 | `group_by=proteome_is_reference`            | x                               | Number of UniProt proteomes that are/aren't from the UniProt reference proteome | https://www.ebi.ac.uk:443/interpro/api/proteome/uniprot?group_by=proteome_is_reference |
-| `extra_fields=[counters, strain, assembly]` | x                               | Includes the value of the selected fields in the results                        | https://www.ebi.ac.uk:443/interpro/api/proteome/uniprot?extra_fields=counters           |
+| `extra_fields=[counters, strain, assembly]` | x                               | Includes the value of the selected fields in the results                        | https://www.ebi.ac.uk:443/interpro/api/proteome/uniprot?extra_fields=counters          |
 
 ## /api/set/< _all, cdd, pfam_ >
 
-| Modifier                                            | Compatible with other modifiers | Data returned                                            | Example                                                             |
-| --------------------------------------------------- |---------------------------------| -------------------------------------------------------- | ------------------------------------------------------------------- |
+| Modifier                                              | Compatible with other modifiers | Data returned                                            | Example                                                              |
+|-------------------------------------------------------|---------------------------------|----------------------------------------------------------|----------------------------------------------------------------------|
 | `extra_fields=[counters, description, relationships]` | x                               | Includes the value of the selected fields in the results | https://www.ebi.ac.uk:443/interpro/api/set/cdd?extra_fields=counters |
+
 ## /api/set/< _all, cdd, pfam_ >/< _accession_ >
 
-| Modifier                                            | Compatible with other modifiers | Data returned                                            | Example                                                             |
-| --------------------------------------------------- | ---------------------------------|-------------------------------------------------------- | ------------------------------------------------------------------- |
-| `alignments` | x                              | Alignment information for the database and set specified | https://www.ebi.ac.uk:443/interpro/api/set/cdd/cl00014/?alignments= |
+| Modifier     | Compatible with other modifiers | Data returned                                            | Example                                                             |
+|--------------|---------------------------------|----------------------------------------------------------|---------------------------------------------------------------------|
+| `alignments` | x                               | Alignment information for the database and set specified | https://www.ebi.ac.uk:443/interpro/api/set/cdd/cl00014/?alignments= |
 
 ## /api/structure
 
-| Modifier                       | Compatible with other modifiers | Data returned                                         | Example                                                                   |
-| ------------------------------ | ---------------------------------|----------------------------------------------------- | ------------------------------------------------------------------------- |
-| `experiment_type=[x_ray,nmr,em]` | x                              | Number of structures for the experiment type selected | https://www.ebi.ac.uk:443/interpro/api/structure?experiment_type=nmr      |
-| `group_by=experiment type`       | x                              | Number of structures for each experiment type         | https://www.ebi.ac.uk:443/interpro/api/structure?group_by=experiment_type |
+| Modifier                         | Compatible with other modifiers | Data returned                                         | Example                                                                   |
+|----------------------------------|---------------------------------|-------------------------------------------------------|---------------------------------------------------------------------------|
+| `experiment_type=[x_ray,nmr,em]` | x                               | Number of structures for the experiment type selected | https://www.ebi.ac.uk:443/interpro/api/structure?experiment_type=nmr      |
+| `group_by=experiment type`       | x                               | Number of structures for each experiment type         | https://www.ebi.ac.uk:443/interpro/api/structure?group_by=experiment_type |
 
 ## /api/structure/pdb
 
@@ -169,13 +172,13 @@ Information on member database signatures integrated/unintegrated in InterPro en
 | `experiment_type=[x_ray,nmr,em]`                                                  | &check;                         | List of PDB structures for the experiment type selected      | https://www.ebi.ac.uk:443/interpro/api/structure/PDB/?experiment_type=x-ray                              |
 | `resolution=< start-end >`                                                        | &check;                         | List of PDB structures between the resolution range selected | https://www.ebi.ac.uk:443/interpro/api/structure/pdb?resolution=1.0-2.5                                  |
 | `group_by=experiment type`                                                        | x                               | Number of PDB structures for each experiment type            | https://www.ebi.ac.uk:443/interpro/api/structure/pdb?group_by=experiment_type                            |
-| `extra_fields=[release_date, literature, chains, secondary_structures, counters]` | &check;                               | Includes the value of the selected fields in the results     | https://www.ebi.ac.uk:443/interpro/api/structure/pdb?resolution=1.0-2.5&extra_field=secondary_structures |
+| `extra_fields=[release_date, literature, chains, secondary_structures, counters]` | &check;                         | Includes the value of the selected fields in the results     | https://www.ebi.ac.uk:443/interpro/api/structure/pdb?resolution=1.0-2.5&extra_field=secondary_structures |
 
 ## /api/structure/pdb/< _pdb accession_ >
 
-| Modifier                                                                        | Compatible with other modifiers | Data returned                                            | Example                                                                            |
-| ------------------------------------------------------------------------------- | ---------------------------------|-------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `extra_fields=[release_date, literature, chains, secondary_structures, counters]` | x                              | Includes the value of the selected fields in the results | https://www.ebi.ac.uk:443/interpro/api/structure/pdb/101m?extra_field=release_date |
+| Modifier                                                                          | Compatible with other modifiers | Data returned                                            | Example                                                                            |
+|-----------------------------------------------------------------------------------|---------------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------|
+| `extra_fields=[release_date, literature, chains, secondary_structures, counters]` | x                               | Includes the value of the selected fields in the results | https://www.ebi.ac.uk:443/interpro/api/structure/pdb/101m?extra_field=release_date |
 
 ## /api/taxonomy/uniprot
 
@@ -197,6 +200,6 @@ Information on member database signatures integrated/unintegrated in InterPro en
 
 Proteins with an AlphaFold model.
 
-| Modifier               | Compatible with other modifiers | Data returned                                                                         | Example                                                                                         |
-| ---------------------- | ---------------------------------| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `has_model=[true,false]` | x                             | List of proteins with/without an AlphaFold prediction for the InterPro entry selected | https://www.ebi.ac.uk:443/interpro/api/protein/uniprot/entry/InterPro/IPR000001/?has_model=true |
+| Modifier                 | Compatible with other modifiers | Data returned                                                                         | Example                                                                                         |
+|--------------------------|---------------------------------|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| `has_model=[true,false]` | x                               | List of proteins with/without an AlphaFold prediction for the InterPro entry selected | https://www.ebi.ac.uk:443/interpro/api/protein/uniprot/entry/InterPro/IPR000001/?has_model=true |

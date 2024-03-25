@@ -291,6 +291,7 @@ class ProteinHandler(CustomView):
                     {"name": "protein_is_fragment", "direction": "asc"},
                     {"name": "protein_af_score", "direction": "desc"},
                 ],
+                sort_pagination=False,
             ),
         )
 

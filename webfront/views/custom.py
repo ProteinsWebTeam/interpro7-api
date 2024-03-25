@@ -163,7 +163,7 @@ class CustomView(GenericAPIView):
                         after_key=self.after_key,
                         before_key=self.before_key,
                         elastic_result=self.elastic_result,
-                        ordering=general_handler.queryset_manager.order_field,
+                        ordering=general_handler.queryset_manager.get_order(),
                     )
                 else:
                     self.queryset = self.get_queryset().first()

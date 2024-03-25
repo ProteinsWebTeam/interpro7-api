@@ -32,6 +32,7 @@ class QuerysetManager:
     exclusions = {}
     endpoints = []
     order_field = None
+    order_field_in_pagination = True
     other_fields = None
 
     def reset_filters(self, endpoint, endpoint_levels=[]):
@@ -49,6 +50,7 @@ class QuerysetManager:
         }
         self.exclusions = self.filters.copy()
         self.order_field = None
+        self.order_field_in_pagination = True
 
     def set_main_endpoint(self, endpoint):
         self.main_endpoint = endpoint
@@ -64,8 +66,12 @@ class QuerysetManager:
         del self.filters[endpoint][f]
         return tmp
 
-    def order_by(self, field):
+    def order_by(self, field, for_pagination=True):
         self.order_field = field
+        self.order_field_in_pagination = for_pagination
+
+    def get_order(self):
+        return self.order_field if self.order_field_in_pagination else None
 
     # Generates a query string for elasticsearch from the registered queryset filters.
     # It explicitely goes through all the filters and create the query string case by case.

@@ -3,4 +3,4 @@ selenium==4.9.0
 django-debug-toolbar~=3.2
 ipdb==0.13.9
 coveralls==3.3.1
-tqdm==4.64.0
+tqdm==4.66.3

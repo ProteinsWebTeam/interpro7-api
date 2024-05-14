@@ -46,6 +46,7 @@ class Entry(models.Model):
     set_info = JSONField(null=True)
     is_llm = models.BooleanField(default=False)
     is_reviewed_llm = models.BooleanField(default=False)
+    is_updated_llm = models.BooleanField(default=False)
     representative_structure = JSONField(null=True)
 
 

@@ -128,7 +128,7 @@ class FixtureReader:
                 + " "
                 + self.entries[e]["type"]
                 + " "
-                + (" ".join(self.entries[e]["description"])),
+                + (" ".join(d["text"] for d in self.entries[e]["description"])),
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
                 "protein_af_score": 0.5 if self.proteins[p]["in_alphafold"] else -1,

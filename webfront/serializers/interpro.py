@@ -245,6 +245,7 @@ class EntrySerializer(ModelContentSerializer):
             ),
             "is_llm": instance.is_llm,
             "is_reviewed_llm": instance.is_reviewed_llm,
+            "is_updated_llm": instance.is_updated_llm,
             "representative_structure": instance.representative_structure,
         }
         return obj

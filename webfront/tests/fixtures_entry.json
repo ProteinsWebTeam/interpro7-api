@@ -137,6 +137,7 @@
       "interactions": null,
       "is_llm": true,
       "is_reviewed_llm": true,
+      "is_updated_llm": true,
       "representative_structure": {
         "accession": "1jm7",
         "name": "the name of 1jm7"

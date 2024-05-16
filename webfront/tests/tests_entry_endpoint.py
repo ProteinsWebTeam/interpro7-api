@@ -52,6 +52,7 @@ class EntryRESTTest(InterproRESTTestCase):
             self.assertIn("extra_fields", obj.keys())
             self.assertIn("is_llm", obj["extra_fields"])
             self.assertIn("is_reviewed_llm", obj["extra_fields"])
+            self.assertIn("is_updated_llm", obj["extra_fields"])
             # the only entry in the fixtures with these values as true
             is_llm = obj["metadata"]["accession"] == "IPR003165"
             self.assertEqual(
@@ -62,9 +63,13 @@ class EntryRESTTest(InterproRESTTestCase):
                 obj["extra_fields"]["is_reviewed_llm"],
                 is_llm,
             )
+            self.assertEqual(
+                obj["extra_fields"]["is_updated_llm"],
+                is_llm,
+            )
 
         response = self.client.get(
-            "/api/entry/interpro?extra_fields=is_llm,is_reviewed_llm"
+            "/api/entry/interpro?extra_fields=is_llm,is_reviewed_llm,is_updated_llm"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_is_list_of_objects_with_key(

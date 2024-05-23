@@ -3,7 +3,7 @@ Django==3.2.24
 djangorestframework==3.13.1
 PyYAML==6.0
 jsonfield2==4.0.0.post0
-pymysql==1.0.2
+pymysql==1.1.1
 django-cors-headers~=3.10
 gunicorn==22.0.0
 django-redis==5.2.0

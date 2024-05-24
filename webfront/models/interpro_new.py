@@ -46,6 +46,7 @@ class Entry(models.Model):
     set_info = JSONField(null=True)
     is_llm = models.BooleanField(default=False)
     is_reviewed_llm = models.BooleanField(default=False)
+    is_updated_llm = models.BooleanField(default=False)
     representative_structure = JSONField(null=True)
 
 
@@ -250,8 +251,8 @@ class Proteome(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=512)
     is_reference = models.BooleanField(default=False)
-    strain = models.CharField(max_length=512)
-    assembly = models.CharField(max_length=512)
+    strain = models.CharField(max_length=512, null=True)
+    assembly = models.CharField(max_length=512, null=True)
     taxonomy = models.ForeignKey(
         "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True
     )

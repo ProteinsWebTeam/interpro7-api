@@ -74,7 +74,11 @@
         }
       ],
       "description": [
-        "The piwi domain [[cite:PUB00020128]] is a protein domain found in piwi proteins and a large number of related nucleic acid-binding proteins, especially those that bind and cleave RNA. The function of the domain is double stranded-RNA-guided hydrolysis of single stranded-RNA, as has been determined in the argonaute family of related proteins [[cite:PUB00018283]]."
+        {
+          "text": "The piwi domain [[cite:PUB00020128]] is a protein domain found in piwi proteins and a large number of related nucleic acid-binding proteins, especially those that bind and cleave RNA. The function of the domain is double stranded-RNA-guided hydrolysis of single stranded-RNA, as has been determined in the argonaute family of related proteins [[cite:PUB00018283]].",
+          "llm": true,
+          "checked": true
+        }
       ],
       "wikipedia": {},
       "literature": {
@@ -137,6 +141,7 @@
       "interactions": null,
       "is_llm": true,
       "is_reviewed_llm": true,
+      "is_updated_llm": true,
       "representative_structure": {
         "accession": "1jm7",
         "name": "the name of 1jm7"
@@ -231,7 +236,11 @@
         }
       ],
       "description": [
-        "The qiwi domain "
+        {
+          "text": "The qiwi domain",
+          "llm": false,
+          "checked": false
+        }
       ],
       "wikipedia": {},
       "literature": {},
@@ -301,7 +310,11 @@
       "member_databases": null,
       "integrated": "IPR003165",
       "description": [
-        "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [[cite:PUB00020128]]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."
+        {
+          "text": "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [[cite:PUB00020128]]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA.",
+          "llm": false,
+          "checked": false
+        }
       ],
       "wikipedia": {"title": "Piwi"},
       "literature": {
@@ -410,7 +423,11 @@
       "member_databases": null,
       "integrated": "IPR003165",
       "description": [
-        "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [[cite:PUB00020128]]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA."
+        {
+          "text": "This domain is found in the protein Piwi and its relatives. The function of this domain is the dsRNA guided hydrolysis of ssRNA. Determination of the crystal structure of Argonaute reveals that PIWI is an RNase H domain, and identifies Argonaute as Slicer, the enzyme that cleaves mRNA in the RNAi RISC complex [[cite:PUB00020128]]. In addition, Mg+2 dependence and production of 3'-OH and 5' phosphate products are shared characteristics of RNaseH and RISC. The PIWI domain core has a tertiary structure belonging to the RNase H family of enzymes. RNase H fold proteins all have a five-stranded mixed beta-sheet surrounded by helices. By analogy to RNase H enzymes which cleave single-stranded RNA guided by the DNA strand in an RNA/DNA hybrid, the PIWI domain can be inferred to cleave single-stranded RNA, for example mRNA, guided by double stranded siRNA.",
+          "llm": false,
+          "checked": false
+        }
       ],
       "wikipedia": {"title": "Piwi"},
       "literature": {},
@@ -440,7 +457,11 @@
       "member_databases": null,
       "integrated": "IPR003165",
       "description": [
-        "The Piwi box (or Sting domain) is an about 40 to 80 amino-acid conserved region, which was first identified in the C-terminal part of Drosophila Piwi and Sting proteins, and of related proteins from human, Caenorhabditis elegans, Arabidopsis thaliana, fission yeast and Dictyostelium discoideum."
+        {
+          "text": "The Piwi box (or Sting domain) is an about 40 to 80 amino-acid conserved region, which was first identified in the C-terminal part of Drosophila Piwi and Sting proteins, and of related proteins from human, Caenorhabditis elegans, Arabidopsis thaliana, fission yeast and Dictyostelium discoideum.",
+          "llm": false,
+          "checked": false
+        }
       ],
       "wikipedia": {"title": "Piwi"},
       "literature": {},
@@ -535,7 +556,11 @@
       "member_databases": null,
       "integrated": null,
       "description": [
-        "The myelin sheath is a multi-layered membrane, unique to the nervous system, that functions as an insulator to greatly increase the velocity of axonal impulse conduction."
+        {
+          "text": "The myelin sheath is a multi-layered membrane, unique to the nervous system, that functions as an insulator to greatly increase the velocity of axonal impulse conduction.",
+          "llm": false,
+          "checked": false
+        }
       ],
       "wikipedia": null,
       "literature": {},
@@ -565,7 +590,11 @@
       "member_databases": null,
       "integrated": null,
       "description": [
-        "Heat shock hsp20 proteins family profile."
+        {
+          "text": "Heat shock hsp20 proteins family profile.",
+          "llm": false,
+          "checked": false
+        }
       ],
       "wikipedia": null,
       "literature": {},
@@ -685,7 +714,11 @@
       "member_databases": null,
       "integrated": null,
       "description": [
-        "two-component response regulator."
+        {
+          "text": "two-component response regulator.",
+          "llm": false,
+          "checked": false
+        }
       ],
       "wikipedia": null,
       "literature": {},
@@ -716,7 +749,11 @@
       "member_databases": null,
       "integrated": "PTHR43214",
       "description": [
-        "nitrate/nitrite response regulator protein narl."
+        {
+          "text": "nitrate/nitrite response regulator protein narl.",
+          "llm": false,
+          "checked": false
+        }
       ],
       "wikipedia": null,
       "literature": {},

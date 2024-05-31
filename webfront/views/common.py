@@ -114,6 +114,35 @@ def getDataForRoot(handlers, queryset_manager, searcher):
     }
 
 
+API_PATHS = ["/api/", "/wwwapi/"]
+
+
+def get_api_path(url):
+    for path in API_PATHS:
+        if path in url:
+            return path
+    return None
+
+
+def replace_link_to_current_api(link):
+    api_path = get_api_path(settings.INTERPRO_CONFIG.get("api_url"))
+    if api_path not in link:
+        new_link = link
+        for path in API_PATHS:
+            new_link = new_link.replace(path, api_path)
+        return new_link
+    return link
+
+
+def set_pagination_links_to_current_api(response):
+    if "next" in response.data and response.data["next"] is not None:
+        response.data["next"] = replace_link_to_current_api(response.data["next"])
+    if "previous" in response.data and response.data["previous"] is not None:
+        response.data["previous"] = replace_link_to_current_api(
+            response.data["previous"]
+        )
+
+
 class GeneralHandler(CustomView):
     # High level view for the API... all th request in the API start by instantiating this Handler
     # The URL gets evaluated blobk by block in the path (e.g. [block1]/[block2/...])
@@ -178,6 +207,7 @@ class GeneralHandler(CustomView):
         if response:
             # Forcing to close the connection because django is not closing it when this query is ran as future
             connection.close()
+            set_pagination_links_to_current_api(response)
             return response
 
         self.filter_serializers = {}

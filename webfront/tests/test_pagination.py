@@ -1,5 +1,13 @@
-from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
+from django.conf import settings
+from django.test import override_settings
 from rest_framework import status
+
+from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
+from webfront.views.common import (
+    get_api_path,
+    replace_link_to_current_api,
+    set_pagination_links_to_current_api,
+)
 
 
 def get_next_value_from_response(response):
@@ -231,3 +239,73 @@ class PaginationOverEntryIDA(InterproRESTTestCase):
     def test_search_by_a_single_accession_paginated(self):
         response = self.client.get("/api/entry/interpro/IPR003165?ida&page_size=1")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class PaginationLinksCorrection(InterproRESTTestCase):
+
+    @override_settings(INTERPRO_CONFIG={"api_url": "http://127.0.0.1/wwwapi/"})
+    def test_overwriting_api_url_setting_to_wwwapi(self):
+        self.assertIn("/wwwapi/", settings.INTERPRO_CONFIG.get("api_url"))
+        self.assertEqual(
+            get_api_path(settings.INTERPRO_CONFIG.get("api_url")), "/wwwapi/"
+        )
+
+    @override_settings(INTERPRO_CONFIG={"api_url": "http://127.0.0.1/api/"})
+    def test_overwriting_api_url_setting_to_api(self):
+        self.assertIn("/api/", settings.INTERPRO_CONFIG.get("api_url"))
+        self.assertEqual(get_api_path(settings.INTERPRO_CONFIG.get("api_url")), "/api/")
+
+    @override_settings(INTERPRO_CONFIG={"api_url": "http://127.0.0.1/wwwapi/"})
+    def test_replace_links_to_wwwapi(self):
+        urls = [
+            "http://127.0.0.1/api/entry",
+            "http://127.0.0.1/wwwapi/entry",
+        ]
+        for url in urls:
+            self.assertEqual(
+                replace_link_to_current_api(url), "http://127.0.0.1/wwwapi/entry"
+            )
+
+    @override_settings(INTERPRO_CONFIG={"api_url": "http://127.0.0.1/api/"})
+    def test_replace_links_to_api(self):
+        urls = [
+            "http://localhost/api/entry",
+            "http://localhost/wwwapi/entry",
+        ]
+        for url in urls:
+            self.assertEqual(
+                replace_link_to_current_api(url), "http://localhost/api/entry"
+            )
+
+    @override_settings(INTERPRO_CONFIG={"api_url": "http://127.0.0.1/wwwapi/"})
+    def test_set_pagination_links_to_wwwapi(self):
+        data = [
+            {"payload": "response without links"},
+            {
+                "next": "http://localhost/api/next",
+                "previous": "http://localhost/api/prev",
+                "payload": "response with /api/ links",
+            },
+            {
+                "next": "http://localhost/wwwapi/next",
+                "previous": "http://localhost/wwwapi/prev",
+                "payload": "response with /wwwapi/ links",
+            },
+        ]
+
+        class FakeResponse(object):
+            def __init__(self, d):
+                self.data = d
+
+        for d in data:
+            response = FakeResponse(d)
+            if "next" in d:
+                set_pagination_links_to_current_api(response)
+                self.assertEqual(response.data["next"], "http://localhost/wwwapi/next")
+                self.assertEqual(
+                    response.data["previous"], "http://localhost/wwwapi/prev"
+                )
+            else:
+                set_pagination_links_to_current_api(response)
+                self.assertNotIn("next", response.data)
+                self.assertNotIn("previous", response.data)

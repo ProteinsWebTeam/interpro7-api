@@ -135,12 +135,9 @@ def replace_link_to_current_api(link):
 
 
 def set_pagination_links_to_current_api(response):
-    if "next" in response.data and response.data["next"] is not None:
-        response.data["next"] = replace_link_to_current_api(response.data["next"])
-    if "previous" in response.data and response.data["previous"] is not None:
-        response.data["previous"] = replace_link_to_current_api(
-            response.data["previous"]
-        )
+    for key in ["next", "previous"]:
+        if key in response.data and response.data[key] is not None:
+            response.data[key] = replace_link_to_current_api(response.data[key])
 
 
 class GeneralHandler(CustomView):

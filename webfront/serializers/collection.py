@@ -282,5 +282,5 @@ class SetSerializer(ModelContentSerializer):
         if include_chain:
             header["chain"] = obj["structure_chain_acc"]
         if "entry_acc" in obj:
-            header["matching_entry"] = obj["entry_acc"]
+            header["entry_accession"] = obj["entry_acc"]
         return header

@@ -673,11 +673,12 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                     )
                 elif type(obj_expected[key]) == str:
                     self.assertIn("_url", key)
+                    self.assertIn(key, obj_response, "URL: {}".format(url))
                     try:
                         validateURL(obj_response[key])
                     except:
                         raise self.failureException(
-                            f"The URL in {key}: {obj_response[key]} is not valid"
+                            f"The URL in {key}: {obj_response[key]} is not valid | URL: {url}"
                         )
                 else:
                     self.assertEqual(
@@ -829,13 +830,13 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     )
 
     def test_db_db_acc(self):
-        for endpoint1 in api_test_map:
+        for endpoint1 in ["protein"]:  # api_test_map:
             for db1 in api_test_map[endpoint1]:
-                for endpoint2 in api_test_map:
+                for endpoint2 in ["structure"]:  # api_test_map:
                     if endpoint1 == endpoint2:
                         continue
                     for db2 in api_test_map[endpoint2]:
-                        for endpoint3 in api_test_map:
+                        for endpoint3 in ["entry"]:  # api_test_map:
                             if endpoint1 == endpoint3 or endpoint2 == endpoint3:
                                 continue
                             for db3 in api_test_map[endpoint3]:

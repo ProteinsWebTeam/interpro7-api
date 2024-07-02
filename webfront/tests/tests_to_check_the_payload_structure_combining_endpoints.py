@@ -4,6 +4,9 @@ import os
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from webfront.serializers.content_serializers import ModelContentSerializer
+from django.core.validators import URLValidator
+
+validateURL = URLValidator()
 
 api_test_map = {
     "entry": {
@@ -235,22 +238,32 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                         )
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
-                            key2 = endpoint2 + "_subset"
                             self._check_is_list_of_metadata_objects(
                                 response.data["results"], "URL : [{}]".format(current)
                             )
-                            self._check_is_list_of_objects_with_key(
-                                response.data["results"],
-                                key2,
-                                "URL : [{}]".format(current),
-                            )
-                            for result in [x[key2] for x in response.data["results"]]:
-                                self._check_list_of_matches(
-                                    result,
-                                    check_coordinates=endpoint2 != "taxonomy"
-                                    and endpoint2 != "proteome",
-                                    msg="URL : [{}]".format(current),
+                            key2 = plurals[endpoint2] + "_url"
+                            if endpoint2 not in ["entry"]:
+                                key2 = endpoint2 + "_subset"
+                                self._check_is_list_of_objects_with_key(
+                                    response.data["results"],
+                                    key2,
+                                    "URL : [{}]".format(current),
                                 )
+                            for result in [x[key2] for x in response.data["results"]]:
+                                if "_subset" in key2:
+                                    self._check_list_of_matches(
+                                        result,
+                                        check_coordinates=endpoint2 != "taxonomy"
+                                        and endpoint2 != "proteome",
+                                        msg="URL : [{}]".format(current),
+                                    )
+                                else:
+                                    try:
+                                        validateURL(result)
+                                    except:
+                                        raise self.failureException(
+                                            f"The URL in {key2}: {result} is not valid | URL: {current}"
+                                        )
 
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(
@@ -326,22 +339,32 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                 self._check_object_by_accesssion(
                                     response.data, "URL : [{}]".format(current)
                                 )
-                                key = endpoint2 + "_subset"
-                                self._check_list_of_matches(
-                                    response.data[key],
-                                    check_coordinates=endpoint2 != "taxonomy"
-                                    and endpoint2 != "proteome",
-                                    msg="URL : [{}]".format(current),
-                                )
-                                self._check_structure_and_chains(
-                                    response,
-                                    endpoint1,
-                                    db,
-                                    acc,
-                                    "/" + endpoint2 + "/" + db2,
-                                    key,
-                                    msg="URL : [{}]".format(current),
-                                )
+                                key = plurals[endpoint2] + "_url"
+                                if endpoint2 not in ["entry"]:
+                                    key = endpoint2 + "_subset"
+                                    self._check_list_of_matches(
+                                        response.data[key],
+                                        check_coordinates=endpoint2 != "taxonomy"
+                                        and endpoint2 != "proteome",
+                                        msg="URL : [{}]".format(current),
+                                    )
+                                    self._check_structure_and_chains(
+                                        response,
+                                        endpoint1,
+                                        db,
+                                        acc,
+                                        f"/{endpoint2}/{db2}",
+                                        key,
+                                        msg="URL : [{}]".format(current),
+                                    )
+                                else:
+                                    try:
+                                        validateURL(response.data[key])
+                                    except:
+                                        raise self.failureException(
+                                            f"The URL in {key}: {response.data[key]} is not valid | URL: {current}"
+                                        )
+
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(
                                     response.status_code, status.HTTP_204_NO_CONTENT
@@ -748,7 +771,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         # [endpoint]/[db]/[endpoint]/[db]/[endpoint]
                         for db2 in api_test_map[endpoint2]:
                             current = (
-                                "/api/"
+                                f"/api/"
                                 + endpoint1
                                 + "/"
                                 + db1
@@ -761,7 +784,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                             )
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
-                                key = endpoint2 + "_subset"
+                                key = plurals[endpoint2] + "_url"
                                 self._check_is_list_of_metadata_objects(
                                     response.data["results"],
                                     "URL : [{}]".format(current),
@@ -815,7 +838,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                             )
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
-                                key2 = endpoint2 + "_subset"
+                                key2 = plurals[endpoint2] + "_url"
                                 self._check_is_list_of_metadata_objects(
                                     response.data["results"],
                                     "URL : [{}]".format(current),
@@ -926,7 +949,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 )
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
-                                    key2 = endpoint2 + "_subset"
+                                    key2 = plurals[endpoint2] + "_url"
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
@@ -986,7 +1009,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 )
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
-                                    key2 = endpoint2 + "_subset"
+                                    key2 = plurals[endpoint2] + "_url"
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
@@ -1557,8 +1580,8 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 )
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
-                                    key2 = endpoint2 + "_subset"
-                                    key3 = endpoint3 + "_subset"
+                                    key2 = plurals[endpoint2] + "_url"
+                                    key3 = plurals[endpoint3] + "_url"
                                     self._check_is_list_of_metadata_objects(
                                         response.data["results"],
                                         "URL : [{}]".format(current),
@@ -1629,8 +1652,8 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     )
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
-                                        key2 = endpoint2 + "_subset"
-                                        key3 = endpoint3 + "_subset"
+                                        key2 = plurals[endpoint2] + "_url"
+                                        key3 = plurals[endpoint3] + "_url"
                                         self.assertEqual(
                                             response.status_code,
                                             status.HTTP_200_OK,
@@ -1705,7 +1728,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     )
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
-                                        key3 = endpoint3 + "_subset"
+                                        key3 = plurals[endpoint3] + "_url"
                                         self.assertEqual(
                                             response.status_code,
                                             status.HTTP_200_OK,
@@ -1784,7 +1807,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     )
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
-                                        key3 = endpoint3 + "_subset"
+                                        key3 = plurals[endpoint3] + "_url"
                                         self.assertEqual(
                                             response.status_code,
                                             status.HTTP_200_OK,
@@ -1872,7 +1895,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         )
                                         response = self._get_in_debug_mode(current)
                                         if response.status_code == status.HTTP_200_OK:
-                                            key3 = endpoint3 + "_subset"
+                                            key3 = plurals[endpoint3] + "_url"
                                             self.assertEqual(
                                                 response.status_code,
                                                 status.HTTP_200_OK,
@@ -1942,27 +1965,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     for acc2 in api_test_map[endpoint2][db2]:
                                         # [endpoint]/[db]/[acc]/[endpoint]/[db]/[endpoint]/[db]/[acc]
-                                        current = (
-                                            "/api/"
-                                            + endpoint1
-                                            + "/"
-                                            + db1
-                                            + "/"
-                                            + acc1
-                                            + "/"
-                                            + endpoint3
-                                            + "/"
-                                            + db3
-                                            + "/"
-                                            + endpoint2
-                                            + "/"
-                                            + db2
-                                            + "/"
-                                            + acc2
-                                        )
+                                        current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint3}/{db3}/{endpoint2}/{db2}/{acc2}"
                                         response = self._get_in_debug_mode(current)
                                         if response.status_code == status.HTTP_200_OK:
-                                            key3 = endpoint3 + "_subset"
+                                            key3 = plurals[endpoint3] + "_url"
                                             self.assertEqual(
                                                 response.status_code,
                                                 status.HTTP_200_OK,

@@ -383,7 +383,7 @@ def extend_obj_with_other_endpoints(data, endpoints, dbs, accs, instance, ep):
             )[
                 :20
             ]  # the API only returns up to 20 items in a sublist
-            if current_ep == "entry":
+            if current_ep == "entry" and current_acc is None:
                 del instance[key]
                 key = "entries_url"
                 instance[key] = "URL TO BE DEFINED"

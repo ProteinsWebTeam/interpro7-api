@@ -102,19 +102,18 @@ class StructureSerializer(ModelContentSerializer):
                 SerializerDetail.ENTRY_DB in detail_filters
                 or SerializerDetail.ENTRY_DETAIL in detail_filters
             ):
-                key = (
-                    "entries"
-                    if SerializerDetail.ENTRY_DETAIL in detail_filters
-                    else "entry_subset"
+                key = self.get_entries_key(
+                    detail_filters, self.queryset_manager.show_subset
                 )
                 representation[key] = self.to_entries_detail_representation(
                     instance,
                     s,
                     "structure_acc:" + escape(instance.accession.lower()),
+                    key == "entries_url",
                     include_chains=True,
                     for_structure=True,
-                    base_query=sq,
                     queryset_manager=self.queryset_manager,
+                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters

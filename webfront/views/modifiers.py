@@ -283,8 +283,7 @@ def filter_by_entry_db(value, general_handler):
     return response.first()
 
 
-def filter_by_min_value(endpoint, field, value, sorting_by=[],
-                        sort_pagination=True):
+def filter_by_min_value(endpoint, field, value, sorting_by=[], sort_pagination=True):
     def x(_, general_handler):
         general_handler.queryset_manager.add_filter(
             endpoint, **{"{}__gte".format(field): value}
@@ -880,6 +879,10 @@ def get_subfamilies(value, general_handler):
 
 def mark_as_subfamily(value, general_handler):
     general_handler.queryset_manager.add_filter("entry", is_public=False)
+
+
+def show_subset(value, general_handler):
+    general_handler.queryset_manager.show_subset = True
 
 
 def passing(x, y):

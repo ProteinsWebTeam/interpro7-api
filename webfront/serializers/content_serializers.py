@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from rest_framework.utils.urls import replace_query_param, remove_query_param
+from django.conf import settings
+import re
 
 from webfront.pagination import replace_url_host
 from webfront.exceptions import EmptyQuerysetError
@@ -180,15 +182,33 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
+    def get_entries_key(detail_filters, show_subset):
+        key = "entries_url"
+        if SerializerDetail.ENTRY_DETAIL in detail_filters:
+            key = "entries"
+        elif show_subset:
+            key = "entry_subset"
+        return key
+
+    @staticmethod
     def to_entries_detail_representation(
         instance,
         searcher,
         searcher_query,
+        show_url,
         include_chains=False,
         for_structure=False,
-        base_query=None,
         queryset_manager=None,
+        request=None,
     ):
+        if show_url and request is not None:
+            elastic_docs = searcher.execute_query(None, fq=searcher_query)
+            if elastic_docs["hits"]["total"]["value"] == 0:
+                raise EmptyQuerysetError("No entries found matching this request")
+            return request.build_absolute_uri(
+                settings.INTERPRO_CONFIG.get("api_url")
+                + reverse_url(request.get_full_path(), "entry", instance.accession)
+            )
         if include_chains:
             search = searcher.get_group_obj_of_field_by_query(
                 None, ["structure_chain", "entry_acc"], fq=searcher_query, rows=20
@@ -352,3 +372,20 @@ def process_counters_attribute(granular_counters, counter_endpoints):
             k: v for k, v in counter_endpoints.items() if k in split_counters_to_include
         }
     return counter_endpoints
+
+
+def reverse_url(path, new_main_endpoint, accession=None):
+    parts = path.split("?")
+    ep_parts = re.split("(entry|protein|structure|taxonomy|proteome|set)", parts[0])
+    if accession is not None and accession.lower() not in ep_parts[2].lower():
+        ep_parts[2] += "/" + accession
+    ep_index = ep_parts.index(new_main_endpoint)
+    new_order = (
+        [""]
+        + ep_parts[ep_index : ep_index + 2]
+        + ep_parts[1:ep_index]
+        + ep_parts[ep_index + 2 :]
+    )
+    new_url = "/".join(new_order)
+    # Dropping the search string because modifiers differ among endpoints.
+    return re.sub("/+", "/", new_url)

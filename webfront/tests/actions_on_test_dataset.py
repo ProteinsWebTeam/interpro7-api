@@ -383,6 +383,10 @@ def extend_obj_with_other_endpoints(data, endpoints, dbs, accs, instance, ep):
             )[
                 :20
             ]  # the API only returns up to 20 items in a sublist
+            if current_ep == "entry":
+                del instance[key]
+                key = "entries_url"
+                instance[key] = "URL TO BE DEFINED"
 
 
 def get_db_payload(data, endpoints, dbs, accs=None):

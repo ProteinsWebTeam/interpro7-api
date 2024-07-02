@@ -7,6 +7,9 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from webfront.searcher.elastic_controller import ElasticsearchController
 from webfront.tests.actions_on_test_dataset import *
+from django.core.validators import URLValidator
+
+validateURL = URLValidator()
 
 api_test_map = {
     "entry": {
@@ -668,9 +671,21 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                             key, endpoint1, obj_expected["metadata"]["accession"], url
                         ),
                     )
+                elif type(obj_expected[key]) == str:
+                    self.assertIn("_url", key)
+                    try:
+                        validateURL(obj_response[key])
+                    except:
+                        raise self.failureException(
+                            f"The URL in {key}: {obj_response[key]} is not valid"
+                        )
                 else:
-                    self.assertEqual(type(obj_expected[key]), list)
-                    self.assertEqual(type(obj_response[key]), list)
+                    self.assertEqual(
+                        type(obj_expected[key]), list, "URL: {}".format(url)
+                    )
+                    self.assertEqual(
+                        type(obj_response[key]), list, "URL: {}".format(url)
+                    )
                     self.assertEqual(
                         len(obj_response[key]),
                         len(obj_expected[key]),
@@ -699,7 +714,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
             obj_expected = expected[i]
             obj_response = response.data["results"][i]
             self.assert_obj_response_is_as_expected(
-                obj_expected, obj_response, endpoint1, url
+                obj_response, obj_expected, endpoint1, url
             )
 
     def test_db_db_endpoint(self):

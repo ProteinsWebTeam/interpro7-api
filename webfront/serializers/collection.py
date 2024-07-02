@@ -61,22 +61,22 @@ class SetSerializer(ModelContentSerializer):
             )
         if detail != SerializerDetail.SET_OVERVIEW:
             q = "set_acc:" + escape(instance.accession.lower())
-            sq = self.queryset_manager.get_searcher_query()
             if (
                 SerializerDetail.ENTRY_DB in detail_filters
                 or SerializerDetail.ENTRY_DETAIL in detail_filters
             ):
-                key = (
-                    "entries"
-                    if SerializerDetail.ENTRY_DETAIL in detail_filters
-                    else "entry_subset"
+
+                key = self.get_entries_key(
+                    detail_filters, self.queryset_manager.show_subset
                 )
+
                 representation[key] = self.to_entries_detail_representation(
                     instance,
                     s,
                     q,
-                    base_query=sq,
+                    key == "entries_url",
                     queryset_manager=self.queryset_manager,
+                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters

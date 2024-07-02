@@ -22,6 +22,7 @@ from webfront.views.modifiers import (
     get_subfamilies,
     mark_as_subfamily,
     get_deprecated_response,
+    show_subset,
 )
 from .custom import CustomView, SerializerDetail
 from django.conf import settings
@@ -208,6 +209,7 @@ class MemberHandler(CustomView):
             type=ModifierType.REPLACE_PAYLOAD,
             many=False,
         )
+        general_handler.modifiers.register("show-subset", show_subset)
 
         return super(MemberHandler, self).get(
             request._request,
@@ -358,6 +360,7 @@ class UnintegratedHandler(CustomView):
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Entry, "counters")
         )
+        general_handler.modifiers.register("show-subset", show_subset)
         return super(UnintegratedHandler, self).get(
             request._request,
             endpoint_levels,
@@ -409,6 +412,7 @@ class IntegratedHandler(CustomView):
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Entry, "counters")
         )
+        general_handler.modifiers.register("show-subset", show_subset)
         return super(IntegratedHandler, self).get(
             request._request,
             endpoint_levels,
@@ -498,6 +502,7 @@ class InterproHandler(CustomView):
             works_in_multiple_endpoint=False,
         )
         general_handler.modifiers.register("latest_entries", filter_by_latest_entries)
+        general_handler.modifiers.register("show-subset", show_subset)
         return super(InterproHandler, self).get(
             request._request,
             endpoint_levels,
@@ -545,6 +550,7 @@ class AllHandler(CustomView):
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Entry, "counters")
         )
+        general_handler.modifiers.register("show-subset", show_subset)
         return super(AllHandler, self).get(
             request._request,
             endpoint_levels,
@@ -658,6 +664,7 @@ class EntryHandler(CustomView):
             type=ModifierType.REPLACE_PAYLOAD,
             serializer=SerializerDetail.IDA_LIST,
         )
+
         response = super(EntryHandler, self).get(
             request._request,
             endpoint_levels,

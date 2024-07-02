@@ -1,7 +1,12 @@
 from webfront.models import Proteome
 from webfront.serializers.proteome import ProteomeSerializer
 from webfront.views.custom import CustomView, SerializerDetail
-from webfront.views.modifiers import group_by, add_extra_fields, filter_by_boolean_field
+from webfront.views.modifiers import (
+    group_by,
+    add_extra_fields,
+    filter_by_boolean_field,
+    show_subset,
+)
 from webfront.constants import ModifierType
 
 
@@ -74,6 +79,7 @@ class UniprotHandler(CustomView):
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Proteome, "counters")
         )
+        general_handler.modifiers.register("show-subset", show_subset)
 
         return super(UniprotHandler, self).get(
             request._request,

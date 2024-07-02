@@ -104,17 +104,16 @@ class TaxonomySerializer(ModelContentSerializer):
                 SerializerDetail.ENTRY_DB in detail_filters
                 or SerializerDetail.ENTRY_DETAIL in detail_filters
             ):
-                key = (
-                    "entries"
-                    if SerializerDetail.ENTRY_DETAIL in detail_filters
-                    else "entry_subset"
+                key = self.get_entries_key(
+                    detail_filters, self.queryset_manager.show_subset
                 )
                 representation[key] = self.to_entries_detail_representation(
                     instance,
                     s,
                     self.get_searcher_query(instance),
-                    base_query=sq,
+                    key == "entries_url",
                     queryset_manager=self.queryset_manager,
+                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters

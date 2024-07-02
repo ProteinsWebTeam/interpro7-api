@@ -565,6 +565,16 @@ class SetEntryTest(InterproRESTTestCase):
                 response.data["results"], "metadata"
             )
             self._check_is_list_of_objects_with_key(
+                response.data["results"], "entries_url"
+            )
+            response = self.client.get(url + "?show-subset")
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
                 response.data["results"], "entry_subset"
             )
             for result in response.data["results"]:
@@ -579,6 +589,12 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
+            self.assertEqual(
+                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
+            )
+            self._check_set_details(response.data["metadata"], True)
+            self.assertIn("entries_url", response.data)
+            response = self.client.get(url + "?show-subset")
             self.assertEqual(
                 response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
             )

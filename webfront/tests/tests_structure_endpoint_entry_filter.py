@@ -108,6 +108,16 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             )
             self._check_is_list_of_objects_with_key(
                 response.data["results"],
+                "entries_url",
+                "It should have the key 'entries_url' for the URL [" + url + "]",
+            )
+            response = self.client.get(url + "?show-subset")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "metadata"
+            )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"],
                 "entry_subset",
                 "It should have the key 'entry_subset' for the URL [" + url + "]",
             )
@@ -139,6 +149,13 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_structure_details(response.data["metadata"])
+            self.assertIn(
+                "entries_url",
+                response.data,
+                "'entries_url' should be one of the keys in the response",
+            )
+            response = self.client.get(url + "?show-subset")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIn(
                 "entry_subset",
                 response.data,
@@ -178,6 +195,13 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self._check_structure_details(response.data["metadata"])
+            self.assertIn(
+                "entries_url",
+                response.data,
+                "'entries_url' should be one of the keys in the response",
+            )
+            response = self.client.get(url + "?show-subset")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertIn(
                 "entry_subset",
                 response.data,

@@ -5,7 +5,12 @@ from webfront.serializers.collection import SetSerializer
 from webfront.views.custom import CustomView, SerializerDetail
 from django.conf import settings
 
-from webfront.views.modifiers import add_extra_fields, get_deprecated_response, sort_by
+from webfront.views.modifiers import (
+    add_extra_fields,
+    get_deprecated_response,
+    sort_by,
+    show_subset,
+)
 
 entry_sets = "|".join(settings.ENTRY_SETS) + "|all"
 entry_sets_accessions = r"^({})$".format(
@@ -92,6 +97,7 @@ class SetTypeHandler(CustomView):
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Set, "counters")
         )
+        general_handler.modifiers.register("show-subset", show_subset)
         return super(SetTypeHandler, self).get(
             request._request,
             endpoint_levels,

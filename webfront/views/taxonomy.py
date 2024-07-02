@@ -10,6 +10,7 @@ from webfront.views.modifiers import (
     filter_by_domain_architectures,
     add_taxonomy_names,
     get_taxonomy_by_scientific_name,
+    show_subset,
 )
 from webfront.constants import ModifierType
 
@@ -109,6 +110,7 @@ class UniprotHandler(CustomView):
         general_handler.modifiers.register(
             "with_names", add_taxonomy_names, type=ModifierType.EXTEND_PAYLOAD
         )
+        general_handler.modifiers.register("show-subset", show_subset)
 
         return super(UniprotHandler, self).get(
             request._request,

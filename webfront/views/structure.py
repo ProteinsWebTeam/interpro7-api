@@ -8,6 +8,7 @@ from webfront.views.modifiers import (
     filter_by_field,
     filter_by_field_or_field_range,
     add_extra_fields,
+    show_subset,
 )
 from webfront.constants import ModifierType
 
@@ -128,6 +129,7 @@ class PDBHandler(CustomView):
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Structure, "counters")
         )
+        general_handler.modifiers.register("show-subset", show_subset)
         return super(PDBHandler, self).get(
             request._request,
             endpoint_levels,

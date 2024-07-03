@@ -182,13 +182,24 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def get_entries_key(detail_filters, show_subset):
-        key = "entries_url"
-        if SerializerDetail.ENTRY_DETAIL in detail_filters:
-            key = "entries"
+    def get_endpoint_key(endpoint, filter, detail_filters, show_subset):
+        plural = ModelContentSerializer.plurals[endpoint]
+        key = f"{plural}_url"
+        if filter in detail_filters:
+            key = plural
         elif show_subset:
-            key = "entry_subset"
+            key = f"{endpoint}_subset"
         return key
+
+    @staticmethod
+    def get_url_for_endpoint(instance, endpoint, searcher, searcher_query, request):
+        elastic_docs = searcher.execute_query(None, fq=searcher_query)
+        if elastic_docs["hits"]["total"]["value"] == 0:
+            raise EmptyQuerysetError("No entries found matching this request")
+        return request.build_absolute_uri(
+            settings.INTERPRO_CONFIG.get("api_url")
+            + reverse_url(request.get_full_path(), endpoint, instance.accession)
+        )
 
     @staticmethod
     def to_entries_detail_representation(
@@ -202,12 +213,8 @@ class ModelContentSerializer(serializers.ModelSerializer):
         request=None,
     ):
         if show_url and request is not None:
-            elastic_docs = searcher.execute_query(None, fq=searcher_query)
-            if elastic_docs["hits"]["total"]["value"] == 0:
-                raise EmptyQuerysetError("No entries found matching this request")
-            return request.build_absolute_uri(
-                settings.INTERPRO_CONFIG.get("api_url")
-                + reverse_url(request.get_full_path(), "entry", instance.accession)
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "entry", searcher, searcher_query, request
             )
         if include_chains:
             search = searcher.get_group_obj_of_field_by_query(
@@ -244,11 +251,18 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         searcher_query,
+        show_url,
         include_chains=False,
         include_coordinates=True,
         for_entry=False,
         queryset_manager=None,
+        request=None,
     ):
+        if show_url and request is not None:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "protein", searcher, searcher_query, request
+            )
+
         field = "structure_chain" if include_chains else "protein_acc"
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(

@@ -5,6 +5,8 @@ singular = {v: k for k, v in plurals.items()}
 for s in plurals.keys():
     singular[s + "_subset"] = s
 
+endpoints_with_url = ["entry", "protein"]
+
 
 # value: * all that have the field, None all that don't have the field
 def filter_by_value(docs, field, value):
@@ -383,9 +385,9 @@ def extend_obj_with_other_endpoints(data, endpoints, dbs, accs, instance, ep):
             )[
                 :20
             ]  # the API only returns up to 20 items in a sublist
-            if current_ep == "entry" and current_acc is None:
+            if current_ep in endpoints_with_url and current_acc is None:
                 del instance[key]
-                key = "entries_url"
+                key = f"{plurals[current_ep]}_url"
                 instance[key] = "URL TO BE DEFINED"
 
 

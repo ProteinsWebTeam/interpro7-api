@@ -104,8 +104,11 @@ class TaxonomySerializer(ModelContentSerializer):
                 SerializerDetail.ENTRY_DB in detail_filters
                 or SerializerDetail.ENTRY_DETAIL in detail_filters
             ):
-                key = self.get_entries_key(
-                    detail_filters, self.queryset_manager.show_subset
+                key = self.get_endpoint_key(
+                    "entry",
+                    SerializerDetail.ENTRY_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_entries_detail_representation(
                     instance,
@@ -135,16 +138,19 @@ class TaxonomySerializer(ModelContentSerializer):
                 SerializerDetail.PROTEIN_DB in detail_filters
                 or SerializerDetail.PROTEIN_DETAIL in detail_filters
             ):
-                key = (
-                    "proteins"
-                    if SerializerDetail.PROTEIN_DETAIL in detail_filters
-                    else "protein_subset"
+                key = self.get_endpoint_key(
+                    "protein",
+                    SerializerDetail.PROTEIN_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_proteins_detail_representation(
                     instance,
                     self.searcher,
                     self.get_searcher_query(instance),
+                    key == "proteins_url",
                     queryset_manager=self.queryset_manager,
+                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.PROTEOME_DB in detail_filters

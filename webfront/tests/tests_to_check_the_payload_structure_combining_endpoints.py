@@ -31,7 +31,7 @@ api_test_map = {
 }
 plurals = ModelContentSerializer.plurals
 
-endpoints_with_url = ["entry"]
+endpoints_with_url = ["entry", "protein"]
 
 
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
@@ -1466,7 +1466,6 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for db3 in api_test_map[endpoint3]:
                                 for acc1 in api_test_map[endpoint1][db1]:
-                                    # TODO: ❇️ Remember the git stash
                                     # /[endpoint]/[db]/[endpoint]/[db]/[acc]/[endpoint]/[db]
                                     current = f"/api/{endpoint2}/{db2}/{endpoint1}/{db1}/{acc1}/{endpoint3}/{db3}"
                                     response = self._get_in_debug_mode(current)

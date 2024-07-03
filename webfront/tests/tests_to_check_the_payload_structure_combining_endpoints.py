@@ -4,9 +4,6 @@ import os
 from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from webfront.serializers.content_serializers import ModelContentSerializer
-from django.core.validators import URLValidator
-
-validateURL = URLValidator()
 
 api_test_map = {
     "entry": {
@@ -34,50 +31,52 @@ api_test_map = {
 }
 plurals = ModelContentSerializer.plurals
 
+endpoints_with_url = ["entry"]
+
 
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
     def test_endpoints_independently(self):
         for endpoint in api_test_map:
-            current = "/api/" + endpoint
+            current = f"/api/{endpoint}"
             response = self.client.get(current)
             self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL: [{}]".format(current)
+                response.status_code, status.HTTP_200_OK, f"URL: [{current}]"
             )
             self._check_counter_by_endpoint(
-                endpoint, response.data, "URL: [{}]".format(current)
+                endpoint, response.data, f"URL: [{current}]"
             )
 
             for db in api_test_map[endpoint]:
-                current = "/api/" + endpoint + "/" + db
+                current = f"/api/{endpoint}/{db}"
                 response_db = self.client.get(current)
                 self.assertEqual(
                     response_db.status_code,
                     status.HTTP_200_OK,
-                    "URL: [{}]".format(current),
+                    f"URL: [{current}]",
                 )
                 self.assertEqual(
                     len(response_db.data["results"]),
                     len(api_test_map[endpoint][db]),
-                    "URL: [{}]".format(current),
+                    f"URL: [{current}]",
                 )
                 self._check_is_list_of_metadata_objects(
-                    response_db.data["results"], "URL: [{}]".format(current)
+                    response_db.data["results"], f"URL: [{current}]"
                 )
 
                 for acc in api_test_map[endpoint][db]:
-                    current = "/api/" + endpoint + "/" + db + "/" + acc
+                    current = f"/api/{endpoint}/{db}/{acc}"
                     response_acc = self.client.get(current)
                     self.assertEqual(
                         response_acc.status_code,
                         status.HTTP_200_OK,
-                        "URL: [{}]".format(current),
+                        f"URL: [{current}]",
                     )
                     self._check_object_by_accesssion(
-                        response_acc.data, "URL: [{}]".format(current)
+                        response_acc.data, f"URL: [{current}]"
                     )
 
                     self._check_structure_and_chains(
-                        response_acc, endpoint, db, acc, "URL: [{}]".format(current)
+                        response_acc, endpoint, db, acc, f"URL: [{current}]"
                     )
 
     def test_endpoint_endpoint(self):
@@ -87,18 +86,18 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     continue
 
                 # [endpoint]/[endpoint]
-                current = "/api/" + endpoint1 + "/" + endpoint2
+                current = f"/api/{endpoint1}/{endpoint2}"
                 response = self.client.get(current)
                 self.assertEqual(
                     response.status_code,
                     status.HTTP_200_OK,
-                    "URL : [{}]".format(current),
+                    f"URL : [{current}]",
                 )
                 self._check_counter_by_endpoint(
-                    endpoint1, response.data, "URL : [{}]".format(current)
+                    endpoint1, response.data, f"URL : [{current}]"
                 )
                 self._check_counter_by_endpoint(
-                    endpoint2, response.data, "URL : [{}]".format(current)
+                    endpoint2, response.data, f"URL : [{current}]"
                 )
 
     def test_db_endpoint(self):
@@ -108,21 +107,21 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     continue
                 for db in api_test_map[endpoint1]:
                     # [endpoint]/[db]/[endpoint]
-                    current = "/api/" + endpoint1 + "/" + db + "/" + endpoint2
+                    current = f"/api/{endpoint1}/{db}/{endpoint2}"
                     response = self._get_in_debug_mode(current)
                     if response.status_code == status.HTTP_200_OK:
                         self.assertEqual(
                             response.status_code,
                             status.HTTP_200_OK,
-                            "URL : [{}]".format(current),
+                            f"URL : [{current}]",
                         )
                         self._check_is_list_of_metadata_objects(
-                            response.data["results"], "URL : [{}]".format(current)
+                            response.data["results"], f"URL : [{current}]"
                         )
                         self._check_is_list_of_objects_with_key(
                             response.data["results"],
                             plurals[endpoint2],
-                            "URL : [{}]".format(current),
+                            f"URL : [{current}]",
                         )
                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                         self.assertEqual(
@@ -136,22 +135,22 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     continue
                 for db in api_test_map[endpoint1]:
                     # [endpoint]/[endpoint]/[db]
-                    current = "/api/" + endpoint2 + "/" + endpoint1 + "/" + db + "/"
+                    current = f"/api/{endpoint2}/{endpoint1}/{db}/"
                     response = self._get_in_debug_mode(current)
                     if response.status_code == status.HTTP_200_OK:
                         self.assertEqual(
                             response.status_code,
                             status.HTTP_200_OK,
-                            "URL : [{}]".format(current),
+                            f"URL : [{current}]",
                         )
                         self._check_counter_by_endpoint(
-                            endpoint2, response.data, "URL : [{}]".format(current)
+                            endpoint2, response.data, f"URL : [{current}]"
                         )
                         self._check_count_overview_per_endpoints(
                             response.data,
                             plurals[endpoint1],
                             plurals[endpoint2],
-                            "URL : [{}]".format(current),
+                            f"URL : [{current}]",
                         )
                     elif response.status_code != status.HTTP_204_NO_CONTENT:
                         self.fail(
@@ -168,24 +167,22 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                 for db in api_test_map[endpoint1]:
                     for acc in api_test_map[endpoint1][db]:
                         # [endpoint]/[db]/[acc]/[endpoint]
-                        current = (
-                            "/api/" + endpoint1 + "/" + db + "/" + acc + "/" + endpoint2
-                        )
+                        current = f"/api/{endpoint1}/{db}/{acc}/{endpoint2}"
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
                             self.assertEqual(
                                 response.status_code,
                                 status.HTTP_200_OK,
-                                "URL : [{}]".format(current),
+                                f"URL : [{current}]",
                             )
                             self._check_object_by_accesssion(
-                                response.data, "URL : [{}]".format(current)
+                                response.data, f"URL : [{current}]"
                             )
                             self._check_counter_by_endpoint(
-                                endpoint2, response.data, "URL : [{}]".format(current)
+                                endpoint2, response.data, f"URL : [{current}]"
                             )
                             self._check_structure_and_chains(
-                                response, endpoint1, db, acc, "/" + endpoint2
+                                response, endpoint1, db, acc, f"/{endpoint2}"
                             )
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(
@@ -200,18 +197,16 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                 for db in api_test_map[endpoint1]:
                     for acc in api_test_map[endpoint1][db]:
                         # [endpoint]/[endpoint]/[db]/[acc]
-                        current = "/api/{}/{}/{}/{}/".format(
-                            endpoint2, endpoint1, db, acc
-                        )
+                        current = f"/api/{endpoint2}/{endpoint1}/{db}/{acc}/"
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
                             self.assertEqual(
                                 response.status_code,
                                 status.HTTP_200_OK,
-                                "URL : [{}]".format(current),
+                                f"URL : [{current}]",
                             )
                             self._check_counter_by_endpoint(
-                                endpoint2, response.data, "URL : [{}]".format(current)
+                                endpoint2, response.data, f"URL : [{current}]"
                             )
                             self._check_structure_chains_as_counter_filter(
                                 endpoint1,
@@ -233,21 +228,19 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                 for db in api_test_map[endpoint1]:
                     # [endpoint]/[db]/[endpoint]/[db]
                     for db2 in api_test_map[endpoint2]:
-                        current = (
-                            "/api/" + endpoint1 + "/" + db + "/" + endpoint2 + "/" + db2
-                        )
+                        current = f"/api/{endpoint1}/{db}/{endpoint2}/{db2}"
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
                             self._check_is_list_of_metadata_objects(
-                                response.data["results"], "URL : [{}]".format(current)
+                                response.data["results"], f"URL : [{current}]"
                             )
-                            key2 = plurals[endpoint2] + "_url"
-                            if endpoint2 not in ["entry"]:
-                                key2 = endpoint2 + "_subset"
+                            key2 = f"{plurals[endpoint2]}_url"
+                            if endpoint2 not in endpoints_with_url:
+                                key2 = f"{endpoint2}_subset"
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     key2,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                             for result in [x[key2] for x in response.data["results"]]:
                                 if "_subset" in key2:
@@ -255,21 +248,19 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                         result,
                                         check_coordinates=endpoint2 != "taxonomy"
                                         and endpoint2 != "proteome",
-                                        msg="URL : [{}]".format(current),
+                                        msg=f"URL : [{current}]",
                                     )
                                 else:
-                                    try:
-                                        validateURL(result)
-                                    except:
-                                        raise self.failureException(
-                                            f"The URL in {key2}: {result} is not valid | URL: {current}"
-                                        )
+                                    self.asserURL(
+                                        result,
+                                        f"The URL in {key2}: {result} is not valid | URL: {current}",
+                                    )
 
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(
                                 response.status_code,
                                 status.HTTP_204_NO_CONTENT,
-                                "URL : [{}]".format(current),
+                                f"URL : [{current}]",
                             )
 
     def test_db_acc(self):
@@ -281,15 +272,13 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                     for db2 in api_test_map[endpoint2]:
                         for acc in api_test_map[endpoint1][db]:
                             # [endpoint]/[db]/[endpoint]/[db]/[acc]
-                            current = "/api/{}/{}/{}/{}/{}/".format(
-                                endpoint2, db2, endpoint1, db, acc
-                            )
+                            current = f"/api/{endpoint2}/{db2}/{endpoint1}/{db}/{acc}/"
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self.assertEqual(
                                     response.status_code,
                                     status.HTTP_200_OK,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_is_list_of_metadata_objects(
                                     response.data["results"]
@@ -302,13 +291,13 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                         result,
                                         check_coordinates=endpoint1 != "taxonomy"
                                         and endpoint1 != "proteome",
-                                        msg="URL : [{}]".format(current),
+                                        msg=f"URL : [{current}]",
                                     )
                                 self._check_structure_chains_as_filter(
                                     endpoint1,
                                     db,
                                     acc,
-                                    endpoint2 + "/" + db2,
+                                    f"{endpoint2}/{db2}",
                                     "",
                                     plurals[endpoint1],
                                 )
@@ -316,7 +305,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                 self.assertEqual(
                                     response.status_code,
                                     status.HTTP_204_NO_CONTENT,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
 
     def test_acc_db(self):
@@ -334,19 +323,19 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                 self.assertEqual(
                                     response.status_code,
                                     status.HTTP_200_OK,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_object_by_accesssion(
-                                    response.data, "URL : [{}]".format(current)
+                                    response.data, f"URL : [{current}]"
                                 )
-                                key = plurals[endpoint2] + "_url"
-                                if endpoint2 not in ["entry"]:
-                                    key = endpoint2 + "_subset"
+                                key = f"{plurals[endpoint2]}_url"
+                                if endpoint2 not in endpoints_with_url:
+                                    key = f"{endpoint2}_subset"
                                     self._check_list_of_matches(
                                         response.data[key],
                                         check_coordinates=endpoint2 != "taxonomy"
                                         and endpoint2 != "proteome",
-                                        msg="URL : [{}]".format(current),
+                                        msg=f"URL : [{current}]",
                                     )
                                     self._check_structure_and_chains(
                                         response,
@@ -355,16 +344,13 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                         acc,
                                         f"/{endpoint2}/{db2}",
                                         key,
-                                        msg="URL : [{}]".format(current),
+                                        msg=f"URL : [{current}]",
                                     )
                                 else:
-                                    try:
-                                        validateURL(response.data[key])
-                                    except:
-                                        raise self.failureException(
-                                            f"The URL in {key}: {response.data[key]} is not valid | URL: {current}"
-                                        )
-
+                                    self.asserURL(
+                                        response.data[key],
+                                        f"The URL in {key}: {response.data[key]} is not valid | URL: {current}",
+                                    )
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(
                                     response.status_code, status.HTTP_204_NO_CONTENT
@@ -388,28 +374,28 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_object_by_accesssion(response.data)
                                     self._check_list_of_matches(
                                         response.data[plurals[endpoint2]],
                                         check_coordinates=endpoint2 != "taxonomy"
                                         and endpoint2 != "proteome",
-                                        msg="URL : [{}]".format(current),
+                                        msg=f"URL : [{current}]",
                                     )
                                     self._check_structure_and_chains(
                                         response,
                                         endpoint1,
                                         db,
                                         acc,
-                                        "/" + endpoint2 + "/" + db2 + "/" + acc2,
+                                        f"/{endpoint2}/{db2}/{acc2}",
                                         plurals[endpoint2],
                                     )
                                     self._check_structure_chains_as_filter(
                                         endpoint2,
                                         db2,
                                         acc2,
-                                        endpoint1 + "/" + db + "/" + acc,
+                                        f"{endpoint1}/{db}/{acc}",
                                         "",
                                         plurals[endpoint2],
                                     )
@@ -417,7 +403,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_204_NO_CONTENT,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
 
 
@@ -436,21 +422,21 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         continue
 
                     # [endpoint]/[endpoint]
-                    current = "/api/" + endpoint1 + "/" + endpoint2 + "/" + endpoint3
+                    current = f"/api/{endpoint1}/{endpoint2}/{endpoint3}"
                     response = self.client.get(current)
                     self.assertEqual(
                         response.status_code,
                         status.HTTP_200_OK,
-                        "URL : [{}]".format(current),
+                        f"URL : [{current}]",
                     )
                     self._check_counter_by_endpoint(
-                        endpoint1, response.data, "URL : [{}]".format(current)
+                        endpoint1, response.data, f"URL : [{current}]"
                     )
                     self._check_counter_by_endpoint(
-                        endpoint2, response.data, "URL : [{}]".format(current)
+                        endpoint2, response.data, f"URL : [{current}]"
                     )
                     self._check_counter_by_endpoint(
-                        endpoint3, response.data, "URL : [{}]".format(current)
+                        endpoint3, response.data, f"URL : [{current}]"
                     )
 
     def test_endpoint_db_endpoint(self):
@@ -463,33 +449,20 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         continue
                     for db1 in api_test_map[endpoint1]:
                         # [endpoint]/[endpoint]/[db]/[endpoint]
-                        current = (
-                            "/api/"
-                            + endpoint2
-                            + "/"
-                            + endpoint1
-                            + "/"
-                            + db1
-                            + "/"
-                            + endpoint3
-                        )
+                        current = f"/api/{endpoint2}/{endpoint1}/{db1}/{endpoint3}"
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
                             self.assertEqual(
                                 response.status_code,
                                 status.HTTP_200_OK,
-                                "URL : [{}]".format(current),
+                                f"URL : [{current}]",
                             )
                             self._check_counter_by_endpoint(
-                                endpoint2, response.data, "URL : [{}]".format(current)
+                                endpoint2, response.data, f"URL : [{current}]"
                             )
                             self._check_counter_by_endpoint(
-                                endpoint3, response.data, "URL : [{}]".format(current)
+                                endpoint3, response.data, f"URL : [{current}]"
                             )
-                            # self._check_count_overview_per_endpoints(response.data,
-                            #                                          plurals[endpoint1],
-                            #                                          plurals[endpoint2],
-                            #                                          "URL : [{}]".format(current))
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(
                                 response.status_code, status.HTTP_204_NO_CONTENT
@@ -505,30 +478,21 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         continue
                     for db1 in api_test_map[endpoint1]:
                         # [endpoint]/[db]/[endpoint]/[endpoint]
-                        current = (
-                            "/api/"
-                            + endpoint1
-                            + "/"
-                            + db1
-                            + "/"
-                            + endpoint2
-                            + "/"
-                            + endpoint3
-                        )
+                        current = f"/api/{endpoint1}/{db1}/{endpoint2}/{endpoint3}"
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
                             self.assertEqual(
                                 response.status_code,
                                 status.HTTP_200_OK,
-                                "URL : [{}]".format(current),
+                                f"URL : [{current}]",
                             )
                             self._check_is_list_of_metadata_objects(
-                                response.data["results"], "URL : [{}]".format(current)
+                                response.data["results"], f"URL : [{current}]"
                             )
                             self._check_is_list_of_objects_with_key(
                                 response.data["results"],
                                 plurals[endpoint2],
-                                "URL : [{}]".format(current),
+                                f"URL : [{current}]",
                             )
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(
@@ -547,44 +511,30 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for acc in api_test_map[endpoint1][db1]:
                             # [endpoint]/[endpoint]/[endpoint]/[db]/[acc]
                             current = (
-                                "/api/"
-                                + endpoint2
-                                + "/"
-                                + endpoint3
-                                + "/"
-                                + endpoint1
-                                + "/"
-                                + db1
-                                + "/"
-                                + acc
-                                + "/"
+                                f"/api/{endpoint2}/{endpoint3}/{endpoint1}/{db1}/{acc}/"
                             )
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self.assertEqual(
                                     response.status_code,
                                     status.HTTP_200_OK,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_counter_by_endpoint(
                                     endpoint2,
                                     response.data,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_counter_by_endpoint(
                                     endpoint3,
                                     response.data,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
-                                # self._check_count_overview_per_endpoints(response.data,
-                                #                                          plurals[endpoint1],
-                                #                                          plurals[endpoint2],
-                                #                                          "URL : [{}]".format(current))
                                 self._check_structure_chains_as_counter_filter(
                                     endpoint1,
                                     db1,
                                     acc,
-                                    endpoint2 + "/" + endpoint3,
+                                    f"{endpoint2}/{endpoint3}",
                                     "",
                                     plurals[endpoint1],
                                     plurals[endpoint2],
@@ -606,35 +556,25 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         continue
                     for db1 in api_test_map[endpoint1]:
                         # [endpoint]/[endpoint]/[endpoint]/[db]
-                        current = (
-                            "/api/"
-                            + endpoint2
-                            + "/"
-                            + endpoint3
-                            + "/"
-                            + endpoint1
-                            + "/"
-                            + db1
-                            + "/"
-                        )
+                        current = f"/api/{endpoint2}/{endpoint3}/{endpoint1}/{db1}/"
                         response = self._get_in_debug_mode(current)
                         if response.status_code == status.HTTP_200_OK:
                             self.assertEqual(
                                 response.status_code,
                                 status.HTTP_200_OK,
-                                "URL : [{}]".format(current),
+                                f"URL : [{current}]",
                             )
                             self._check_counter_by_endpoint(
-                                endpoint2, response.data, "URL : [{}]".format(current)
+                                endpoint2, response.data, f"URL : [{current}]"
                             )
                             self._check_counter_by_endpoint(
-                                endpoint3, response.data, "URL : [{}]".format(current)
+                                endpoint3, response.data, f"URL : [{current}]"
                             )
                             self._check_count_overview_per_endpoints(
                                 response.data,
                                 plurals[endpoint1],
                                 plurals[endpoint2],
-                                "URL : [{}]".format(current),
+                                f"URL : [{current}]",
                             )
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.fail(
@@ -655,44 +595,31 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for acc in api_test_map[endpoint1][db1]:
                             # [endpoint]/[endpoint]/[db]/[acc]/[endpoint]
                             current = (
-                                "/api/"
-                                + endpoint2
-                                + "/"
-                                + endpoint1
-                                + "/"
-                                + db1
-                                + "/"
-                                + acc
-                                + "/"
-                                + endpoint3
+                                f"/api/{endpoint2}/{endpoint1}/{db1}/{acc}/{endpoint3}"
                             )
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self.assertEqual(
                                     response.status_code,
                                     status.HTTP_200_OK,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_counter_by_endpoint(
                                     endpoint2,
                                     response.data,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_counter_by_endpoint(
                                     endpoint3,
                                     response.data,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
-                                # self._check_count_overview_per_endpoints(response.data,
-                                #                                          plurals[endpoint1],
-                                #                                          plurals[endpoint2],
-                                #                                          "URL : [{}]".format(current))
                                 self._check_structure_chains_as_counter_filter(
                                     endpoint1,
                                     db1,
                                     acc,
                                     endpoint2,
-                                    "/" + endpoint3,
+                                    f"/{endpoint3}",
                                     plurals[endpoint1],
                                     plurals[endpoint2],
                                 )
@@ -715,16 +642,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for acc in api_test_map[endpoint1][db1]:
                             # [endpoint]/[db]/[acc]/[endpoint]/[endpoint]
                             current = (
-                                "/api/"
-                                + endpoint1
-                                + "/"
-                                + db1
-                                + "/"
-                                + acc
-                                + "/"
-                                + endpoint2
-                                + "/"
-                                + endpoint3
+                                f"/api/{endpoint1}/{db1}/{acc}/{endpoint2}/{endpoint3}"
                             )
                             response = self._get_in_debug_mode(current)
 
@@ -732,27 +650,27 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 self.assertEqual(
                                     response.status_code,
                                     status.HTTP_200_OK,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_object_by_accesssion(
-                                    response.data, "URL : [{}]".format(current)
+                                    response.data, f"URL : [{current}]"
                                 )
                                 self._check_counter_by_endpoint(
                                     endpoint2,
                                     response.data,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_counter_by_endpoint(
                                     endpoint3,
                                     response.data,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_structure_and_chains(
                                     response,
                                     endpoint1,
                                     db1,
                                     acc,
-                                    "/" + endpoint2 + "/" + endpoint3,
+                                    f"/{endpoint2}/{endpoint3}",
                                 )
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(
@@ -771,42 +689,42 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         # [endpoint]/[db]/[endpoint]/[db]/[endpoint]
                         for db2 in api_test_map[endpoint2]:
                             current = (
-                                f"/api/"
-                                + endpoint1
-                                + "/"
-                                + db1
-                                + "/"
-                                + endpoint2
-                                + "/"
-                                + db2
-                                + "/"
-                                + endpoint3
+                                f"/api/{endpoint1}/{db1}/{endpoint2}/{db2}/{endpoint3}"
                             )
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
-                                key = plurals[endpoint2] + "_url"
                                 self._check_is_list_of_metadata_objects(
                                     response.data["results"],
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
+
+                                key = f"{plurals[endpoint2]}_url"
+                                if endpoint2 not in endpoints_with_url:
+                                    key = f"{endpoint2}_subset"
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     key,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 for result in [
                                     x[key] for x in response.data["results"]
                                 ]:
-                                    self._check_list_of_matches(
-                                        result,
-                                        check_coordinates=endpoint2 != "taxonomy"
-                                        and endpoint2 != "proteome",
-                                        msg="URL : [{}]".format(current),
-                                    )
+                                    if "_subset" in key:
+                                        self._check_list_of_matches(
+                                            result,
+                                            check_coordinates=endpoint2 != "taxonomy"
+                                            and endpoint2 != "proteome",
+                                            msg=f"URL : [{current}]",
+                                        )
+                                    else:
+                                        self.asserURL(
+                                            result,
+                                            f"The URL in {key}: {result} is not valid | URL: {current}",
+                                        )
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     plurals[endpoint3],
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(
@@ -825,42 +743,41 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             # [endpoint]/[db]/[endpoint]/[endpoint]/[db]
                             current = (
-                                "/api/"
-                                + endpoint1
-                                + "/"
-                                + db1
-                                + "/"
-                                + endpoint3
-                                + "/"
-                                + endpoint2
-                                + "/"
-                                + db2
+                                f"/api/{endpoint1}/{db1}/{endpoint3}/{endpoint2}/{db2}"
                             )
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
-                                key2 = plurals[endpoint2] + "_url"
                                 self._check_is_list_of_metadata_objects(
                                     response.data["results"],
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
+                                key2 = f"{plurals[endpoint2]}_url"
+                                if endpoint2 not in endpoints_with_url:
+                                    key2 = f"{endpoint2}_subset"
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     key2,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 for result in [
                                     x[key2] for x in response.data["results"]
                                 ]:
-                                    self._check_list_of_matches(
-                                        result,
-                                        check_coordinates=endpoint2 != "taxonomy"
-                                        and endpoint2 != "proteome",
-                                        msg="URL : [{}]".format(current),
-                                    )
+                                    if "_subset" in key2:
+                                        self._check_list_of_matches(
+                                            result,
+                                            check_coordinates=endpoint2 != "taxonomy"
+                                            and endpoint2 != "proteome",
+                                            msg=f"URL : [{current}]",
+                                        )
+                                    else:
+                                        self.asserURL(
+                                            result,
+                                            f"The URL in {key2}: {result} is not valid | URL: {current}",
+                                        )
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     plurals[endpoint3],
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(
@@ -879,40 +796,31 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             # [endpoint]/[endpoint]/[db]/[endpoint]/[db]
                             current = (
-                                "/api/"
-                                + endpoint3
-                                + "/"
-                                + endpoint2
-                                + "/"
-                                + db2
-                                + "/"
-                                + endpoint1
-                                + "/"
-                                + db1
+                                f"/api/{endpoint3}/{endpoint2}/{db2}/{endpoint1}/{db1}"
                             )
                             response = self._get_in_debug_mode(current)
                             if response.status_code == status.HTTP_200_OK:
                                 self.assertEqual(
                                     response.status_code,
                                     status.HTTP_200_OK,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_counter_by_endpoint(
                                     endpoint3,
                                     response.data,
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_count_overview_per_endpoints(
                                     response.data,
                                     plurals[endpoint2],
                                     plurals[endpoint3],
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                                 self._check_count_overview_per_endpoints(
                                     response.data,
                                     plurals[endpoint1],
                                     plurals[endpoint3],
-                                    "URL : [{}]".format(current),
+                                    f"URL : [{current}]",
                                 )
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.fail(
@@ -933,48 +841,42 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 # [endpoint]/[db]/[acc]/[endpoint]/[db]/[endpoint]
-                                current = (
-                                    "/api/"
-                                    + endpoint1
-                                    + "/"
-                                    + db1
-                                    + "/"
-                                    + acc1
-                                    + "/"
-                                    + endpoint2
-                                    + "/"
-                                    + db2
-                                    + "/"
-                                    + endpoint3
-                                )
+                                current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}/{endpoint3}"
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
-                                    key2 = plurals[endpoint2] + "_url"
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_object_by_accesssion(
-                                        response.data, "URL : [{}]".format(current)
+                                        response.data, f"URL : [{current}]"
                                     )
-                                    self._check_list_of_matches(
-                                        response.data[key2],
-                                        check_coordinates=endpoint2 != "taxonomy"
-                                        and endpoint2 != "proteome",
-                                        msg="URL : [{}]".format(current),
-                                    )
+                                    key2 = f"{plurals[endpoint2]}_url"
+                                    if endpoint2 not in endpoints_with_url:
+                                        key2 = f"{endpoint2}_subset"
+                                        self._check_list_of_matches(
+                                            response.data[key2],
+                                            check_coordinates=endpoint2 != "taxonomy"
+                                            and endpoint2 != "proteome",
+                                            msg=f"URL : [{current}]",
+                                        )
+                                    else:
+                                        self.asserURL(
+                                            response.data[key2],
+                                            f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
+                                        )
                                     self._check_counter_by_endpoint(
                                         endpoint3,
                                         response.data,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_structure_and_chains(
                                         response,
                                         endpoint1,
                                         db1,
                                         acc1,
-                                        "/" + endpoint2 + "/" + db2 + "/" + endpoint3,
+                                        f"/{endpoint2}/{db2}/{endpoint3}",
                                     )
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     self.assertEqual(
@@ -993,48 +895,42 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 # [endpoint]/[db]/[acc]/[endpoint]/[endpoint]/[db]
-                                current = (
-                                    "/api/"
-                                    + endpoint1
-                                    + "/"
-                                    + db1
-                                    + "/"
-                                    + acc1
-                                    + "/"
-                                    + endpoint3
-                                    + "/"
-                                    + endpoint2
-                                    + "/"
-                                    + db2
-                                )
+                                current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint3}/{endpoint2}/{db2}"
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
-                                    key2 = plurals[endpoint2] + "_url"
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_object_by_accesssion(
-                                        response.data, "URL : [{}]".format(current)
+                                        response.data, f"URL : [{current}]"
                                     )
-                                    self._check_list_of_matches(
-                                        response.data[key2],
-                                        check_coordinates=endpoint2 != "taxonomy"
-                                        and endpoint2 != "proteome",
-                                        msg="URL : [{}]".format(current),
-                                    )
+                                    key2 = f"{plurals[endpoint2]}_url"
+                                    if endpoint2 not in endpoints_with_url:
+                                        key2 = f"{endpoint2}_subset"
+                                        self._check_list_of_matches(
+                                            response.data[key2],
+                                            check_coordinates=endpoint2 != "taxonomy"
+                                            and endpoint2 != "proteome",
+                                            msg=f"URL : [{current}]",
+                                        )
+                                    else:
+                                        self.asserURL(
+                                            response.data[key2],
+                                            f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
+                                        )
                                     self._check_counter_by_endpoint(
                                         endpoint3,
                                         response.data,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_structure_and_chains(
                                         response,
                                         endpoint1,
                                         db1,
                                         acc1,
-                                        "/" + endpoint3 + "/" + endpoint2 + "/" + db2,
+                                        f"/{endpoint3}/{endpoint2}/{db2}",
                                     )
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     self.assertEqual(
@@ -1053,26 +949,13 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 # /[endpoint]/[db]/[endpoint]/[db]/[acc]/[endpoint]
-                                current = (
-                                    "/api/"
-                                    + endpoint2
-                                    + "/"
-                                    + db2
-                                    + "/"
-                                    + endpoint1
-                                    + "/"
-                                    + db1
-                                    + "/"
-                                    + acc1
-                                    + "/"
-                                    + endpoint3
-                                )
+                                current = f"/api/{endpoint2}/{db2}/{endpoint1}/{db1}/{acc1}/{endpoint3}"
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_is_list_of_metadata_objects(
                                         response.data["results"]
@@ -1085,19 +968,19 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             result,
                                             check_coordinates=endpoint1 != "taxonomy"
                                             and endpoint1 != "proteome",
-                                            msg="URL : [{}]".format(current),
+                                            msg=f"URL : [{current}]",
                                         )
                                     self._check_is_list_of_objects_with_key(
                                         response.data["results"],
                                         plurals[endpoint3],
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_structure_chains_as_filter(
                                         endpoint1,
                                         db1,
                                         acc1,
-                                        endpoint2 + "/" + db2,
-                                        "/" + endpoint3,
+                                        f"{endpoint2}/{db2}",
+                                        f"/{endpoint3}",
                                         plurals[endpoint1],
                                     )
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
@@ -1117,26 +1000,13 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 # /[endpoint]/[db]/[endpoint]/[endpoint]/[db]/[acc]
-                                current = (
-                                    "/api/"
-                                    + endpoint2
-                                    + "/"
-                                    + db2
-                                    + "/"
-                                    + endpoint3
-                                    + "/"
-                                    + endpoint1
-                                    + "/"
-                                    + db1
-                                    + "/"
-                                    + acc1
-                                )
+                                current = f"/api/{endpoint2}/{db2}/{endpoint3}/{endpoint1}/{db1}/{acc1}"
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_is_list_of_metadata_objects(
                                         response.data["results"]
@@ -1149,18 +1019,18 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             result,
                                             check_coordinates=endpoint1 != "taxonomy"
                                             and endpoint1 != "proteome",
-                                            msg="URL : [{}]".format(current),
+                                            msg=f"URL : [{current}]",
                                         )
                                     self._check_is_list_of_objects_with_key(
                                         response.data["results"],
                                         plurals[endpoint3],
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_structure_chains_as_filter(
                                         endpoint1,
                                         db1,
                                         acc1,
-                                        endpoint2 + "/" + db2 + "/" + endpoint3,
+                                        f"{endpoint2}/{db2}/{endpoint3}",
                                         "",
                                         plurals[endpoint1],
                                     )
@@ -1181,48 +1051,31 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 # /[endpoint]/[endpoint]/[db]/[endpoint]/[db]/[acc]
-                                current = (
-                                    "/api/"
-                                    + endpoint3
-                                    + "/"
-                                    + endpoint2
-                                    + "/"
-                                    + db2
-                                    + "/"
-                                    + endpoint1
-                                    + "/"
-                                    + db1
-                                    + "/"
-                                    + acc1
-                                )
+                                current = f"/api/{endpoint3}/{endpoint2}/{db2}/{endpoint1}/{db1}/{acc1}"
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_counter_by_endpoint(
                                         endpoint3,
                                         response.data,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_count_overview_per_endpoints(
                                         response.data,
                                         plurals[endpoint2],
                                         plurals[endpoint3],
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
-                                    # self._check_count_overview_per_endpoints(response.data,
-                                    #                                          plurals[endpoint1],
-                                    #                                          plurals[endpoint3],
-                                    #                                          "URL : [{}]".format(current))
 
                                     self._check_structure_chains_as_counter_filter(
                                         endpoint1,
                                         db1,
                                         acc1,
-                                        endpoint3 + "/" + endpoint2 + "/" + db2 + "/",
+                                        f"{endpoint3}/{endpoint2}/{db2}/",
                                         "",
                                         plurals[endpoint1],
                                         plurals[endpoint3],
@@ -1246,49 +1099,32 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for acc1 in api_test_map[endpoint1][db1]:
                                 # /[endpoint]/[endpoint]/[db]/[acc]/[endpoint]/[db]
-                                current = (
-                                    "/api/"
-                                    + endpoint3
-                                    + "/"
-                                    + endpoint1
-                                    + "/"
-                                    + db1
-                                    + "/"
-                                    + acc1
-                                    + "/"
-                                    + endpoint2
-                                    + "/"
-                                    + db2
-                                )
+                                current = f"/api/{endpoint3}/{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}"
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_200_OK,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_counter_by_endpoint(
                                         endpoint3,
                                         response.data,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     self._check_count_overview_per_endpoints(
                                         response.data,
                                         plurals[endpoint2],
                                         plurals[endpoint3],
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
-                                    # self._check_count_overview_per_endpoints(response.data,
-                                    #                                          plurals[endpoint1],
-                                    #                                          plurals[endpoint3],
-                                    #                                          "URL : [{}]".format(current))
 
                                     self._check_structure_chains_as_counter_filter(
                                         endpoint1,
                                         db1,
                                         acc1,
                                         endpoint3,
-                                        "/" + endpoint2 + "/" + db2,
+                                        f"/{endpoint2}/{db2}",
                                         plurals[endpoint1],
                                         plurals[endpoint3],
                                     )
@@ -1313,41 +1149,26 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                             for acc1 in api_test_map[endpoint1][db1]:
                                 for acc2 in api_test_map[endpoint2][db2]:
                                     # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]
-                                    current = (
-                                        "/api/"
-                                        + endpoint1
-                                        + "/"
-                                        + db1
-                                        + "/"
-                                        + acc1
-                                        + "/"
-                                        + endpoint2
-                                        + "/"
-                                        + db2
-                                        + "/"
-                                        + acc2
-                                        + "/"
-                                        + endpoint3
-                                    )
+                                    current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}/{acc2}/{endpoint3}"
                                     tested.append(current)
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.assertEqual(
                                             response.status_code,
                                             status.HTTP_200_OK,
-                                            "URL : [{}]".format(current),
+                                            f"URL : [{current}]",
                                         )
                                         self._check_object_by_accesssion(response.data)
                                         self._check_list_of_matches(
                                             response.data[plurals[endpoint2]],
                                             check_coordinates=endpoint2 != "taxonomy"
                                             and endpoint2 != "proteome",
-                                            msg="URL : [{}]".format(current),
+                                            msg=f"URL : [{current}]",
                                         )
                                         self._check_counter_by_endpoint(
                                             endpoint3,
                                             response.data,
-                                            "URL : [{}]".format(current),
+                                            f"URL : [{current}]",
                                         )
 
                                         tested += self._check_structure_and_chains(
@@ -1355,14 +1176,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             endpoint1,
                                             db1,
                                             acc1,
-                                            "/"
-                                            + endpoint2
-                                            + "/"
-                                            + db2
-                                            + "/"
-                                            + acc2
-                                            + "/"
-                                            + endpoint3,
+                                            f"/{endpoint2}/{db2}/{acc2}/{endpoint3}",
                                         )
 
                                         tested += (
@@ -1370,8 +1184,8 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 endpoint2,
                                                 db2,
                                                 acc2,
-                                                endpoint1 + "/" + db1 + "/" + acc1,
-                                                "/" + endpoint3,
+                                                f"{endpoint1}/{db1}/{acc1}",
+                                                f"/{endpoint3}",
                                             )
                                         )
 
@@ -1397,40 +1211,25 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                             for acc1 in api_test_map[endpoint1][db1]:
                                 for acc2 in api_test_map[endpoint2][db2]:
                                     # [endpoint]/[db]/[acc]/[endpoint]/[endpoint]/[db]/[acc]
-                                    current = (
-                                        "/api/"
-                                        + endpoint1
-                                        + "/"
-                                        + db1
-                                        + "/"
-                                        + acc1
-                                        + "/"
-                                        + endpoint3
-                                        + "/"
-                                        + endpoint2
-                                        + "/"
-                                        + db2
-                                        + "/"
-                                        + acc2
-                                    )
+                                    current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint3}/{endpoint2}/{db2}/{acc2}"
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.assertEqual(
                                             response.status_code,
                                             status.HTTP_200_OK,
-                                            "URL : [{}]".format(current),
+                                            f"URL : [{current}]",
                                         )
                                         self._check_object_by_accesssion(response.data)
                                         self._check_list_of_matches(
                                             response.data[plurals[endpoint2]],
                                             check_coordinates=endpoint2 != "taxonomy"
                                             and endpoint2 != "proteome",
-                                            msg="URL : [{}]".format(current),
+                                            msg=f"URL : [{current}]",
                                         )
                                         self._check_counter_by_endpoint(
                                             endpoint3,
                                             response.data,
-                                            "URL : [{}]".format(current),
+                                            f"URL : [{current}]",
                                         )
 
                                         self._check_structure_and_chains(
@@ -1438,27 +1237,14 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             endpoint1,
                                             db1,
                                             acc1,
-                                            "/"
-                                            + endpoint3
-                                            + "/"
-                                            + endpoint2
-                                            + "/"
-                                            + db2
-                                            + "/"
-                                            + acc2,
+                                            f"/{endpoint3}/{endpoint2}/{db2}/{acc2}",
                                         )
 
                                         self._check_structure_chains_as_filter(
                                             endpoint2,
                                             db2,
                                             acc2,
-                                            endpoint1
-                                            + "/"
-                                            + db1
-                                            + "/"
-                                            + acc1
-                                            + "/"
-                                            + endpoint3,
+                                            f"{endpoint1}/{db1}/{acc1}/{endpoint3}",
                                             "",
                                         )
                                     elif (
@@ -1483,48 +1269,26 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                             for acc1 in api_test_map[endpoint1][db1]:
                                 for acc2 in api_test_map[endpoint2][db2]:
                                     # /[endpoint]/[endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
-                                    current = (
-                                        "/api/"
-                                        + endpoint3
-                                        + "/"
-                                        + endpoint1
-                                        + "/"
-                                        + db1
-                                        + "/"
-                                        + acc1
-                                        + "/"
-                                        + endpoint2
-                                        + "/"
-                                        + db2
-                                        + "/"
-                                        + acc2
-                                    )
+                                    current = f"/api/{endpoint3}/{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}/{acc2}"
+
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
                                         self.assertEqual(
                                             response.status_code,
                                             status.HTTP_200_OK,
-                                            "URL : [{}]".format(current),
+                                            f"URL : [{current}]",
                                         )
                                         self._check_counter_by_endpoint(
                                             endpoint3,
                                             response.data,
-                                            "URL : [{}]".format(current),
+                                            f"URL : [{current}]",
                                         )
-                                        # self._check_count_overview_per_endpoints(response.data,
-                                        #                                          plurals[endpoint2],
-                                        #                                          plurals[endpoint3],
-                                        #                                          "URL : [{}]".format(current))
-                                        # self._check_count_overview_per_endpoints(response.data,
-                                        #                                          plurals[endpoint1],
-                                        #                                          plurals[endpoint3],
-                                        #                                          "URL : [{}]".format(current))
                                         self._check_structure_chains_as_counter_filter(
                                             endpoint1,
                                             db1,
                                             acc1,
                                             endpoint3,
-                                            "/" + endpoint2 + "/" + db2 + "/" + acc2,
+                                            f"/{endpoint2}/{db2}/{acc2}",
                                             plurals[endpoint1],
                                             plurals[endpoint3],
                                         )
@@ -1532,13 +1296,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             endpoint2,
                                             db2,
                                             acc2,
-                                            endpoint3
-                                            + "/"
-                                            + endpoint1
-                                            + "/"
-                                            + db1
-                                            + "/"
-                                            + acc1,
+                                            f"{endpoint3}/{endpoint1}/{db1}/{acc1}",
                                             "",
                                             plurals[endpoint2],
                                             plurals[endpoint3],
@@ -1564,61 +1322,66 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                     for db1 in api_test_map[endpoint1]:
                         for db2 in api_test_map[endpoint2]:
                             for db3 in api_test_map[endpoint3]:
-                                current = (
-                                    "/api/"
-                                    + endpoint1
-                                    + "/"
-                                    + db1
-                                    + "/"
-                                    + endpoint2
-                                    + "/"
-                                    + db2
-                                    + "/"
-                                    + endpoint3
-                                    + "/"
-                                    + db3
-                                )
+                                current = f"/api/{endpoint1}/{db1}/{endpoint2}/{db2}/{endpoint3}/{db3}"
                                 response = self._get_in_debug_mode(current)
                                 if response.status_code == status.HTTP_200_OK:
-                                    key2 = plurals[endpoint2] + "_url"
-                                    key3 = plurals[endpoint3] + "_url"
                                     self._check_is_list_of_metadata_objects(
                                         response.data["results"],
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
+                                    key2 = f"{plurals[endpoint2]}_url"
+                                    if endpoint2 not in endpoints_with_url:
+                                        key2 = f"{endpoint2}_subset"
                                     self._check_is_list_of_objects_with_key(
                                         response.data["results"],
                                         key2,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     for result in [
                                         x[key2] for x in response.data["results"]
                                     ]:
-                                        self._check_list_of_matches(
-                                            result,
-                                            check_coordinates=endpoint2 != "taxonomy"
-                                            and endpoint2 != "proteome",
-                                            msg="URL : [{}]".format(current),
-                                        )
+                                        if "_subset" in key2:
+                                            self._check_list_of_matches(
+                                                result,
+                                                check_coordinates=endpoint2
+                                                != "taxonomy"
+                                                and endpoint2 != "proteome",
+                                                msg=f"URL : [{current}]",
+                                            )
+                                        else:
+                                            self.asserURL(
+                                                result,
+                                                f"The URL in {key2}: {result} is not valid | URL: {current}",
+                                            )
+                                    key3 = f"{plurals[endpoint3]}_url"
+                                    if endpoint3 not in endpoints_with_url:
+                                        key3 = f"{endpoint3}_subset"
                                     self._check_is_list_of_objects_with_key(
                                         response.data["results"],
                                         key3,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
                                     for result in [
                                         x[key3] for x in response.data["results"]
                                     ]:
-                                        self._check_list_of_matches(
-                                            result,
-                                            check_coordinates=endpoint3 != "taxonomy"
-                                            and endpoint3 != "proteome",
-                                            msg="URL : [{}]".format(current),
-                                        )
+                                        if "_subset" in key3:
+                                            self._check_list_of_matches(
+                                                result,
+                                                check_coordinates=endpoint3
+                                                != "taxonomy"
+                                                and endpoint3 != "proteome",
+                                                msg=f"URL : [{current}]",
+                                            )
+                                        else:
+                                            self.asserURL(
+                                                result,
+                                                f"The URL in {key3}: {result} is not valid | URL: {current}",
+                                            )
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     self.assertEqual(
                                         response.status_code,
                                         status.HTTP_204_NO_CONTENT,
-                                        "URL : [{}]".format(current),
+                                        f"URL : [{current}]",
                                     )
 
     def test_acc_db_db(self):
@@ -1634,59 +1397,53 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                             for db3 in api_test_map[endpoint3]:
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     # [endpoint]/[db]/[acc]/[endpoint]/[db]/[endpoint]/[db]
-                                    current = (
-                                        "/api/"
-                                        + endpoint1
-                                        + "/"
-                                        + db1
-                                        + "/"
-                                        + acc1
-                                        + "/"
-                                        + endpoint2
-                                        + "/"
-                                        + db2
-                                        + "/"
-                                        + endpoint3
-                                        + "/"
-                                        + db3
-                                    )
+                                    current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}/{endpoint3}/{db3}"
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
-                                        key2 = plurals[endpoint2] + "_url"
-                                        key3 = plurals[endpoint3] + "_url"
                                         self.assertEqual(
                                             response.status_code,
                                             status.HTTP_200_OK,
-                                            "URL : [{}]".format(current),
+                                            f"URL : [{current}]",
                                         )
                                         self._check_object_by_accesssion(
-                                            response.data, "URL : [{}]".format(current)
+                                            response.data, f"URL : [{current}]"
                                         )
-                                        self._check_list_of_matches(
-                                            response.data[key2],
-                                            check_coordinates=endpoint2 != "taxonomy"
-                                            and endpoint2 != "proteome",
-                                            msg="URL : [{}]".format(current),
-                                        )
-                                        self._check_list_of_matches(
-                                            response.data[key3],
-                                            check_coordinates=endpoint3 != "taxonomy"
-                                            and endpoint3 != "proteome",
-                                            msg="URL : [{}]".format(current),
-                                        )
+                                        key2 = f"{plurals[endpoint2]}_url"
+                                        if endpoint2 not in endpoints_with_url:
+                                            key2 = f"{endpoint2}_subset"
+                                            self._check_list_of_matches(
+                                                response.data[key2],
+                                                check_coordinates=endpoint2
+                                                != "taxonomy"
+                                                and endpoint2 != "proteome",
+                                                msg=f"URL : [{current}]",
+                                            )
+                                        else:
+                                            self.asserURL(
+                                                response.data[key2],
+                                                f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
+                                            )
+                                        key3 = f"{plurals[endpoint3]}_url"
+                                        if endpoint3 not in endpoints_with_url:
+                                            key3 = f"{endpoint3}_subset"
+                                            self._check_list_of_matches(
+                                                response.data[key3],
+                                                check_coordinates=endpoint3
+                                                != "taxonomy"
+                                                and endpoint3 != "proteome",
+                                                msg=f"URL : [{current}]",
+                                            )
+                                        else:
+                                            self.asserURL(
+                                                response.data[key3],
+                                                f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
+                                            )
                                         self._check_structure_and_chains(
                                             response,
                                             endpoint1,
                                             db1,
                                             acc1,
-                                            "/"
-                                            + endpoint2
-                                            + "/"
-                                            + db2
-                                            + "/"
-                                            + endpoint3
-                                            + "/"
-                                            + db3,
+                                            f"/{endpoint2}/{db2}/{endpoint3}/{db3}",
                                         )
                                     elif (
                                         response.status_code
@@ -1709,31 +1466,11 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                         for db2 in api_test_map[endpoint2]:
                             for db3 in api_test_map[endpoint3]:
                                 for acc1 in api_test_map[endpoint1][db1]:
+                                    # TODO: ❇️ Remember the git stash
                                     # /[endpoint]/[db]/[endpoint]/[db]/[acc]/[endpoint]/[db]
-                                    current = (
-                                        "/api/"
-                                        + endpoint2
-                                        + "/"
-                                        + db2
-                                        + "/"
-                                        + endpoint1
-                                        + "/"
-                                        + db1
-                                        + "/"
-                                        + acc1
-                                        + "/"
-                                        + endpoint3
-                                        + "/"
-                                        + db3
-                                    )
+                                    current = f"/api/{endpoint2}/{db2}/{endpoint1}/{db1}/{acc1}/{endpoint3}/{db3}"
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
-                                        key3 = plurals[endpoint3] + "_url"
-                                        self.assertEqual(
-                                            response.status_code,
-                                            status.HTTP_200_OK,
-                                            "URL : [{}]".format(current),
-                                        )
                                         self._check_is_list_of_metadata_objects(
                                             response.data["results"]
                                         )
@@ -1746,25 +1483,34 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 check_coordinates=endpoint1
                                                 != "taxonomy"
                                                 and endpoint1 != "proteome",
-                                                msg="URL : [{}]".format(current),
+                                                msg=f"URL : [{current}]",
                                             )
+                                        key3 = f"{plurals[endpoint3]}_url"
+                                        if endpoint3 not in endpoints_with_url:
+                                            key3 = f"{endpoint3}_subset"
                                         for result in [
                                             x[key3] for x in response.data["results"]
                                         ]:
-                                            self._check_list_of_matches(
-                                                result,
-                                                check_coordinates=endpoint3
-                                                != "taxonomy"
-                                                and endpoint3 != "proteome",
-                                                msg="URL : [{}]".format(current),
-                                            )
+                                            if "_subset" in key3:
+                                                self._check_list_of_matches(
+                                                    result,
+                                                    check_coordinates=endpoint3
+                                                    != "taxonomy"
+                                                    and endpoint3 != "proteome",
+                                                    msg=f"URL : [{current}]",
+                                                )
+                                            else:
+                                                self.asserURL(
+                                                    result,
+                                                    f"The URL in {key3}: {result} is not valid | URL: {current}",
+                                                )
 
                                         self._check_structure_chains_as_filter(
                                             endpoint1,
                                             db1,
                                             acc1,
-                                            endpoint2 + "/" + db2,
-                                            "/" + endpoint3 + "/" + db3,
+                                            f"{endpoint2}/{db2}",
+                                            f"/{endpoint3}/{db3}",
                                             plurals[endpoint1],
                                         )
                                     elif (
@@ -1789,30 +1535,9 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                             for db3 in api_test_map[endpoint3]:
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     # /[endpoint]/[db]/[endpoint]/[db]/[endpoint]/[db]/[acc]
-                                    current = (
-                                        "/api/"
-                                        + endpoint2
-                                        + "/"
-                                        + db2
-                                        + "/"
-                                        + endpoint3
-                                        + "/"
-                                        + db3
-                                        + "/"
-                                        + endpoint1
-                                        + "/"
-                                        + db1
-                                        + "/"
-                                        + acc1
-                                    )
+                                    current = f"/api/{endpoint2}/{db2}/{endpoint3}/{db3}/{endpoint1}/{db1}/{acc1}"
                                     response = self._get_in_debug_mode(current)
                                     if response.status_code == status.HTTP_200_OK:
-                                        key3 = plurals[endpoint3] + "_url"
-                                        self.assertEqual(
-                                            response.status_code,
-                                            status.HTTP_200_OK,
-                                            "URL : [{}]".format(current),
-                                        )
                                         self._check_is_list_of_metadata_objects(
                                             response.data["results"]
                                         )
@@ -1825,29 +1550,33 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 check_coordinates=endpoint1
                                                 != "taxonomy"
                                                 and endpoint1 != "proteome",
-                                                msg="URL : [{}]".format(current),
+                                                msg=f"URL : [{current}]",
                                             )
+                                        key3 = f"{plurals[endpoint3]}_url"
+                                        if endpoint3 not in endpoints_with_url:
+                                            key3 = f"{endpoint3}_subset"
                                         for result in [
                                             x[key3] for x in response.data["results"]
                                         ]:
-                                            self._check_list_of_matches(
-                                                result,
-                                                check_coordinates=endpoint3
-                                                != "taxonomy"
-                                                and endpoint3 != "proteome",
-                                                msg="URL : [{}]".format(current),
-                                            )
+                                            if "_subset" in key3:
+                                                self._check_list_of_matches(
+                                                    result,
+                                                    check_coordinates=endpoint3
+                                                    != "taxonomy"
+                                                    and endpoint3 != "proteome",
+                                                    msg=f"URL : [{current}]",
+                                                )
+                                            else:
+                                                self.asserURL(
+                                                    result,
+                                                    f"The URL in {key3}: {result} is not valid | URL: {current}",
+                                                )
+
                                         self._check_structure_chains_as_filter(
                                             endpoint1,
                                             db1,
                                             acc1,
-                                            endpoint2
-                                            + "/"
-                                            + db2
-                                            + "/"
-                                            + endpoint3
-                                            + "/"
-                                            + db3,
+                                            f"{endpoint2}/{db2}/{endpoint3}/{db3}",
                                             "",
                                             plurals[endpoint1],
                                         )
@@ -1875,31 +1604,13 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     for acc2 in api_test_map[endpoint2][db2]:
                                         # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]/[db]
-                                        current = (
-                                            "/api/"
-                                            + endpoint1
-                                            + "/"
-                                            + db1
-                                            + "/"
-                                            + acc1
-                                            + "/"
-                                            + endpoint2
-                                            + "/"
-                                            + db2
-                                            + "/"
-                                            + acc2
-                                            + "/"
-                                            + endpoint3
-                                            + "/"
-                                            + db3
-                                        )
+                                        current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}/{acc2}/{endpoint3}/{db3}"
                                         response = self._get_in_debug_mode(current)
                                         if response.status_code == status.HTTP_200_OK:
-                                            key3 = plurals[endpoint3] + "_url"
                                             self.assertEqual(
                                                 response.status_code,
                                                 status.HTTP_200_OK,
-                                                "URL : [{}]".format(current),
+                                                f"URL : [{current}]",
                                             )
                                             self._check_object_by_accesssion(
                                                 response.data
@@ -1909,37 +1620,36 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 check_coordinates=endpoint2
                                                 != "taxonomy"
                                                 and endpoint2 != "proteome",
-                                                msg="URL : [{}]".format(current),
+                                                msg=f"URL : [{current}]",
                                             )
-                                            self._check_list_of_matches(
-                                                response.data[key3],
-                                                check_coordinates=endpoint3
-                                                != "taxonomy"
-                                                and endpoint3 != "proteome",
-                                                msg="URL : [{}]".format(current),
-                                            )
+                                            key3 = f"{plurals[endpoint3]}_url"
+                                            if endpoint3 not in endpoints_with_url:
+                                                key3 = f"{endpoint3}_subset"
+                                                self._check_list_of_matches(
+                                                    response.data[key3],
+                                                    check_coordinates=endpoint3
+                                                    != "taxonomy"
+                                                    and endpoint3 != "proteome",
+                                                    msg=f"URL : [{current}]",
+                                                )
+                                            else:
+                                                self.asserURL(
+                                                    response.data[key3],
+                                                    f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
+                                                )
                                             self._check_structure_and_chains(
                                                 response,
                                                 endpoint1,
                                                 db1,
                                                 acc1,
-                                                "/"
-                                                + endpoint2
-                                                + "/"
-                                                + db2
-                                                + "/"
-                                                + acc2
-                                                + "/"
-                                                + endpoint3
-                                                + "/"
-                                                + db3,
+                                                f"/{endpoint2}/{db2}/{acc2}/{endpoint3}/{db3}",
                                             )
                                             self._check_structure_chains_as_filter(
                                                 endpoint2,
                                                 db2,
                                                 acc2,
-                                                endpoint1 + "/" + db1 + "/" + acc1,
-                                                "/" + endpoint3 + "/" + db3,
+                                                f"{endpoint1}/{db1}/{acc1}",
+                                                f"/{endpoint3}/{db3}",
                                                 plurals[endpoint2],
                                             )
                                         elif (
@@ -1968,11 +1678,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint3}/{db3}/{endpoint2}/{db2}/{acc2}"
                                         response = self._get_in_debug_mode(current)
                                         if response.status_code == status.HTTP_200_OK:
-                                            key3 = plurals[endpoint3] + "_url"
                                             self.assertEqual(
                                                 response.status_code,
                                                 status.HTTP_200_OK,
-                                                "URL : [{}]".format(current),
+                                                f"URL : [{current}]",
                                             )
                                             self._check_object_by_accesssion(
                                                 response.data
@@ -1982,44 +1691,35 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 check_coordinates=endpoint2
                                                 != "taxonomy"
                                                 and endpoint2 != "proteome",
-                                                msg="URL : [{}]".format(current),
+                                                msg=f"URL : [{current}]",
                                             )
-                                            self._check_list_of_matches(
-                                                response.data[key3],
-                                                check_coordinates=endpoint3
-                                                != "taxonomy"
-                                                and endpoint3 != "proteome",
-                                                msg="URL : [{}]".format(current),
-                                            )
+                                            key3 = f"{plurals[endpoint3]}_url"
+                                            if endpoint3 not in endpoints_with_url:
+                                                key3 = f"{endpoint3}_subset"
+                                                self._check_list_of_matches(
+                                                    response.data[key3],
+                                                    check_coordinates=endpoint3
+                                                    != "taxonomy"
+                                                    and endpoint3 != "proteome",
+                                                    msg=f"URL : [{current}]",
+                                                )
+                                            else:
+                                                self.asserURL(
+                                                    response.data[key3],
+                                                    f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
+                                                )
                                             self._check_structure_and_chains(
                                                 response,
                                                 endpoint1,
                                                 db1,
                                                 acc1,
-                                                "/"
-                                                + endpoint3
-                                                + "/"
-                                                + db3
-                                                + "/"
-                                                + endpoint2
-                                                + "/"
-                                                + db2
-                                                + "/"
-                                                + acc2,
+                                                f"/{endpoint3}/{db3}/{endpoint2}/{db2}/{acc2}",
                                             )
                                             self._check_structure_chains_as_filter(
                                                 endpoint2,
                                                 db2,
                                                 acc2,
-                                                endpoint1
-                                                + "/"
-                                                + db1
-                                                + "/"
-                                                + acc1
-                                                + "/"
-                                                + endpoint3
-                                                + "/"
-                                                + db3,
+                                                f"{endpoint1}/{db1}/{acc1}/{endpoint3}/{db3}",
                                                 "",
                                                 plurals[endpoint2],
                                             )
@@ -2046,30 +1746,13 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 for acc1 in api_test_map[endpoint1][db1]:
                                     for acc2 in api_test_map[endpoint2][db2]:
                                         # [endpoint]/[db]/[endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
-                                        current = (
-                                            "/api/"
-                                            + endpoint3
-                                            + "/"
-                                            + db3
-                                            + "/"
-                                            + endpoint1
-                                            + "/"
-                                            + db1
-                                            + "/"
-                                            + acc1
-                                            + "/"
-                                            + endpoint2
-                                            + "/"
-                                            + db2
-                                            + "/"
-                                            + acc2
-                                        )
+                                        current = f"/api/{endpoint3}/{db3}/{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}/{acc2}"
                                         response = self._get_in_debug_mode(current)
                                         if response.status_code == status.HTTP_200_OK:
                                             self.assertEqual(
                                                 response.status_code,
                                                 status.HTTP_200_OK,
-                                                "URL : [{}]".format(current),
+                                                f"URL : [{current}]",
                                             )
                                             self._check_is_list_of_metadata_objects(
                                                 response.data["results"]
@@ -2083,7 +1766,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                     check_coordinates=endpoint1
                                                     != "taxonomy"
                                                     and endpoint1 != "proteome",
-                                                    msg="URL : [{}]".format(current),
+                                                    msg=f"URL : [{current}]",
                                                 )
                                             for result in [
                                                 x[plurals[endpoint2]]
@@ -2094,34 +1777,21 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                     check_coordinates=endpoint2
                                                     != "taxonomy"
                                                     and endpoint2 != "proteome",
-                                                    msg="URL : [{}]".format(current),
+                                                    msg=f"URL : [{current}]",
                                                 )
                                             self._check_structure_chains_as_filter(
                                                 endpoint1,
                                                 db1,
                                                 acc1,
-                                                endpoint3 + "/" + db3,
-                                                "/"
-                                                + endpoint2
-                                                + "/"
-                                                + db2
-                                                + "/"
-                                                + acc2,
+                                                f"{endpoint3}/{db3}",
+                                                f"/{endpoint2}/{db2}/{acc2}",
                                                 plurals[endpoint1],
                                             )
                                             self._check_structure_chains_as_filter(
                                                 endpoint2,
                                                 db2,
                                                 acc2,
-                                                endpoint3
-                                                + "/"
-                                                + db3
-                                                + "/"
-                                                + endpoint1
-                                                + "/"
-                                                + db1
-                                                + "/"
-                                                + acc1,
+                                                f"{endpoint3}/{db3}/{endpoint1}/{db1}/{acc1}",
                                                 "",
                                                 plurals[endpoint2],
                                             )
@@ -2149,26 +1819,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     for acc2 in api_test_map[endpoint2][db2]:
                                         # [endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]/[endpoint]/[db]/[acc]
                                         for acc3 in api_test_map[endpoint3][db3]:
-                                            current = (
-                                                "/api/"
-                                                + endpoint1
-                                                + "/"
-                                                + db1
-                                                + "/"
-                                                + acc1
-                                                + "/"
-                                                + endpoint2
-                                                + "/"
-                                                + db2
-                                                + "/"
-                                                + acc2
-                                                + "/"
-                                                + endpoint3
-                                                + "/"
-                                                + db3
-                                                + "/"
-                                                + acc3
-                                            )
+                                            current = f"/api/{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}/{acc2}/{endpoint3}/{db3}/{acc3}"
                                             response = self._get_in_debug_mode(current)
                                             if (
                                                 response.status_code
@@ -2177,7 +1828,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 self.assertEqual(
                                                     response.status_code,
                                                     status.HTTP_200_OK,
-                                                    "URL : [{}]".format(current),
+                                                    f"URL : [{current}]",
                                                 )
                                                 self._check_object_by_accesssion(
                                                     response.data
@@ -2187,61 +1838,35 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                     check_coordinates=endpoint2
                                                     != "taxonomy"
                                                     and endpoint2 != "proteome",
-                                                    msg="URL : [{}]".format(current),
+                                                    msg=f"URL : [{current}]",
                                                 )
                                                 self._check_list_of_matches(
                                                     response.data[plurals[endpoint3]],
                                                     check_coordinates=endpoint3
                                                     != "taxonomy"
                                                     and endpoint3 != "proteome",
-                                                    msg="URL : [{}]".format(current),
+                                                    msg=f"URL : [{current}]",
                                                 )
                                                 self._check_structure_and_chains(
                                                     response,
                                                     endpoint1,
                                                     db1,
                                                     acc1,
-                                                    "/"
-                                                    + endpoint2
-                                                    + "/"
-                                                    + db2
-                                                    + "/"
-                                                    + acc2
-                                                    + "/"
-                                                    + endpoint3
-                                                    + "/"
-                                                    + db3
-                                                    + "/"
-                                                    + acc3,
+                                                    f"/{endpoint2}/{db2}/{acc2}/{endpoint3}/{db3}/{acc3}",
                                                 )
                                                 self._check_structure_chains_as_filter(
                                                     endpoint2,
                                                     db2,
                                                     acc2,
-                                                    endpoint1 + "/" + db1 + "/" + acc1,
-                                                    "/"
-                                                    + endpoint3
-                                                    + "/"
-                                                    + db3
-                                                    + "/"
-                                                    + acc3,
+                                                    f"{endpoint1}/{db1}/{acc1}",
+                                                    f"/{endpoint3}/{db3}/{acc3}",
                                                     plurals[endpoint2],
                                                 )
                                                 self._check_structure_chains_as_filter(
                                                     endpoint3,
                                                     db3,
                                                     acc3,
-                                                    endpoint1
-                                                    + "/"
-                                                    + db1
-                                                    + "/"
-                                                    + acc1
-                                                    + "/"
-                                                    + endpoint2
-                                                    + "/"
-                                                    + db2
-                                                    + "/"
-                                                    + acc2,
+                                                    f"{endpoint1}/{db1}/{acc1}/{endpoint2}/{db2}/{acc2}",
                                                     "",
                                                     plurals[endpoint3],
                                                 )

@@ -72,8 +72,11 @@ class ProteinSerializer(ModelContentSerializer):
                 SerializerDetail.ENTRY_DB in detail_filters
                 or SerializerDetail.ENTRY_DETAIL in detail_filters
             ):
-                key = self.get_entries_key(
-                    detail_filters, self.queryset_manager.show_subset
+                key = self.get_endpoint_key(
+                    "entry",
+                    SerializerDetail.ENTRY_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
 
                 representation[key] = self.to_entries_detail_representation(

@@ -46,13 +46,11 @@ class EntrySetTest(InterproRESTTestCase):
             "/api/entry/unintegrated/set",
             "/api/entry/interpro/pfam/set",
             "/api/entry/unintegrated/pfam/set",
-            "/api/entry/interpro/" + acc + "/pfam/set",
+            f"/api/entry/interpro/{acc}/pfam/set",
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -65,17 +63,15 @@ class EntrySetTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_un = "PF17176"
         urls = [
-            "/api/entry/pfam/" + pfam + "/set",
-            "/api/entry/pfam/" + pfam_un + "/set",
-            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/set",
-            "/api/entry/interpro/pfam/" + pfam + "/set",
-            "/api/entry/unintegrated/pfam/" + pfam_un + "/set",
+            f"/api/entry/pfam/{pfam}/set",
+            f"/api/entry/pfam/{pfam_un}/set",
+            f"/api/entry/interpro/{acc}/pfam/{pfam}/set",
+            f"/api/entry/interpro/pfam/{pfam}/set",
+            f"/api/entry/unintegrated/pfam/{pfam_un}/set",
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_entry_details(response.data["metadata"])
             self.assertIn(
                 "sets",
@@ -88,9 +84,7 @@ class EntrySetTest(InterproRESTTestCase):
         urls = ["/api/entry/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self.assertIn(
                 "sets",
                 response.data["entries"]["integrated"],
@@ -108,13 +102,11 @@ class EntrySetTest(InterproRESTTestCase):
         urls = [
             "/api/entry/pfam/set/pfam",
             "/api/entry/unintegrated/set/pfam",
-            "/api/entry/interpro/" + acc + "/pfam/set/pfam",
+            f"/api/entry/interpro/{acc}/pfam/set/pfam",
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -132,9 +124,7 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_entry_details(response.data["metadata"])
             self.assertIn("set_subset", response.data)
             for org in response.data["set_subset"]:
@@ -144,9 +134,7 @@ class EntrySetTest(InterproRESTTestCase):
         urls = ["/api/entry/set/pfam/Cl0001", "/api/entry/set/pfam/Cl0002"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_entry_count_overview(response.data)
 
     def test_can_get_the_set_object_on_a_list(self):
@@ -157,9 +145,7 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -175,9 +161,7 @@ class EntrySetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_entry_details(response.data["metadata"])
             self.assertIn("sets", response.data)
             for s in response.data["sets"]:
@@ -186,9 +170,7 @@ class EntrySetTest(InterproRESTTestCase):
     def test_can_get_the_authors_and_literature(self):
         url = "/api/set/pfam/CL0001"
         response = self.client.get(url)
-        self.assertEqual(
-            response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
         metadata = response.data["metadata"]
         self._check_set_details(metadata)
         self.assertIn("authors", metadata)
@@ -201,9 +183,7 @@ class EntrySetTest(InterproRESTTestCase):
     def test_can_authors_and_literature_be_null(self):
         url = "/api/set/pfam/CL0002"
         response = self.client.get(url)
-        self.assertEqual(
-            response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
         metadata = response.data["metadata"]
         self._check_set_details(metadata)
         self.assertIn("authors", metadata)
@@ -222,9 +202,7 @@ class ProteinSetTest(InterproRESTTestCase):
         urls = ["/api/protein/reviewed/set/", "/api/protein/uniprot/set/"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -235,14 +213,12 @@ class ProteinSetTest(InterproRESTTestCase):
     def test_urls_that_return_protein_with_set_count(self):
         reviewed = "A1CUJ5"
         urls = [
-            "/api/protein/uniprot/" + reviewed + "/set",
-            "/api/protein/reviewed/" + reviewed + "/set",
+            f"/api/protein/uniprot/{reviewed}/set",
+            f"/api/protein/reviewed/{reviewed}/set",
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_protein_details(response.data["metadata"])
             self.assertIn(
                 "sets",
@@ -255,9 +231,7 @@ class ProteinSetTest(InterproRESTTestCase):
         urls = ["/api/protein/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self.assertIn(
                 "proteins",
                 response.data["proteins"]["uniprot"],
@@ -295,9 +269,7 @@ class ProteinSetTest(InterproRESTTestCase):
         urls = ["/api/protein/reviewed/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -315,9 +287,7 @@ class ProteinSetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_protein_details(response.data["metadata"])
             self.assertIn("set_subset", response.data)
             for s in response.data["set_subset"]:
@@ -327,9 +297,7 @@ class ProteinSetTest(InterproRESTTestCase):
         urls = ["/api/protein/set/pfam/Cl0001"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_protein_count_overview(response.data)
 
     def test_can_get_the_set_object_on_a_list(self):
@@ -339,9 +307,7 @@ class ProteinSetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -357,9 +323,7 @@ class ProteinSetTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_protein_details(response.data["metadata"])
             self.assertIn("sets", response.data)
             for s in response.data["sets"]:
@@ -377,9 +341,7 @@ class StructureSetTest(InterproRESTTestCase):
         urls = ["/api/structure/pdb/set/"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -388,12 +350,10 @@ class StructureSetTest(InterproRESTTestCase):
                 self._check_set_count_overview(result)
 
     def test_urls_that_return_structure_with_set_count(self):
-        urls = ["/api/structure/pdb/" + pdb + "/set/" for pdb in ["1JM7", "2BKM"]]
+        urls = [f"/api/structure/pdb/{pdb}/set/" for pdb in ["1JM7", "2BKM"]]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_structure_details(response.data["metadata"])
             self.assertIn(
                 "sets",
@@ -406,9 +366,7 @@ class StructureSetTest(InterproRESTTestCase):
         urls = ["/api/structure/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self.assertIn(
                 "structures",
                 response.data["structures"]["pdb"],
@@ -424,9 +382,7 @@ class StructureSetTest(InterproRESTTestCase):
         urls = ["/api/structure/pdb/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -441,9 +397,7 @@ class StructureSetTest(InterproRESTTestCase):
         urls = ["/api/structure/pdb/1JM7/set/pfam"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_structure_details(response.data["metadata"])
             self.assertIn("set_subset", response.data)
             for s in response.data["set_subset"]:
@@ -453,18 +407,14 @@ class StructureSetTest(InterproRESTTestCase):
         urls = ["/api/structure/set/pfam/Cl0001"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_structure_count_overview(response.data)
 
     def test_can_get_the_set_object_on_a_list(self):
         urls = ["/api/structure/pdb/set/pfam/Cl0001"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -477,9 +427,7 @@ class StructureSetTest(InterproRESTTestCase):
         urls = ["/api/structure/pdb/1JM7/set/pfam/Cl0001"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_structure_details(response.data["metadata"])
             self.assertIn("sets", response.data)
             for s in response.data["sets"]:
@@ -497,9 +445,7 @@ class SetEntryTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/entry"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -511,9 +457,7 @@ class SetEntryTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/CL0001/entry"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"])
             self.assertIn(
                 "entries",
@@ -529,13 +473,11 @@ class SetEntryTest(InterproRESTTestCase):
             "/api/set/entry/unintegrated",
             "/api/set/entry/unintegrated/pfam",
             "/api/set/entry/interpro/pfam",
-            "/api/set/entry/interpro/" + acc + "/pfam",
+            f"/api/set/entry/interpro/{acc}/pfam",
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self.assertIsInstance(response.data, dict)
             if "pfam" in response.data["sets"]:
                 self.assertIn(
@@ -554,23 +496,19 @@ class SetEntryTest(InterproRESTTestCase):
         urls = [
             "/api/set/pfam/entry/pfam",
             "/api/set/pfam/entry/unintegrated",
-            "/api/set/pfam/entry/interpro/" + acc + "/pfam",
+            f"/api/set/pfam/entry/interpro/{acc}/pfam",
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "entries_url"
             )
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            response = self.client.get(f"{url}?show-subset")
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -589,15 +527,11 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"], True)
             self.assertIn("entries_url", response.data)
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            response = self.client.get(f"{url}?show-subset")
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"], True)
             self.assertIn("entry_subset", response.data)
             for st in response.data["entry_subset"]:
@@ -608,31 +542,27 @@ class SetEntryTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_un = "PF17176"
         urls = [
-            "/api/set/entry/pfam/" + pfam,
-            "/api/set/entry/pfam/" + pfam_un,
-            "/api/set/entry/interpro/" + acc + "/pfam/" + pfam,
-            "/api/set/entry/interpro/pfam/" + pfam,
-            "/api/set/entry/unintegrated/pfam/" + pfam_un,
+            f"/api/set/entry/pfam/{pfam}",
+            f"/api/set/entry/pfam/{pfam_un}",
+            f"/api/set/entry/interpro/{acc}/pfam/{pfam}",
+            f"/api/set/entry/interpro/pfam/{pfam}",
+            f"/api/set/entry/unintegrated/pfam/{pfam_un}",
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_count_overview(response.data)
 
     def test_can_get_object_on_a_set_list(self):
         pfam = "PF02171"
         pfam_un = "PF17176"
         urls = [
-            "/api/set/pfam/entry/unintegrated/pfam/" + pfam_un,
-            "/api/set/pfam/entry/integrated/pfam/" + pfam,
+            f"/api/set/pfam/entry/unintegrated/pfam/{pfam_un}",
+            f"/api/set/pfam/entry/integrated/pfam/{pfam}",
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -649,9 +579,7 @@ class SetEntryTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"])
             self.assertIn("entries", response.data)
             for s in response.data["entries"]:
@@ -669,9 +597,7 @@ class SetProteinTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/protein"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -685,9 +611,7 @@ class SetProteinTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/CL0001/protein"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"])
             self.assertIn(
                 "proteins",
@@ -700,9 +624,7 @@ class SetProteinTest(InterproRESTTestCase):
         urls = ["/api/set/protein/uniprot", "/api/set/protein/reviewed"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self.assertIsInstance(response.data, dict)
             if "pfam" in response.data["sets"]:
                 self.assertIn(
@@ -720,12 +642,14 @@ class SetProteinTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/protein/reviewed"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
+            self._check_is_list_of_objects_with_key(
+                response.data["results"], "proteins_url"
+            )
+            response = self.client.get(url + "?show-subset")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "protein_subset"
             )
@@ -740,10 +664,10 @@ class SetProteinTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"], True)
+            self.assertIn("proteins_url", response.data)
+            response = self.client.get(url + "?show-subset")
             self.assertIn("protein_subset", response.data)
             for st in response.data["protein_subset"]:
                 self._check_match(st, include_coordinates=False)
@@ -752,18 +676,14 @@ class SetProteinTest(InterproRESTTestCase):
         urls = ["/api/set/protein/uniprot/M5ADK6", "/api/set/protein/reviewed/M5ADK6"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_count_overview(response.data)
 
     def test_can_get_object_on_a_set_list(self):
         urls = ["/api/set/pfam/protein/uniprot/a1cuj5"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -782,9 +702,7 @@ class SetProteinTest(InterproRESTTestCase):
         ]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"])
             self.assertIn("proteins", response.data)
             for s in response.data["proteins"]:
@@ -802,9 +720,7 @@ class SetStructureTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/structure"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -818,9 +734,7 @@ class SetStructureTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/CL0001/structure"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"])
             self.assertIn(
                 "structures",
@@ -833,9 +747,7 @@ class SetStructureTest(InterproRESTTestCase):
         urls = ["/api/set/structure/pdb"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self.assertIsInstance(response.data, dict)
             if "kegg" in response.data["sets"]:
                 self.assertIn(
@@ -864,9 +776,7 @@ class SetStructureTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/structure/pdb"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -881,9 +791,7 @@ class SetStructureTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/Cl0001/structure/pdb"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"], True)
             self.assertIn("structure_subset", response.data)
             for st in response.data["structure_subset"]:
@@ -893,18 +801,14 @@ class SetStructureTest(InterproRESTTestCase):
         urls = ["/api/set/structure/pdb/1JM7", "/api/set/structure/pdb/2bkm"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_count_overview(response.data)
 
     def test_can_get_object_on_a_set_list(self):
         urls = ["/api/set/pfam/structure/pdb/1JM7"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "metadata"
             )
@@ -920,9 +824,7 @@ class SetStructureTest(InterproRESTTestCase):
         urls = ["/api/set/pfam/Cl0001/structure/pdb/1JM7"]
         for url in urls:
             response = self.client.get(url)
-            self.assertEqual(
-                response.status_code, status.HTTP_200_OK, "URL : [{}]".format(url)
-            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self._check_set_details(response.data["metadata"])
             self.assertIn("structures", response.data)
             for s in response.data["structures"]:
@@ -932,11 +834,11 @@ class SetStructureTest(InterproRESTTestCase):
 class SetAlignmentTests(InterproRESTTestCase):
     def test_can_get_the_set_alignments(self):
         clan = "cl0001"
-        response = self.client.get("/api/set/pfam/" + clan + "?alignments")
+        response = self.client.get(f"/api/set/pfam/{clan}?alignments")
         self.assertEqual(response.status_code, status.HTTP_410_GONE)
 
     def test_can_get_the_set_alignment(self):
         clan = "cl0001"
         pfam = "pf02171"
-        response = self.client.get("/api/set/pfam/" + clan + "?alignments=" + pfam)
+        response = self.client.get(f"/api/set/pfam/{clan}?alignments={pfam}")
         self.assertEqual(response.status_code, status.HTTP_410_GONE)

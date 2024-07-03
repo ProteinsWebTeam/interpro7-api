@@ -34,9 +34,9 @@ class StructureWithFilterProteinRESTTest(InterproRESTTestCase):
     def test_urls_that_return_structure_with_protein_count(self):
         for pdb in data_in_fixtures:
             urls = [
-                "/api/structure/pdb/" + pdb + "/protein",
-                "/api/structure/pdb/" + pdb + "/A/protein/",
-                "/api/structure/pdb/" + pdb + "/B/protein/",
+                f"/api/structure/pdb/{pdb}/protein",
+                f"/api/structure/pdb/{pdb}/A/protein/",
+                f"/api/structure/pdb/{pdb}/B/protein/",
             ]
             for url in urls:
                 response = self.client.get(url)
@@ -72,12 +72,19 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         response = self.client.get("/api/structure/pdb/protein/uniprot")
         self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
         for result in response.data["results"]:
+            self.assertIn(
+                "proteins_url",
+                result,
+                f"Should have the field proteins_url in response",
+            )
+            self.asserURL(result["proteins_url"])
+        response = self.client.get("/api/structure/pdb/protein/uniprot?show-subset")
+        self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
+        for result in response.data["results"]:
             self.assertEqual(
                 len(result["protein_subset"]),
                 len(data_in_fixtures[result["metadata"]["accession"]]),
-                "different length while testing {}".format(
-                    result["metadata"]["accession"]
-                ),
+                f"different length while testing {result['metadata']['accession']}",
             )
             for match in result["protein_subset"]:
                 self.assertIn(
@@ -89,6 +96,14 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
     def test_can_get_reviewed_from_pdb_structures(self):
         response = self.client.get("/api/structure/pdb/protein/reviewed")
         for result in response.data["results"]:
+            self.assertIn(
+                "proteins_url",
+                result,
+                f"Should have the field proteins_url in response",
+            )
+            self.asserURL(result["proteins_url"])
+        response = self.client.get("/api/structure/pdb/protein/reviewed?show-subset")
+        for result in response.data["results"]:
             for match in result["protein_subset"]:
                 self.assertIn(
                     match["accession"].lower(),
@@ -98,11 +113,18 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
 
     def test_can_get_uniprot_matches_from_structures(self):
         tests = {
-            "/api/structure/pdb/" + pdb + "/protein/uniprot": data_in_fixtures[pdb]
+            f"/api/structure/pdb/{pdb}/protein/uniprot": data_in_fixtures[pdb]
             for pdb in data_in_fixtures
         }
         for url in tests:
             response = self.client.get(url)
+            self.assertIn(
+                "proteins_url",
+                response.data,
+                "'proteins_url' should be one of the keys in the response",
+            )
+            self.asserURL(response.data["proteins_url"])
+            response = self.client.get(url + "?show-subset")
             self.assertIn(
                 "protein_subset",
                 response.data,
@@ -116,11 +138,18 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
 
     def test_can_get_uniprot_matches_from_structures_chain(self):
         tests = {
-            "/api/structure/pdb/" + pdb + "/A/protein/uniprot": data_in_fixtures[pdb]
+            f"/api/structure/pdb/{pdb}/A/protein/uniprot": data_in_fixtures[pdb]
             for pdb in data_in_fixtures
         }
         for url in tests:
             response = self.client.get(url)
+            self.assertIn(
+                "proteins_url",
+                response.data,
+                "'proteins_url' should be one of the keys in the response",
+            )
+            self.asserURL(response.data["proteins_url"])
+            response = self.client.get(url + "?show-subset")
             self.assertIn(
                 "protein_subset",
                 response.data,
@@ -138,12 +167,12 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_b = "M5ADK6"
 
         tests = {
-            "/api/structure/pdb/" + pdb + "/protein/uniprot/" + prot_a: [prot_a],
-            "/api/structure/pdb/" + pdb + "/protein/uniprot/" + prot_b: [prot_b],
-            "/api/structure/pdb/" + pdb + "/A/protein/uniprot/" + prot_a: [prot_a],
-            "/api/structure/pdb/" + pdb + "/A/protein/reviewed/" + prot_a: [prot_a],
-            "/api/structure/pdb/" + pdb + "/B/protein/uniprot/" + prot_b: [prot_b],
-            "/api/structure/pdb/" + pdb + "/B/protein/reviewed/" + prot_b: [prot_b],
+            f"/api/structure/pdb/{pdb}/protein/uniprot/{prot_a}": [prot_a],
+            f"/api/structure/pdb/{pdb}/protein/uniprot/{prot_b}": [prot_b],
+            f"/api/structure/pdb/{pdb}/A/protein/uniprot/{prot_a}": [prot_a],
+            f"/api/structure/pdb/{pdb}/A/protein/reviewed/{prot_a}": [prot_a],
+            f"/api/structure/pdb/{pdb}/B/protein/uniprot/{prot_b}": [prot_b],
+            f"/api/structure/pdb/{pdb}/B/protein/reviewed/{prot_b}": [prot_b],
         }
         for url in tests:
             response = self.client.get(url)
@@ -163,10 +192,15 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_t = "P16582"
 
         tests = {
-            "/api/structure/pdb/protein/uniprot/" + prot_s: ["2BKM", "1JM7"],
-            "/api/structure/pdb/protein/reviewed/" + prot_s: ["2BKM", "1JM7"],
-            "/api/structure/pdb/protein/unreviewed/"
-            + prot_t: ["1T2V", "1T2V", "1T2V", "1T2V", "1T2V"],
+            f"/api/structure/pdb/protein/uniprot/{prot_s}": ["2BKM", "1JM7"],
+            f"/api/structure/pdb/protein/reviewed/{prot_s}": ["2BKM", "1JM7"],
+            f"/api/structure/pdb/protein/unreviewed/{prot_t}": [
+                "1T2V",
+                "1T2V",
+                "1T2V",
+                "1T2V",
+                "1T2V",
+            ],
         }
         for url in tests:
             response = self.client.get(url)
@@ -187,7 +221,7 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
 
     def test_can_get_proteins_from_structure_protein_id(self):
         prot_s = "M5ADK6"
-        response = self.client.get("/api/structure/protein/uniprot/" + prot_s)
+        response = self.client.get(f"/api/structure/protein/uniprot/{prot_s}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._check_structure_count_overview(response.data)
         # TODO: improve this test
@@ -197,40 +231,40 @@ class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
         prot_s = "M5ADK6"
         prot_t = "P16582"
         tests = [
-            "/api/structure/pdb/" + pdb + "/protein/uniprot/bad_uniprot",
-            "/api/structure/pdb/" + pdb + "/protein/unreviewed/" + prot_s,
-            "/api/structure/pdb/protein/unreviewed/" + prot_s,
-            "/api/structure/pdb/protein/reviewed/" + prot_t,
+            f"/api/structure/pdb/{pdb}/protein/uniprot/bad_uniprot",
+            f"/api/structure/pdb/{pdb}/protein/unreviewed/{prot_s}",
+            f"/api/structure/pdb/protein/unreviewed/{prot_s}",
+            f"/api/structure/pdb/protein/reviewed/{prot_t}",
         ]
         for url in tests:
             self._check_HTTP_response_code(
-                url, msg="The URL [" + url + "] should've failed."
+                url, msg=f"The URL [{url}] should've failed."
             )
 
     def test_urls_that_should_fail(self):
         pdb = "1JM7"
         prot_s = "M5ADK6"
         tests = [
-            "/api/structure/pdb/bad_structure/protein/uniprot/" + prot_s,
-            "/api/bad_endpoint/pdb/" + pdb + "/protein/uniprot/" + prot_s,
-            "/api/structure/bad_db/" + pdb + "/protein/uniprot/" + prot_s,
-            "/api/structure/pdb/" + pdb + "/protein/uniprot/bad_protein",
-            "/api/structure/pdb/" + pdb + "/protein/bad_db/" + prot_s,
-            "/api/structure/pdb/" + pdb + "/bad_endpoint/uniprot/" + prot_s,
+            f"/api/structure/pdb/bad_structure/protein/uniprot/{prot_s}",
+            f"/api/bad_endpoint/pdb/{pdb}/protein/uniprot/{prot_s}",
+            f"/api/structure/bad_db/{pdb}/protein/uniprot/{prot_s}",
+            f"/api/structure/pdb/{pdb}/protein/uniprot/bad_protein",
+            f"/api/structure/pdb/{pdb}/protein/bad_db/{prot_s}",
+            f"/api/structure/pdb/{pdb}/bad_endpoint/uniprot/{prot_s}",
         ]
         for url in tests:
             self._check_HTTP_response_code(
                 url,
                 code=status.HTTP_404_NOT_FOUND,
-                msg="The URL [" + url + "] should've failed.",
+                msg=f"The URL [{url}] should've failed.",
             )
         tests = [
-            "/api/structure/pdb/BADP/protein/uniprot/" + prot_s,
-            "/api/structure/pdb/" + pdb + "/protein/uniprot/bad_prot",
+            f"/api/structure/pdb/BADP/protein/uniprot/{prot_s}",
+            f"/api/structure/pdb/{pdb}/protein/uniprot/bad_prot",
         ]
         for url in tests:
             self._check_HTTP_response_code(
                 url,
                 code=status.HTTP_204_NO_CONTENT,
-                msg="The URL [" + url + "] should've failed.",
+                msg=f"The URL [{url}] should've failed.",
             )

@@ -6,6 +6,9 @@ from rest_framework import status
 
 from webfront.models import TaxonomyPerEntry
 from webfront.tests.fixtures_reader import FixtureReader
+from django.core.validators import URLValidator
+
+validateURL = URLValidator()
 
 chains = {
     "1JM7": ["A", "B"],
@@ -336,6 +339,12 @@ class InterproRESTTestCase(APITransactionTestCase):
             self.assertIn(
                 element, superset, "Element {} in subset but not in set".format(element)
             )
+
+    def asserURL(self, url, msg=None):
+        try:
+            validateURL(url)
+        except:
+            raise self.failureException(msg)
 
     def _check_taxonomy_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)

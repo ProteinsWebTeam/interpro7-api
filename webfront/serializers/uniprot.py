@@ -110,15 +110,18 @@ class ProteinSerializer(ModelContentSerializer):
                 SerializerDetail.TAXONOMY_DB in detail_filters
                 or SerializerDetail.TAXONOMY_DETAIL in detail_filters
             ):
-                key = (
-                    "taxa"
-                    if SerializerDetail.TAXONOMY_DETAIL in detail_filters
-                    else "taxonomy_subset"
+                key = self.get_endpoint_key(
+                    "taxonomy",
+                    SerializerDetail.TAXONOMY_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_taxonomy_detail_representation(
                     instance,
                     self.searcher,
                     "protein_acc:" + escape(instance.accession.lower()),
+                    key == "taxa_url",
+                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.PROTEOME_DB in detail_filters

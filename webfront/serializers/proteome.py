@@ -137,13 +137,18 @@ class ProteomeSerializer(ModelContentSerializer):
                 SerializerDetail.TAXONOMY_DB in detail_filters
                 or SerializerDetail.TAXONOMY_DETAIL in detail_filters
             ):
-                key = (
-                    "taxa"
-                    if SerializerDetail.TAXONOMY_DETAIL in detail_filters
-                    else "taxonomy_subset"
+                key = self.get_endpoint_key(
+                    "taxonomy",
+                    SerializerDetail.TAXONOMY_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_taxonomy_detail_representation(
-                    None, self.searcher, query_searcher
+                    instance,
+                    self.searcher,
+                    query_searcher,
+                    key == "taxa_url",
+                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.SET_DB in detail_filters

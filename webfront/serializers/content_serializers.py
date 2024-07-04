@@ -140,14 +140,25 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def to_set_detail_representation(instance, searcher, query, include_chains=False):
+    def to_set_detail_representation(
+        instance,
+        searcher,
+        searcher_query,
+        show_url,
+        include_chains=False,
+        request=None,
+    ):
+        if show_url and request is not None:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "set", searcher, searcher_query, request
+            )
         fields = ["set_acc", "structure_chain"] if include_chains else "set_acc"
         response = [
             webfront.serializers.collection.SetSerializer.get_set_from_search_object(
                 r, include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=20
+                None, fields, fq=searcher_query, rows=20
             )["groups"]
         ]
         if len(response) == 0:

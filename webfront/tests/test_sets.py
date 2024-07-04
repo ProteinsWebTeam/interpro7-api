@@ -105,17 +105,11 @@ class EntrySetTest(InterproRESTTestCase):
             f"/api/entry/interpro/{acc}/pfam/set/pfam",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "set",
+                inner_subset_check_fn=self._check_set_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "set_subset"
-            )
-            for result in response.data["results"]:
-                for s in result["set_subset"]:
-                    self._check_set_from_searcher(s)
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
         urls = [
@@ -123,12 +117,12 @@ class EntrySetTest(InterproRESTTestCase):
             "/api/entry/unintegrated/pfam/PF17176/set/pfam",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_entry_details(response.data["metadata"])
-            self.assertIn("set_subset", response.data)
-            for org in response.data["set_subset"]:
-                self._check_set_from_searcher(org)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "set",
+                inner_subset_check_fn=self._check_set_from_searcher,
+                check_metadata_fn=self._check_entry_details,
+            )
 
     def test_can_filter_entry_counter_with_set_acc(self):
         urls = ["/api/entry/set/pfam/Cl0001", "/api/entry/set/pfam/Cl0002"]
@@ -268,17 +262,11 @@ class ProteinSetTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         urls = ["/api/protein/reviewed/set/pfam"]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "set",
+                inner_subset_check_fn=self._check_set_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "set_subset"
-            )
-            for result in response.data["results"]:
-                for s in result["set_subset"]:
-                    self._check_set_from_searcher(s)
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
         urls = [
@@ -286,12 +274,12 @@ class ProteinSetTest(InterproRESTTestCase):
             "/api/protein/reviewed/A1CUJ5/set/pfam",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_protein_details(response.data["metadata"])
-            self.assertIn("set_subset", response.data)
-            for s in response.data["set_subset"]:
-                self._check_set_from_searcher(s)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "set",
+                inner_subset_check_fn=self._check_set_from_searcher,
+                check_metadata_fn=self._check_protein_details,
+            )
 
     def test_can_filter_counter_with_set_acc(self):
         urls = ["/api/protein/set/pfam/Cl0001"]
@@ -381,27 +369,21 @@ class StructureSetTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         urls = ["/api/structure/pdb/set/pfam"]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "set",
+                inner_subset_check_fn=self._check_set_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "set_subset"
-            )
-            for result in response.data["results"]:
-                for s in result["set_subset"]:
-                    self._check_set_from_searcher(s)
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
         urls = ["/api/structure/pdb/1JM7/set/pfam"]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_structure_details(response.data["metadata"])
-            self.assertIn("set_subset", response.data)
-            for s in response.data["set_subset"]:
-                self._check_set_from_searcher(s)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "set",
+                inner_subset_check_fn=self._check_set_from_searcher,
+                check_metadata_fn=self._check_structure_details,
+            )
 
     def test_can_filter_counter_with_set_acc(self):
         urls = ["/api/structure/set/pfam/Cl0001"]

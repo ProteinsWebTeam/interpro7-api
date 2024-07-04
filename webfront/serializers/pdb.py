@@ -158,15 +158,18 @@ class StructureSerializer(ModelContentSerializer):
                 SerializerDetail.SET_DB in detail_filters
                 or SerializerDetail.SET_DETAIL in detail_filters
             ):
-                key = (
-                    "sets"
-                    if SerializerDetail.SET_DETAIL in detail_filters
-                    else "set_subset"
+                key = self.get_endpoint_key(
+                    "set",
+                    SerializerDetail.SET_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_set_detail_representation(
                     instance,
                     self.searcher,
                     "structure_acc:" + escape(instance.accession.lower()),
+                    key == "sets_url",
+                    request=self.context["request"],
                     include_chains=True,
                 )
 

@@ -1146,34 +1146,25 @@ class TaxonomySetTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         urls = [
             "/api/taxonomy/uniprot/set/pfam",
-            #            "/api/taxonomy/uniprot/set/kegg",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "set",
+                inner_subset_check_fn=self._check_set_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "set_subset"
-            )
-            for result in response.data["results"]:
-                for s in result["set_subset"]:
-                    self._check_set_from_searcher(s)
 
     def test_can_get_the_set_list_on_a__tax_object(self):
         urls = [
             "/api/taxonomy/uniprot/2579/set/pfam",
-            #            "/api/taxonomy/uniprot/2579/set/kegg",
-            #            "/api/taxonomy/uniprot/2579/set/kegg/kegg01/node",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_taxonomy_details(response.data["metadata"])
-            self.assertIn("set_subset", response.data)
-            for s in response.data["set_subset"]:
-                self._check_set_from_searcher(s)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "set",
+                inner_subset_check_fn=self._check_set_from_searcher,
+                check_metadata_fn=self._check_taxonomy_details,
+            )
 
     def test_can_filter_counter_with_set_acc(self):
         urls = [

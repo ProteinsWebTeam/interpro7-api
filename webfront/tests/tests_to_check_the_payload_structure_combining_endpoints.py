@@ -31,7 +31,7 @@ api_test_map = {
 }
 plurals = ModelContentSerializer.plurals
 
-endpoints_with_url = ["entry", "protein", "proteome"]
+endpoints_with_url = ["entry", "protein", "structure", "proteome"]
 
 
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
@@ -251,7 +251,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                         msg=f"URL : [{current}]",
                                     )
                                 else:
-                                    self.asserURL(
+                                    self.assertURL(
                                         result,
                                         f"The URL in {key2}: {result} is not valid | URL: {current}",
                                     )
@@ -347,7 +347,7 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                         msg=f"URL : [{current}]",
                                     )
                                 else:
-                                    self.asserURL(
+                                    self.assertURL(
                                         response.data[key],
                                         f"The URL in {key}: {response.data[key]} is not valid | URL: {current}",
                                     )
@@ -717,7 +717,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             msg=f"URL : [{current}]",
                                         )
                                     else:
-                                        self.asserURL(
+                                        self.assertURL(
                                             result,
                                             f"The URL in {key}: {result} is not valid | URL: {current}",
                                         )
@@ -770,7 +770,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             msg=f"URL : [{current}]",
                                         )
                                     else:
-                                        self.asserURL(
+                                        self.assertURL(
                                             result,
                                             f"The URL in {key2}: {result} is not valid | URL: {current}",
                                         )
@@ -862,7 +862,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             msg=f"URL : [{current}]",
                                         )
                                     else:
-                                        self.asserURL(
+                                        self.assertURL(
                                             response.data[key2],
                                             f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
                                         )
@@ -916,7 +916,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             msg=f"URL : [{current}]",
                                         )
                                     else:
-                                        self.asserURL(
+                                        self.assertURL(
                                             response.data[key2],
                                             f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
                                         )
@@ -1349,7 +1349,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 msg=f"URL : [{current}]",
                                             )
                                         else:
-                                            self.asserURL(
+                                            self.assertURL(
                                                 result,
                                                 f"The URL in {key2}: {result} is not valid | URL: {current}",
                                             )
@@ -1373,7 +1373,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 msg=f"URL : [{current}]",
                                             )
                                         else:
-                                            self.asserURL(
+                                            self.assertURL(
                                                 result,
                                                 f"The URL in {key3}: {result} is not valid | URL: {current}",
                                             )
@@ -1419,7 +1419,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 msg=f"URL : [{current}]",
                                             )
                                         else:
-                                            self.asserURL(
+                                            self.assertURL(
                                                 response.data[key2],
                                                 f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
                                             )
@@ -1434,7 +1434,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 msg=f"URL : [{current}]",
                                             )
                                         else:
-                                            self.asserURL(
+                                            self.assertURL(
                                                 response.data[key3],
                                                 f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
                                             )
@@ -1499,7 +1499,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                     msg=f"URL : [{current}]",
                                                 )
                                             else:
-                                                self.asserURL(
+                                                self.assertURL(
                                                     result,
                                                     f"The URL in {key3}: {result} is not valid | URL: {current}",
                                                 )
@@ -1566,7 +1566,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                     msg=f"URL : [{current}]",
                                                 )
                                             else:
-                                                self.asserURL(
+                                                self.assertURL(
                                                     result,
                                                     f"The URL in {key3}: {result} is not valid | URL: {current}",
                                                 )
@@ -1632,7 +1632,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                     msg=f"URL : [{current}]",
                                                 )
                                             else:
-                                                self.asserURL(
+                                                self.assertURL(
                                                     response.data[key3],
                                                     f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
                                                 )
@@ -1703,7 +1703,7 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                     msg=f"URL : [{current}]",
                                                 )
                                             else:
-                                                self.asserURL(
+                                                self.assertURL(
                                                     response.data[key3],
                                                     f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
                                                 )

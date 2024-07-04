@@ -1043,16 +1043,12 @@ class ProteomeStructureTest(InterproRESTTestCase):
 
     def test_can_get_a_list_from_the_proteome_list(self):
         url = "/api/proteome/uniprot/structure/pdb"
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self._check_is_list_of_objects_with_key(
-            response.data["results"], "structure_subset"
+        self._check_list_url_with_and_without_subset(
+            url,
+            "structure",
+            check_metadata_fn=lambda m: self._check_proteome_details(m, False),
+            inner_subset_check_fn=self._check_structure_chain_details,
         )
-        for result in response.data["results"]:
-            self._check_proteome_details(result["metadata"], False)
-            for st in result["structure_subset"]:
-                self._check_structure_chain_details(st)
 
     def test_can_get_a_list_from_the_proteome_object(self):
         urls = [
@@ -1060,12 +1056,12 @@ class ProteomeStructureTest(InterproRESTTestCase):
             "/api/proteome/uniprot/UP000030104/structure/pdb",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_proteome_details(response.data["metadata"], False)
-            self.assertIn("structure_subset", response.data)
-            for st in response.data["structure_subset"]:
-                self._check_structure_chain_details(st)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "structure",
+                check_metadata_fn=lambda m: self._check_proteome_details(m, False),
+                inner_subset_check_fn=self._check_structure_chain_details,
+            )
 
     def test_can_filter_proteome_counter_with_acc(self):
         urls = ["/api/proteome/structure/pdb/1JM7", "/api/proteome/structure/pdb/1JZ8"]

@@ -25,7 +25,7 @@ class EntryWithFilterStructureRESTTest(InterproRESTTestCase):
             "/api/entry/unintegrated/structure/",
             "/api/entry/interpro/pfam/structure/",
             "/api/entry/unintegrated/pfam/structure/",
-            "/api/entry/interpro/" + acc + "/pfam/structure",
+            f"/api/entry/interpro/{acc}/pfam/structure",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -39,12 +39,12 @@ class EntryWithFilterStructureRESTTest(InterproRESTTestCase):
         pfam = "PF02171"
         pfam_un = "PF17176"
         urls = [
-            "/api/entry/interpro/" + acc + "/structure",
-            "/api/entry/pfam/" + pfam + "/structure/",
-            "/api/entry/pfam/" + pfam_un + "/structure/",
-            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/structure/",
-            "/api/entry/interpro/pfam/" + pfam + "/structure/",
-            "/api/entry/unintegrated/pfam/" + pfam_un + "/structure/",
+            f"/api/entry/interpro/{acc}/structure",
+            f"/api/entry/pfam/{pfam}/structure/",
+            f"/api/entry/pfam/{pfam_un}/structure/",
+            f"/api/entry/interpro/{acc}/pfam/{pfam}/structure/",
+            f"/api/entry/interpro/pfam/{pfam}/structure/",
+            f"/api/entry/unintegrated/pfam/{pfam_un}/structure/",
         ]
         for url in urls:
             response = self.client.get(url)
@@ -71,57 +71,55 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
         self.assertIsInstance(response.data["entries"]["interpro"]["structures"], int)
 
     def test_can_get_structures_from_interpro_structure(self):
-        response = self.client.get("/api/entry/interpro/structure/pdb")
-        self.assertEqual(len(response.data["results"]), 2)
-        for result in response.data["results"]:
-            for match in result["structure_subset"]:
-                # self.assertIn(match["structure"], data_in_fixtures[result["accession"]])
-                self._check_entry_structure_details(match)
+        self._check_list_url_with_and_without_subset(
+            "/api/entry/interpro/structure/pdb",
+            "structure",
+            inner_subset_check_fn=self._check_entry_structure_details,
+        )
 
     def test_can_get_structures_from_entry_acc_structure(self):
         acc = "IPR003165"
         pfam = "PF02171"
         pfam_u = "PF17180"
         tests = {
-            "/api/entry/interpro/"
-            + acc
-            + "/structure/pdb": ["1JM7", "1T2V", "1T2V", "1T2V", "1T2V", "1T2V"],
-            "/api/entry/interpro/" + acc + "/pfam/" + pfam + "/structure/pdb": ["1JM7"],
-            "/api/entry/pfam/" + pfam + "/structure/pdb": ["1JM7"],
-            "/api/entry/unintegrated/pfam/"
-            + pfam_u
-            + "/structure/pdb": ["1JM7", "2BKM"],
+            f"/api/entry/interpro/{acc}/structure/pdb": [
+                "1JM7",
+                "1T2V",
+                "1T2V",
+                "1T2V",
+                "1T2V",
+                "1T2V",
+            ],
+            f"/api/entry/interpro/{acc}/pfam/{pfam}/structure/pdb": ["1JM7"],
+            f"/api/entry/pfam/{pfam}/structure/pdb": ["1JM7"],
+            f"/api/entry/unintegrated/pfam/{pfam_u}/structure/pdb": ["1JM7", "2BKM"],
         }
-        for url in tests:
-            response = self.client.get(url)
-            self.assertIn(
-                "structure_subset",
-                response.data,
-                f"'structures' should be one of the keys in the response {url}",
-            )
-            self.assertEqual(
-                len(response.data["structure_subset"]),
-                len(tests[url]),
-                "on url: " + url,
-            )
-            for match in response.data["structure_subset"]:
-                self._check_entry_structure_details(match)
-            ids = [x["accession"] for x in response.data["structure_subset"]]
+
+        def check_subset(subset):
+            ids = [x["accession"] for x in subset]
             self.assertEqual(tests[url].sort(), ids.sort())
+
+        for url in tests:
+            self._check_details_url_with_and_without_subset(
+                url,
+                "structure",
+                inner_subset_check_fn=self._check_entry_structure_details,
+                subset_check_fn=check_subset,
+            )
 
     def test_urls_that_should_fails_with_no_content(self):
         smart = "SM00002"
-        tests = ["/api/entry/unintegrated/smart/" + smart + "/structure/pdb"]
+        tests = [f"/api/entry/unintegrated/smart/{smart}/structure/pdb"]
         for url in tests:
             self._check_HTTP_response_code(
-                url, msg="The URL [" + url + "] should've failed."
+                url, msg=f"The URL [{url}] should've failed."
             )
 
 
 class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
     def test_can_get_entry_overview_filtered_by_structure(self):
         pdb = "1JM7"
-        tests = ["/api/entry/structure/pdb/" + pdb]
+        tests = [f"/api/entry/structure/pdb/{pdb}"]
         for url in tests:
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -135,22 +133,11 @@ class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
         pdb_2 = "2BKM"
 
         tests = {
-            "/api/entry/interpro/" + acc + "/structure/pdb/" + pdb_1: [pdb_1],
-            "/api/entry/interpro/"
-            + acc
-            + "/pfam/"
-            + pfam
-            + "/structure/pdb/"
-            + pdb_1: [pdb_1],
-            "/api/entry/pfam/" + pfam + "/structure/pdb/" + pdb_1: [pdb_1],
-            "/api/entry/unintegrated/pfam/"
-            + pfam_u
-            + "/structure/pdb/"
-            + pdb_1: [pdb_1],
-            "/api/entry/unintegrated/pfam/"
-            + pfam_u
-            + "/structure/pdb/"
-            + pdb_2: [pdb_2],
+            f"/api/entry/interpro/{acc}/structure/pdb/{pdb_1}": [pdb_1],
+            f"/api/entry/interpro/{acc}/pfam/{pfam}/structure/pdb/{pdb_1}": [pdb_1],
+            f"/api/entry/pfam/{pfam}/structure/pdb/{pdb_1}": [pdb_1],
+            f"/api/entry/unintegrated/pfam/{pfam_u}/structure/pdb/{pdb_1}": [pdb_1],
+            f"/api/entry/unintegrated/pfam/{pfam_u}/structure/pdb/{pdb_2}": [pdb_2],
         }
         for url in tests:
             response = self.client.get(url)
@@ -160,7 +147,7 @@ class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
                 "'structures' should be one of the keys in the response",
             )
             self.assertEqual(
-                len(response.data["structures"]), len(tests[url]), "failed at " + url
+                len(response.data["structures"]), len(tests[url]), f"failed at {url}"
             )
             for match in response.data["structures"]:
                 self._check_entry_structure_details(match)
@@ -173,10 +160,10 @@ class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
         pdb_2 = "2BKM"
 
         tests = {
-            "/api/entry/interpro/structure/pdb/" + pdb_1: [pdb_1],
-            "/api/entry/interpro/" + acc + "/pfam//structure/pdb/" + pdb_1: [pdb_1],
-            "/api/entry/pfam/structure/pdb/" + pdb_1: [pdb_1],
-            "/api/entry/unintegrated/pfam/structure/pdb/" + pdb_2: [pdb_2],
+            f"/api/entry/interpro/structure/pdb/{pdb_1}": [pdb_1],
+            f"/api/entry/interpro/{acc}/pfam//structure/pdb/{pdb_1}": [pdb_1],
+            f"/api/entry/pfam/structure/pdb/{pdb_1}": [pdb_1],
+            f"/api/entry/unintegrated/pfam/structure/pdb/{pdb_2}": [pdb_2],
         }
         for url in tests:
             response = self.client.get(url)
@@ -200,22 +187,22 @@ class EntryWithFilterstructurepdbAccessionRESTTest(InterproRESTTestCase):
         pdb_2 = "2BKM"
         pfam_u = "PF17180"
         tests = [
-            "/api/entry/interpro/structure/pdb/" + pdb_2,
-            "/api/entry/interpro/" + acc + "/structure/pdb/" + pdb_2,
-            "/api/entry/unintegrated/pfam/" + pfam_u + "/structure/pdb/" + pdb_1,
+            f"/api/entry/interpro/structure/pdb/{pdb_2}",
+            f"/api/entry/interpro/{acc}/structure/pdb/{pdb_2}",
+            f"/api/entry/unintegrated/pfam/{pfam_u}/structure/pdb/{pdb_1}",
         ]
         for url in tests:
             self._check_HTTP_response_code(
-                url, msg="The URL [" + url + "] should've failed."
+                url, msg=f"The URL [{url}] should've failed."
             )
 
     def test_urls_that_should_fail(self):
         pdb_2 = "2BKM"
         pfam = "PF02171"
-        tests = ["/api/entry/unintegrated/pfam/" + pfam + "/structure/pdb/" + pdb_2]
+        tests = [f"/api/entry/unintegrated/pfam/{pfam}/structure/pdb/{pdb_2}"]
         for url in tests:
             self._check_HTTP_response_code(
                 url,
                 code=status.HTTP_204_NO_CONTENT,
-                msg="The URL [" + url + "] should've failed.",
+                msg=f"The URL [{url}] should've failed.",
             )

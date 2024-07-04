@@ -887,7 +887,7 @@ class TaxonomyProteinTest(InterproRESTTestCase):
                     result,
                     f"Should have the field proteins_url in response",
                 )
-                self.asserURL(result["proteins_url"])
+                self.assertURL(result["proteins_url"])
             response = self.client.get(url + "?show-subset")
             self._check_is_list_of_objects_with_key(
                 response.data["results"], "protein_subset"
@@ -1025,16 +1025,12 @@ class TaxonomyStructureTest(InterproRESTTestCase):
 
     def test_can_get_a_list_from_the_taxonomy_list(self):
         url = "/api/taxonomy/uniprot/structure/pdb"
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self._check_is_list_of_objects_with_key(
-            response.data["results"], "structure_subset"
+        self._check_list_url_with_and_without_subset(
+            url,
+            "structure",
+            check_metadata_fn=lambda m: self._check_taxonomy_details(m, False),
+            inner_subset_check_fn=self._check_structure_chain_details,
         )
-        for result in response.data["results"]:
-            self._check_taxonomy_details(result["metadata"], False)
-            for st in result["structure_subset"]:
-                self._check_structure_chain_details(st)
 
     def test_can_get_a_list_from_the_taxonomy_object(self):
         urls = [
@@ -1044,12 +1040,12 @@ class TaxonomyStructureTest(InterproRESTTestCase):
             "/api/taxonomy/uniprot/344612/structure/pdb",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_taxonomy_details(response.data["metadata"], False)
-            self.assertIn("structure_subset", response.data)
-            for st in response.data["structure_subset"]:
-                self._check_structure_chain_details(st)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "structure",
+                check_metadata_fn=lambda m: self._check_taxonomy_details(m, False),
+                inner_subset_check_fn=self._check_structure_chain_details,
+            )
 
     def test_can_filter_taxonomy_counter_with_acc(self):
         urls = ["/api/taxonomy/structure/pdb/1JM7", "/api/taxonomy/structure/pdb/1JZ8"]

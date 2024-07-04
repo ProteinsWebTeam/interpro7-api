@@ -158,12 +158,18 @@ class ModelContentSerializer(serializers.ModelSerializer):
     def to_structures_detail_representation(
         instance,
         searcher,
-        query,
+        searcher_query,
+        show_url,
         include_structure=False,
         include_matches=False,
         include_chain=True,
         queryset_manager=None,
+        request=None,
     ):
+        if show_url and request is not None:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "structure", searcher, searcher_query, request
+            )
         field = "structure_chain" if include_chain else "structure_acc"
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
@@ -174,7 +180,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 queryset_manager=queryset_manager,
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, field, fq=query, rows=20
+                None, field, fq=searcher_query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -197,7 +203,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if elastic_docs["hits"]["total"]["value"] == 0:
             raise EmptyQuerysetError("No entries found matching this request")
         return request.build_absolute_uri(
-            settings.INTERPRO_CONFIG.get("api_url")
+            re.sub("/$", "", settings.INTERPRO_CONFIG.get("api_url"))
             + reverse_url(request.get_full_path(), endpoint, instance.accession)
         )
 

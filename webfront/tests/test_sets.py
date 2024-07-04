@@ -775,27 +775,21 @@ class SetStructureTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         urls = ["/api/set/pfam/structure/pdb"]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "structure",
+                inner_subset_check_fn=self._check_structure_chain_details,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "structure_subset"
-            )
-            for result in response.data["results"]:
-                for s in result["structure_subset"]:
-                    self._check_structure_chain_details(s)
 
     def test_can_get_a_list_from_the_set_object(self):
         urls = ["/api/set/pfam/Cl0001/structure/pdb"]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_set_details(response.data["metadata"], True)
-            self.assertIn("structure_subset", response.data)
-            for st in response.data["structure_subset"]:
-                self._check_structure_chain_details(st)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "structure",
+                check_metadata_fn=lambda m: self._check_set_details(m, True),
+                inner_subset_check_fn=self._check_structure_chain_details,
+            )
 
     def test_can_filter_set_counter_with_acc(self):
         urls = ["/api/set/structure/pdb/1JM7", "/api/set/structure/pdb/2bkm"]

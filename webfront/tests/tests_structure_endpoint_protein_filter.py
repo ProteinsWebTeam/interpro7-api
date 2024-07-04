@@ -77,7 +77,7 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
                 result,
                 f"Should have the field proteins_url in response",
             )
-            self.asserURL(result["proteins_url"])
+            self.assertURL(result["proteins_url"])
         response = self.client.get("/api/structure/pdb/protein/uniprot?show-subset")
         self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
         for result in response.data["results"]:
@@ -101,7 +101,7 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
                 result,
                 f"Should have the field proteins_url in response",
             )
-            self.asserURL(result["proteins_url"])
+            self.assertURL(result["proteins_url"])
         response = self.client.get("/api/structure/pdb/protein/reviewed?show-subset")
         for result in response.data["results"]:
             for match in result["protein_subset"]:
@@ -123,7 +123,7 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
                 response.data,
                 "'proteins_url' should be one of the keys in the response",
             )
-            self.asserURL(response.data["proteins_url"])
+            self.assertURL(response.data["proteins_url"])
             response = self.client.get(url + "?show-subset")
             self.assertIn(
                 "protein_subset",
@@ -148,7 +148,7 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
                 response.data,
                 "'proteins_url' should be one of the keys in the response",
             )
-            self.asserURL(response.data["proteins_url"])
+            self.assertURL(response.data["proteins_url"])
             response = self.client.get(url + "?show-subset")
             self.assertIn(
                 "protein_subset",

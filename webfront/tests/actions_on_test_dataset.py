@@ -5,7 +5,7 @@ singular = {v: k for k, v in plurals.items()}
 for s in plurals.keys():
     singular[s + "_subset"] = s
 
-endpoints_with_url = ["entry", "protein"]
+endpoints_with_url = ["entry", "protein", "proteome"]
 
 
 # value: * all that have the field, None all that don't have the field

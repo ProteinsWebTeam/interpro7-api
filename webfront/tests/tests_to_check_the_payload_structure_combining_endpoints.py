@@ -31,7 +31,7 @@ api_test_map = {
 }
 plurals = ModelContentSerializer.plurals
 
-endpoints_with_url = ["entry", "protein"]
+endpoints_with_url = ["entry", "protein", "proteome"]
 
 
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):

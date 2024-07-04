@@ -140,15 +140,19 @@ class StructureSerializer(ModelContentSerializer):
                 SerializerDetail.PROTEOME_DB in detail_filters
                 or SerializerDetail.PROTEOME_DETAIL in detail_filters
             ):
-                key = (
-                    "proteomes"
-                    if SerializerDetail.PROTEOME_DETAIL in detail_filters
-                    else "proteome_subset"
+                key = self.get_endpoint_key(
+                    "proteome",
+                    SerializerDetail.PROTEOME_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_proteomes_detail_representation(
+                    instance,
                     self.searcher,
                     "structure_acc:" + escape(instance.accession.lower()),
+                    key == "proteomes_url",
                     include_chains=True,
+                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.SET_DB in detail_filters

@@ -51,6 +51,11 @@ class TaxonomyProteomeFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/taxonomy/uniprot/40296/proteome/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
+        self.assertIn("proteomes_url", response.data)
+        response = self.client.get(
+            "/api/taxonomy/uniprot/40296/proteome/uniprot?show-subset"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("proteome_subset", response.data)
         self.assertEqual(len(response.data["proteome_subset"]), 1)
 
@@ -58,6 +63,11 @@ class TaxonomyProteomeFixturesTest(InterproRESTTestCase):
         response = self.client.get("/api/taxonomy/uniprot/2579/proteome/uniprot")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("metadata", response.data)
+        self.assertIn("proteomes_url", response.data)
+        response = self.client.get(
+            "/api/taxonomy/uniprot/2579/proteome/uniprot?show-subset"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("proteome_subset", response.data)
         self.assertEqual(len(response.data["proteome_subset"]), 3)
 

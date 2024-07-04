@@ -281,7 +281,18 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def to_proteomes_detail_representation(searcher, query, include_chains=False):
+    def to_proteomes_detail_representation(
+        instance,
+        searcher,
+        searcher_query,
+        show_url,
+        include_chains=False,
+        request=None,
+    ):
+        if show_url and request is not None:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "proteome", searcher, searcher_query, request
+            )
         fields = (
             ["proteome_acc", "structure_chain"] if include_chains else "proteome_acc"
         )
@@ -290,7 +301,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chain=include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=20
+                None, fields, fq=searcher_query, rows=20
             )["groups"]
         ]
         if len(response) == 0:

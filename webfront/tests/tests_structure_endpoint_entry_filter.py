@@ -26,9 +26,7 @@ class StructureWithFilterEntryRESTTest(InterproRESTTestCase):
             )
 
     def test_can_get_entries_from_structure_id(self):
-        urls = [
-            f"/api/structure/pdb/{pdb}/entry/" for pdb in ["1JM7", "2BKM", "1T2V"]
-        ]
+        urls = [f"/api/structure/pdb/{pdb}/entry/" for pdb in ["1JM7", "2BKM", "1T2V"]]
         for url in urls:
             response = self.client.get(url)
             self.assertIn(
@@ -101,29 +99,11 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             f"/api/structure/pdb/entry/interpro/{acc}/pfam",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "entry",
+                inner_subset_check_fn=self._check_entry_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"],
-                "entries_url",
-                f"It should have the key 'entries_url' for the URL [{url}]",
-            )
-            response = self.client.get(f"{url}?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
-            )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"],
-                "entry_subset",
-                f"It should have the key 'entry_subset' for the URL [{url}]",
-            )
-            for structure in response.data["results"]:
-                for match in structure["entry_subset"]:
-                    self._check_entry_structure_details(match)
 
     def test_urls_that_return_a_structure_details_with_matches(self):
         pdb_1 = "1JM7"
@@ -146,28 +126,15 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             f"/api/structure/pdb/{pdb_2}/entry/unintegrated/pfam": ["PF17180"],
         }
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_structure_details(response.data["metadata"])
-            self.assertIn(
-                "entries_url",
-                response.data,
-                "'entries_url' should be one of the keys in the response",
+            self._check_details_url_with_and_without_subset(
+                url,
+                "entry",
+                inner_subset_check_fn=lambda entry: self._check_entry_from_searcher(
+                    entry
+                )
+                and self.assertIn(entry["accession"].upper(), urls[url]),
+                check_metadata_fn=self._check_structure_details,
             )
-            response = self.client.get(f"{url}?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIn(
-                "entry_subset",
-                response.data,
-                "'entry_subset' should be one of the keys in the response",
-            )
-            self.assertEqual(
-                len(response.data["entry_subset"]),
-                len(urls[url]),
-                f"The number of entries should be the same URL: [{url}]",
-            )
-            for entry in response.data["entry_subset"]:
-                self.assertIn(entry["accession"].upper(), urls[url])
 
     def test_urls_that_return_a_structure_details_with_matches_from_chain(self):
         pdb_1 = "1JM7"
@@ -192,28 +159,15 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             f"/api/structure/pdb/{pdb_2}/B/entry/unintegrated/pfam": ["PF17180"],
         }
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_structure_details(response.data["metadata"])
-            self.assertIn(
-                "entries_url",
-                response.data,
-                "'entries_url' should be one of the keys in the response",
+            self._check_details_url_with_and_without_subset(
+                url,
+                "entry",
+                inner_subset_check_fn=lambda entry: self._check_entry_from_searcher(
+                    entry
+                )
+                and self.assertIn(entry["accession"].upper(), urls[url]),
+                check_metadata_fn=self._check_structure_details,
             )
-            response = self.client.get(f"{url}?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertIn(
-                "entry_subset",
-                response.data,
-                "'entry_subset' should be one of the keys in the response",
-            )
-            self.assertEqual(
-                len(response.data["entry_subset"]),
-                len(urls[url]),
-                f"The number of entry_subset should be the same. URL: [{url}]",
-            )
-            for entry in response.data["entry_subset"]:
-                self.assertIn(entry["accession"].upper(), urls[url])
 
     def test_urls_that_should_return_empty_entries(self):
         pdb_1 = "1JM7"

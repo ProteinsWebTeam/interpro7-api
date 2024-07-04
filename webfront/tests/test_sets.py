@@ -481,25 +481,11 @@ class SetEntryTest(InterproRESTTestCase):
             f"/api/set/pfam/entry/interpro/{acc}/pfam",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "entry",
+                inner_subset_check_fn=self._check_entry_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "entries_url"
-            )
-            response = self.client.get(f"{url}?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
-            )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "entry_subset"
-            )
-            for result in response.data["results"]:
-                for s in result["entry_subset"]:
-                    self._check_entry_from_searcher(s)
 
     def test_can_get_a_list_from_the_set_object(self):
         urls = [
@@ -508,16 +494,12 @@ class SetEntryTest(InterproRESTTestCase):
             "/api/set/pfam/CL0001/entry/unintegrated/pfam",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_set_details(response.data["metadata"], True)
-            self.assertIn("entries_url", response.data)
-            response = self.client.get(f"{url}?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_set_details(response.data["metadata"], True)
-            self.assertIn("entry_subset", response.data)
-            for st in response.data["entry_subset"]:
-                self._check_entry_from_searcher(st)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "entry",
+                inner_subset_check_fn=self._check_entry_from_searcher,
+                check_metadata_fn=self._check_set_details,
+            )
 
     def test_can_filter_set_counter_with_acc(self):
         acc = "IPR003165"

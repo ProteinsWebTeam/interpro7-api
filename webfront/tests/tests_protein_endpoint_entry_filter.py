@@ -116,29 +116,11 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             "/api/protein/uniprot/entry/interpro/" + acc + "/pfam",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "entry",
+                inner_subset_check_fn=self._check_match,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"],
-                "entries_url",
-                "It should have the key 'entries_url' for the URL [" + url + "]",
-            )
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
-            )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"],
-                "entry_subset",
-                "It should have the key 'entry_subset' for the URL [" + url + "]",
-            )
-            for protein in response.data["results"]:
-                for match in protein["entry_subset"]:
-                    self._check_match(match)
 
     def test_urls_that_return_a_protein_details_with_matches(self):
         sp_1 = "M5ADK6"
@@ -155,28 +137,19 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             f"/api/protein/uniprot/{sp_2}/entry/interpro/{acc}/pfam": ["PF02171"],
         }
         for url in urls:
-            response = self.client.get(url)
-            self._check_protein_details(response.data["metadata"])
-            self.assertIn(
-                "entries_url",
-                response.data,
-                "'entries_url' should be one of the keys in the response",
+            self._check_details_url_with_and_without_subset(
+                url,
+                "entry",
+                inner_subset_check_fn=self._check_entry_from_searcher,
+                check_metadata_fn=self._check_protein_details,
+                subset_check_fn=lambda subset: self.assertEqual(
+                    len(subset),
+                    len(urls[url]),
+                    "The number of entries should be the same URL: [{}]".format(url),
+                )
+                and self.assertIn(subset[0]["accession"].upper(), urls[url]),
             )
             response = self.client.get(url + "?show-subset")
-            self._check_protein_details(response.data["metadata"])
-            self.assertIn(
-                "entry_subset",
-                response.data,
-                "'entry_subset' should be one of the keys in the response",
-            )
-            self.assertEqual(
-                len(response.data["entry_subset"]),
-                len(urls[url]),
-                "The number of entries should be the same URL: [{}]".format(url),
-            )
-            self.assertIn(
-                response.data["entry_subset"][0]["accession"].upper(), urls[url]
-            )
 
     def test_urls_that_should_fails(self):
         tr_1 = "P16582"

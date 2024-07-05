@@ -69,47 +69,26 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
         # self.assertEqual(uniprots, reviewed+unreviewed, "uniprot proteins should be equal to reviewed + unreviewed")
 
     def test_can_get_proteins_from_pdb_structures(self):
-        response = self.client.get("/api/structure/pdb/protein/uniprot")
-        self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
-        for result in response.data["results"]:
-            self.assertIn(
-                "proteins_url",
-                result,
-                f"Should have the field proteins_url in response",
-            )
-            self.assertURL(result["proteins_url"])
-        response = self.client.get("/api/structure/pdb/protein/uniprot?show-subset")
-        self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
-        for result in response.data["results"]:
-            self.assertEqual(
+        self._check_list_url_with_and_without_subset(
+            "/api/structure/pdb/protein/uniprot",
+            "protein",
+            check_inner_subset_fn=self._check_structure_chain_details,
+            check_results_fn=lambda results: self.assertEqual(
+                len(results), len(data_in_fixtures)
+            ),
+            check_result_fn=lambda result: self.assertEqual(
                 len(result["protein_subset"]),
                 len(data_in_fixtures[result["metadata"]["accession"]]),
                 f"different length while testing {result['metadata']['accession']}",
-            )
-            for match in result["protein_subset"]:
-                self.assertIn(
-                    match["accession"].lower(),
-                    data_in_fixtures[result["metadata"]["accession"]],
-                )
-                self._check_structure_chain_details(match)
+            ),
+        )
 
     def test_can_get_reviewed_from_pdb_structures(self):
-        response = self.client.get("/api/structure/pdb/protein/reviewed")
-        for result in response.data["results"]:
-            self.assertIn(
-                "proteins_url",
-                result,
-                f"Should have the field proteins_url in response",
-            )
-            self.assertURL(result["proteins_url"])
-        response = self.client.get("/api/structure/pdb/protein/reviewed?show-subset")
-        for result in response.data["results"]:
-            for match in result["protein_subset"]:
-                self.assertIn(
-                    match["accession"].lower(),
-                    data_in_fixtures[result["metadata"]["accession"]],
-                )
-                self._check_structure_chain_details(match)
+        self._check_list_url_with_and_without_subset(
+            "/api/structure/pdb/protein/reviewed",
+            "protein",
+            check_inner_subset_fn=self._check_structure_chain_details,
+        )
 
     def test_can_get_uniprot_matches_from_structures(self):
         tests = {
@@ -117,24 +96,16 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             for pdb in data_in_fixtures
         }
         for url in tests:
-            response = self.client.get(url)
-            self.assertIn(
-                "proteins_url",
-                response.data,
-                "'proteins_url' should be one of the keys in the response",
+            self._check_details_url_with_and_without_subset(
+                url,
+                "protein",
+                check_inner_subset_fn=self._check_structure_chain_details,
+                check_metadata_fn=self._check_structure_details,
+                check_subset_fn=lambda s: self.assertEqual(len(s), len(tests[url]))
+                and self.assertEqual(
+                    tests[url].sort(), [x["accession"].lower() for x in s].sort()
+                ),
             )
-            self.assertURL(response.data["proteins_url"])
-            response = self.client.get(url + "?show-subset")
-            self.assertIn(
-                "protein_subset",
-                response.data,
-                "'protein_subset' should be one of the keys in the response",
-            )
-            self.assertEqual(len(response.data["protein_subset"]), len(tests[url]))
-            for match in response.data["protein_subset"]:
-                self._check_structure_chain_details(match)
-            ids = [x["accession"].lower() for x in response.data["protein_subset"]]
-            self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_can_get_uniprot_matches_from_structures_chain(self):
         tests = {
@@ -142,22 +113,15 @@ class StructureWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             for pdb in data_in_fixtures
         }
         for url in tests:
-            response = self.client.get(url)
-            self.assertIn(
-                "proteins_url",
-                response.data,
-                "'proteins_url' should be one of the keys in the response",
+            self._check_details_url_with_and_without_subset(
+                url,
+                "protein",
+                check_inner_subset_fn=lambda match: self._check_structure_chain_details(
+                    match
+                )
+                and self.assertIn(match["accession"].lower(), tests[url]),
+                check_metadata_fn=self._check_structure_details,
             )
-            self.assertURL(response.data["proteins_url"])
-            response = self.client.get(url + "?show-subset")
-            self.assertIn(
-                "protein_subset",
-                response.data,
-                "'proteins' should be one of the keys in the response",
-            )
-            for match in response.data["protein_subset"]:
-                self._check_structure_chain_details(match)
-                self.assertIn(match["accession"].lower(), tests[url])
 
 
 class StructureWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):

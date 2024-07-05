@@ -320,22 +320,23 @@ class InterproRESTTestCase(APITransactionTestCase):
         url,
         endpoint,
         check_metadata_fn=None,
-        inner_subset_check_fn=None,
-        subset_check_fn=None,
+        check_subset_fn=None,
+        check_inner_subset_fn=None,
     ):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
         if check_metadata_fn is not None:
             check_metadata_fn(response.data["metadata"])
         self.assertIn(f"{plurals[endpoint]}_url", response.data)
+        self.assertURL(response.data[f"{plurals[endpoint]}_url"])
         response = self.client.get(url + "?show-subset")
         self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
         self.assertIn(f"{endpoint}_subset", response.data)
-        if subset_check_fn is not None:
-            subset_check_fn(response.data[f"{endpoint}_subset"])
-        if inner_subset_check_fn is not None:
+        if check_subset_fn is not None:
+            check_subset_fn(response.data[f"{endpoint}_subset"])
+        if check_inner_subset_fn is not None:
             for st in response.data[f"{endpoint}_subset"]:
-                inner_subset_check_fn(st)
+                check_inner_subset_fn(st)
 
     def _check_list_url_with_and_without_subset(
         self,
@@ -344,8 +345,8 @@ class InterproRESTTestCase(APITransactionTestCase):
         check_results_fn=None,
         check_result_fn=None,
         check_metadata_fn=None,
-        inner_subset_check_fn=None,
-        subset_check_fn=None,
+        check_subset_fn=None,
+        check_inner_subset_fn=None,
     ):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
@@ -365,11 +366,11 @@ class InterproRESTTestCase(APITransactionTestCase):
                 check_result_fn(result)
             if check_metadata_fn is not None:
                 check_metadata_fn(result["metadata"])
-            if subset_check_fn is not None:
-                subset_check_fn(result[f"{endpoint}_subset"])
+            if check_subset_fn is not None:
+                check_subset_fn(result[f"{endpoint}_subset"])
             for s in result[f"{endpoint}_subset"]:
-                if inner_subset_check_fn is not None:
-                    inner_subset_check_fn(s)
+                if check_inner_subset_fn is not None:
+                    check_inner_subset_fn(s)
 
     def assertURL(self, url, msg=None):
         try:

@@ -728,7 +728,7 @@ class ProteomeEntryTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=self._check_entry_from_searcher,
+                check_inner_subset_fn=self._check_entry_from_searcher,
                 check_metadata_fn=lambda metadata: self._check_proteome_details(
                     metadata, False
                 ),
@@ -746,7 +746,7 @@ class ProteomeEntryTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=self._check_entry_from_searcher,
+                check_inner_subset_fn=self._check_entry_from_searcher,
                 check_metadata_fn=self._check_proteome_details,
             )
 
@@ -875,22 +875,14 @@ class ProteomeProteinTest(InterproRESTTestCase):
             "/api/proteome/uniprot/protein/reviewed",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "protein",
+                check_inner_subset_fn=lambda p: self._check_match(
+                    p, include_coordinates=False
+                ),
+                check_metadata_fn=lambda m: self._check_proteome_details(m, False),
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "proteins_url"
-            )
-            response = self.client.get(url + "?show-subset")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "protein_subset"
-            )
-            for result in response.data["results"]:
-                self._check_proteome_details(result["metadata"], False)
-                for st in result["protein_subset"]:
-                    self._check_match(st, include_coordinates=False)
 
     def test_can_get_a_list_from_the_proteome_object(self):
         urls = [
@@ -899,14 +891,14 @@ class ProteomeProteinTest(InterproRESTTestCase):
             "/api/proteome/uniprot/UP000006701/protein/reviewed",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_proteome_details(response.data["metadata"], False)
-            self.assertIn("proteins_url", response.data)
-            response = self.client.get(url + "?show-subset")
-            self.assertIn("protein_subset", response.data)
-            for st in response.data["protein_subset"]:
-                self._check_match(st, include_coordinates=False)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "protein",
+                check_inner_subset_fn=lambda p: self._check_match(
+                    p, include_coordinates=False
+                ),
+                check_metadata_fn=lambda m: self._check_proteome_details(m, False),
+            )
 
     def test_can_filter_proteome_counter_with_acc(self):
         urls = [
@@ -1031,7 +1023,7 @@ class ProteomeStructureTest(InterproRESTTestCase):
             url,
             "structure",
             check_metadata_fn=lambda m: self._check_proteome_details(m, False),
-            inner_subset_check_fn=self._check_structure_chain_details,
+            check_inner_subset_fn=self._check_structure_chain_details,
         )
 
     def test_can_get_a_list_from_the_proteome_object(self):
@@ -1044,7 +1036,7 @@ class ProteomeStructureTest(InterproRESTTestCase):
                 url,
                 "structure",
                 check_metadata_fn=lambda m: self._check_proteome_details(m, False),
-                inner_subset_check_fn=self._check_structure_chain_details,
+                check_inner_subset_fn=self._check_structure_chain_details,
             )
 
     def test_can_filter_proteome_counter_with_acc(self):
@@ -1152,7 +1144,7 @@ class ProteomeSetTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "set",
-                inner_subset_check_fn=self._check_set_from_searcher,
+                check_inner_subset_fn=self._check_set_from_searcher,
             )
 
     def test_can_get_the_set_list_on_a_proteome_object(self):
@@ -1165,7 +1157,7 @@ class ProteomeSetTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "set",
-                inner_subset_check_fn=self._check_set_from_searcher,
+                check_inner_subset_fn=self._check_set_from_searcher,
                 check_metadata_fn=self._check_proteome_details,
             )
 

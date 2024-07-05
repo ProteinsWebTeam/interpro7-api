@@ -74,7 +74,7 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
         self._check_list_url_with_and_without_subset(
             "/api/entry/interpro/structure/pdb",
             "structure",
-            inner_subset_check_fn=self._check_entry_structure_details,
+            check_inner_subset_fn=self._check_entry_structure_details,
         )
 
     def test_can_get_structures_from_entry_acc_structure(self):
@@ -103,8 +103,8 @@ class EntryWithFilterStructurePDBRESTTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "structure",
-                inner_subset_check_fn=self._check_entry_structure_details,
-                subset_check_fn=check_subset,
+                check_inner_subset_fn=self._check_entry_structure_details,
+                check_subset_fn=check_subset,
             )
 
     def test_urls_that_should_fails_with_no_content(self):

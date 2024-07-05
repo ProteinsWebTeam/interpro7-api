@@ -119,7 +119,7 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=self._check_match,
+                check_inner_subset_fn=self._check_match,
             )
 
     def test_urls_that_return_a_protein_details_with_matches(self):
@@ -140,9 +140,9 @@ class ProteinWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=self._check_entry_from_searcher,
+                check_inner_subset_fn=self._check_entry_from_searcher,
                 check_metadata_fn=self._check_protein_details,
-                subset_check_fn=lambda subset: self.assertEqual(
+                check_subset_fn=lambda subset: self.assertEqual(
                     len(subset),
                     len(urls[url]),
                     "The number of entries should be the same URL: [{}]".format(url),

@@ -108,7 +108,7 @@ class EntrySetTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "set",
-                inner_subset_check_fn=self._check_set_from_searcher,
+                check_inner_subset_fn=self._check_set_from_searcher,
             )
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
@@ -120,7 +120,7 @@ class EntrySetTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "set",
-                inner_subset_check_fn=self._check_set_from_searcher,
+                check_inner_subset_fn=self._check_set_from_searcher,
                 check_metadata_fn=self._check_entry_details,
             )
 
@@ -265,7 +265,7 @@ class ProteinSetTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "set",
-                inner_subset_check_fn=self._check_set_from_searcher,
+                check_inner_subset_fn=self._check_set_from_searcher,
             )
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
@@ -277,7 +277,7 @@ class ProteinSetTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "set",
-                inner_subset_check_fn=self._check_set_from_searcher,
+                check_inner_subset_fn=self._check_set_from_searcher,
                 check_metadata_fn=self._check_protein_details,
             )
 
@@ -372,7 +372,7 @@ class StructureSetTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "set",
-                inner_subset_check_fn=self._check_set_from_searcher,
+                check_inner_subset_fn=self._check_set_from_searcher,
             )
 
     def test_can_get_the_taxonomy_list_on_an_object(self):
@@ -381,7 +381,7 @@ class StructureSetTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "set",
-                inner_subset_check_fn=self._check_set_from_searcher,
+                check_inner_subset_fn=self._check_set_from_searcher,
                 check_metadata_fn=self._check_structure_details,
             )
 
@@ -484,7 +484,7 @@ class SetEntryTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=self._check_entry_from_searcher,
+                check_inner_subset_fn=self._check_entry_from_searcher,
             )
 
     def test_can_get_a_list_from_the_set_object(self):
@@ -497,7 +497,7 @@ class SetEntryTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=self._check_entry_from_searcher,
+                check_inner_subset_fn=self._check_entry_from_searcher,
                 check_metadata_fn=self._check_set_details,
             )
 
@@ -605,21 +605,13 @@ class SetProteinTest(InterproRESTTestCase):
     def test_can_get_the_set_list_on_a_list(self):
         urls = ["/api/set/pfam/protein/reviewed"]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "protein",
+                check_inner_subset_fn=lambda p: self._check_match(
+                    p, include_coordinates=False
+                ),
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "proteins_url"
-            )
-            response = self.client.get(url + "?show-subset")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "protein_subset"
-            )
-            for result in response.data["results"]:
-                for s in result["protein_subset"]:
-                    self._check_match(s, include_coordinates=False)
 
     def test_can_get_a_list_from_the_set_object(self):
         urls = [
@@ -627,14 +619,16 @@ class SetProteinTest(InterproRESTTestCase):
             "/api/set/pfam/CL0001/protein/uniprot",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_set_details(response.data["metadata"], True)
-            self.assertIn("proteins_url", response.data)
-            response = self.client.get(url + "?show-subset")
-            self.assertIn("protein_subset", response.data)
-            for st in response.data["protein_subset"]:
-                self._check_match(st, include_coordinates=False)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "protein",
+                check_inner_subset_fn=lambda p: self._check_match(
+                    p, include_coordinates=False
+                ),
+                check_metadata_fn=self._check_set_details,
+            )
+
+    # TODO: 📝 Replace the rest of tests like the 2 ones above
 
     def test_can_filter_set_counter_with_acc(self):
         urls = ["/api/set/protein/uniprot/M5ADK6", "/api/set/protein/reviewed/M5ADK6"]
@@ -742,7 +736,7 @@ class SetStructureTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "structure",
-                inner_subset_check_fn=self._check_structure_chain_details,
+                check_inner_subset_fn=self._check_structure_chain_details,
             )
 
     def test_can_get_a_list_from_the_set_object(self):
@@ -752,7 +746,7 @@ class SetStructureTest(InterproRESTTestCase):
                 url,
                 "structure",
                 check_metadata_fn=lambda m: self._check_set_details(m, True),
-                inner_subset_check_fn=self._check_structure_chain_details,
+                check_inner_subset_fn=self._check_structure_chain_details,
             )
 
     def test_can_filter_set_counter_with_acc(self):

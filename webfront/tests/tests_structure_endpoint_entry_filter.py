@@ -102,7 +102,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_list_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=self._check_entry_from_searcher,
+                check_inner_subset_fn=self._check_entry_from_searcher,
             )
 
     def test_urls_that_return_a_structure_details_with_matches(self):
@@ -129,7 +129,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=lambda entry: self._check_entry_from_searcher(
+                check_inner_subset_fn=lambda entry: self._check_entry_from_searcher(
                     entry
                 )
                 and self.assertIn(entry["accession"].upper(), urls[url]),
@@ -162,7 +162,7 @@ class StructureWithFilterEntryDatabaseRESTTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "entry",
-                inner_subset_check_fn=lambda entry: self._check_entry_from_searcher(
+                check_inner_subset_fn=lambda entry: self._check_entry_from_searcher(
                     entry
                 )
                 and self.assertIn(entry["accession"].upper(), urls[url]),

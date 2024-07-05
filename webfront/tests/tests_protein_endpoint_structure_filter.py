@@ -84,7 +84,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
                 len(data_in_fixtures[result["metadata"]["accession"]]),
                 "failing for " + result["metadata"]["accession"],
             ),
-            inner_subset_check_fn=self._check_structure_chain_details,
+            check_inner_subset_fn=self._check_structure_chain_details,
         )
 
     def test_can_get_reviewed_from_pdb_structures(self):
@@ -102,7 +102,7 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
             check_metadata_fn=lambda metadata: self.assertIn(
                 metadata["accession"], data_reviewed
             ),
-            inner_subset_check_fn=self._check_structure_chain_details,
+            check_inner_subset_fn=self._check_structure_chain_details,
         )
 
     def test_can_get_uniprot_matches_from_structures(self):
@@ -114,13 +114,13 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
             self._check_details_url_with_and_without_subset(
                 url,
                 "structure",
-                subset_check_fn=lambda subset: self.assertEqual(
+                check_subset_fn=lambda subset: self.assertEqual(
                     len(subset), len(tests[url])
                 )
                 and self.assertEqual(
                     tests[url].sort(), [x["accession"] for x in subset].sort()
                 ),
-                inner_subset_check_fn=self._check_structure_chain_details,
+                check_inner_subset_fn=self._check_structure_chain_details,
             )
 
     def test_urls_that_should_fails(self):

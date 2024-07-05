@@ -64,15 +64,6 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             response.data["entries"]["unintegrated"],
             "'proteins' should be one of the keys in the response",
         )
-        # TODO: Improve this test
-        # uniprots = response.data["proteins"]
-        # response = self.client.get("/api/entry/protein/reviewed")
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # reviewed = response.data["proteins"]
-        # response = self.client.get("/api/entry/protein/unreviewed")
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # unreviewed = response.data["proteins"]
-        # self.assertEqual(uniprots, reviewed+unreviewed, "uniprot proteins should be equal to reviewed + unreviewed")
 
     def test_can_get_proteins_from_interpro_protein(self):
         response = self.client.get("/api/entry/interpro/protein/uniprot?show-subset")
@@ -121,23 +112,18 @@ class EntryWithFilterProteinUniprotRESTTest(InterproRESTTestCase):
             f"/api/entry/unintegrated/pfam/{pfam_u}/protein/uniprot": ["M5ADK6"],
         }
         for url in tests:
-            response = self.client.get(url)
-            self.assertIn(
-                "proteins_url",
-                response.data,
-                "'proteins_url' should be one of the keys in the response",
+            self._check_details_url_with_and_without_subset(
+                url,
+                "protein",
+                check_inner_subset_fn=self._check_match,
+                check_metadata_fn=self._check_entry_details,
+                check_subset_fn=lambda subset: self.assertEqual(
+                    len(subset), len(tests[url])
+                )
+                and self.assertEqual(
+                    tests[url].sort(), [x["accession"].upper() for x in subset].sort()
+                ),
             )
-            response = self.client.get(f"{url}?show-subset")
-            self.assertIn(
-                "protein_subset",
-                response.data,
-                "'proteins' should be one of the keys in the response",
-            )
-            self.assertEqual(len(response.data["protein_subset"]), len(tests[url]))
-            for match in response.data["protein_subset"]:
-                self._check_match(match)
-            ids = [x["accession"].upper() for x in response.data["protein_subset"]]
-            self.assertEqual(tests[url].sort(), ids.sort())
 
 
 class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):

@@ -140,21 +140,11 @@ class EntryProteomeTest(InterproRESTTestCase):
             f"/api/entry/interpro/{acc}/pfam/proteome/uniprot",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "proteome",
+                check_inner_subset_fn=self._check_proteome_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "proteomes_url"
-            )
-            response = self.client.get(url + "?show-subset")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "proteome_subset"
-            )
-            for result in response.data["results"]:
-                for org in result["proteome_subset"]:
-                    self._check_proteome_from_searcher(org)
 
     def test_can_get_the_proteome_list_on_an_object(self):
         urls = [
@@ -164,15 +154,12 @@ class EntryProteomeTest(InterproRESTTestCase):
             "/api/entry/interpro/IPR003165/pfam/PF02171/proteome/uniprot",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_entry_details(response.data["metadata"])
-            self.assertIn("proteomes_url", response.data)
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self.assertIn("proteome_subset", response.data)
-            for org in response.data["proteome_subset"]:
-                self._check_proteome_from_searcher(org)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "proteome",
+                check_inner_subset_fn=self._check_proteome_from_searcher,
+                check_metadata_fn=self._check_entry_details,
+            )
 
     def test_can_filter_entry_counter_with_proteome_acc(self):
         urls = [
@@ -309,22 +296,11 @@ class ProteinProteomeTest(InterproRESTTestCase):
             "/api/protein/reviewed/proteome/uniprot",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "proteome",
+                check_inner_subset_fn=self._check_proteome_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "proteomes_url"
-            )
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "proteome_subset"
-            )
-            for result in response.data["results"]:
-                for org in result["proteome_subset"]:
-                    self._check_proteome_from_searcher(org)
 
     def test_can_get_the_proteome_list_on_an_object(self):
         urls = [
@@ -333,15 +309,13 @@ class ProteinProteomeTest(InterproRESTTestCase):
             "/api/protein/reviewed/A1CUJ5/proteome/uniprot",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_protein_details(response.data["metadata"])
-            self.assertIn("proteomes_url", response.data)
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self.assertIn("proteome_subset", response.data)
-            for org in response.data["proteome_subset"]:
-                self._check_proteome_from_searcher(org)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "proteome",
+                check_inner_subset_fn=self._check_proteome_from_searcher,
+                check_metadata_fn=self._check_protein_details,
+                check_subset_fn=lambda s: self.assertEqual(len(s), 1),
+            )
 
     def test_can_filter_counter_with_proteome_acc(self):
         urls = [
@@ -433,20 +407,11 @@ class StructureProteomeTest(InterproRESTTestCase):
 
     def test_can_get_the_proteome_list_on_a_list(self):
         url = "/api/structure/pdb/proteome/uniprot"
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
-        self._check_is_list_of_objects_with_key(
-            response.data["results"], "proteomes_url"
+        self._check_list_url_with_and_without_subset(
+            url,
+            "proteome",
+            check_inner_subset_fn=self._check_proteome_from_searcher,
         )
-        response = self.client.get(url + "?show-subset")
-        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-        self._check_is_list_of_objects_with_key(
-            response.data["results"], "proteome_subset"
-        )
-        for result in response.data["results"]:
-            for org in result["proteome_subset"]:
-                self._check_proteome_from_searcher(org)
 
     def test_can_get_the_proteome_list_on_an_object(self):
         urls = [
@@ -455,15 +420,12 @@ class StructureProteomeTest(InterproRESTTestCase):
             "/api/structure/pdb/1JM7/proteome/uniprot",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_structure_details(response.data["metadata"])
-            self.assertIn("proteomes_url", response.data)
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self.assertIn("proteome_subset", response.data)
-            for org in response.data["proteome_subset"]:
-                self._check_proteome_from_searcher(org)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "proteome",
+                check_inner_subset_fn=self._check_proteome_from_searcher,
+                check_metadata_fn=self._check_structure_details,
+            )
 
     def test_can_filter_counter_with_proteome_acc(self):
         urls = [
@@ -576,37 +538,23 @@ class SetProteomeTest(InterproRESTTestCase):
             "/api/set/pfam/proteome/uniprot",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "metadata"
+            self._check_list_url_with_and_without_subset(
+                url,
+                "proteome",
+                check_inner_subset_fn=self._check_proteome_from_searcher,
             )
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "proteomes_url"
-            )
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_is_list_of_objects_with_key(
-                response.data["results"], "proteome_subset"
-            )
-            for result in response.data["results"]:
-                for s in result["proteome_subset"]:
-                    self._check_proteome_from_searcher(s)
 
     def test_can_get_a_list_from_the_set_object(self):
         urls = [
             "/api/set/pfam/Cl0001/proteome/uniprot",
         ]
         for url in urls:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self._check_set_details(response.data["metadata"], True)
-            self.assertIn("proteomes_url", response.data)
-            response = self.client.get(url + "?show-subset")
-            self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
-            self.assertIn("proteome_subset", response.data)
-            for st in response.data["proteome_subset"]:
-                self._check_proteome_from_searcher(st)
+            self._check_details_url_with_and_without_subset(
+                url,
+                "proteome",
+                check_inner_subset_fn=self._check_proteome_from_searcher,
+                check_metadata_fn=self._check_set_details,
+            )
 
     def test_can_filter_set_counter_with_acc(self):
         urls = [

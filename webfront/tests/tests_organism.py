@@ -48,28 +48,22 @@ class TaxonomyProteomeFixturesTest(InterproRESTTestCase):
         self.assertEqual(response.data["proteomes"]["uniprot"], 1)
 
     def test_can_read_taxonomy_leaf_id_with_proteomes(self):
-        response = self.client.get("/api/taxonomy/uniprot/40296/proteome/uniprot")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("metadata", response.data)
-        self.assertIn("proteomes_url", response.data)
-        response = self.client.get(
-            "/api/taxonomy/uniprot/40296/proteome/uniprot?show-subset"
+        url = "/api/taxonomy/uniprot/40296/proteome/uniprot"
+        self._check_details_url_with_and_without_subset(
+            url,
+            "proteome",
+            check_metadata_fn=self._check_taxonomy_details,
+            check_subset_fn=lambda s: self.assertEqual(len(s), 1),
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("proteome_subset", response.data)
-        self.assertEqual(len(response.data["proteome_subset"]), 1)
 
     def test_can_read_taxonomy_node_id_with_proteomes(self):
-        response = self.client.get("/api/taxonomy/uniprot/2579/proteome/uniprot")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("metadata", response.data)
-        self.assertIn("proteomes_url", response.data)
-        response = self.client.get(
-            "/api/taxonomy/uniprot/2579/proteome/uniprot?show-subset"
+        url = "/api/taxonomy/uniprot/2579/proteome/uniprot"
+        self._check_details_url_with_and_without_subset(
+            url,
+            "proteome",
+            check_metadata_fn=self._check_taxonomy_details,
+            check_subset_fn=lambda s: self.assertEqual(len(s), 3),
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("proteome_subset", response.data)
-        self.assertEqual(len(response.data["proteome_subset"]), 3)
 
     def test_can_read_proteome_id_including_tax_id(self):
         lineage = [1, 2, 40296]

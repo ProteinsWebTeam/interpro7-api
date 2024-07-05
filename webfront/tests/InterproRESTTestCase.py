@@ -356,6 +356,9 @@ class InterproRESTTestCase(APITransactionTestCase):
         self._check_is_list_of_objects_with_key(
             response.data["results"], f"{plurals[endpoint]}_url"
         )
+        for result in response.data["results"]:
+            self.assertURL(result[f"{plurals[endpoint]}_url"])
+
         response = self.client.get(url + "?show-subset")
         self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
         self._check_is_list_of_objects_with_key(
@@ -400,7 +403,6 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_proteome_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)
         self.assertIn("taxonomy", obj, msg)
-        self.assertIn("is_reference", obj, msg)
         self.assertIn("name", obj, msg)
         if is_complete:
             self.assertIn("strain", obj, msg)

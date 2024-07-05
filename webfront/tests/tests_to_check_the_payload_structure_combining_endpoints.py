@@ -31,8 +31,6 @@ api_test_map = {
 }
 plurals = ModelContentSerializer.plurals
 
-endpoints_with_url = ["entry", "protein", "structure", "taxonomy", "proteome", "set"]
-
 
 class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
     def test_endpoints_independently(self):
@@ -235,26 +233,11 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                 response.data["results"], f"URL : [{current}]"
                             )
                             key2 = f"{plurals[endpoint2]}_url"
-                            if endpoint2 not in endpoints_with_url:
-                                key2 = f"{endpoint2}_subset"
-                                self._check_is_list_of_objects_with_key(
-                                    response.data["results"],
-                                    key2,
-                                    f"URL : [{current}]",
-                                )
                             for result in [x[key2] for x in response.data["results"]]:
-                                if "_subset" in key2:
-                                    self._check_list_of_matches(
-                                        result,
-                                        check_coordinates=endpoint2 != "taxonomy"
-                                        and endpoint2 != "proteome",
-                                        msg=f"URL : [{current}]",
-                                    )
-                                else:
-                                    self.assertURL(
-                                        result,
-                                        f"The URL in {key2}: {result} is not valid | URL: {current}",
-                                    )
+                                self.assertURL(
+                                    result,
+                                    f"The URL in {key2}: {result} is not valid | URL: {current}",
+                                )
 
                         elif response.status_code != status.HTTP_204_NO_CONTENT:
                             self.assertEqual(
@@ -329,28 +312,10 @@ class ObjectStructureTwoEndpointsTest(InterproRESTTestCase):
                                     response.data, f"URL : [{current}]"
                                 )
                                 key = f"{plurals[endpoint2]}_url"
-                                if endpoint2 not in endpoints_with_url:
-                                    key = f"{endpoint2}_subset"
-                                    self._check_list_of_matches(
-                                        response.data[key],
-                                        check_coordinates=endpoint2 != "taxonomy"
-                                        and endpoint2 != "proteome",
-                                        msg=f"URL : [{current}]",
-                                    )
-                                    self._check_structure_and_chains(
-                                        response,
-                                        endpoint1,
-                                        db,
-                                        acc,
-                                        f"/{endpoint2}/{db2}",
-                                        key,
-                                        msg=f"URL : [{current}]",
-                                    )
-                                else:
-                                    self.assertURL(
-                                        response.data[key],
-                                        f"The URL in {key}: {response.data[key]} is not valid | URL: {current}",
-                                    )
+                                self.assertURL(
+                                    response.data[key],
+                                    f"The URL in {key}: {response.data[key]} is not valid | URL: {current}",
+                                )
                             elif response.status_code != status.HTTP_204_NO_CONTENT:
                                 self.assertEqual(
                                     response.status_code, status.HTTP_204_NO_CONTENT
@@ -699,8 +664,6 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 )
 
                                 key = f"{plurals[endpoint2]}_url"
-                                if endpoint2 not in endpoints_with_url:
-                                    key = f"{endpoint2}_subset"
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     key,
@@ -709,18 +672,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 for result in [
                                     x[key] for x in response.data["results"]
                                 ]:
-                                    if "_subset" in key:
-                                        self._check_list_of_matches(
-                                            result,
-                                            check_coordinates=endpoint2 != "taxonomy"
-                                            and endpoint2 != "proteome",
-                                            msg=f"URL : [{current}]",
-                                        )
-                                    else:
-                                        self.assertURL(
-                                            result,
-                                            f"The URL in {key}: {result} is not valid | URL: {current}",
-                                        )
+                                    self.assertURL(
+                                        result,
+                                        f"The URL in {key}: {result} is not valid | URL: {current}",
+                                    )
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     plurals[endpoint3],
@@ -752,8 +707,6 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     f"URL : [{current}]",
                                 )
                                 key2 = f"{plurals[endpoint2]}_url"
-                                if endpoint2 not in endpoints_with_url:
-                                    key2 = f"{endpoint2}_subset"
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     key2,
@@ -762,18 +715,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                 for result in [
                                     x[key2] for x in response.data["results"]
                                 ]:
-                                    if "_subset" in key2:
-                                        self._check_list_of_matches(
-                                            result,
-                                            check_coordinates=endpoint2 != "taxonomy"
-                                            and endpoint2 != "proteome",
-                                            msg=f"URL : [{current}]",
-                                        )
-                                    else:
-                                        self.assertURL(
-                                            result,
-                                            f"The URL in {key2}: {result} is not valid | URL: {current}",
-                                        )
+                                    self.assertURL(
+                                        result,
+                                        f"The URL in {key2}: {result} is not valid | URL: {current}",
+                                    )
                                 self._check_is_list_of_objects_with_key(
                                     response.data["results"],
                                     plurals[endpoint3],
@@ -853,19 +798,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         response.data, f"URL : [{current}]"
                                     )
                                     key2 = f"{plurals[endpoint2]}_url"
-                                    if endpoint2 not in endpoints_with_url:
-                                        key2 = f"{endpoint2}_subset"
-                                        self._check_list_of_matches(
-                                            response.data[key2],
-                                            check_coordinates=endpoint2 != "taxonomy"
-                                            and endpoint2 != "proteome",
-                                            msg=f"URL : [{current}]",
-                                        )
-                                    else:
-                                        self.assertURL(
-                                            response.data[key2],
-                                            f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
-                                        )
+                                    self.assertURL(
+                                        response.data[key2],
+                                        f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
+                                    )
                                     self._check_counter_by_endpoint(
                                         endpoint3,
                                         response.data,
@@ -907,19 +843,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         response.data, f"URL : [{current}]"
                                     )
                                     key2 = f"{plurals[endpoint2]}_url"
-                                    if endpoint2 not in endpoints_with_url:
-                                        key2 = f"{endpoint2}_subset"
-                                        self._check_list_of_matches(
-                                            response.data[key2],
-                                            check_coordinates=endpoint2 != "taxonomy"
-                                            and endpoint2 != "proteome",
-                                            msg=f"URL : [{current}]",
-                                        )
-                                    else:
-                                        self.assertURL(
-                                            response.data[key2],
-                                            f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
-                                        )
+                                    self.assertURL(
+                                        response.data[key2],
+                                        f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
+                                    )
                                     self._check_counter_by_endpoint(
                                         endpoint3,
                                         response.data,
@@ -1330,8 +1257,6 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                         f"URL : [{current}]",
                                     )
                                     key2 = f"{plurals[endpoint2]}_url"
-                                    if endpoint2 not in endpoints_with_url:
-                                        key2 = f"{endpoint2}_subset"
                                     self._check_is_list_of_objects_with_key(
                                         response.data["results"],
                                         key2,
@@ -1340,22 +1265,11 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     for result in [
                                         x[key2] for x in response.data["results"]
                                     ]:
-                                        if "_subset" in key2:
-                                            self._check_list_of_matches(
-                                                result,
-                                                check_coordinates=endpoint2
-                                                != "taxonomy"
-                                                and endpoint2 != "proteome",
-                                                msg=f"URL : [{current}]",
-                                            )
-                                        else:
-                                            self.assertURL(
-                                                result,
-                                                f"The URL in {key2}: {result} is not valid | URL: {current}",
-                                            )
+                                        self.assertURL(
+                                            result,
+                                            f"The URL in {key2}: {result} is not valid | URL: {current}",
+                                        )
                                     key3 = f"{plurals[endpoint3]}_url"
-                                    if endpoint3 not in endpoints_with_url:
-                                        key3 = f"{endpoint3}_subset"
                                     self._check_is_list_of_objects_with_key(
                                         response.data["results"],
                                         key3,
@@ -1364,19 +1278,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                     for result in [
                                         x[key3] for x in response.data["results"]
                                     ]:
-                                        if "_subset" in key3:
-                                            self._check_list_of_matches(
-                                                result,
-                                                check_coordinates=endpoint3
-                                                != "taxonomy"
-                                                and endpoint3 != "proteome",
-                                                msg=f"URL : [{current}]",
-                                            )
-                                        else:
-                                            self.assertURL(
-                                                result,
-                                                f"The URL in {key3}: {result} is not valid | URL: {current}",
-                                            )
+                                        self.assertURL(
+                                            result,
+                                            f"The URL in {key3}: {result} is not valid | URL: {current}",
+                                        )
                                 elif response.status_code != status.HTTP_204_NO_CONTENT:
                                     self.assertEqual(
                                         response.status_code,
@@ -1409,35 +1314,15 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                             response.data, f"URL : [{current}]"
                                         )
                                         key2 = f"{plurals[endpoint2]}_url"
-                                        if endpoint2 not in endpoints_with_url:
-                                            key2 = f"{endpoint2}_subset"
-                                            self._check_list_of_matches(
-                                                response.data[key2],
-                                                check_coordinates=endpoint2
-                                                != "taxonomy"
-                                                and endpoint2 != "proteome",
-                                                msg=f"URL : [{current}]",
-                                            )
-                                        else:
-                                            self.assertURL(
-                                                response.data[key2],
-                                                f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
-                                            )
+                                        self.assertURL(
+                                            response.data[key2],
+                                            f"The URL in {key2}: {response.data[key2]} is not valid | URL: {current}",
+                                        )
                                         key3 = f"{plurals[endpoint3]}_url"
-                                        if endpoint3 not in endpoints_with_url:
-                                            key3 = f"{endpoint3}_subset"
-                                            self._check_list_of_matches(
-                                                response.data[key3],
-                                                check_coordinates=endpoint3
-                                                != "taxonomy"
-                                                and endpoint3 != "proteome",
-                                                msg=f"URL : [{current}]",
-                                            )
-                                        else:
-                                            self.assertURL(
-                                                response.data[key3],
-                                                f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
-                                            )
+                                        self.assertURL(
+                                            response.data[key3],
+                                            f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
+                                        )
                                         self._check_structure_and_chains(
                                             response,
                                             endpoint1,
@@ -1485,24 +1370,13 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 msg=f"URL : [{current}]",
                                             )
                                         key3 = f"{plurals[endpoint3]}_url"
-                                        if endpoint3 not in endpoints_with_url:
-                                            key3 = f"{endpoint3}_subset"
                                         for result in [
                                             x[key3] for x in response.data["results"]
                                         ]:
-                                            if "_subset" in key3:
-                                                self._check_list_of_matches(
-                                                    result,
-                                                    check_coordinates=endpoint3
-                                                    != "taxonomy"
-                                                    and endpoint3 != "proteome",
-                                                    msg=f"URL : [{current}]",
-                                                )
-                                            else:
-                                                self.assertURL(
-                                                    result,
-                                                    f"The URL in {key3}: {result} is not valid | URL: {current}",
-                                                )
+                                            self.assertURL(
+                                                result,
+                                                f"The URL in {key3}: {result} is not valid | URL: {current}",
+                                            )
 
                                         self._check_structure_chains_as_filter(
                                             endpoint1,
@@ -1552,24 +1426,13 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 msg=f"URL : [{current}]",
                                             )
                                         key3 = f"{plurals[endpoint3]}_url"
-                                        if endpoint3 not in endpoints_with_url:
-                                            key3 = f"{endpoint3}_subset"
                                         for result in [
                                             x[key3] for x in response.data["results"]
                                         ]:
-                                            if "_subset" in key3:
-                                                self._check_list_of_matches(
-                                                    result,
-                                                    check_coordinates=endpoint3
-                                                    != "taxonomy"
-                                                    and endpoint3 != "proteome",
-                                                    msg=f"URL : [{current}]",
-                                                )
-                                            else:
-                                                self.assertURL(
-                                                    result,
-                                                    f"The URL in {key3}: {result} is not valid | URL: {current}",
-                                                )
+                                            self.assertURL(
+                                                result,
+                                                f"The URL in {key3}: {result} is not valid | URL: {current}",
+                                            )
 
                                         self._check_structure_chains_as_filter(
                                             endpoint1,
@@ -1622,20 +1485,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 msg=f"URL : [{current}]",
                                             )
                                             key3 = f"{plurals[endpoint3]}_url"
-                                            if endpoint3 not in endpoints_with_url:
-                                                key3 = f"{endpoint3}_subset"
-                                                self._check_list_of_matches(
-                                                    response.data[key3],
-                                                    check_coordinates=endpoint3
-                                                    != "taxonomy"
-                                                    and endpoint3 != "proteome",
-                                                    msg=f"URL : [{current}]",
-                                                )
-                                            else:
-                                                self.assertURL(
-                                                    response.data[key3],
-                                                    f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
-                                                )
+                                            self.assertURL(
+                                                response.data[key3],
+                                                f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
+                                            )
                                             self._check_structure_and_chains(
                                                 response,
                                                 endpoint1,
@@ -1693,20 +1546,10 @@ class ObjectStructureThreeEndpointsTest(InterproRESTTestCase):
                                                 msg=f"URL : [{current}]",
                                             )
                                             key3 = f"{plurals[endpoint3]}_url"
-                                            if endpoint3 not in endpoints_with_url:
-                                                key3 = f"{endpoint3}_subset"
-                                                self._check_list_of_matches(
-                                                    response.data[key3],
-                                                    check_coordinates=endpoint3
-                                                    != "taxonomy"
-                                                    and endpoint3 != "proteome",
-                                                    msg=f"URL : [{current}]",
-                                                )
-                                            else:
-                                                self.assertURL(
-                                                    response.data[key3],
-                                                    f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
-                                                )
+                                            self.assertURL(
+                                                response.data[key3],
+                                                f"The URL in {key3}: {response.data[key3]} is not valid | URL: {current}",
+                                            )
                                             self._check_structure_and_chains(
                                                 response,
                                                 endpoint1,

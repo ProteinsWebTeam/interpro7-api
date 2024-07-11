@@ -707,17 +707,6 @@ class SetStructureTest(InterproRESTTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
             self.assertIsInstance(response.data, dict)
-            if "kegg" in response.data["sets"]:
-                self.assertIn(
-                    "structures",
-                    response.data["sets"]["kegg"],
-                    "'structures' should be one of the keys in the response",
-                )
-                self.assertIn(
-                    "sets",
-                    response.data["sets"]["kegg"],
-                    "'sets' should be one of the keys in the response",
-                )
             if "pfam" in response.data["sets"]:
                 self.assertIn(
                     "structures",

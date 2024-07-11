@@ -90,10 +90,10 @@ class EntrySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "proteins_url",
                     for_entry=True,
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -109,12 +109,12 @@ class EntrySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "structures_url",
                     include_structure=SerializerDetail.STRUCTURE_DETAIL
                     not in detail_filters,
                     include_matches=True,
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters
@@ -130,8 +130,8 @@ class EntrySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "taxa_url",
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.PROTEOME_DB in detail_filters
@@ -147,8 +147,8 @@ class EntrySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "proteomes_url",
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.SET_DB in detail_filters
@@ -164,8 +164,8 @@ class EntrySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "entry_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "sets_url",
-                    request=self.context["request"],
                 )
 
         return representation

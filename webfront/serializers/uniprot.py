@@ -83,9 +83,9 @@ class ProteinSerializer(ModelContentSerializer):
                     instance,
                     s,
                     "protein_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "entries_url",
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -101,10 +101,10 @@ class ProteinSerializer(ModelContentSerializer):
                     instance,
                     s,
                     "protein_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "structures_url",
                     include_chain=True,
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters
@@ -120,8 +120,8 @@ class ProteinSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "protein_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "taxa_url",
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.PROTEOME_DB in detail_filters
@@ -137,8 +137,8 @@ class ProteinSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "protein_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "proteomes_url",
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.SET_DB in detail_filters
@@ -154,8 +154,8 @@ class ProteinSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "protein_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "sets_url",
-                    request=self.context["request"],
                 )
         return representation
 

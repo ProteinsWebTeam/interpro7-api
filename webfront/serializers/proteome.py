@@ -77,7 +77,6 @@ class ProteomeSerializer(ModelContentSerializer):
                     endpoint, query_searcher
                 )
         if detail != SerializerDetail.PROTEOME_OVERVIEW:
-            sq = self.queryset_manager.get_searcher_query()
             if (
                 SerializerDetail.ENTRY_DB in detail_filters
                 or SerializerDetail.ENTRY_DETAIL in detail_filters
@@ -92,9 +91,9 @@ class ProteomeSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     query_searcher,
+                    self.context["request"],
                     key == "entries_url",
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -110,10 +109,10 @@ class ProteomeSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     query_searcher,
+                    self.context["request"],
                     key == "structures_url",
                     include_chain=True,
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.PROTEIN_DB in detail_filters
@@ -129,9 +128,9 @@ class ProteomeSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     query_searcher,
+                    self.context["request"],
                     key == "proteins_url",
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters
@@ -147,8 +146,8 @@ class ProteomeSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     query_searcher,
+                    self.context["request"],
                     key == "taxa_url",
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.SET_DB in detail_filters
@@ -164,8 +163,8 @@ class ProteomeSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     query_searcher,
+                    self.context["request"],
                     key == "sets_url",
-                    request=self.context["request"],
                 )
         return representation
 
@@ -292,10 +291,10 @@ class ProteomeSerializer(ModelContentSerializer):
     @staticmethod
     def to_group_representation(instance):
         if "groups" in instance:
-            if ProteomeSerializer.grouper_is_empty(instance):
-                raise EmptyQuerysetError(
-                    ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome")
-                )
+            # if ProteomeSerializer.grouper_is_empty(instance):
+            #     raise EmptyQuerysetError(
+            #         ModelContentSerializer.NO_DATA_ERROR_MESSAGE.format("Proteome")
+            #     )
             return {
                 ProteomeSerializer.get_key_from_bucket(
                     bucket

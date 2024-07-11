@@ -122,7 +122,7 @@ class TestReverseURL(TestCase):
             ],
         ]
         for url in urls:
-            self.assertEqual(reverse_url(url[0], "entry"), url[1])
+            self.assertEqual(reverse_url(url[0], "entry", "p99999"), url[1])
 
     def test_reverse_to_protein(self):
         urls = [
@@ -148,4 +148,4 @@ class TestReverseURL(TestCase):
             ],
         ]
         for url in urls:
-            self.assertEqual(reverse_url(url[0], "protein"), url[1])
+            self.assertEqual(reverse_url(url[0], "protein", "ipr000001"), url[1])

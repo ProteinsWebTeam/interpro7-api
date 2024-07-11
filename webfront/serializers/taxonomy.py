@@ -114,9 +114,9 @@ class TaxonomySerializer(ModelContentSerializer):
                     instance,
                     s,
                     self.get_searcher_query(instance),
+                    self.context["request"],
                     key == "entries_url",
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
@@ -132,10 +132,10 @@ class TaxonomySerializer(ModelContentSerializer):
                     instance,
                     s,
                     self.get_searcher_query(instance),
+                    self.context["request"],
                     key == "structures_url",
                     include_chain=True,
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.PROTEIN_DB in detail_filters
@@ -151,9 +151,9 @@ class TaxonomySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     self.get_searcher_query(instance),
+                    self.context["request"],
                     key == "proteins_url",
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.PROTEOME_DB in detail_filters
@@ -169,8 +169,8 @@ class TaxonomySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     self.get_searcher_query(instance),
+                    self.context["request"],
                     key == "proteomes_url",
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.SET_DB in detail_filters
@@ -186,8 +186,8 @@ class TaxonomySerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     self.get_searcher_query(instance),
+                    self.context["request"],
                     key == "sets_url",
-                    request=self.context["request"],
                 )
         return representation
 

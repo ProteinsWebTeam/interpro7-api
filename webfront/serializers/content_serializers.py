@@ -142,9 +142,14 @@ class ModelContentSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def to_taxonomy_detail_representation(
-        instance, searcher, searcher_query, show_url, include_chains=False, request=None
+        instance,
+        searcher,
+        searcher_query,
+        request,
+        show_url,
+        include_chains=False,
     ):
-        if show_url and request is not None:
+        if show_url:
             return ModelContentSerializer.get_url_for_endpoint(
                 instance, "taxonomy", searcher, searcher_query, request
             )
@@ -168,11 +173,11 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         searcher_query,
+        request,
         show_url,
         include_chains=False,
-        request=None,
     ):
-        if show_url and request is not None:
+        if show_url:
             return ModelContentSerializer.get_url_for_endpoint(
                 instance, "set", searcher, searcher_query, request
             )
@@ -194,12 +199,12 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         searcher_query,
+        request,
         show_url,
         include_structure=False,
         include_matches=False,
         include_chain=True,
         queryset_manager=None,
-        request=None,
     ):
         if show_url and request is not None:
             return ModelContentSerializer.get_url_for_endpoint(
@@ -227,13 +232,13 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         searcher_query,
+        request,
         show_url,
         include_chains=False,
         for_structure=False,
         queryset_manager=None,
-        request=None,
     ):
-        if show_url and request is not None:
+        if show_url:
             return ModelContentSerializer.get_url_for_endpoint(
                 instance, "entry", searcher, searcher_query, request
             )
@@ -272,14 +277,14 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         searcher_query,
+        request,
         show_url,
         include_chains=False,
         include_coordinates=True,
         for_entry=False,
         queryset_manager=None,
-        request=None,
     ):
-        if show_url and request is not None:
+        if show_url:
             return ModelContentSerializer.get_url_for_endpoint(
                 instance, "protein", searcher, searcher_query, request
             )
@@ -306,11 +311,11 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         searcher_query,
+        request,
         show_url,
         include_chains=False,
-        request=None,
     ):
-        if show_url and request is not None:
+        if show_url:
             return ModelContentSerializer.get_url_for_endpoint(
                 instance, "proteome", searcher, searcher_query, request
             )
@@ -420,10 +425,10 @@ def process_counters_attribute(granular_counters, counter_endpoints):
     return counter_endpoints
 
 
-def reverse_url(path, new_main_endpoint, accession=None):
+def reverse_url(path, new_main_endpoint, accession):
     parts = path.split("?")
     ep_parts = re.split("(entry|protein|structure|taxonomy|proteome|set)", parts[0])
-    if accession is not None and accession.lower() not in ep_parts[2].lower():
+    if accession.lower() not in ep_parts[2].lower():
         ep_parts[2] += "/" + accession
     ep_index = ep_parts.index(new_main_endpoint)
     new_order = (

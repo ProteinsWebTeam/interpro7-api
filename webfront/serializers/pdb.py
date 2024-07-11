@@ -79,7 +79,6 @@ class StructureSerializer(ModelContentSerializer):
             representation["sets"] = self.to_set_count_representation(representation)
 
         if self.detail != SerializerDetail.STRUCTURE_OVERVIEW:
-            sq = self.queryset_manager.get_searcher_query()
             if (
                 SerializerDetail.PROTEIN_DB in detail_filters
                 or SerializerDetail.PROTEIN_DETAIL in detail_filters
@@ -95,10 +94,10 @@ class StructureSerializer(ModelContentSerializer):
                         instance,
                         s,
                         "structure_acc:" + escape(instance.accession.lower()),
+                        self.context["request"],
                         key == "proteins_url",
                         include_chains=True,
                         queryset_manager=self.queryset_manager,
-                        request=self.context["request"],
                     )
                 )
             if (
@@ -115,11 +114,11 @@ class StructureSerializer(ModelContentSerializer):
                     instance,
                     s,
                     "structure_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "entries_url",
                     include_chains=True,
                     for_structure=True,
                     queryset_manager=self.queryset_manager,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.TAXONOMY_DB in detail_filters
@@ -135,9 +134,9 @@ class StructureSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "structure_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "taxa_url",
                     include_chains=True,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.PROTEOME_DB in detail_filters
@@ -153,9 +152,9 @@ class StructureSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "structure_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "proteomes_url",
                     include_chains=True,
-                    request=self.context["request"],
                 )
             if (
                 SerializerDetail.SET_DB in detail_filters
@@ -171,8 +170,8 @@ class StructureSerializer(ModelContentSerializer):
                     instance,
                     self.searcher,
                     "structure_acc:" + escape(instance.accession.lower()),
+                    self.context["request"],
                     key == "sets_url",
-                    request=self.context["request"],
                     include_chains=True,
                 )
 

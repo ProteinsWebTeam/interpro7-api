@@ -136,7 +136,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
         if elastic_docs["hits"]["total"]["value"] == 0:
             raise EmptyQuerysetError("No entries found matching this request")
         return request.build_absolute_uri(
-            re.sub("/$", "", settings.INTERPRO_CONFIG.get("api_url"))
+            settings.INTERPRO_CONFIG.get("api_url").strip("/")
             + reverse_url(request.get_full_path(), endpoint, instance.accession)
         )
 

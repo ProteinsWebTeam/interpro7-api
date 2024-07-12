@@ -34,6 +34,7 @@ class QuerysetManager:
     order_field = None
     order_field_in_pagination = True
     other_fields = None
+    show_subset = False
 
     def reset_filters(self, endpoint, endpoint_levels=[]):
         self.main_endpoint = endpoint

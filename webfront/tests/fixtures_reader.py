@@ -100,8 +100,6 @@ class FixtureReader:
             for n in self.sets[s]["relationships"]["nodes"]:
                 if n["type"] == "entry":
                     db = self.sets[s]["source_database"]
-                    # if db == "node":
-                    #     db = "kegg"
                     if n["accession"].lower() not in e2s:
                         e2s[n["accession"].lower()] = []
                     e2s[n["accession"].lower()].append(

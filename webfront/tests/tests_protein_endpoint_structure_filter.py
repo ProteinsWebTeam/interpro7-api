@@ -73,37 +73,37 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
         )
 
     def test_can_get_proteins_from_pdb_structures(self):
-        response = self.client.get("/api/protein/uniprot/structure/pdb")
-        self.assertEqual(len(response.data["results"]), len(data_in_fixtures))
-        for result in response.data["results"]:
-            self.assertEqual(
+        self._check_list_url_with_and_without_subset(
+            "/api/protein/uniprot/structure/pdb",
+            "structure",
+            check_results_fn=lambda results: self.assertEqual(
+                len(results), len(data_in_fixtures)
+            ),
+            check_result_fn=lambda result: self.assertEqual(
                 len(result["structure_subset"]),
                 len(data_in_fixtures[result["metadata"]["accession"]]),
                 "failing for " + result["metadata"]["accession"],
-            )
-            for match in result["structure_subset"]:
-                self.assertIn(
-                    match["accession"].lower(),
-                    data_in_fixtures[result["metadata"]["accession"]],
-                )
-                self._check_structure_chain_details(match)
+            ),
+            check_inner_subset_fn=self._check_structure_chain_details,
+        )
 
     def test_can_get_reviewed_from_pdb_structures(self):
-        response = self.client.get("/api/protein/reviewed/structure/pdb")
-        self.assertEqual(len(response.data["results"]), len(data_reviewed))
-        for result in response.data["results"]:
-            self.assertEqual(
+        self._check_list_url_with_and_without_subset(
+            "/api/protein/reviewed/structure/pdb",
+            "structure",
+            check_results_fn=lambda results: self.assertEqual(
+                len(results), len(data_reviewed)
+            ),
+            check_result_fn=lambda result: self.assertEqual(
                 len(result["structure_subset"]),
                 len(data_in_fixtures[result["metadata"]["accession"]]),
                 "failing for " + result["metadata"]["accession"],
-            )
-            self.assertIn(result["metadata"]["accession"], data_reviewed)
-            for match in result["structure_subset"]:
-                self.assertIn(
-                    match["accession"].lower(),
-                    data_in_fixtures[result["metadata"]["accession"]],
-                )
-                self._check_structure_chain_details(match)
+            ),
+            check_metadata_fn=lambda metadata: self.assertIn(
+                metadata["accession"], data_reviewed
+            ),
+            check_inner_subset_fn=self._check_structure_chain_details,
+        )
 
     def test_can_get_uniprot_matches_from_structures(self):
         tests = {
@@ -111,17 +111,17 @@ class ProteinWithFilterStructurePdbRESTTest(InterproRESTTestCase):
             for prot in data_in_fixtures
         }
         for url in tests:
-            response = self.client.get(url)
-            self.assertIn(
-                "structure_subset",
-                response.data,
-                "'structure_subset' should be one of the keys in the response",
+            self._check_details_url_with_and_without_subset(
+                url,
+                "structure",
+                check_subset_fn=lambda subset: self.assertEqual(
+                    len(subset), len(tests[url])
+                )
+                and self.assertEqual(
+                    tests[url].sort(), [x["accession"] for x in subset].sort()
+                ),
+                check_inner_subset_fn=self._check_structure_chain_details,
             )
-            self.assertEqual(len(response.data["structure_subset"]), len(tests[url]))
-            for match in response.data["structure_subset"]:
-                self._check_structure_chain_details(match)
-            ids = [x["accession"] for x in response.data["structure_subset"]]
-            self.assertEqual(tests[url].sort(), ids.sort())
 
     def test_urls_that_should_fails(self):
         prot_s = "M5ADK6"

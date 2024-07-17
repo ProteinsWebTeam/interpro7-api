@@ -260,7 +260,7 @@ class ReleaseVersionEndpointHandler(CustomView):
 class ReleaseEndpointHandler(CustomView):
     level_description = "Release level"
     from_model = False
-    child_handlers = [(r"current|(\d\d\.\d)", ReleaseVersionEndpointHandler)]
+    child_handlers = [(r"current|(\d{2,3}\.\d)", ReleaseVersionEndpointHandler)]
     many = False
     serializer_class = ModelContentSerializer
 

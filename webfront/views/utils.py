@@ -278,7 +278,8 @@ class ReleaseEndpointHandler(CustomView):
     ):
 
         self.queryset = {
-            note.version: note.release_date for note in Release_Note.objects.all()
+            note.version: note.release_date
+            for note in Release_Note.objects.all().order_by("release_date")
         }
 
         return super(ReleaseEndpointHandler, self).get(

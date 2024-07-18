@@ -5,7 +5,13 @@ from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
 from webfront.models import TaxonomyPerEntry
+from webfront.serializers.content_serializers import ModelContentSerializer
 from webfront.tests.fixtures_reader import FixtureReader
+from django.core.validators import URLValidator
+
+plurals = ModelContentSerializer.plurals
+
+validateURL = URLValidator()
 
 chains = {
     "1JM7": ["A", "B"],
@@ -54,7 +60,7 @@ class InterproRESTTestCase(APITransactionTestCase):
         self.assertEqual(
             len(response.data["entries"]),
             1,
-            "only one entry should be included when the ID is specified" + msg,
+            f"only one entry should be included when the ID is specified{msg}",
         )
         # self.assertIn("entry", response.data["entries"][0], msg)
         # self._check_entry_details(response.data["entries"][0]["entry"], msg)
@@ -232,9 +238,7 @@ class InterproRESTTestCase(APITransactionTestCase):
             # _chains = [list(ch.keys())[0] for ch in chains[acc]]
             self.assertEqual(chains[acc], response.data["metadata"]["chains"], msg)
             for chain in chains[acc]:
-                current = (
-                    "/api/" + endpoint + "/" + db + "/" + acc + "/" + chain + postfix
-                )
+                current = f"/api/{endpoint}/{db}/{acc}/{chain}{postfix}"
                 urls.append(current)
                 response_acc = self._get_in_debug_mode(current)
                 if response_acc.status_code == status.HTTP_200_OK:
@@ -261,24 +265,12 @@ class InterproRESTTestCase(APITransactionTestCase):
         urls = []
         if "structure" == endpoint:
             for chain in chains[acc]:
-                current = (
-                    "/api/"
-                    + prefix
-                    + "/"
-                    + endpoint
-                    + "/"
-                    + db
-                    + "/"
-                    + acc
-                    + "/"
-                    + chain
-                    + postfix
-                )
+                current = f"/api/{prefix}/{endpoint}/{db}/{acc}/{chain}{postfix}"
                 urls.append(current)
                 response = self._get_in_debug_mode(current)
                 if response.status_code == status.HTTP_200_OK:
                     self._check_counter_by_endpoint(
-                        prefix, response.data, "URL : [{}]".format(current)
+                        prefix, response.data, f"URL : [{current}]"
                     )
                     # self._check_count_overview_per_endpoints(response.data, key1, key2,
                     #                                          "URL : [{}]".format(current))
@@ -292,19 +284,7 @@ class InterproRESTTestCase(APITransactionTestCase):
         urls = []
         if "structure" == endpoint:
             for chain in chains[acc]:
-                current = (
-                    "/api/"
-                    + prefix
-                    + "/"
-                    + endpoint
-                    + "/"
-                    + db
-                    + "/"
-                    + acc
-                    + "/"
-                    + chain
-                    + postfix
-                )
+                current = f"/api/{prefix}/{endpoint}/{db}/{acc}/{chain}{postfix}"
                 urls.append(current)
                 response = self._get_in_debug_mode(current)
                 if response.status_code == status.HTTP_200_OK:
@@ -315,9 +295,7 @@ class InterproRESTTestCase(APITransactionTestCase):
                     )
                     self._check_is_list_of_metadata_objects(obj)
                     for result in [x[key1] for x in obj if key1 in x]:
-                        self._check_list_of_matches(
-                            result, "URL : [{}]".format(current)
-                        )
+                        self._check_list_of_matches(result, f"URL : [{current}]")
                         self.assertGreaterEqual(len(result), 1)
                         for r in result:
                             self.assertEqual(r["chain"].upper(), chain)
@@ -334,8 +312,74 @@ class InterproRESTTestCase(APITransactionTestCase):
         )
         for element in subset:
             self.assertIn(
-                element, superset, "Element {} in subset but not in set".format(element)
+                element, superset, f"Element {element} in subset but not in set"
             )
+
+    def _check_details_url_with_and_without_subset(
+        self,
+        url,
+        endpoint,
+        check_metadata_fn=None,
+        check_subset_fn=None,
+        check_inner_subset_fn=None,
+    ):
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
+        if check_metadata_fn is not None:
+            check_metadata_fn(response.data["metadata"])
+        self.assertIn(f"{plurals[endpoint]}_url", response.data)
+        self.assertURL(response.data[f"{plurals[endpoint]}_url"])
+        response = self.client.get(url + "?show-subset")
+        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
+        self.assertIn(f"{endpoint}_subset", response.data)
+        if check_subset_fn is not None:
+            check_subset_fn(response.data[f"{endpoint}_subset"])
+        if check_inner_subset_fn is not None:
+            for st in response.data[f"{endpoint}_subset"]:
+                check_inner_subset_fn(st)
+
+    def _check_list_url_with_and_without_subset(
+        self,
+        url,
+        endpoint,
+        check_results_fn=None,
+        check_result_fn=None,
+        check_metadata_fn=None,
+        check_subset_fn=None,
+        check_inner_subset_fn=None,
+    ):
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
+        self._check_is_list_of_objects_with_key(response.data["results"], "metadata")
+        if check_results_fn is not None:
+            check_results_fn(response.data["results"])
+        self._check_is_list_of_objects_with_key(
+            response.data["results"], f"{plurals[endpoint]}_url"
+        )
+        for result in response.data["results"]:
+            self.assertURL(result[f"{plurals[endpoint]}_url"])
+
+        response = self.client.get(url + "?show-subset")
+        self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
+        self._check_is_list_of_objects_with_key(
+            response.data["results"], f"{endpoint}_subset"
+        )
+        for result in response.data["results"]:
+            if check_result_fn is not None:
+                check_result_fn(result)
+            if check_metadata_fn is not None:
+                check_metadata_fn(result["metadata"])
+            if check_subset_fn is not None:
+                check_subset_fn(result[f"{endpoint}_subset"])
+            for s in result[f"{endpoint}_subset"]:
+                if check_inner_subset_fn is not None:
+                    check_inner_subset_fn(s)
+
+    def assertURL(self, url, msg=None):
+        try:
+            validateURL(url)
+        except:
+            raise self.failureException(msg)
 
     def _check_taxonomy_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)
@@ -359,7 +403,6 @@ class InterproRESTTestCase(APITransactionTestCase):
     def _check_proteome_details(self, obj, is_complete=True, msg=""):
         self.assertIn("accession", obj, msg)
         self.assertIn("taxonomy", obj, msg)
-        self.assertIn("is_reference", obj, msg)
         self.assertIn("name", obj, msg)
         if is_complete:
             self.assertIn("strain", obj, msg)

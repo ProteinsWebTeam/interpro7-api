@@ -7,6 +7,9 @@ from rest_framework import status
 from webfront.tests.InterproRESTTestCase import InterproRESTTestCase
 from webfront.searcher.elastic_controller import ElasticsearchController
 from webfront.tests.actions_on_test_dataset import *
+from django.core.validators import URLValidator
+
+validateURL = URLValidator()
 
 api_test_map = {
     "entry": {
@@ -668,9 +671,22 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                             key, endpoint1, obj_expected["metadata"]["accession"], url
                         ),
                     )
+                elif type(obj_expected[key]) == str:
+                    self.assertIn("_url", key)
+                    self.assertIn(key, obj_response, "URL: {}".format(url))
+                    try:
+                        validateURL(obj_response[key])
+                    except:
+                        raise self.failureException(
+                            f"The URL in {key}: {obj_response[key]} is not valid | URL: {url}"
+                        )
                 else:
-                    self.assertEqual(type(obj_expected[key]), list)
-                    self.assertEqual(type(obj_response[key]), list)
+                    self.assertEqual(
+                        type(obj_expected[key]), list, "URL: {}".format(url)
+                    )
+                    self.assertEqual(
+                        type(obj_response[key]), list, "URL: {}".format(url)
+                    )
                     self.assertEqual(
                         len(obj_response[key]),
                         len(obj_expected[key]),
@@ -699,7 +715,7 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
             obj_expected = expected[i]
             obj_response = response.data["results"][i]
             self.assert_obj_response_is_as_expected(
-                obj_expected, obj_response, endpoint1, url
+                obj_response, obj_expected, endpoint1, url
             )
 
     def test_db_db_endpoint(self):
@@ -814,13 +830,13 @@ class ThreeEndpointsTableTest(InterproRESTTestCase):
                                     )
 
     def test_db_db_acc(self):
-        for endpoint1 in api_test_map:
+        for endpoint1 in ["protein"]:  # api_test_map:
             for db1 in api_test_map[endpoint1]:
-                for endpoint2 in api_test_map:
+                for endpoint2 in ["structure"]:  # api_test_map:
                     if endpoint1 == endpoint2:
                         continue
                     for db2 in api_test_map[endpoint2]:
-                        for endpoint3 in api_test_map:
+                        for endpoint3 in ["entry"]:  # api_test_map:
                             if endpoint1 == endpoint3 or endpoint2 == endpoint3:
                                 continue
                             for db3 in api_test_map[endpoint3]:

@@ -18,6 +18,7 @@ from webfront.views.modifiers import (
     calculate_residue_conservation,
     extra_features,
     residues,
+    show_subset,
 )
 from webfront.models import Protein
 from webfront.constants import ModifierType
@@ -185,6 +186,7 @@ class UniprotHandler(CustomView):
         general_handler.modifiers.register(
             "extra_fields", add_extra_fields(Protein, "counters", "sequence")
         )
+        general_handler.modifiers.register("show-subset", show_subset)
         return super(UniprotHandler, self).get(
             request._request,
             endpoint_levels,

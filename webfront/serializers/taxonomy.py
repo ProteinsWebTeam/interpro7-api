@@ -104,31 +104,36 @@ class TaxonomySerializer(ModelContentSerializer):
                 SerializerDetail.ENTRY_DB in detail_filters
                 or SerializerDetail.ENTRY_DETAIL in detail_filters
             ):
-                key = (
-                    "entries"
-                    if SerializerDetail.ENTRY_DETAIL in detail_filters
-                    else "entry_subset"
+                key = self.get_endpoint_key(
+                    "entry",
+                    SerializerDetail.ENTRY_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_entries_detail_representation(
                     instance,
                     s,
                     self.get_searcher_query(instance),
-                    base_query=sq,
+                    self.context["request"],
+                    key == "entries_url",
                     queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.STRUCTURE_DB in detail_filters
                 or SerializerDetail.STRUCTURE_DETAIL in detail_filters
             ):
-                key = (
-                    "structures"
-                    if SerializerDetail.STRUCTURE_DETAIL in detail_filters
-                    else "structure_subset"
+                key = self.get_endpoint_key(
+                    "structure",
+                    SerializerDetail.STRUCTURE_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_structures_detail_representation(
                     instance,
                     s,
                     self.get_searcher_query(instance),
+                    self.context["request"],
+                    key == "structures_url",
                     include_chain=True,
                     queryset_manager=self.queryset_manager,
                 )
@@ -136,40 +141,53 @@ class TaxonomySerializer(ModelContentSerializer):
                 SerializerDetail.PROTEIN_DB in detail_filters
                 or SerializerDetail.PROTEIN_DETAIL in detail_filters
             ):
-                key = (
-                    "proteins"
-                    if SerializerDetail.PROTEIN_DETAIL in detail_filters
-                    else "protein_subset"
+                key = self.get_endpoint_key(
+                    "protein",
+                    SerializerDetail.PROTEIN_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_proteins_detail_representation(
                     instance,
                     self.searcher,
                     self.get_searcher_query(instance),
+                    self.context["request"],
+                    key == "proteins_url",
                     queryset_manager=self.queryset_manager,
                 )
             if (
                 SerializerDetail.PROTEOME_DB in detail_filters
                 or SerializerDetail.PROTEOME_DETAIL in detail_filters
             ):
-                key = (
-                    "proteomes"
-                    if SerializerDetail.PROTEOME_DETAIL in detail_filters
-                    else "proteome_subset"
+                key = self.get_endpoint_key(
+                    "proteome",
+                    SerializerDetail.PROTEOME_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_proteomes_detail_representation(
-                    self.searcher, self.get_searcher_query(instance)
+                    instance,
+                    self.searcher,
+                    self.get_searcher_query(instance),
+                    self.context["request"],
+                    key == "proteomes_url",
                 )
             if (
                 SerializerDetail.SET_DB in detail_filters
                 or SerializerDetail.SET_DETAIL in detail_filters
             ):
-                key = (
-                    "sets"
-                    if SerializerDetail.SET_DETAIL in detail_filters
-                    else "set_subset"
+                key = self.get_endpoint_key(
+                    "set",
+                    SerializerDetail.SET_DETAIL,
+                    detail_filters,
+                    self.queryset_manager.show_subset,
                 )
                 representation[key] = self.to_set_detail_representation(
-                    instance, self.searcher, self.get_searcher_query(instance)
+                    instance,
+                    self.searcher,
+                    self.get_searcher_query(instance),
+                    self.context["request"],
+                    key == "sets_url",
                 )
         return representation
 

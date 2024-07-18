@@ -372,17 +372,19 @@ def extend_obj_with_other_endpoints(data, endpoints, dbs, accs, instance, ep):
         else:
             key = plurals[current_ep]
             if current_acc is None:
-                key = current_ep + "_subset"
-            instance[key] = get_payload_list(
-                data,
-                current_ep,
-                current_db,
-                False,
-                ep == "structure"
-                or current_ep == "structure",  # and current_acc is None
-            )[
-                :20
-            ]  # the API only returns up to 20 items in a sublist
+                key = f"{plurals[current_ep]}_url"
+                instance[key] = "URL TO BE DEFINED"
+            else:
+                instance[key] = get_payload_list(
+                    data,
+                    current_ep,
+                    current_db,
+                    False,
+                    ep == "structure"
+                    or current_ep == "structure",  # and current_acc is None
+                )[
+                    :20
+                ]  # the API only returns up to 20 items in a sublist
 
 
 def get_db_payload(data, endpoints, dbs, accs=None):

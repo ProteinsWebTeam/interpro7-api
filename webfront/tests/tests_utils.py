@@ -7,6 +7,7 @@ from webfront.views.cache import (
     SHOULD_NO_CACHE,
     FIVE_DAYS,
 )
+from webfront.serializers.content_serializers import reverse_url
 
 
 class CanonicalTestCase(TestCase):
@@ -94,3 +95,57 @@ class CacheLifespanTestCase(TestCase):
         for url in urls:
             levels = map_url_to_levels(url.split("?")[0])
             self.assertIsNone(get_timeout_from_path(url, levels))
+
+
+class TestReverseURL(TestCase):
+    def test_reverse_to_entry(self):
+        urls = [
+            [
+                "/protein/uniprot/p99999/entry/InterPro/",
+                "/entry/InterPro/protein/uniprot/p99999/",
+            ],
+            [  # Modifiers are removed
+                "/protein/uniprot/p99999/entry/InterPro/?some-modifier",
+                "/entry/InterPro/protein/uniprot/p99999/",
+            ],
+            [  # 3 endpoints -endpoint
+                "/protein/uniprot/p99999/entry/InterPro/structure",
+                "/entry/InterPro/protein/uniprot/p99999/structure/",
+            ],
+            [  # 3 endpoints - db
+                "/protein/uniprot/p99999/entry/InterPro/structure/pdb",
+                "/entry/InterPro/protein/uniprot/p99999/structure/pdb",
+            ],
+            [  # 3 endpoints - accession
+                "/protein/uniprot/p99999/entry/InterPro/structure/pdb/1cuk",
+                "/entry/InterPro/protein/uniprot/p99999/structure/pdb/1cuk",
+            ],
+        ]
+        for url in urls:
+            self.assertEqual(reverse_url(url[0], "entry", "p99999"), url[1])
+
+    def test_reverse_to_protein(self):
+        urls = [
+            [
+                "/entry/InterPro/ipr000001/protein/uniprot/",
+                "/protein/uniprot/entry/InterPro/ipr000001/",
+            ],
+            [  # Modifiers are removed
+                "/entry/InterPro/ipr000001/protein/uniprot/?some-modifier",
+                "/protein/uniprot/entry/InterPro/ipr000001/",
+            ],
+            [  # 3 endpoints -endpoint
+                "/entry/InterPro/ipr000001/protein/uniprot/structure",
+                "/protein/uniprot/entry/InterPro/ipr000001/structure/",
+            ],
+            [  # 3 endpoints - db
+                "/entry/InterPro/ipr000001/protein/uniprot/structure/pdb",
+                "/protein/uniprot/entry/InterPro/ipr000001/structure/pdb",
+            ],
+            [  # 3 endpoints - accession
+                "/entry/InterPro/ipr000001/protein/uniprot/structure/pdb/1cuk",
+                "/protein/uniprot/entry/InterPro/ipr000001/structure/pdb/1cuk",
+            ],
+        ]
+        for url in urls:
+            self.assertEqual(reverse_url(url[0], "protein", "ipr000001"), url[1])

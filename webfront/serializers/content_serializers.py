@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from rest_framework.utils.urls import replace_query_param, remove_query_param
+from django.conf import settings
+import re
 
 from webfront.pagination import replace_url_host
 from webfront.exceptions import EmptyQuerysetError
@@ -119,9 +121,38 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return output
 
     @staticmethod
+    def get_endpoint_key(endpoint, filter, detail_filters, show_subset):
+        plural = ModelContentSerializer.plurals[endpoint]
+        key = f"{plural}_url"
+        if filter in detail_filters:
+            key = plural
+        elif show_subset:
+            key = f"{endpoint}_subset"
+        return key
+
+    @staticmethod
+    def get_url_for_endpoint(instance, endpoint, searcher, searcher_query, request):
+        elastic_docs = searcher.execute_query(None, fq=searcher_query)
+        if elastic_docs["hits"]["total"]["value"] == 0:
+            raise EmptyQuerysetError("No entries found matching this request")
+        return request.build_absolute_uri(
+            settings.INTERPRO_CONFIG.get("api_url").strip("/")
+            + reverse_url(request.get_full_path(), endpoint, instance.accession)
+        )
+
+    @staticmethod
     def to_taxonomy_detail_representation(
-        instance, searcher, query, include_chains=False
+        instance,
+        searcher,
+        searcher_query,
+        request,
+        show_url,
+        include_chains=False,
     ):
+        if show_url:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "taxonomy", searcher, searcher_query, request
+            )
         fields = ["tax_id", "structure_chain"] if include_chains else "tax_id"
 
         response = [
@@ -129,7 +160,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chain=include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=20
+                None, fields, fq=searcher_query, rows=20
             )["groups"]
         ]
 
@@ -138,14 +169,25 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def to_set_detail_representation(instance, searcher, query, include_chains=False):
+    def to_set_detail_representation(
+        instance,
+        searcher,
+        searcher_query,
+        request,
+        show_url,
+        include_chains=False,
+    ):
+        if show_url:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "set", searcher, searcher_query, request
+            )
         fields = ["set_acc", "structure_chain"] if include_chains else "set_acc"
         response = [
             webfront.serializers.collection.SetSerializer.get_set_from_search_object(
                 r, include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=20
+                None, fields, fq=searcher_query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -156,12 +198,18 @@ class ModelContentSerializer(serializers.ModelSerializer):
     def to_structures_detail_representation(
         instance,
         searcher,
-        query,
+        searcher_query,
+        request,
+        show_url,
         include_structure=False,
         include_matches=False,
         include_chain=True,
         queryset_manager=None,
     ):
+        if show_url and request is not None:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "structure", searcher, searcher_query, request
+            )
         field = "structure_chain" if include_chain else "structure_acc"
         response = [
             webfront.serializers.pdb.StructureSerializer.get_structure_from_search_object(
@@ -172,7 +220,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 queryset_manager=queryset_manager,
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, field, fq=query, rows=20
+                None, field, fq=searcher_query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -184,11 +232,16 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         searcher_query,
+        request,
+        show_url,
         include_chains=False,
         for_structure=False,
-        base_query=None,
         queryset_manager=None,
     ):
+        if show_url:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "entry", searcher, searcher_query, request
+            )
         if include_chains:
             search = searcher.get_group_obj_of_field_by_query(
                 None, ["structure_chain", "entry_acc"], fq=searcher_query, rows=20
@@ -224,11 +277,18 @@ class ModelContentSerializer(serializers.ModelSerializer):
         instance,
         searcher,
         searcher_query,
+        request,
+        show_url,
         include_chains=False,
         include_coordinates=True,
         for_entry=False,
         queryset_manager=None,
     ):
+        if show_url:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "protein", searcher, searcher_query, request
+            )
+
         field = "structure_chain" if include_chains else "protein_acc"
         response = [
             webfront.serializers.uniprot.ProteinSerializer.get_protein_header_from_search_object(
@@ -247,7 +307,18 @@ class ModelContentSerializer(serializers.ModelSerializer):
         return response
 
     @staticmethod
-    def to_proteomes_detail_representation(searcher, query, include_chains=False):
+    def to_proteomes_detail_representation(
+        instance,
+        searcher,
+        searcher_query,
+        request,
+        show_url,
+        include_chains=False,
+    ):
+        if show_url:
+            return ModelContentSerializer.get_url_for_endpoint(
+                instance, "proteome", searcher, searcher_query, request
+            )
         fields = (
             ["proteome_acc", "structure_chain"] if include_chains else "proteome_acc"
         )
@@ -256,7 +327,7 @@ class ModelContentSerializer(serializers.ModelSerializer):
                 r, include_chain=include_chains
             )
             for r in searcher.get_group_obj_of_field_by_query(
-                None, fields, fq=query, rows=20
+                None, fields, fq=searcher_query, rows=20
             )["groups"]
         ]
         if len(response) == 0:
@@ -352,3 +423,20 @@ def process_counters_attribute(granular_counters, counter_endpoints):
             k: v for k, v in counter_endpoints.items() if k in split_counters_to_include
         }
     return counter_endpoints
+
+
+def reverse_url(path, new_main_endpoint, accession):
+    parts = path.split("?")
+    ep_parts = re.split("(entry|protein|structure|taxonomy|proteome|set)", parts[0])
+    if accession.lower() not in ep_parts[2].lower():
+        ep_parts[2] += "/" + accession
+    ep_index = ep_parts.index(new_main_endpoint)
+    new_order = (
+        [""]
+        + ep_parts[ep_index : ep_index + 2]
+        + ep_parts[1:ep_index]
+        + ep_parts[ep_index + 2 :]
+    )
+    new_url = "/".join(new_order)
+    # Dropping the search string because modifiers differ among endpoints.
+    return re.sub("/+", "/", new_url)

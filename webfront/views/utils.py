@@ -260,7 +260,7 @@ class ReleaseVersionEndpointHandler(CustomView):
 class ReleaseEndpointHandler(CustomView):
     level_description = "Release level"
     from_model = False
-    child_handlers = [(r"current|(\d\d\.\d)", ReleaseVersionEndpointHandler)]
+    child_handlers = [(r"current|(\d{2,3}\.\d)", ReleaseVersionEndpointHandler)]
     many = False
     serializer_class = ModelContentSerializer
 
@@ -278,7 +278,8 @@ class ReleaseEndpointHandler(CustomView):
     ):
 
         self.queryset = {
-            note.version: note.release_date for note in Release_Note.objects.all()
+            note.version: note.release_date
+            for note in Release_Note.objects.all().order_by("release_date")
         }
 
         return super(ReleaseEndpointHandler, self).get(

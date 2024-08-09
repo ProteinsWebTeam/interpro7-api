@@ -100,7 +100,7 @@ class ProteinSerializer(ModelContentSerializer):
                 representation[key] = self.to_structures_detail_representation(
                     instance,
                     s,
-                    "protein_acc:" + escape(instance.accession.lower()),
+                    "structure_protein_acc:" + escape(instance.accession.lower()),
                     self.context["request"],
                     key == "structures_url",
                     include_chain=True,

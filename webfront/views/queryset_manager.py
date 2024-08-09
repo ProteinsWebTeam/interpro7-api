@@ -99,8 +99,8 @@ class QuerysetManager:
                 elif k == "accession" or k == "accession__iexact":
                     if ep == "taxonomy":
                         blocks.append("tax_lineage:{}".format(escape(v)))
-                    if ep == "protein" and self.main_endpoint == "structure":
-                        blocks.append("structure_protein_acc:{}".format(escape(v)))
+                    if ep == "protein" and len(self.filters["structure"]) > 0:
+                        blocks.append("(protein_acc:{0} || structure_protein_acc:{0})".format(escape(v)))
                     else:
                         blocks.append("{}_acc:{}".format(ep, escape(v)))
                 elif k == "accession__isnull":
@@ -112,6 +112,8 @@ class QuerysetManager:
                         blocks.append(
                             "{}_exists_:proteome_acc".format("!" if v else "")
                         )
+                    elif ep == "protein" and len(self.filters["structure"]) > 0:
+                        blocks.append("({0}_exists_:protein_db || {0}_exists_:structure_protein_db)".format("!" if v else ""))
                     else:
                         blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
 

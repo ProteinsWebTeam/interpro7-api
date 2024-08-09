@@ -99,7 +99,7 @@ class QuerysetManager:
                 elif k == "accession" or k == "accession__iexact":
                     if ep == "taxonomy":
                         blocks.append("tax_lineage:{}".format(escape(v)))
-                    if ep == "protein" and len(self.filters["structure"]) > 0:
+                    elif ep == "protein" and len(self.filters["structure"]) > 0:
                         blocks.append("(protein_acc:{0} || structure_protein_acc:{0})".format(escape(v)))
                     else:
                         blocks.append("{}_acc:{}".format(ep, escape(v)))

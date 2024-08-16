@@ -406,17 +406,6 @@ def filter_by_match_presence(value, general_handler):
         "entry", **{"source_database__isnull": value.lower() != "true"}
     )
 
-""""
-    if is_single_endpoint(general_handler):
-        qs = {
-            groups[cat]: general_handler.queryset_manager.get_queryset()
-            .filter(go_terms__contains=template.format(cat))
-            .count()
-            for cat in groups
-        }
-        return qs"""
-
-
 def filter_by_ai_entries(value, general_handler):
     if value == "MC":
         general_handler.queryset_manager.add_filter("entry", is_llm=False)

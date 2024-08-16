@@ -37,6 +37,7 @@ from time import sleep
 
 QUERY_TIMEOUT = settings.INTERPRO_CONFIG.get("query_timeout", 90)
 CACHE_TIMEOUT = settings.INTERPRO_CONFIG.get("cache_volatile_key_ttl", 1800)
+CACHE_204 = settings.INTERPRO_CONFIG.get("cache_204", True)
 logger = logging.getLogger(__name__)
 
 
@@ -257,7 +258,8 @@ class GeneralHandler(CustomView):
                     raise
                 content = {"detail": e.args[0]}
                 response = Response(content, status=status.HTTP_204_NO_CONTENT)
-                self._set_in_cache(caching_allowed, full_path, response)
+                if CACHE_204:
+                    self._set_in_cache(caching_allowed, full_path, response)
             except DeprecatedModifier as e:
                 content = {"detail": e.args[0]}
                 response = Response(content, status=status.HTTP_410_GONE)

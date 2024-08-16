@@ -505,7 +505,7 @@ class InterproHandler(CustomView):
         )
         general_handler.modifiers.register("latest_entries", filter_by_latest_entries)
         
-        # Filter for AI-generated entries, and weather they were reviewed or not
+        # Filter for AI-generated entries, and whether they were reviewed or not
         general_handler.modifiers.register("ai_category", filter_by_ai_entries)
         
         general_handler.modifiers.register("show-subset", show_subset)

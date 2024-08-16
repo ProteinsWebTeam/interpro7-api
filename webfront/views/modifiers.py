@@ -198,6 +198,8 @@ def group_by(endpoint_queryset, fields):
             return group_by_go_terms(general_handler)
         if "go_categories" == field:
             return group_by_go_categories(general_handler)
+        if "ai_categories" == field:
+            return group_by_ai_categories(general_handler)
         if "annotation" == field:
             return group_by_annotations(general_handler)
         if "tax_id" == field:
@@ -404,6 +406,46 @@ def filter_by_match_presence(value, general_handler):
         "entry", **{"source_database__isnull": value.lower() != "true"}
     )
 
+""""
+    if is_single_endpoint(general_handler):
+        qs = {
+            groups[cat]: general_handler.queryset_manager.get_queryset()
+            .filter(go_terms__contains=template.format(cat))
+            .count()
+            for cat in groups
+        }
+        return qs"""
+
+
+def filter_by_ai_entries(value, general_handler):
+    if value == "MC":
+        general_handler.queryset_manager.add_filter("entry", is_llm=False)
+    elif value == "AI-R":
+        general_handler.queryset_manager.add_filter("entry", is_llm=True, is_reviewed_llm=True)
+    elif value == "AI-U":
+        general_handler.queryset_manager.add_filter("entry", is_llm=True, is_reviewed_llm=False)
+
+def group_by_ai_categories(general_handler):
+    template = '"code": "{}"'
+    id_to_params = {
+        "MC": {"is_llm": False},
+        "AI-R": {"is_llm": True, "is_reviewed_llm": True},
+        "AI-U": {"is_llm": True, "is_reviewed_llm": False},
+    }
+    id_to_name = {
+        "MC": "Manually Curated",
+        "AI-R": "AI-Generated and Reviewed",
+        "AI-U": "AI-Generated and Unreviewed"
+    }
+    if is_single_endpoint(general_handler):
+        qs = {
+            id_to_name[cat]: general_handler.queryset_manager.get_queryset()
+            .filter(**id_to_params[cat])
+            .count()
+            for cat in id_to_params
+        }
+        return qs
+
 
 def filter_by_latest_entries(value, general_handler):
     notes = Release_Note.objects.all()
@@ -457,7 +499,7 @@ def get_entry_annotation(field, general_handler):
 def get_entry_annotation_info(field, general_handler):
     queryset = general_handler.queryset_manager.get_queryset()
     for entry in queryset:
-        data = entry.entryannotation_set.filter(type=field).values(
+        data = entry.entryannotation_set.filter(go=field).values(
             "accession", "type", "mime_type", "num_sequences"
         )
         annotation = data[0]

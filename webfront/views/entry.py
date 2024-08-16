@@ -17,6 +17,7 @@ from webfront.views.modifiers import (
     add_extra_fields,
     ida_search,
     filter_by_latest_entries,
+    filter_by_ai_entries,
     get_value_for_field,
     get_sunburst_taxa,
     get_subfamilies,
@@ -488,6 +489,7 @@ class InterproHandler(CustomView):
                     "member_databases": "",
                     "go_categories": "go_categories",
                     "go_terms": "text",
+                    "ai_categories": "ai_categories"
                 },
             ),
             type=ModifierType.REPLACE_PAYLOAD,
@@ -502,6 +504,10 @@ class InterproHandler(CustomView):
             works_in_multiple_endpoint=False,
         )
         general_handler.modifiers.register("latest_entries", filter_by_latest_entries)
+        
+        # Filter for AI-generated entries, and weather they were reviewed or not
+        general_handler.modifiers.register("ai_category", filter_by_ai_entries)
+        
         general_handler.modifiers.register("show-subset", show_subset)
         return super(InterproHandler, self).get(
             request._request,

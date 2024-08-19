@@ -195,6 +195,7 @@ class MemberHandler(CustomView):
                     "go_categories": "go_categories",
                     "go_terms": "go_terms",
                     "tax_id": "tax_id",
+                    "ai_categories": "ai_categories"
                 },
             ),
             type=ModifierType.REPLACE_PAYLOAD,
@@ -505,8 +506,6 @@ class InterproHandler(CustomView):
         )
         general_handler.modifiers.register("latest_entries", filter_by_latest_entries)
         
-        # Filter for AI-generated entries, and whether they were reviewed or not
-        general_handler.modifiers.register("ai_category", filter_by_ai_entries)
         
         general_handler.modifiers.register("show-subset", show_subset)
         return super(InterproHandler, self).get(
@@ -661,6 +660,10 @@ class EntryHandler(CustomView):
             "go_term",
             filter_by_contains_field("entry", "go_terms", '"identifier": "{}"'),
         )
+
+        # Filter for AI-generated entries, and whether they were reviewed or not
+        general_handler.modifiers.register("ai_category", filter_by_ai_entries)
+
         general_handler.modifiers.register(
             "annotation", filter_by_contains_field("entry", "entryannotation__type")
         )

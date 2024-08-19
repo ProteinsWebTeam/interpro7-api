@@ -415,7 +415,6 @@ def filter_by_ai_entries(value, general_handler):
         general_handler.queryset_manager.add_filter("entry", is_llm=True, is_reviewed_llm=False)
 
 def group_by_ai_categories(general_handler):
-    template = '"code": "{}"'
     id_to_params = {
         "MC": {"is_llm": False},
         "AI-R": {"is_llm": True, "is_reviewed_llm": True},

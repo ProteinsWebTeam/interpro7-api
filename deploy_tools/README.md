@@ -6,12 +6,10 @@ Provisioning a new site
 * Python 3
 * Git
 * pip
-* virtualenv
 
 eg, on Ubuntu:
 
     sudo apt-get install git python3 python3-pip
-    sudo pip3 install virtualenv
 
 ## Folder structure:
 Assume we have a user account at /home/username
@@ -49,7 +47,7 @@ Assume we have a user account at /home/username
 3.  Start the virtual env in the assigned folder:
 
     ```bash
-    virtualenv --python=python3 ../virtualenv
+    python -m venv virtualenv
     ```
 
 4.  Install requirements in the virtual environment
@@ -58,7 +56,7 @@ Assume we have a user account at /home/username
     ../virtualenv/bin/pip install -r requirements.txt
     ```
 
-    *  [Optional] Install requirements for development
+5.  Install requirements for development
 
         ```bash
         ../virtualenv/bin/pip install -r dev_requirements.txt
@@ -68,14 +66,17 @@ Assume we have a user account at /home/username
     In this file you can overwite any of the settings included in the read-only file `config/interpro.yml`.
     Below is an example of the local config that will run in debug mode using the test DB with SQLite, a local instance of elasticsearch without redis:
     ```yaml
-    use_test_db: true
+    use_test_db: false
     debug: true
-    allowed_host: []
-    searcher_path: "http://localhost:9200/current/relationship"
-    searcher_test_path: "http://localhost:9200/test/relationship"
+    allowed_host: ["localhost", "127.0.0.1"]
+    searcher_path: "https://localhost:9200"
+    searcher_index: "test"
+    searcher_user: "elastic"
+    searcher_password: "password"
     api_url: "http://localhost:8007/api/"
-    enable_caching: false
-    enable_cache_write: false
+    static_url: "api/static_files/"
+    searcher_test_path: "https://localhost:9200"
+    searcher_test_password: "password"
 
     ```
 
@@ -104,9 +105,9 @@ Assume we have a user account at /home/username
     ```bash
     ../virtualenv/bin/python manage.py loaddata webfront/tests/fixtures_*.json
     
-9.  Install Elasticsearch and load index. NB At the time of writing this must be version 6.8.
+9.  Install Elasticsearch and load index. Currently running version 8.12 with authentication by password
 
-    e.g for OSX: brew install elasticsearch@6.8
+    e.g for OSX: brew install elasticsearch@8.12
     ```
     curl -XPUT 'localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json
     ```
@@ -121,13 +122,12 @@ Assume we have a user account at /home/username
     ../virtualenv/bin/python manage.py runserver 0.0.0.0:8000
     ```
 
-12.  _[Optional]_ Install precommit, black and the pre-commit hook, to enable the preformatiing of files with before each commit.
+12.  _[Optional]_ Install precommit, black and the pre-commit hook, to enable the formatting of files before each commit.
     ```
     ../virtualenv/bin/pip install pre-commit black
     ../virtualenv/bin/pre-commit install
     ```  
-    *Note 1*: We are not including black and precommit in the dev_requirements because we run the tests on python 3.5 and black requires 3.6.
-    *Note 2*:It is importan to run the test in Python 3.5 because the VMs where the API runs uses that version.
+    *Note 1*:It is important to run the test in Python 3.8 because the VMs where the API runs use that version.
 
 
 

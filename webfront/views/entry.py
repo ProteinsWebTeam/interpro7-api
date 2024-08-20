@@ -17,7 +17,7 @@ from webfront.views.modifiers import (
     add_extra_fields,
     ida_search,
     filter_by_latest_entries,
-    filter_by_ai_entries,
+    filter_by_curation_status,
     get_value_for_field,
     get_sunburst_taxa,
     get_subfamilies,
@@ -195,7 +195,7 @@ class MemberHandler(CustomView):
                     "go_categories": "go_categories",
                     "go_terms": "go_terms",
                     "tax_id": "tax_id",
-                    "ai_categories": "ai_categories"
+                    "curation_statuses": "curation_statuses"
                 },
             ),
             type=ModifierType.REPLACE_PAYLOAD,
@@ -490,7 +490,7 @@ class InterproHandler(CustomView):
                     "member_databases": "",
                     "go_categories": "go_categories",
                     "go_terms": "text",
-                    "ai_categories": "ai_categories"
+                    "curation_statuses": "curation_statuses"
                 },
             ),
             type=ModifierType.REPLACE_PAYLOAD,
@@ -662,7 +662,7 @@ class EntryHandler(CustomView):
         )
 
         # Filter for AI-generated entries, and whether they were reviewed or not
-        general_handler.modifiers.register("ai_category", filter_by_ai_entries)
+        general_handler.modifiers.register("curation_status", filter_by_curation_status)
 
         general_handler.modifiers.register(
             "annotation", filter_by_contains_field("entry", "entryannotation__type")

@@ -72,8 +72,9 @@ class GroupByModifierTest(InterproRESTTestCase):
 
     def test_can_group_entries_by_curation_status(self):
         response = self.client.get(
-            "api/entry/InterPro/?group_by=curation_statuses"
+            "/api/entry/interpro/?group_by=curation_statuses"
         )
+        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertIn("Curated", response.data)

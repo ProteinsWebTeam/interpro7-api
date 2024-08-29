@@ -70,6 +70,21 @@ class GroupByModifierTest(InterproRESTTestCase):
         self.assertEqual(response.data["proteome_is_reference"]["true"], 2)
         self.assertEqual(response.data["proteome_is_reference"]["false"], 1)
 
+    def test_can_group_entries_by_curation_status(self):
+        response = self.client.get(
+            "/api/entry/interpro/?group_by=curation_statuses"
+        )
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertIn("Curated", response.data)
+        self.assertIn("AI-Generated (reviewed)", response.data)
+        self.assertIn("AI-Generated (unreviewed)", response.data)
+
+        self.assertEqual(type(response.data["Curated"]), int)
+        self.assertEqual(type(response.data["AI-Generated (reviewed)"]), int)
+        self.assertEqual(type(response.data["AI-Generated (unreviewed)"]), int)
+
 
 class FilterByFieldModifierTest(InterproRESTTestCase):
     def test_can_filter_pfam_by_integrated(self):

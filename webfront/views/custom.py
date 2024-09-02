@@ -26,6 +26,10 @@ from webfront.views.queryset_manager import (
     can_use_proteome_per_db,
 )
 
+from django.conf import settings
+from rest_framework import status
+
+
 logger = logging.getLogger("interpro.request")
 
 
@@ -78,9 +82,19 @@ class CustomView(GenericAPIView):
         *args,
         **kwargs
     ):
+        
+        # Before any logic is executed, check correctness of accession format
+        db_members_accessions = r"^({})$".format("|".join((db["accession"] for (_, db) in settings.DB_MEMBERS.items())))
+        for i in range(0, len(endpoint_levels)):
+            if (re.match(db_members_accessions, endpoint_levels[i])):
+                if (not(re.match(settings.DB_MEMBERS[endpoint_levels[i-1]]["accession"], endpoint_levels[i]))):
+                    content = {"detail": "The accession provided can't be used for this member database."}
+                    return Response(content, status=status.HTTP_404_NOT_FOUND)
+
         # if this is the last level
         if len(endpoint_levels) == level:
             searcher = general_handler.searcher
+
             # Executes all the modifiers, some add filters to the query set but others might replace it.
             has_payload = general_handler.modifiers.execute(drf_request)
             logger.debug(request.get_full_path())
@@ -228,6 +242,7 @@ class CustomView(GenericAPIView):
             except ValueError:
                 pass
 
+            
             if index != -1:
                 endpoints.pop(index)
                 # removing the current

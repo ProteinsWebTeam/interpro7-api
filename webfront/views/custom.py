@@ -88,7 +88,7 @@ class CustomView(GenericAPIView):
         for i in range(0, len(endpoint_levels)):
             if (re.match(db_members_accessions, endpoint_levels[i])):
                 if (not(re.match(settings.DB_MEMBERS[endpoint_levels[i-1]]["accession"], endpoint_levels[i]))):
-                    content = {"detail": "The accession provided can't be used for this member database."}
+                    content = {"detail": f"{endpoint_levels[i]} is not a valid {endpoint_levels[i-1].upper()} accession"}
                     return Response(content, status=status.HTTP_404_NOT_FOUND)
 
         # if this is the last level

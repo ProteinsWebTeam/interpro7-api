@@ -93,7 +93,7 @@ class CustomView(GenericAPIView):
                 # If an accession is found, get the member DB at the previous endpoint level
                 if regex.match(endpoint_level):
                     accession = endpoint_level.upper()
-                    db_key = endpoint_levels[i - 1].lower()
+                    db_key = endpoint_levels[i - 1].lower().replace("tigrfams", "ncbifam")
                     db_member = settings.DB_MEMBERS[db_key]
                     pattern = db_member["accession"]
 

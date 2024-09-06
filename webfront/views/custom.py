@@ -82,14 +82,31 @@ class CustomView(GenericAPIView):
         *args,
         **kwargs
     ):
-        
         # Before any logic is executed, check correctness of accession format
-        db_members_accessions = r"^({})$".format("|".join((db["accession"] for (_, db) in settings.DB_MEMBERS.items())))
-        for i in range(0, len(endpoint_levels)):
-            if (re.match(db_members_accessions, endpoint_levels[i])):
-                if (not(re.match(settings.DB_MEMBERS[endpoint_levels[i-1]]["accession"], endpoint_levels[i]))):
-                    content = {"detail": f"{endpoint_levels[i]} is not a valid {endpoint_levels[i-1].upper()} accession"}
-                    return Response(content, status=status.HTTP_404_NOT_FOUND)
+        if level == 0:
+            patterns = [db["accession"] for db in settings.DB_MEMBERS.values()]
+            pattern = r"({})".format("|".join(patterns))
+            regex = re.compile(pattern, re.IGNORECASE)
+
+            for i, endpoint_level in enumerate(endpoint_levels):
+                
+                # If an accession is found, get the member DB at the previous endpoint level
+                if regex.match(endpoint_level):
+                    accession = endpoint_level.upper()
+                    db_key = endpoint_levels[i - 1].lower()
+                    db_member = settings.DB_MEMBERS[db_key]
+                    pattern = db_member["accession"]
+
+                    # If the member DB doesn't accept that accession format, return a 404
+                    match = re.match(pattern, accession, re.IGNORECASE)
+                    if match is None:
+                        return Response(
+                            {
+                                "Error": f"{accession} is not a valid "
+                                         f"{db_member['label']} accession",
+                            },
+                            status=status.HTTP_404_NOT_FOUND
+                        )
 
         # if this is the last level
         if len(endpoint_levels) == level:

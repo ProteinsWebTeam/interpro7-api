@@ -26,6 +26,10 @@ from webfront.views.queryset_manager import (
     can_use_proteome_per_db,
 )
 
+from django.conf import settings
+from rest_framework import status
+
+
 logger = logging.getLogger("interpro.request")
 
 
@@ -78,9 +82,36 @@ class CustomView(GenericAPIView):
         *args,
         **kwargs
     ):
+        # Before any logic is executed, check correctness of accession format
+        if level == 0:
+            patterns = [db["accession"] for db in settings.DB_MEMBERS.values()]
+            pattern = r"({})".format("|".join(patterns))
+            regex = re.compile(pattern, re.IGNORECASE)
+
+            for i, endpoint_level in enumerate(endpoint_levels):
+                
+                # If an accession is found, get the member DB at the previous endpoint level
+                if regex.match(endpoint_level):
+                    accession = endpoint_level.upper()
+                    db_key = endpoint_levels[i - 1].lower().replace("tigrfams", "ncbifam")
+                    db_member = settings.DB_MEMBERS[db_key]
+                    pattern = db_member["accession"]
+
+                    # If the member DB doesn't accept that accession format, return a 404
+                    match = re.match(pattern, accession, re.IGNORECASE)
+                    if match is None:
+                        return Response(
+                            {
+                                "Error": f"{accession} is not a valid "
+                                         f"{db_member['label']} accession",
+                            },
+                            status=status.HTTP_404_NOT_FOUND
+                        )
+
         # if this is the last level
         if len(endpoint_levels) == level:
             searcher = general_handler.searcher
+
             # Executes all the modifiers, some add filters to the query set but others might replace it.
             has_payload = general_handler.modifiers.execute(drf_request)
             logger.debug(request.get_full_path())
@@ -228,6 +259,7 @@ class CustomView(GenericAPIView):
             except ValueError:
                 pass
 
+            
             if index != -1:
                 endpoints.pop(index)
                 # removing the current

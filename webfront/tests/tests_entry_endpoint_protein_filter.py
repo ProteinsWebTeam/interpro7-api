@@ -216,12 +216,26 @@ class EntryWithFilterProteinUniprotAccessionRESTTest(InterproRESTTestCase):
                 url, msg=f"The URL [{url}] should've failed."
             )
 
-    def test_urls_that_should_fail(self):
+    def test_urls_with_wrong_accession(self):
         acc = "IPR003165"
         pfam = "PF02171"
         prot = "A1CUJ5"
         tests = [
             f"/api/entry/interpro/{acc}/smart/{pfam}/protein/unreviewed/{prot}",
+            f"/api/structure/PDB/101m/entry/smart/{pfam}",
+            f"/api/entry/smart/{pfam}/structure/PDB/101m/"]
+        for url in tests:
+            self._check_HTTP_response_code(
+                url,
+                code=status.HTTP_404_NOT_FOUND,
+                msg=f"The URL [{url}] should've failed.",
+            )
+        
+    def test_urls_that_should_fail(self):
+        acc = "IPR003165"
+        pfam = "PF02171"
+        prot = "A1CUJ5"
+        tests = [
             f"/api/entry/unintegrated/pfam/{pfam}/protein/unreviewed/{prot}",
         ]
         for url in tests:

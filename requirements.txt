@@ -1,11 +1,11 @@
-# remember to check the version is compatible with python 3.6
-Django==3.2.24
-djangorestframework==3.13.1
+# remember to check the version is compatible with python 3.8
+Django==4.2.13
+djangorestframework==3.15.1
 PyYAML==6.0
 jsonfield2==4.0.0.post0
 pymysql==1.1.1
-django-cors-headers~=3.10
+django-cors-headers==4.3.1
 gunicorn==22.0.0
-django-redis==5.2.0
-redis==4.4.4
-requests~=2.27
+django-redis==5.4.0
+redis==5.0.4
+requests==2.32.3

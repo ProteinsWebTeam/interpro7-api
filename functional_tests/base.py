@@ -53,10 +53,10 @@ class FunctionalTest(StaticLiveServerTestCase):
                 if "BROWSER_TEST_PATH" in os.environ:
                     self.browser = webdriver.Chrome(
                         executable_path=os.environ["BROWSER_TEST_PATH"],
-                        chrome_options=chrome_options,
+                        options=chrome_options,
                     )
                 else:
-                    self.browser = webdriver.Chrome(chrome_options=chrome_options)
+                    self.browser = webdriver.Chrome(options=chrome_options)
             else:
                 raise KeyError
         except KeyError:

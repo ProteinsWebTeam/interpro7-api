@@ -1,4 +1,4 @@
-# remember to check the version is compatible with python 3.6
+# remember to check the version is compatible with python 3.8
 selenium==4.21.0
 django-debug-toolbar==4.4.2
 ipdb==0.13.13

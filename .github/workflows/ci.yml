@@ -1,0 +1,43 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - dev  
+      - master
+      - runner
+
+jobs:
+  build:
+    runs-on: self-hosted 
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: 🐍 - Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Release 
+        run: |
+
+            # Release to dev
+            if [ "${{ github.ref }}" == "refs/heads/runner" ]; then
+              export VM_BASE_PATH="/nfs/www-prod/web_hx2/interpro/dev/api/releases/";
+              export VM_NAME="wp-np3-bc";
+
+            # Release to staging
+            elif [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+              export VM_BASE_PATH="/nfs/www-prod/web_hx2/interpro/stage/api/releases/";
+              export VM_NAME="wp-np3-be";
+            fi
+
+            # Define folder name
+            export IPRO_RELEASE_FOLDER="interpro7-api-$(date --utc +%Y_%m_%d-%H_%M_%S_utc)";
+            
+            # SSH into correct VM and create directory
+            ssh "$VM_NAME" "cd $VM_BASE_PATH; mkdir "${IPRO_RELEASE_FOLDER}"";
+
+            # Copy contents of the build
+            scp -q -r * "$VM_NAME":"$VM_BASE_PATH/$IPRO_RELEASE_FOLDER";
+            scp -q -r /net/isilonP/public/rw/homes/ipr_adm/deploy_configs/api/stage/* "$VM_NAME":"$VM_BASE_PATH/$IPRO_RELEASE_FOLDER/config/";

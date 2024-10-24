@@ -23,13 +23,12 @@ jobs:
           pip install -r dev_requirements.txt
           pip install tblib
 
-      - name: Run elasticsearch
-        uses: elastic/elastic-github-actions/elasticsearch@master
-        with:
-          stack-version: 8.2.0
-          security-enabled: true
-          elasticsearch_password: "elasticsearch_password"
-
+      - name: Run Elastic
+        run: |
+          cd ../../../elasticsearch-8.15.3/bin
+          ./bin
+    
+      
       # - name: ⚙️🔎 - Setup elastic search
       #   run: |
       #     curl --user elastic:elasticsearch_password 'https://localhost:9200' -k

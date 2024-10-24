@@ -14,6 +14,42 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Setup Python
+        run: | 
+          conda init bash
+          source ~/.bashrc 
+          conda activate interpro-api
+          pip install -r requirements.txt
+          pip install -r dev_requirements.txt
+          pip install tblib
+
+      # - name: Configure sysctl limits
+      #   run: |
+      #     sudo swapoff -a
+      #     sudo sysctl -w vm.swappiness=1
+      #     sudo sysctl -w fs.file-max=262144
+      #     sudo sysctl -w vm.max_map_count=262144
+
+      # - name: Run elasticsearch
+      #   uses: elastic/elastic-github-actions/elasticsearch@master
+      #   with:
+      #     stack-version: 8.2.0
+      #     security-enabled: true
+      #     elasticsearch_password: "elasticsearch_password"
+
+      # - name: ⚙️🔎 - Setup elastic search
+      #   run: |
+      #     curl --user elastic:elasticsearch_password 'https://localhost:9200' -k
+      #     curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json -k
+      #     curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json -k
+
+      # - name: 🧪 - Testing
+      #   run: |
+      #     echo -e "searcher_user: elastic \nsearcher_test_password: elasticsearch_password" > config/interpro.local.yml
+      #     cat config/interpro.local.yml
+      #     export BROWSER_TEST=chrome
+      #     coverage run --source='.' manage.py test
+
       - name: Release 
         run: |
 

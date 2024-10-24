@@ -23,19 +23,12 @@ jobs:
           pip install -r dev_requirements.txt
           pip install tblib
 
-      - name: Configure sysctl limits
-        run: |
-          swapoff -a
-          sysctl -w vm.swappiness=1
-          sysctl -w fs.file-max=262144
-          sysctl -w vm.max_map_count=262144
-
-      # - name: Run elasticsearch
-      #   uses: elastic/elastic-github-actions/elasticsearch@master
-      #   with:
-      #     stack-version: 8.2.0
-      #     security-enabled: true
-      #     elasticsearch_password: "elasticsearch_password"
+      - name: Run elasticsearch
+        uses: elastic/elastic-github-actions/elasticsearch@master
+        with:
+          stack-version: 8.2.0
+          security-enabled: true
+          elasticsearch_password: "elasticsearch_password"
 
       # - name: ⚙️🔎 - Setup elastic search
       #   run: |

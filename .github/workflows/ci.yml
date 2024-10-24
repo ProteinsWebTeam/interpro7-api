@@ -36,4 +36,4 @@ jobs:
 
             # Copy contents of the build
             scp -q -r * "$VM_NAME":"$VM_BASE_PATH/$IPRO_RELEASE_FOLDER";
-            scp -q -r /net/isilonP/public/rw/homes/ipr_adm/deploy_configs/api/stage/* "$VM_NAME":"$VM_BASE_PATH/$IPRO_RELEASE_FOLDER/config/";
+            scp -q -r /net/isilonP/public/rw/homes/ipr_adm/release-procedures/deploy-configs/api/staging/* "$VM_NAME":"$VM_BASE_PATH/$IPRO_RELEASE_FOLDER/config/";

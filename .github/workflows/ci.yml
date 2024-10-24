@@ -26,7 +26,7 @@ jobs:
       - name: Run Elastic
         run: |
           cd ../../../elasticsearch-8.15.3/bin
-          ./elasticsearch
+          ./elasticsearch &
     
       
       # - name: ⚙️🔎 - Setup elastic search

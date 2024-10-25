@@ -22,6 +22,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r dev_requirements.txt
           pip install tblib
+          export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
 
       - name: Run Elastic
         run: |

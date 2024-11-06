@@ -36,9 +36,7 @@ jobs:
       - name: 🧪 - Testing
         run: |
           echo -e "searcher_user: elastic \nsearcher_test_password: "$(cat ~/release-procedures/backend-actions-runner/elastic_pass.txt)"" > config/interpro.local.yml
-          export BROWSER_TEST=chrome
-          export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
-          coverage run --source='.' manage.py test
+          export BROWSER_TEST=chrome; export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH; coverage run --source='.' manage.py test
 
       - name: Release 
         run: |

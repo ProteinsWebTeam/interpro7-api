@@ -32,7 +32,8 @@ jobs:
       #   run: |
       #     curl --user elastic:pass 'https://localhost:9200' -k
       #     curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json -k
-      #     curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json -k
+      #      curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json -k
+      
       
       - name: 🧪 - Testing
         run: |

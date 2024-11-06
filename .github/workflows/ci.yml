@@ -16,8 +16,7 @@ jobs:
 
       - name: Setup Python
         run: | 
-          conda init bash
-          source ~/.bashrc 
+          source ~/miniforge3/etc/profile.d/conda.sh
           conda activate interpro-api
           pip install -r requirements.txt
           pip install -r dev_requirements.txt
@@ -26,9 +25,8 @@ jobs:
 
       - name: Run Elastic
         run: |
-          cd ../../../elasticsearch-8.15.3/bin
+          cd ~/release-procedures/backend-actions-runner/elasticsearch-8.15.3/bin
           ./elasticsearch &
-    
       
       # - name: ⚙️🔎 - Setup elastic search
       #   run: |

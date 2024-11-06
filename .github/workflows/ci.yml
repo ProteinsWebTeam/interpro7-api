@@ -32,14 +32,13 @@ jobs:
       #     curl --user elastic:pass 'https://localhost:9200' -k
       #     curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json -k
       #     curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json -k
-      # 
+      
       - name: 🧪 - Testing
         run: |
           echo -e "searcher_user: elastic \nsearcher_test_password: "$(cat ~/release-procedures/backend-actions-runner/elastic_pass.txt)"" > config/interpro.local.yml
           export BROWSER_TEST=chrome
           export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
-          cd /net/isilonP/public/rw/homes/ipr_adm/.cache/selenium/chromedriver/linux64/114.0.5735.90
-          ./chromedriver
+          coverage run --source='.' manage.py test
 
       - name: Release 
         run: |

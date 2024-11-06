@@ -33,11 +33,11 @@ jobs:
       #     curl --user elastic:elasticsearch_password 'https://localhost:9200' -k
       #     curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/test?pretty' -H 'Content-Type: application/json' -d @config/elastic_mapping.json -k
       #     curl --user elastic:elasticsearch_password -XPUT 'https://localhost:9200/ida?pretty' -H 'Content-Type: application/json' -d @config/elastic_ida_mapping.json -k
-
+      #     echo -e "searcher_user: elastic \nsearcher_test_password: elasticsearch_password" > config/interpro.local.yml
+      #     cat config/interpro.local.yml
+      
       - name: 🧪 - Testing
         run: |
-          echo -e "searcher_user: elastic \nsearcher_test_password: elasticsearch_password" > config/interpro.local.yml
-          cat config/interpro.local.yml
           export BROWSER_TEST=chrome
           coverage run --source='.' manage.py test
 

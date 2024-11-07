@@ -63,7 +63,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         except KeyError:
             options = FirefoxOptions()
             options.add_argument("--headless")
-            self.browser = webdriver.Firefox()
+            self.browser = webdriver.Firefox(options=options)
         self.browser.implicitly_wait(3)
 
     def tearDown(self):

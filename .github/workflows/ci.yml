@@ -24,7 +24,7 @@ jobs:
 
       - name: Run Elastic
         run: |
-          ps aux | grep elasticsearch | awk '{print $2}' | xargs kill 
+          ps aux | grep '[e]lasticsearch' | awk '{print $2}' | xargs -r kill
           cd ~/release-procedures/backend-actions-runner/elasticsearch-8.15.3/bin
           ./elasticsearch &
       

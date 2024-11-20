@@ -109,7 +109,7 @@ class ProteinExtraFeatures(models.Model):
     source_database = models.CharField(max_length=10)
     location_start = models.IntegerField()
     location_end = models.IntegerField()
-    sequence_feature = models.CharField(max_length=35)
+    sequence_feature = models.CharField(max_length=255)
 
     class Meta:
         db_table = "webfront_proteinfeature"

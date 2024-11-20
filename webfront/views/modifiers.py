@@ -198,6 +198,8 @@ def group_by(endpoint_queryset, fields):
             return group_by_go_terms(general_handler)
         if "go_categories" == field:
             return group_by_go_categories(general_handler)
+        if "curation_statuses" == field:
+            return group_by_curation_status(general_handler)
         if "annotation" == field:
             return group_by_annotations(general_handler)
         if "tax_id" == field:
@@ -403,6 +405,34 @@ def filter_by_match_presence(value, general_handler):
     general_handler.queryset_manager.add_filter(
         "entry", **{"source_database__isnull": value.lower() != "true"}
     )
+
+def filter_by_curation_status(value, general_handler):
+    if value == "curated":
+        general_handler.queryset_manager.add_filter("entry", is_llm=False)
+    elif value == "ai-reviewed":
+        general_handler.queryset_manager.add_filter("entry", is_llm=True, is_reviewed_llm=True)
+    elif value == "ai-unreviewed":
+        general_handler.queryset_manager.add_filter("entry", is_llm=True, is_reviewed_llm=False)
+
+def group_by_curation_status(general_handler):
+    id_to_params = {
+        "curated": {"is_llm": False},
+        "ai-reviewed": {"is_llm": True, "is_reviewed_llm": True},
+        "ai-unreviewed": {"is_llm": True, "is_reviewed_llm": False},
+    }
+    id_to_name = {
+        "curated": "Curated",
+        "ai-reviewed": "AI-Generated (reviewed)",
+        "ai-unreviewed": "AI-Generated (unreviewed)"
+    }
+    if is_single_endpoint(general_handler):
+        qs = {
+            id_to_name[cat]: general_handler.queryset_manager.get_queryset()
+            .filter(**id_to_params[cat])
+            .count()
+            for cat in id_to_params
+        }
+        return qs
 
 
 def filter_by_latest_entries(value, general_handler):

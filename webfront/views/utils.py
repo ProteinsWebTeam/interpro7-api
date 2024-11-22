@@ -122,15 +122,15 @@ class AccessionHandler(CustomView):
                 )
 
                 if qs2.count() > 0:
-                    first = qs2.first()
                     self.queryset = {
                         "endpoint": "protein",
-                        "source_database": first.source_database,
+                        "source_database": "UniProt",
                         "proteins": [
                             {
                                 "accession": item.accession,
                                 "organism": item.organism["scientificName"],
                                 "tax_id": item.tax_id,
+                                "is_fragment": item.is_fragment,
                             }
                             for item in qs2
                         ],

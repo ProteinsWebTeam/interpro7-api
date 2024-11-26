@@ -66,10 +66,14 @@ class UtilsAccessionTest(InterproRESTTestCase):
         response = self.client.get("/api/utils/accession/FOLH1")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["endpoint"], "protein")
-        self.assertEqual(response.data["source_database"], "unreviewed")
+        self.assertEqual(response.data["source_database"], "UniProt")
         self.assertIn("proteins", response.data)
         self.assertGreater(len(response.data["proteins"]), 0)
+        self.assertIn("accession", response.data["proteins"][0])
         self.assertEqual(response.data["proteins"][0]["accession"], "Q0VDM6")
+        self.assertIn("organism", response.data["proteins"][0])
+        self.assertIn("tax_id", response.data["proteins"][0])
+        self.assertIn("is_fragment", response.data["proteins"][0])
 
 
 class UtilsReleaseTest(InterproRESTTestCase):

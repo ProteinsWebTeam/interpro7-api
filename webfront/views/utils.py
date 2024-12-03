@@ -119,7 +119,7 @@ class AccessionHandler(CustomView):
             else:
                 qs2 = Protein.objects.filter(tax_id__in=list(organisms.keys())).filter(
                     gene__iexact=acc
-                )
+                ).order_by('is_fragment', 'accession')
 
                 if qs2.count() > 0:
                     self.queryset = {

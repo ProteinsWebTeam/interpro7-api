@@ -921,7 +921,7 @@ def get_interpro_n_matches(value, general_handler):
     queryset = general_handler.queryset_manager.get_queryset().first()
     interpro_n_matches = InterProNMatches.objects.filter(protein_acc=queryset.accession)
     
-    return {"results": [
+    return [
             {
                 "accession": match.entry.pk,
                 "name": match.entry.name,
@@ -931,8 +931,7 @@ def get_interpro_n_matches(value, general_handler):
                 "locations": loads(match.locations)
             }
             for match in interpro_n_matches
-            ], 
-            "count": len(interpro_n_matches)}
+            ]
 
 def passing(x, y):
     pass

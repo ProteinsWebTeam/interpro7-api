@@ -13,6 +13,7 @@ from webfront.models import (
     Taxonomy,
     ProteinExtraFeatures,
     ProteinResidues,
+    InterProNMatches
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import (
@@ -914,6 +915,45 @@ def mark_as_subfamily(value, general_handler):
 def show_subset(value, general_handler):
     general_handler.queryset_manager.show_subset = True
 
+
+
+def get_isoforms(value, general_handler):
+    isoforms = Isoforms.objects.filter(
+        protein_acc__in=general_handler.queryset_manager.get_queryset()
+    )
+    if value is not None and value != "":
+        isoforms = isoforms.filter(accession__iexact=value)
+        if len(isoforms) == 0:
+            raise EmptyQuerysetError(
+                "There aren't isoforms with accession {}".format(value)
+            )
+        isoform = isoforms.first()
+        return {
+            "accession": isoform.accession,
+            "protein_acc": isoform.protein_acc,
+            "length": isoform.length,
+            "sequence": isoform.sequence,
+            "features": isoform.features,
+        }
+
+    return {"results": [iso.accession for iso in isoforms], "count": len(isoforms)}
+
+def get_interpro_n_matches(value, general_handler):
+
+    queryset = general_handler.queryset_manager.get_queryset().first()
+    interpro_n_matches = InterProNMatches.objects.filter(protein_acc=queryset.accession)
+    
+    return {"results": [
+            {
+                "accession": match.entry.pk,
+                "name": match.entry.name,
+                "short_name": match.entry.short_name,
+                "source_database": match.entry.source_database,
+                "locations": loads(match.locations)
+            }
+            for match in interpro_n_matches
+            ], 
+            "count": len(interpro_n_matches)}
 
 def passing(x, y):
     pass

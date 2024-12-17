@@ -916,28 +916,6 @@ def show_subset(value, general_handler):
     general_handler.queryset_manager.show_subset = True
 
 
-
-def get_isoforms(value, general_handler):
-    isoforms = Isoforms.objects.filter(
-        protein_acc__in=general_handler.queryset_manager.get_queryset()
-    )
-    if value is not None and value != "":
-        isoforms = isoforms.filter(accession__iexact=value)
-        if len(isoforms) == 0:
-            raise EmptyQuerysetError(
-                "There aren't isoforms with accession {}".format(value)
-            )
-        isoform = isoforms.first()
-        return {
-            "accession": isoform.accession,
-            "protein_acc": isoform.protein_acc,
-            "length": isoform.length,
-            "sequence": isoform.sequence,
-            "features": isoform.features,
-        }
-
-    return {"results": [iso.accession for iso in isoforms], "count": len(isoforms)}
-
 def get_interpro_n_matches(value, general_handler):
 
     queryset = general_handler.queryset_manager.get_queryset().first()

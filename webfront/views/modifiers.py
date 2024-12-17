@@ -925,6 +925,7 @@ def get_interpro_n_matches(value, general_handler):
             {
                 "accession": match.entry.pk,
                 "name": match.entry.name,
+                "type": match.entry.type, 
                 "short_name": match.entry.short_name,
                 "source_database": match.entry.source_database,
                 "locations": loads(match.locations)

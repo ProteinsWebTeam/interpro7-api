@@ -295,7 +295,7 @@ class InterProNMatches(models.Model):
     entry = models.ForeignKey(
         Entry, db_column="entry_acc", on_delete=models.SET_NULL, null=True
     )
-    locations = models.TextField()
+    locations = models.JSONField()
 
     class Meta:
         db_table = "webfront_interpro_n"

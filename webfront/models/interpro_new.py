@@ -286,3 +286,16 @@ class Isoforms(models.Model):
 
     class Meta:
         db_table = "webfront_varsplic"
+
+class InterProNMatches(models.Model):
+    match_id = models.AutoField(primary_key=True)
+    protein_acc = models.ForeignKey(
+        Protein, db_column="protein_acc", on_delete=models.SET_NULL, null=True
+    )
+    entry = models.ForeignKey(
+        Entry, db_column="entry_acc", on_delete=models.SET_NULL, null=True
+    )
+    locations = models.JSONField()
+
+    class Meta:
+        db_table = "webfront_interpro_n"

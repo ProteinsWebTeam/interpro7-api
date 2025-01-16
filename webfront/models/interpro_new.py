@@ -269,6 +269,7 @@ class Set(models.Model):
     counts = JSONField(null=True)
     authors = JSONField(null=True)
     literature = JSONField(null=True)
+    wikipedia = JSONField(null=True)
 
 
 class Release_Note(models.Model):

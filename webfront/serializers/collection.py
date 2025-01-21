@@ -205,6 +205,7 @@ class SetSerializer(ModelContentSerializer):
                 "counters": counters,
                 "authors": instance.authors,
                 "literature": instance.literature,
+                "wikipedia": instance.wikipedia, 
             }
         }
         return obj

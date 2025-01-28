@@ -13,6 +13,7 @@ from webfront.models import (
     Taxonomy,
     ProteinExtraFeatures,
     ProteinResidues,
+    InterProNMatches
 )
 from webfront.views.custom import filter_queryset_accession_in
 from webfront.exceptions import (
@@ -914,6 +915,27 @@ def mark_as_subfamily(value, general_handler):
 def show_subset(value, general_handler):
     general_handler.queryset_manager.show_subset = True
 
+
+def get_interpro_n_matches(value, general_handler):
+
+    queryset = general_handler.queryset_manager.get_queryset().first()
+    ipro_n_matches = InterProNMatches.objects.filter(protein_acc=queryset.accession)
+    ipro_n_result = {}
+
+    for match in ipro_n_matches: 
+        integrated = match.entry.integrated
+        ipro_n_result[match.entry.pk] = {
+            "accession": match.entry.pk,
+            "name": match.entry.name,
+            "type": match.entry.type, 
+            "short_name": match.entry.short_name,
+            "source_database": match.entry.source_database,
+            "integrated": integrated.accession if integrated else None, 
+            "locations": match.locations
+        }
+
+    return ipro_n_result
+            
 
 def passing(x, y):
     pass

@@ -75,7 +75,7 @@ class QuerysetManager:
         return self.order_field if self.order_field_in_pagination else None
 
     # Generates a query string for elasticsearch from the registered queryset filters.
-    # It explicitely goes through all the filters and create the query string case by case.
+    # It explicitly goes through all the filters and create the query string case by case.
     def get_searcher_query(self, include_search=False, use_lineage=False):
         blocks = []
         search_blocks = []

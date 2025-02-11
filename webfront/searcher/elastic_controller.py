@@ -310,6 +310,13 @@ class ElasticsearchController(SearchController):
 
         return output
 
+    def get_cardinality_field(self, endpoint):
+        filters = self.queryset_manager.filters
+        if filters.get("protein") and filters.get("structure") and not filters.get("entry"):
+            return "structure_protein_acc"
+
+        return endpoint + "_acc"
+
     def get_list_of_endpoint(self, endpoint, query=None, rows=10, start=0, cursor=None):
         should_keep_elastic_order = False
         qs = self.queryset_manager.get_searcher_query() if query is None else query
@@ -317,12 +324,12 @@ class ElasticsearchController(SearchController):
             qs = "*:*"
         facet = {
             "aggs": {
-                "ngroups": {"cardinality": {"field": endpoint + "_acc"}},
+                "ngroups": {"cardinality": {"field": self.get_cardinality_field(endpoint)}},
                 "groups": {
                     "composite": {
                         "size": rows,
                         "sources": [
-                            {"source": {"terms": {"field": "{}_acc".format(endpoint)}}}
+                            {"source": {"terms": {"field": self.get_cardinality_field(endpoint)}}}
                         ],
                     }
                 },

@@ -172,7 +172,9 @@ class FixtureReader:
 
                     c["entry_structure_locations"] = ep["coordinates"]
                     c["structure_protein_locations"] = sp["coordinates"]
-                    c["structure_protein_acc"] = p
+                    c["structure_protein_acc"] = sp
+                    c["structure_protein_db"] = obj["protein_db"]
+                    c["structure_protein_length"] = sp["length"]
                     # c["protein_structure"] = sp["mapping"]
                     if e in entry2set:
                         for e2s in entry2set[e]:
@@ -208,11 +210,9 @@ class FixtureReader:
                     to_add.append(
                         {
                             "text": p + " " + sp["structure"],
-                            "protein_acc": p,
-                            "protein_db": self.proteins[p]["source_database"],
-                            "protein_af_score": (
-                                0.5 if self.proteins[p]["in_alphafold"] else -1
-                            ),
+                            "structure_protein_acc": p,
+                            "structure_protein_db": self.proteins[p]["source_database"],
+                            "structure_protein_length": sp["length"],
                             "text_protein": p
                             + " "
                             + self.proteins[p]["source_database"]
@@ -247,8 +247,6 @@ class FixtureReader:
                             "structure_chain_acc": sp["chain"],
                             "text_structure": sp["structure"] + " " + sp["chain"],
                             "structure_protein_locations": sp["coordinates"],
-                            "structure_protein_acc": p,
-                            # "protein_structure": sp["mapping"],
                         }
                     )
 

@@ -263,7 +263,9 @@ class FixtureReader:
 
         # Creating obj to add for proteins without entry or structure
         for p in self.proteins:
-            p_ocurrences = len([t for t in to_add if t["protein_acc"] == p])
+            p_ocurrences = len([t for t in to_add
+                                if t.get("protein_acc") == p or
+                                t.get("structure_protein_acc") == p])
             if p_ocurrences == 0:
                 to_add.append(
                     {

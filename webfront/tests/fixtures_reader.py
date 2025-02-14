@@ -172,7 +172,7 @@ class FixtureReader:
 
                     c["entry_structure_locations"] = ep["coordinates"]
                     c["structure_protein_locations"] = sp["coordinates"]
-                    c["structure_protein_acc"] = sp
+                    c["structure_protein_acc"] = sp["protein"]
                     c["structure_protein_db"] = obj["protein_db"]
                     c["structure_protein_length"] = sp["length"]
                     # c["protein_structure"] = sp["mapping"]

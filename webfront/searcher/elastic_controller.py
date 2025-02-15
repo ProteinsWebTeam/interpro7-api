@@ -6,6 +6,8 @@ import urllib.parse
 import json
 import re
 
+from redis.cluster import PRIMARY
+
 from webfront.views.queryset_manager import escape
 from webfront.searcher.search_controller import SearchController
 
@@ -216,9 +218,19 @@ class ElasticsearchController(SearchController):
 
     def tune_counter_facet_for_protein(self, facet, endpoint, extra_counters):
         if endpoint == "protein":
+            if self.queryset_manager.main_endpoint == "structure":
+                acc_field = "structure_protein_acc"
+                db_field = "structure_protein_db"
+            else:
+                acc_field = "protein_acc"
+                db_field = "protein_db"
+
+            facet["aggs"]["databases"]["terms"]["field"] = db_field
+            facet["aggs"]["databases"]["aggs"]["unique"]["cardinality"]["field"] = acc_field
+
             facet["aggs"]["uniprot"] = {
-                "filter": {"exists": {"field": "protein_acc"}},
-                "aggs": {"unique": {"cardinality": {"field": "protein_acc"}}},
+                "filter": {"exists": {"field": acc_field}},
+                "aggs": {"unique": {"cardinality": {"field": acc_field}}},
             }
             self.add_extra_counters(facet, "uniprot", extra_counters)
 

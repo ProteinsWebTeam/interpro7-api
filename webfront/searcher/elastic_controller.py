@@ -312,7 +312,7 @@ class ElasticsearchController(SearchController):
 
     def get_cardinality_field(self, endpoint):
         filters = self.queryset_manager.filters
-        if filters.get("protein") and filters.get("structure") and not filters.get("entry"):
+        if endpoint == "protein" and filters.get("structure") and not filters.get("entry"):
             return "structure_protein_acc"
 
         return endpoint + "_acc"

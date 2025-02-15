@@ -303,7 +303,7 @@ class StructureSerializer(ModelContentSerializer):
             "protein": obj["structure_protein_acc"],
             "chain": obj["structure_chain_acc"],
             "protein_length": obj["protein_length"],
-            "source_database": obj["protein_db"],
+            "source_database": obj["structure_protein_db"],
             "sequence": chain.sequence,
             "sequence_length": chain.length,
             # "structure_protein_acc": obj["structure_protein_acc"],

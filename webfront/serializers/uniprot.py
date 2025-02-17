@@ -359,30 +359,26 @@ class ProteinSerializer(ModelContentSerializer):
         include_coordinates=True,
         queryset_manager=None,
     ):
-        if for_entry:
-            header = {
-                "accession": obj["protein_acc"],
-                "protein_length": obj["protein_length"],
-                "source_database": obj["protein_db"],
-                "organism": obj["tax_id"],
-                "in_alphafold": obj.get("protein_af_score", -1) != -1,
-            }
-            key_loc = "entry_protein_locations"
-        else:
-            header = {
-                "accession": obj["structure_protein_acc"],
-                "protein_length": obj["structure_protein_length"],
-                "source_database": obj["structure_protein_db"],
-                "organism": obj["tax_id"],
-                "in_alphafold": obj.get("protein_af_score", -1) != -1,
-            }
-            if "structure_chain_acc" in obj:
-                header["chain"] = obj["structure_chain_acc"]
-            key_loc = "structure_protein_locations"
-
+        header = {
+            "accession": obj["protein_acc"],
+            "protein_length": obj["protein_length"],
+            "source_database": obj["protein_db"],
+            "organism": obj["tax_id"],
+            "in_alphafold": not obj["protein_af_score"] == -1,
+        }
+        if not for_entry and "structure_chain_acc" in obj:
+            header["chain"] = obj["structure_chain_acc"]
         if include_coordinates:
-            header[key_loc] = obj[key_loc] if key_loc in obj else None
-
+            key_coord = (
+                "entry_protein_locations"
+                if for_entry
+                else "structure_protein_locations"
+            )
+            header[key_coord] = obj[key_coord] if key_coord in obj else None
+            # if not for_entry:
+            #     header["protein_structure_mapping"] = (
+            #         obj["protein_structure"] if "protein_structure" in obj else None
+            #     )
         if include_protein:
             header["protein"] = ProteinSerializer.to_metadata_representation(
                 Protein.objects.get(accession__iexact=obj["protein_acc"].lower()),

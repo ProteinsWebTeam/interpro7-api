@@ -210,6 +210,12 @@ class FixtureReader:
                     to_add.append(
                         {
                             "text": p + " " + sp["structure"],
+                            "protein_acc": p,
+                            "protein_db": self.proteins[p]["source_database"],
+                            "protein_length": self.proteins[p]["length"],
+                            "protein_af_score": (
+                                0.5 if self.proteins[p]["in_alphafold"] else -1
+                            ),
                             "structure_protein_acc": p,
                             "structure_protein_db": self.proteins[p]["source_database"],
                             "structure_protein_length": sp["length"],
@@ -231,7 +237,6 @@ class FixtureReader:
                             "proteome_is_reference": self.proteomes[proteome][
                                 "is_reference"
                             ],
-                            "protein_length": self.proteins[p]["length"],
                             "id": get_id(None, p, sp["structure"], sp["chain"]),
                             "structure_acc": sp["structure"],
                             "structure_evidence": self.structures[sp["structure"]][

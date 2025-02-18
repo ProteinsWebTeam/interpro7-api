@@ -6,8 +6,6 @@ import urllib.parse
 import json
 import re
 
-from redis.cluster import PRIMARY
-
 from webfront.views.queryset_manager import escape
 from webfront.searcher.search_controller import SearchController
 

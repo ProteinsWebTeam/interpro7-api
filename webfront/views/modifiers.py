@@ -925,7 +925,7 @@ def get_interpro_n_matches(value, general_handler):
     for match in ipro_n_matches: 
         integrated = match.entry.integrated
         ipro_n_result[match.entry.pk] = {
-            "accession": match.entry.pk ,
+            "accession": match.entry.pk,
             "name": match.entry.name,
             "type": match.entry.type, 
             "short_name": match.entry.short_name,

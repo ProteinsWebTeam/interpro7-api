@@ -925,13 +925,22 @@ def get_interpro_n_matches(value, general_handler):
     for match in ipro_n_matches: 
         integrated = match.entry.integrated
         ipro_n_result[match.entry.pk] = {
-            "accession": match.entry.pk,
+            "accession": match.entry.pk ,
             "name": match.entry.name,
             "type": match.entry.type, 
             "short_name": match.entry.short_name,
             "source_database": match.entry.source_database,
-            "integrated": integrated.accession if integrated else None, 
-            "locations": match.locations
+            "integrated": { 
+                "accession": integrated.accession,
+                "name": integrated.name,
+                "source_database": integrated.source_database,
+                "type": integrated.type, 
+                "member_databases": integrated.member_databases,
+                "go_terms":  integrated.go_terms
+             } if integrated else None, 
+            "entry_protein_locations": match.locations,
+            "in_interpro": match.in_interpro,
+            "is_preferred": match.is_preferred
         }
 
     return ipro_n_result

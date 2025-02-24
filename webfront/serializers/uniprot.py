@@ -300,7 +300,7 @@ class ProteinSerializer(ModelContentSerializer):
 
     def to_structures_count_representation(self, instance):
         query = (
-            "protein_acc:" + escape(instance.accession)
+            "structure_protein_acc:" + escape(instance.accession)
             if hasattr(instance, "accession")
             else None
         )

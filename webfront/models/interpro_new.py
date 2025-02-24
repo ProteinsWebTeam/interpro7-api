@@ -267,9 +267,9 @@ class Set(models.Model):
     source_database = models.CharField(max_length=20, db_index=True)
     relationships = JSONField(null=True)
     counts = JSONField(null=True)
-    authors = JSONField(null=True)
-    literature = JSONField(null=True)
-    wikipedia = JSONField(null=True)
+    authors = JSONField(default=list)
+    literature = JSONField(default=list)
+    wikipedia = JSONField(default=list)
 
 
 class Release_Note(models.Model):

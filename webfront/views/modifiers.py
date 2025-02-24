@@ -919,7 +919,7 @@ def show_subset(value, general_handler):
 def get_interpro_n_matches(value, general_handler):
 
     queryset = general_handler.queryset_manager.get_queryset().first()
-    ipro_n_matches = InterProNMatches.objects.filter(protein_acc=queryset.accession)
+    ipro_n_matches = InterProNMatches.objects.select_related("entry", "entry__integrated").filter(protein_acc=queryset.accession)
     ipro_n_result = {}
 
     for match in ipro_n_matches: 

@@ -296,6 +296,8 @@ class InterProNMatches(models.Model):
     entry = models.ForeignKey(
         Entry, db_column="entry_acc", on_delete=models.SET_NULL, null=True
     )
+    in_interpro = models.BooleanField(db_column="in_interpro", null=False)
+    is_preferred = models.BooleanField(db_column="is_preferred", null=False)
     locations = models.JSONField()
 
     class Meta:

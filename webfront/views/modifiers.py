@@ -919,7 +919,7 @@ def show_subset(value, general_handler):
 def get_interpro_n_matches(value, general_handler):
 
     queryset = general_handler.queryset_manager.get_queryset().first()
-    ipro_n_matches = InterProNMatches.objects.filter(protein_acc=queryset.accession)
+    ipro_n_matches = InterProNMatches.objects.select_related("entry", "entry__integrated").filter(protein_acc=queryset.accession)
     ipro_n_result = {}
 
     for match in ipro_n_matches: 
@@ -930,8 +930,17 @@ def get_interpro_n_matches(value, general_handler):
             "type": match.entry.type, 
             "short_name": match.entry.short_name,
             "source_database": match.entry.source_database,
-            "integrated": integrated.accession if integrated else None, 
-            "locations": match.locations
+            "integrated": { 
+                "accession": integrated.accession,
+                "name": integrated.name,
+                "source_database": integrated.source_database,
+                "type": integrated.type, 
+                "member_databases": integrated.member_databases,
+                "go_terms":  integrated.go_terms
+             } if integrated else None, 
+            "entry_protein_locations": match.locations,
+            "in_interpro": match.in_interpro,
+            "is_preferred": match.is_preferred
         }
 
     return ipro_n_result

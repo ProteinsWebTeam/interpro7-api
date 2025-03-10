@@ -35,7 +35,7 @@ class Entry(models.Model):
     hierarchy = JSONField(null=True)
     cross_references = JSONField(null=True)
     entry_date = models.DateTimeField(null=True)
-    overlaps_with = JSONField(default=[])
+    overlaps_with = JSONField(default=list)
     is_public = models.BooleanField(default=False)
     deletion_date = models.DateTimeField(null=True)
     counts = JSONField(null=True)
@@ -86,7 +86,7 @@ class Protein(models.Model):
     source_database = models.CharField(
         max_length=20, default="unreviewed", db_index=True
     )
-    structure = JSONField(default={}, null=True)
+    structure = JSONField(default=dict, null=True)
     is_fragment = models.BooleanField(default=False)
     in_alphafold = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
@@ -267,9 +267,9 @@ class Set(models.Model):
     source_database = models.CharField(max_length=20, db_index=True)
     relationships = JSONField(null=True)
     counts = JSONField(null=True)
-    authors = JSONField(null=True)
-    literature = JSONField(null=True)
-    wikipedia = JSONField(null=True)
+    authors = JSONField(default=list)
+    literature = JSONField(default=list)
+    wikipedia = JSONField(default=list)
 
 
 class Release_Note(models.Model):

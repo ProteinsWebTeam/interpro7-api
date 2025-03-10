@@ -161,7 +161,7 @@ class EntrySetTest(InterproRESTTestCase):
             for s in response.data["sets"]:
                 self._check_set_from_searcher(s)
 
-    def test_can_get_the_authors_and_literature(self):
+    def test_set_with_optional_fields(self):
         url = "/api/set/pfam/CL0001"
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
@@ -170,19 +170,29 @@ class EntrySetTest(InterproRESTTestCase):
         self.assertIn("authors", metadata)
         self.assertEqual(2, len(metadata["authors"]))
         self.assertEqual(str, type(metadata["authors"][0]))
+        self.assertIn("literature", metadata)
         self.assertEqual(2, len(metadata["literature"]))
         self.assertEqual(dict, type(metadata["literature"][0]))
         self.assertIn("PMID", metadata["literature"][0])
+        self.assertIn("wikipedia", metadata)
+        self.assertEqual(1, len(metadata["wikipedia"]))
+        self.assertEqual(dict, type(metadata["wikipedia"][0]))
+        self.assertIn("title", metadata["wikipedia"][0])
+        self.assertIn("extract", metadata["wikipedia"][0])
+        self.assertIn("thumbnail", metadata["wikipedia"][0])
 
-    def test_can_authors_and_literature_be_null(self):
+    def test_set_without_optional_fields(self):
         url = "/api/set/pfam/CL0002"
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK, f"URL : [{url}]")
         metadata = response.data["metadata"]
         self._check_set_details(metadata)
         self.assertIn("authors", metadata)
-        self.assertEqual(None, metadata["authors"])
-        self.assertEqual(None, metadata["literature"])
+        self.assertEqual([], metadata["authors"])
+        self.assertIn("literature", metadata)
+        self.assertEqual([], metadata["literature"])
+        self.assertIn("wikipedia", metadata)
+        self.assertEqual([], metadata["wikipedia"])
 
 
 class ProteinSetTest(InterproRESTTestCase):

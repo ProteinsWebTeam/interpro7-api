@@ -130,6 +130,7 @@ class FixtureReader:
                 "protein_acc": p,
                 "protein_db": self.proteins[p]["source_database"],
                 "protein_af_score": 0.5 if self.proteins[p]["in_alphafold"] else -1,
+                "protein_bfvd_score": 0.5 if self.proteins[p]["in_bfvd"] else -1,
                 "text_protein": p
                 + " "
                 + self.proteins[p]["source_database"]
@@ -216,6 +217,9 @@ class FixtureReader:
                             "protein_af_score": (
                                 0.5 if self.proteins[p]["in_alphafold"] else -1
                             ),
+                            "protein_bfvd_score": (
+                                0.5 if self.proteins[p]["in_bfvd"] else -1
+                            ),
                             "structure_protein_acc": p,
                             "structure_protein_db": self.proteins[p]["source_database"],
                             "structure_protein_length": sp["length"],
@@ -283,6 +287,9 @@ class FixtureReader:
                         "protein_db": self.proteins[p]["source_database"],
                         "protein_af_score": (
                             0.5 if self.proteins[p]["in_alphafold"] else -1
+                        ),
+                        "protein_bfvd_score": (
+                            0.5 if self.proteins[p]["in_bfvd"] else -1
                         ),
                         "text_protein": p + " " + self.proteins[p]["source_database"],
                         "tax_id": self.proteins[p]["organism"]["taxId"],

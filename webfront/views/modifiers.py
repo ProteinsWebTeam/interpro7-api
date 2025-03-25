@@ -286,22 +286,28 @@ def filter_by_entry_db(value, general_handler):
     return response.first()
 
 
-def filter_structure_model_type(model_type, general_handler):
+def filter_structure_model_type(param, model_type, general_handler):
+    
+    # Backwards compatibility with has_model
+    if param == "with":
+        if model_type.lower() == "alphafold":
+            score_field = "protein_af_score"
+        elif model_type.lower() == "bfvd":
+            score_field = "protein_bfvd_score"
+        else:
+            raise ValueError(
+                "{} is not a valid model type".format(model_type)
+            )
+    elif param == "has_model":
+        score_field = "protein_af_score"
 
-    endpoint = "protein"
-                        
-    # Empty string for backwards compatibility with has_model
-    score_field = "protein_af_score" \
-                    if (model_type == "alphafold" or model_type == "") \
-                    else "protein_bfvd_score"
     sorting_by = [
         {"name": "protein_is_fragment", "direction": "asc"},
         {"name": score_field, "direction": "desc"},
     ]
 
-
     general_handler.queryset_manager.add_filter(
-        endpoint, **{"{}__gte".format(score_field): 0}
+        "protein", **{"{}__gte".format(score_field): 0}
     )
     sort_str = ""
     connector = ""
@@ -315,7 +321,6 @@ def filter_structure_model_type(model_type, general_handler):
                 "{} is not a valid sorting order".format(sort_field["direction"])
             )
         connector = ","
-    if len(sort_str) > 0:
         general_handler.queryset_manager.order_by(sort_str, False)
 
 

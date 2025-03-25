@@ -24,6 +24,7 @@ from webfront.views.modifiers import (
 from webfront.models import Protein
 from webfront.constants import ModifierType
 from django.conf import settings
+from functools import partial
 
 entry_db_members = "|".join(settings.DB_MEMBERS)
 
@@ -290,9 +291,8 @@ class ProteinHandler(CustomView):
         general_handler.modifiers.register(
             "is_fragment", filter_by_boolean_field("protein", "is_fragment")
         )
-        general_handler.modifiers.register("has_model", filter_structure_model_type)
-
-        general_handler.modifiers.register("with", filter_structure_model_type)
+        general_handler.modifiers.register("has_model", partial(filter_structure_model_type, "has_model"))
+        general_handler.modifiers.register("with", partial(filter_structure_model_type, "with"))
 
         return super(ProteinHandler, self).get(
             request._request,

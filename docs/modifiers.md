@@ -203,3 +203,11 @@ Proteins with an AlphaFold model.
 | Modifier                 | Compatible with other modifiers | Data returned                                                                         | Example                                                                                         |
 |--------------------------|---------------------------------|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
 | `has_model=[true,false]` | x                               | List of proteins with/without an AlphaFold prediction for the InterPro entry selected | https://www.ebi.ac.uk:443/interpro/api/protein/uniprot/entry/InterPro/IPR000001/?has_model=true |
+
+
+Proteins with an AlphaFold or BFVD model.
+
+| Modifier                 | Compatible with other modifiers | Data returned                                                                         | Example                                                                                         |
+|--------------------------|---------------------------------|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| `with=[alphafold,bfvd]` | x                               | List of proteins with an AlphaFold prediction or a BFVD prediction for the InterPro entry selected | https://www.ebi.ac.uk:443/interpro/api/protein/uniprot/entry/InterPro/IPR000001/?with=alphafold|
+

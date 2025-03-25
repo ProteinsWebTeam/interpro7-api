@@ -321,7 +321,7 @@ def filter_structure_model_type(param, model_type, general_handler):
                 "{} is not a valid sorting order".format(sort_field["direction"])
             )
         connector = ","
-        general_handler.queryset_manager.order_by(sort_str, False)
+    general_handler.queryset_manager.order_by(sort_str, False)
 
 
 

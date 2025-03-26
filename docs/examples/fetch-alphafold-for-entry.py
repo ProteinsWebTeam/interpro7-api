@@ -19,7 +19,7 @@ from urllib.request import urlopen
 
 
 def get_uniprot_accessions(source_db, query):
-    api_url = "http://localhost:8000/api"
+    api_url = "https://www.ebi.ac.uk/interpro/api"
     url = f"{api_url}/protein/UniProt/entry/{source_db}/{query}/?"
     url += urlencode({"with": "alphafold", "page_size": 100})
     accessions = []

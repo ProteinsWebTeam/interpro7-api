@@ -19,7 +19,7 @@ from urllib.request import urlopen
 
 
 def get_uniprot_accessions(source_db, query):
-    api_url = "https://www.ebi.ac.uk/interpro/api"
+    api_url = "http://localhost:8000/api"
     url = f"{api_url}/protein/UniProt/entry/{source_db}/{query}/?"
     url += urlencode({"with": "alphafold", "page_size": 100})
     accessions = []
@@ -37,7 +37,21 @@ def get_uniprot_accessions(source_db, query):
 
     return accessions
 
+def get_mem_db(query):
+    url = f"https://www.ebi.ac.uk/interpro/api/utils/accession/{query}"
 
+    with urlopen(url) as res:
+        if res.status != 200:
+            sys.stderr.write(f"error: no results found for {query}\n")
+            sys.exit(1)
+
+        payload = res.read().decode("utf-8")
+        obj = json.loads(payload)
+        if obj["endpoint"] != "entry":
+            sys.stderr.write(f"error: {query} is not an entry\n")
+
+        return obj["source_database"]
+    
 def download_af_pdb(accession, outdir):
     url = f"https://alphafold.ebi.ac.uk/api/prediction/{accession}"
     with urlopen(url) as res:
@@ -52,12 +66,12 @@ def download_af_pdb(accession, outdir):
         for chunk in res:
             fh.write(chunk)
 
-
 def main():
-    source_db = sys.argv[1]
-    query = sys.argv[2]
-    outdir = sys.argv[3]
 
+    query = sys.argv[1]
+    outdir = sys.argv[2]
+
+    source_db = get_mem_db(query)
     proteins = get_uniprot_accessions(source_db, query)
 
     with ThreadPoolExecutor(max_workers=8) as executor:

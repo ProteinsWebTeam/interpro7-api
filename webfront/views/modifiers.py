@@ -960,7 +960,20 @@ def get_interpro_n_matches(value, general_handler):
         }
 
     return ipro_n_result
-            
+
+
+def get_ted_domains(value, general_handler):
+    print("yoooo")
+    queryset = general_handler.queryset_manager.get_queryset().first()
+    url = "https://ted.cathdb.info/api/v1/uniprot/summary/" + queryset.accession
+    req = request.Request(
+        url=url,
+        headers={"Accept": "application/json"}
+    )
+    with request.urlopen(req) as response:
+        payload = response.read().decode("utf-8")
+
+    return loads(payload)
 
 def passing(x, y):
     pass

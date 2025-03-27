@@ -19,7 +19,8 @@ from webfront.views.modifiers import (
     extra_features,
     residues,
     show_subset,
-    get_interpro_n_matches
+    get_interpro_n_matches,
+    get_ted_domains,
 )
 from webfront.models import Protein
 from webfront.constants import ModifierType
@@ -78,6 +79,10 @@ class UniprotAccessionHandler(CustomView):
         general_handler.modifiers.register(
             "interpro_n", 
             get_interpro_n_matches,
+            type=ModifierType.REPLACE_PAYLOAD)
+        general_handler.modifiers.register(
+            "ted",
+            get_ted_domains,
             type=ModifierType.REPLACE_PAYLOAD)
         
         return super(UniprotAccessionHandler, self).get(

@@ -196,10 +196,18 @@ Information on member database signatures integrated/unintegrated in InterPro en
 | `filter_by_entry=< InterPro accession >` | x                               | Selected taxon hierarchy and counters for the InterPro entry accession specified                      | https://www.ebi.ac.uk:443/interpro/api/taxonomy/uniprot/1?filter_by_entry=IPR001165   |
 | `filter_by_entry_db=< db name >`         | x                               | Selected taxon hierarchy and counters for the database name specified (e.g. interpro, pfam, smart...) | https://www.ebi.ac.uk:443/interpro/api/taxonomy/uniprot/1?filter_by_entry_db=interpro |
 
-## /api/protein/uniprot/entry/InterPro/< _interpro accession_ >
+## /api/protein/uniprot/entry/< _source database_ >/< _interpro accession_ >
 
 Proteins with an AlphaFold model.
 
 | Modifier                 | Compatible with other modifiers | Data returned                                                                         | Example                                                                                         |
 |--------------------------|---------------------------------|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-| `has_model=[true,false]` | x                               | List of proteins with/without an AlphaFold prediction for the InterPro entry selected | https://www.ebi.ac.uk:443/interpro/api/protein/uniprot/entry/InterPro/IPR000001/?has_model=true |
+| `has_model=[true,false]` | x                               | List of proteins with/without an AlphaFold prediction for the <_ source database _> entry selected | https://www.ebi.ac.uk:443/interpro/api/protein/uniprot/entry/InterPro/IPR000001/?has_model=true |
+
+
+Proteins with an AlphaFold or BFVD model.
+
+| Modifier                 | Compatible with other modifiers | Data returned                                                                         | Example                                                                                         |
+|--------------------------|---------------------------------|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| `with=[alphafold,bfvd]` | x                               | List of proteins with an AlphaFold prediction or a BFVD prediction for the <_ source database _> entry selected | https://www.ebi.ac.uk:443/interpro/api/protein/uniprot/entry/InterPro/IPR000001/?with=alphafold|
+

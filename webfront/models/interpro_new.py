@@ -89,6 +89,7 @@ class Protein(models.Model):
     structure = JSONField(default=dict, null=True)
     is_fragment = models.BooleanField(default=False)
     in_alphafold = models.BooleanField(default=False)
+    in_bfvd = models.BooleanField(default=False)
     tax_id = models.CharField(max_length=20, null=False, default="")
     ida_id = models.CharField(max_length=40, null=True)
     ida = models.TextField(null=True)

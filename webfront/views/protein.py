@@ -12,7 +12,7 @@ from webfront.views.modifiers import (
     filter_by_domain_architectures,
     filter_by_contains_field,
     filter_by_match_presence,
-    filter_by_min_value,
+    filter_structure_model_type,
     add_extra_fields,
     get_isoforms,
     calculate_residue_conservation,
@@ -24,6 +24,7 @@ from webfront.views.modifiers import (
 from webfront.models import Protein
 from webfront.constants import ModifierType
 from django.conf import settings
+from functools import partial
 
 entry_db_members = "|".join(settings.DB_MEMBERS)
 
@@ -290,19 +291,8 @@ class ProteinHandler(CustomView):
         general_handler.modifiers.register(
             "is_fragment", filter_by_boolean_field("protein", "is_fragment")
         )
-        general_handler.modifiers.register(
-            "has_model",
-            filter_by_min_value(
-                "protein",
-                "protein_af_score",
-                0,
-                sorting_by=[
-                    {"name": "protein_is_fragment", "direction": "asc"},
-                    {"name": "protein_af_score", "direction": "desc"},
-                ],
-                sort_pagination=False,
-            ),
-        )
+        general_handler.modifiers.register("has_model", partial(filter_structure_model_type, "has_model"))
+        general_handler.modifiers.register("with", partial(filter_structure_model_type, "with"))
 
         return super(ProteinHandler, self).get(
             request._request,

@@ -88,6 +88,7 @@ paths:
         - $ref: "#/components/parameters/entryAnnotationMemberDB"
         - $ref: "#/components/parameters/entryExtraFields"
         - $ref: "#/components/parameters/entryAFmodel"
+        - $ref: "#/components/parameters/entryAlphafoldOrBFVDmodel"
         - $ref: "#/components/parameters/entrySubfamilies"
         - $ref: "#/components/parameters/entrySubfamily"
         #- $ref: "#/components/parameters/entryModelMemberDB" needs to change from ':' to '='
@@ -668,6 +669,21 @@ components:
 
       schema:
         type: boolean
+    entryAlphafoldOrBFVDModel:
+      name: with
+      in: query
+      description: |
+        Returns a list of proteins an AlphaFold prediction or a BFVD prediction for the InterPro entry selected
+
+        **Note:** This parameter only works when the sourceDB selected is InterPro.
+
+         **Note: ** This modifier doesn't operates in combination with other parameters.
+
+      schema:
+        type: string
+        enum:
+          - alphafold
+          - bfvd
     entrySubfamilies:
       name: subfamilies
       in: query

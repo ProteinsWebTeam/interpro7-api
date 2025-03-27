@@ -41,6 +41,7 @@ no_cache_modifiers = [
     "subfamily",
     "page_size",
     "ted",
+    "interpro_n",
 ]
 
 

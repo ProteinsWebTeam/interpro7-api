@@ -963,7 +963,6 @@ def get_interpro_n_matches(value, general_handler):
 
 
 def get_ted_domains(value, general_handler):
-    print("yoooo")
     queryset = general_handler.queryset_manager.get_queryset().first()
     url = "https://ted.cathdb.info/api/v1/uniprot/summary/" + queryset.accession
     req = request.Request(

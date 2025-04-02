@@ -81,6 +81,9 @@
       "protein_af_score": {
         "type": "float"
       },
+      "protein_bfvd_score": {
+        "type": "float"
+      },
       "proteome_acc": {
         "type": "keyword"
       },
@@ -104,6 +107,12 @@
       },
       "structure_protein_acc": {
         "type": "keyword"
+      },
+      "structure_protein_db": {
+        "type": "keyword"
+      },
+      "structure_protein_length": {
+        "type": "long"
       },
       "structure_protein_locations": {
         "type": "object",

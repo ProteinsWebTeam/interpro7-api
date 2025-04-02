@@ -183,6 +183,7 @@ class ProteinSerializer(ModelContentSerializer):
                 "source_organism": instance.organism,
                 "gene": instance.gene,
                 "in_alphafold": instance.in_alphafold,
+                "in_bfvd": instance.in_bfvd,
             }
         }
 
@@ -203,6 +204,7 @@ class ProteinSerializer(ModelContentSerializer):
             "source_database": instance.source_database,
             "is_fragment": instance.is_fragment,
             "in_alphafold": instance.in_alphafold,
+            "in_bfvd": instance.in_bfvd,
             "ida_accession": instance.ida_id,
             "counters": (
                 ProteinSerializer.get_counters(instance, searcher, queryset_manager)
@@ -300,7 +302,7 @@ class ProteinSerializer(ModelContentSerializer):
 
     def to_structures_count_representation(self, instance):
         query = (
-            "protein_acc:" + escape(instance.accession)
+            "structure_protein_acc:" + escape(instance.accession)
             if hasattr(instance, "accession")
             else None
         )
@@ -365,6 +367,7 @@ class ProteinSerializer(ModelContentSerializer):
             "source_database": obj["protein_db"],
             "organism": obj["tax_id"],
             "in_alphafold": not obj["protein_af_score"] == -1,
+            "in_bfvd": not obj["protein_bfvd_score"] == -1,
         }
         if not for_entry and "structure_chain_acc" in obj:
             header["chain"] = obj["structure_chain_acc"]

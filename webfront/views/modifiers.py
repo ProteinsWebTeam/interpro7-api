@@ -286,27 +286,43 @@ def filter_by_entry_db(value, general_handler):
     return response.first()
 
 
-def filter_by_min_value(endpoint, field, value, sorting_by=[], sort_pagination=True):
-    def x(_, general_handler):
-        general_handler.queryset_manager.add_filter(
-            endpoint, **{"{}__gte".format(field): value}
-        )
-        sort_str = ""
-        connector = ""
-        for sort_field in sorting_by:
-            if sort_field["direction"] in ("asc", "desc"):
-                sort_str += "{}{}:{}".format(
-                    connector, sort_field["name"], sort_field["direction"]
-                )
-            else:
-                raise ValueError(
-                    "{} is not a valid sorting order".format(sort_field["direction"])
-                )
-            connector = ","
-        if len(sort_str) > 0:
-            general_handler.queryset_manager.order_by(sort_str, sort_pagination)
+def filter_structure_model_type(param, model_type, general_handler):
+    
+    # Backwards compatibility with has_model
+    if param == "with":
+        if model_type.lower() == "alphafold":
+            score_field = "protein_af_score"
+        elif model_type.lower() == "bfvd":
+            score_field = "protein_bfvd_score"
+        else:
+            raise ValueError(
+                "{} is not a valid model type".format(model_type)
+            )
+    elif param == "has_model":
+        score_field = "protein_af_score"
 
-    return x
+    sorting_by = [
+        {"name": "protein_is_fragment", "direction": "asc"},
+        {"name": score_field, "direction": "desc"},
+    ]
+
+    general_handler.queryset_manager.add_filter(
+        "protein", **{"{}__gte".format(score_field): 0}
+    )
+    sort_str = ""
+    connector = ""
+    for sort_field in sorting_by:
+        if sort_field["direction"] in ("asc", "desc"):
+            sort_str += "{}{}:{}".format(
+                connector, sort_field["name"], sort_field["direction"]
+            )
+        else:
+            raise ValueError(
+                "{} is not a valid sorting order".format(sort_field["direction"])
+            )
+        connector = ","
+    general_handler.queryset_manager.order_by(sort_str, False)
+
 
 
 def filter_by_boolean_field(endpoint, field):
@@ -919,7 +935,7 @@ def show_subset(value, general_handler):
 def get_interpro_n_matches(value, general_handler):
 
     queryset = general_handler.queryset_manager.get_queryset().first()
-    ipro_n_matches = InterProNMatches.objects.filter(protein_acc=queryset.accession)
+    ipro_n_matches = InterProNMatches.objects.select_related("entry", "entry__integrated").filter(protein_acc=queryset.accession)
     ipro_n_result = {}
 
     for match in ipro_n_matches: 
@@ -930,8 +946,17 @@ def get_interpro_n_matches(value, general_handler):
             "type": match.entry.type, 
             "short_name": match.entry.short_name,
             "source_database": match.entry.source_database,
-            "integrated": integrated.accession if integrated else None, 
-            "locations": match.locations
+            "integrated": { 
+                "accession": integrated.accession,
+                "name": integrated.name,
+                "source_database": integrated.source_database,
+                "type": integrated.type, 
+                "member_databases": integrated.member_databases,
+                "go_terms":  integrated.go_terms
+             } if integrated else None, 
+            "entry_protein_locations": match.locations,
+            "in_interpro": match.in_interpro,
+            "is_preferred": match.is_preferred
         }
 
     return ipro_n_result

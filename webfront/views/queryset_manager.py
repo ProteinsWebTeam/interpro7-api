@@ -75,7 +75,7 @@ class QuerysetManager:
         return self.order_field if self.order_field_in_pagination else None
 
     # Generates a query string for elasticsearch from the registered queryset filters.
-    # It explicitely goes through all the filters and create the query string case by case.
+    # It explicitly goes through all the filters and create the query string case by case.
     def get_searcher_query(self, include_search=False, use_lineage=False):
         blocks = []
         search_blocks = []
@@ -95,12 +95,23 @@ class QuerysetManager:
                         for token in v.split():
                             blocks.append("text_{}:{}~0".format(main_ep, token))
                 elif k == "source_database__isnull":
-                    blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
+                    if ep == "protein" and len(self.filters["structure"]) > 0:
+                        blocks.append(
+                            "({0}_exists_:protein_db || {0}_exists_:structure_protein_db)".format(
+                                "!" if v else ""
+                            )
+                        )
+                    else:
+                        blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
                 elif k == "accession" or k == "accession__iexact":
                     if ep == "taxonomy":
                         blocks.append("tax_lineage:{}".format(escape(v)))
                     elif ep == "protein" and len(self.filters["structure"]) > 0:
-                        blocks.append("(protein_acc:{0} || structure_protein_acc:{0})".format(escape(v)))
+                        blocks.append(
+                            "(protein_acc:{0} || structure_protein_acc:{0})".format(
+                                escape(v)
+                            )
+                        )
                     else:
                         blocks.append("{}_acc:{}".format(ep, escape(v)))
                 elif k == "accession__isnull":
@@ -113,7 +124,11 @@ class QuerysetManager:
                             "{}_exists_:proteome_acc".format("!" if v else "")
                         )
                     elif ep == "protein" and len(self.filters["structure"]) > 0:
-                        blocks.append("({0}_exists_:protein_db || {0}_exists_:structure_protein_db)".format("!" if v else ""))
+                        blocks.append(
+                            "({0}_exists_:protein_db || {0}_exists_:structure_protein_db)".format(
+                                "!" if v else ""
+                            )
+                        )
                     else:
                         blocks.append("{}_exists_:{}_db".format("!" if v else "", ep))
 

@@ -21,8 +21,7 @@ from urllib.request import urlopen
 def get_uniprot_accessions(source_db, query):
     api_url = "https://www.ebi.ac.uk/interpro/api"
     url = f"{api_url}/protein/UniProt/entry/{source_db}/{query}/?"
-    url += urlencode({"has_model": True, "page_size": 100})
-
+    url += urlencode({"with": "alphafold", "page_size": 100})
     accessions = []
 
     while True:
@@ -38,10 +37,9 @@ def get_uniprot_accessions(source_db, query):
 
     return accessions
 
-
 def get_mem_db(query):
     url = f"https://www.ebi.ac.uk/interpro/api/utils/accession/{query}"
-    
+
     with urlopen(url) as res:
         if res.status != 200:
             sys.stderr.write(f"error: no results found for {query}\n")
@@ -53,8 +51,7 @@ def get_mem_db(query):
             sys.stderr.write(f"error: {query} is not an entry\n")
 
         return obj["source_database"]
-
-
+    
 def download_af_pdb(accession, outdir):
     url = f"https://alphafold.ebi.ac.uk/api/prediction/{accession}"
     with urlopen(url) as res:
@@ -69,8 +66,8 @@ def download_af_pdb(accession, outdir):
         for chunk in res:
             fh.write(chunk)
 
-
 def main():
+
     query = sys.argv[1]
     outdir = sys.argv[2]
 

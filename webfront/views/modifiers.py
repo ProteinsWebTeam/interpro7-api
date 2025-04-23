@@ -949,6 +949,7 @@ def get_interpro_n_matches(value, general_handler):
             "integrated": { 
                 "accession": integrated.accession,
                 "name": integrated.name,
+                "short_name": integrated.short_name,
                 "source_database": integrated.source_database,
                 "type": integrated.type, 
                 "member_databases": integrated.member_databases,

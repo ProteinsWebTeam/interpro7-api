@@ -291,6 +291,7 @@ class EntrySerializer(ModelContentSerializer):
             "metadata": {
                 "accession": instance.accession,
                 "name": instance.name if instance.name else instance.short_name,
+                "short_name": instance.short_name if instance.short_name else '',
                 "source_database": instance.source_database,
                 "type": instance.type,
                 "integrated": (

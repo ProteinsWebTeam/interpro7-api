@@ -18,7 +18,7 @@ es_results = list()
 def parseCursor(cursor):
     fields = {}
     for item in cursor.split(","):
-        k, t, v = item.split(":")
+        k, t, v = item.split("|")
         if t == "f":
             fields[k] = float(v)
         elif t == "i":
@@ -40,7 +40,7 @@ def encodeCursor(keys):
             t = "i"
         else:
             t = "s"
-        output.append("{}:{}:{}".format(k, t, v))
+        output.append("{}|{}|{}".format(k, t, v))
 
     return ",".join(output)
 

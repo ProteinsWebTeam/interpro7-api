@@ -24,6 +24,7 @@ static_url: "/interpro7/api/static_files/"
 hmmerweb: 'https://www.ebi.ac.uk/Tools/hmmer/search/hmmscan'
 sendmail_path: "/usr/sbin/sendmail"
 http_proxy: ""
+pgsql_schema: '-c search_path=interpro,public'
 
 members:
   cathgene3d:

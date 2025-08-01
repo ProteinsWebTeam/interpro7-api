@@ -4,3 +4,4 @@ sid: DATABASE_NAME
 port: 4602
 user: USER
 password: PASSWORD
+pgsql_schema: '-c search_path=interpro,public'

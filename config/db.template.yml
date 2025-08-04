@@ -1,4 +1,4 @@
-engine: django.db.backends.mysql
+engine: django.db.backends.postgresql
 host: URL
 sid: DATABASE_NAME
 port: 4602

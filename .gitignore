@@ -12,6 +12,7 @@ config/oracle.yml
 config/oracle_dw.yml
 config/interpro.local.yml
 config/mysql.yml
+config/db.yml
 config/mysql_rel.yml
 config/mysql_test.yml
 config/~mysql.yml

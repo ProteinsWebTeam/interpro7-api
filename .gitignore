@@ -7,14 +7,8 @@ unifam/mysql.conf
 .vscode
 unifam/settings-private.py
 .coverage
-config/~oracle.yml
-config/oracle.yml
-config/oracle_dw.yml
 config/interpro.local.yml
-config/mysql.yml
-config/mysql_rel.yml
-config/mysql_test.yml
-config/~mysql.yml
+config/db.yml
 *.db
 *.iml
 gunicorn.local.conf.py

@@ -7,7 +7,7 @@ encoding = "utf-8"
 
 
 class Database(models.Model):
-    name = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100, primary_key=True, db_collation="case_insensitive")
     name_long = models.CharField(max_length=100)
     description = models.TextField(null=True)
     version = models.CharField(max_length=100, null=True)
@@ -19,11 +19,11 @@ class Database(models.Model):
 
 class Entry(models.Model):
     entry_id = models.CharField(max_length=10, null=True)
-    accession = models.CharField(primary_key=True, max_length=25)
+    accession = models.CharField(primary_key=True, max_length=25, db_collation="case_insensitive")
     type = models.CharField(max_length=50)
-    name = models.TextField()
-    short_name = models.CharField(max_length=100)
-    source_database = models.CharField(max_length=100, db_index=True)
+    name = models.TextField(db_collation="case_insensitive")
+    short_name = models.CharField(max_length=100, db_collation="case_insensitive")
+    source_database = models.CharField(max_length=100, db_index=True, db_collation="case_insensitive")
     member_databases = JSONField(null=True)
     integrated = models.ForeignKey(
         "Entry", on_delete=models.SET_NULL, null=True, blank=True
@@ -72,26 +72,26 @@ class EntryAnnotation(models.Model):
 
 
 class Protein(models.Model):
-    accession = models.CharField(max_length=15, primary_key=True)
-    identifier = models.CharField(max_length=16, unique=True, null=False)
+    accession = models.CharField(max_length=15, primary_key=True, db_collation="case_insensitive")
+    identifier = models.CharField(max_length=16, unique=True, null=False, db_collation="case_insensitive")
     organism = JSONField(null=True)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, db_collation="case_insensitive")
     description = JSONField(null=True)
     sequence_bin = models.BinaryField(db_column="sequence", null=True)
     length = models.IntegerField(null=False)
-    proteome = models.CharField(max_length=20, null=True)
-    gene = models.CharField(max_length=70, null=True)
+    proteome = models.CharField(max_length=20, null=True, db_collation="case_insensitive")
+    gene = models.CharField(max_length=70, null=True, db_collation="case_insensitive")
     go_terms = JSONField(null=True)
     evidence_code = models.IntegerField()
     source_database = models.CharField(
-        max_length=20, default="unreviewed", db_index=True
+        max_length=20, default="unreviewed", db_index=True, db_collation="case_insensitive"
     )
     structure = JSONField(default=dict, null=True)
     is_fragment = models.BooleanField(default=False)
     in_alphafold = models.BooleanField(default=False)
     in_bfvd = models.BooleanField(default=False)
-    tax_id = models.CharField(max_length=20, null=False, default="")
-    ida_id = models.CharField(max_length=40, null=True)
+    tax_id = models.CharField(max_length=20, null=False, default="", db_collation="case_insensitive")
+    ida_id = models.CharField(max_length=40, null=True, db_collation="case_insensitive")
     ida = models.TextField(null=True)
     counts = JSONField(null=True)
 
@@ -105,7 +105,7 @@ class Protein(models.Model):
 
 class ProteinExtraFeatures(models.Model):
     feature_id = models.IntegerField(primary_key=True)
-    protein_acc = models.CharField(max_length=15)
+    protein_acc = models.CharField(max_length=15, db_collation="case_insensitive")
     entry_acc = models.CharField(max_length=25)
     source_database = models.CharField(max_length=10)
     location_start = models.IntegerField()
@@ -118,7 +118,7 @@ class ProteinExtraFeatures(models.Model):
 
 class ProteinResidues(models.Model):
     residue_id = models.IntegerField(primary_key=True)
-    protein_acc = models.CharField(max_length=15)
+    protein_acc = models.CharField(max_length=15, db_collation="case_insensitive")
     entry_acc = models.CharField(max_length=25)
     entry_name = models.CharField(max_length=100)
     source_database = models.CharField(max_length=10)
@@ -130,7 +130,7 @@ class ProteinResidues(models.Model):
 
 
 class Structure(models.Model):
-    accession = models.CharField(max_length=4, primary_key=True)
+    accession = models.CharField(max_length=4, primary_key=True, db_collation="case_insensitive")
     name = models.CharField(max_length=512)
     experiment_type = models.CharField(max_length=16)
     release_date = models.DateTimeField()
@@ -167,7 +167,7 @@ class ChainSequence(models.Model):
 
 
 class Taxonomy(models.Model):
-    accession = models.CharField(max_length=20, primary_key=True)
+    accession = models.CharField(max_length=20, primary_key=True, db_collation="case_insensitive")
     scientific_name = models.CharField(max_length=255)
     full_name = models.CharField(max_length=512)
     lineage = models.CharField(max_length=512)
@@ -200,7 +200,7 @@ class TaxonomyPerEntryDB(models.Model):
     taxonomy = models.ForeignKey(
         "Taxonomy", on_delete=models.SET_NULL, null=True, blank=True, db_column="tax_id"
     )
-    source_database = models.CharField(max_length=100, db_index=True)
+    source_database = models.CharField(max_length=100, db_index=True, db_collation="case_insensitive")
     counts = JSONField(null=True)
     num_proteins = models.IntegerField(null=False, default=0)
 
@@ -238,7 +238,7 @@ class ProteomePerEntryDB(models.Model):
         blank=True,
         db_column="accession",
     )
-    source_database = models.CharField(max_length=100, db_index=True)
+    source_database = models.CharField(max_length=100, db_index=True, db_collation="case_insensitive")
     counts = JSONField(null=True)
     num_proteins = models.IntegerField(null=False, default=0)
 
@@ -249,7 +249,7 @@ class ProteomePerEntryDB(models.Model):
 
 
 class Proteome(models.Model):
-    accession = models.CharField(max_length=20, primary_key=True)
+    accession = models.CharField(max_length=20, primary_key=True, db_collation="case_insensitive")
     name = models.CharField(max_length=512)
     is_reference = models.BooleanField(default=False)
     strain = models.CharField(max_length=512, null=True)
@@ -281,7 +281,7 @@ class Release_Note(models.Model):
 
 class Isoforms(models.Model):
     accession = models.CharField(max_length=20, primary_key=True)
-    protein_acc = models.CharField(max_length=20)
+    protein_acc = models.CharField(max_length=20, db_collation="case_insensitive")
     length = models.IntegerField(null=False)
     sequence = models.TextField(null=False)
     features = JSONField(null=True)

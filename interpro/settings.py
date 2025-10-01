@@ -22,9 +22,9 @@ try:
 except FileNotFoundError:
     INTERPRO_CONFIG = {}
 try:
-    MYSQL_CONFIG = yaml.safe_load(open("{}/config/mysql.yml".format(BASE_DIR)))
+    DB_CONFIG = yaml.safe_load(open("{}/config/db.yml".format(BASE_DIR)))
 except FileNotFoundError:
-    MYSQL_CONFIG = {}
+    DB_CONFIG = {}
 try:
     INTERPRO_CONFIG_LOCAL = yaml.safe_load(
         open("{}/config/interpro.local.yml".format(BASE_DIR))
@@ -112,15 +112,15 @@ WSGI_APPLICATION = "interpro.wsgi.application"
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 DATABASES = {
     "default": {
-        "ENGINE": MYSQL_CONFIG.get("engine", "django.db.backends.sqlite3"),
-        "NAME": MYSQL_CONFIG.get(
+        "ENGINE": DB_CONFIG.get("engine", "django.db.backends.sqlite3"),
+        "NAME": DB_CONFIG.get(
             "sid", os.path.join(BASE_DIR, "../database/db.sqlite3")
         ),
-        "USER": MYSQL_CONFIG.get("user"),
-        "PASSWORD": MYSQL_CONFIG.get("password"),
-        "HOST": MYSQL_CONFIG.get("host"),
-        "PORT": MYSQL_CONFIG.get("port"),
-        "CONN_MAX_AGE": MYSQL_CONFIG.get("conn_max_age", 0),
+        "USER": DB_CONFIG.get("user"),
+        "PASSWORD": DB_CONFIG.get("password"),
+        "HOST": DB_CONFIG.get("host"),
+        "PORT": DB_CONFIG.get("port"),
+        "CONN_MAX_AGE": DB_CONFIG.get("conn_max_age", 0),
         "TEST": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": os.path.join(os.path.dirname(__file__), "test.db"),

@@ -1,7 +1,6 @@
-engine: django.db.backends.postgresql
+engine: django.db.backends.mysql
 host: URL
 sid: DATABASE_NAME
 port: 4602
 user: USER
 password: PASSWORD
-pgsql_schema: '-c search_path=interpro,public'

@@ -121,9 +121,6 @@ DATABASES = {
         "HOST": DB_CONFIG.get("host"),
         "PORT": DB_CONFIG.get("port"),
         "CONN_MAX_AGE": DB_CONFIG.get("conn_max_age", 0),
-        "OPTIONS": {
-            "options": DB_CONFIG.get("pgsql_schema", ""), 
-        },
         "TEST": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": os.path.join(os.path.dirname(__file__), "test.db"),

@@ -34,7 +34,7 @@
       "full_name": "Eucaryotae",
       "lineage": " 1 2579 ",
       "parent": "1",
-      "rank": "SUPERKINGDOM",
+      "rank": "DOMAIN",
       "children": [
         "344612",
         "1001583"
@@ -61,7 +61,7 @@
       "full_name": "Prokaryota",
       "lineage": " 1 2 ",
       "parent": "1",
-      "rank": "SUPERKINGDOM",
+      "rank": "DOMAIN",
       "children": [
         "40296"
       ],
